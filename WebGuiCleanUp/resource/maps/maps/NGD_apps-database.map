@@ -1,0 +1,4 @@
+map(name="NGD_apps-database",bgColor="white",w=156,h=25,acl="*")
+button(name="visual_1",label="untitled",x=0,y=0,action="Open URL",url="",target="_self",entity="apps-database-fault",datasource="NCOMS",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=11,font color="black",style="+_fontStyle+")
+button(name="visual_2",label="untitled",x=53,y=0,action="Open URL",url="",target="_self",entity="apps-database-performance",datasource="NCOMS",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=11,font color="black",style="+_fontStyle+")
+button(name="visual_3",label="untitled",x=106,y=0,action="Open URL",url="",target="_self",entity="apps-database-sla",datasource="NCOMS",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=11,font color="black",style="+_fontStyle+")

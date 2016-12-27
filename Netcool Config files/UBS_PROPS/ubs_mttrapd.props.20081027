@@ -1,0 +1,109 @@
+#######################################################################
+#
+#       Copyright (C) 2002 Micromuse Ltd. All rights reserved.
+
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: mkprops 1.20 2003/01/29 16:41:34 kris Development $
+#
+#######################################################################
+
+#######################################################################
+#
+# Property Name					Default
+#
+# Generic Properties
+#
+# AuthPassword          	: ''
+# AuthUserName          	: ''
+# AutoSAF               	: 0
+# Buffering             	: 0
+# BufferingTimeout      	: 10
+# BufferSize            	: 10
+# Help                  	: 0
+# LookupTableMode       	: 3
+# Manager               	: 'mttrapd'
+# MaxLogFileSize        	: 1048576
+# MaxRawFileSize        	: -1
+# MaxSAFFileSize        	: 1048576
+# MessageLevel          	: 'warn'
+# MessageLog            	: '$OMNIHOME/log/mttrapd.log'
+# MsgDailyLog           	: 0
+# MsgTimeLog            	: '0000'
+# Name                  	: 'mttrapd'
+# NetworkTimeout        	: 0
+# PollServer            	: 0
+# PropsFile             	: '$OMNIHOME/probes/<arch>/mttrapd.props'
+# RawCapture            	: 0
+# RawCaptureFile        	: '$OMNIHOME/var/mttrapd.cap'
+# RawCaptureFileAppend  	: 0
+# RawCaptureFileBackup  	: 0
+# RetryConnectionCount  	: 15
+# RetryConnectionTimeOut	: 30
+# RulesFile             	: '$OMNIHOME/probes/<arch>/mttrapd.rules'
+# SAFFileName           	: ''
+# Server                	: 'NCOMS'
+# ServerBackup          	: ''
+# StoreAndForward       	: 1
+# Version               	: 0
+#
+# Specific Properties
+#
+# Forwarding            	: 0
+# MIBDirs               	: '$OMNIHOME/common/mibs'
+# MIBFile               	: '$OMNIHOME/probes/<arch>/mib.txt'
+# MIBs                  	: 'ALL'
+# NoNameResolution      	: 0
+# Optimize              	: 0
+# Port                  	: 162
+# Props.CheckNames      	: TRUE
+# Protocol              	: 'UDP'
+# QuietOutput           	: 1
+# ReadBuffer            	: 6500
+# Realfast              	: 0
+# SleepTime             	: 1
+# SocketSize            	: 8192
+# ThreadQueueSize       	: 10000
+# TrapQueueMax          	: 0
+#
+#######################################################################
+
+#######################################################################
+#
+# Add your settings here
+#
+#######################################################################
+Name				: 'ubs_mttrapd'
+Server				: 'PACIFIC'
+PollServer			: 60
+NetworkTimeout			: 300
+Manager				: 'SNGMTPPROD1'
+PropsFile			: '/sbclocal/netcool/omnibus/probes/linux2x86/ubs_mttrapd.props'
+RulesFile			: '/sbclocal/netcool/omnibus/all_rules/ubsw/mttrapd.rules'
+MibFile				: '/dev/null'
+PeerHost			: 'xsng1283pap'
+PeerPort			: 4401
+Mode				: 'master'
+#Mode				: 'slave'
+StoreAndForward			: 1
+QuietOutput			: 1
+#MsgDailyLog			: 1
+MaxLogFileSize			: 102400000
+MessageLevel			: 'info'
+MessageLog			: '/sbclocal/netcool/omnibus/log/ubs_mttrapd.log'
+Port				: 162
+Buffering                       : 1
+BufferSize                      : 25
+# 20080131      Chris Janes of Abilitec
+FlushBufferInterval             : 5
+

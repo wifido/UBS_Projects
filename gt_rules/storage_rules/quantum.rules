@@ -1,0 +1,84 @@
+########################################################################
+#
+# Quantum DX30 disk array trap rules
+#
+########################################################################
+case "qTraps":
+    @Agent = "Quantum"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128070
+    @Origin = $1
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - quantum-DX30"
+
+    if (nmatch($5, "Storage Array : Disk"))  {
+        $tmpAlertGroup = "Storage Array"
+        $tmpAlertKey = extract($5, "^Storage Array : Disk (.*) has changed to")
+        $tmpStatus = extract($5, "^Storage Array : Disk .* has changed to (.*)")
+    }
+
+    switch ($specific-trap)  {
+        case "1":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 1
+            @Severity = 2
+        case "2":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 1
+            @Severity = 3
+        case "3":
+            @Summary = $5
+            switch ($tmpStatus)  {
+                case "Failed":
+                    @Severity = 5
+                    @Type = 1
+                case "Rebuilding":
+                    @Severity = 2
+                    @Type = 1
+                default:
+                    @Severity = 3
+                    @Type = 1
+            }
+            @AlertKey = $tmpAlertKey
+            @AlertGroup = $tmpAlertGroup
+        case "4":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 2
+            @Severity = 2
+        case "5":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 1
+            @Severity = 4
+        case "6":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 2
+            @Severity = 2
+        case "7":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 1
+            @Severity = 3
+        case "8":
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary = $5
+            @Type = 1
+            @Severity = 4
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary

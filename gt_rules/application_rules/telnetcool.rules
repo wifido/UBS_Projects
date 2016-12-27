@@ -1,0 +1,183 @@
+#####################################################################################
+#
+#	telnetcool.rules - rules associated with Accelerated Event Notification
+#
+#	20071012	Chris Janes	Original
+#
+#
+#####################################################################################
+
+
+case "2300007":
+        # Rule set for events sent via telnetcool script 
+	$ruleset =  $ruleset + ' - TelnetCool'
+      	@Agent = "TelNetcool" 
+	@NodeAlias = lower($Nodealias)
+
+#	20080917	Changes by Chris Janes of Abilitec	TD 5052
+##	20071015	This bit set for debug and should not be sent to prod
+#
+#@Description = '$Profile = ' + $Profile + ' $UserInt = ' + $UserInt + ' $UserData = ' + $UserData
+##	20071015	End of debug used the word details so it will show up on cc_arc
+#	20080917	End of Change
+
+
+	$ruleset =  $ruleset + ' Profile = ' + $Profile
+	switch($Profile)
+	{
+		case "Test":
+			$ruleset =  $ruleset + $AlertGroup + $AlertKey + $Class
+			if( exists( $AlertGroup))
+			{
+				@AlertGroup = $AlertGroup
+			}
+			else
+			{
+				@AlertGroup = "TelNetcool"
+			}
+
+                        if( exists( $AlertKey))
+                        {
+                                @AlertKey = $AlertKey
+                        }
+                        else
+                        {
+ 				@AlertKey = $Profile
+			}
+
+                        if( exists( $SysInt))
+                        {
+                                @SysInt = $SysInt
+                        }
+
+#			@Summary = "This event has been sent in using TelNetcool as a test " 
+
+                       if( exists( $MessageText))
+			{
+				@Summary = $MessageText
+			}
+			else
+			{
+				@Summary = "This event has been sent in using TelNetcool as a test "
+			} 
+
+
+                       if( exists( $Class))
+                        {
+                                @Class = $Class
+				$ruleset =  $ruleset + "Setting Class to " + $Class
+                        }
+                        else
+                        {
+                                @Class = 999999
+                        }
+
+                        if( exists( $Domain))
+                        {
+                                @Domain = $Domain
+                        }
+
+                        if( exists( $OwnerGID))
+                        {
+                                @OwnerGID = $OwnerGID
+                        }
+                        else
+                        {
+ 				@OwnerGID = 591
+			}
+
+			$TempDoLookup = 2
+#			@Severity = 5
+#			@Type = 1
+                        if( exists( $Severity))
+			switch($Severity)
+			{
+				case "CRITICAL":
+					@Severity = 5
+					@Type = 1
+				case "MAJOR":
+					@Severity = 4
+					@Type = 1
+				case "MINOR":
+					@Severity = 3
+					@Type = 1
+				case "INFO":
+					@Severity = 2
+					@Type = 1
+				default:
+					@Severity = 1
+					@Type = 1
+			}
+			else
+			{
+                                @Severity = 5
+                                @Type = 1
+ 			}
+
+			@UserInt = $UserInt
+			@UserData = $UserData
+
+                case "Insert":
+                        @AlertGroup = "TelNetcool"
+                        @AlertKey = $Profile
+                        @Summary = "This event has been Inserted in using TelNetcool as a test "
+                        @Class = $class
+                        @OwnerGID = $group
+                        $TempDoLookup = 2
+                        @Severity = 2
+                        @Type = 1
+                        @UserInt = $UserInt
+                        @UserData = $UserData
+			$tempAddId = @OwnerGID
+
+
+
+#		20080304	Change by Chris Janes of abilitec at Richard Harpers request TD 4698
+                case "prism_restart_issued":
+#                       @AlertGroup = "Prism"
+#                       @AlertKey = "Re-Start"
+#                       @Summary = "Prism has restarted SSM"
+#                       @Class = 999999
+#                       @Severity = 1
+#                       @Type = 2
+
+                        @AlertGroup = "Agent"
+                        @AlertKey = "StartStop"
+                        @Summary = "Prism has restarted SSM"
+			# 20091203 GT BR_755 Modified Class value.
+			@Class = 2000000
+                        #@Class = 0
+			# 20091203 End of Change.
+			@OwnerGID = 591
+                        $TempDoLookup = 2
+                        @Severity = 2
+                        @Type = 1
+			@Manager = 'StartStop'
+
+#		20080304	End of Changes
+
+		case "prism_server_crash_detected":
+                        @AlertGroup = "Prism"
+                        @AlertKey = "Re-Start"
+                        @Summary = "Prism has failed to restarted SSM"
+#		20080325	Change by Chris Janes of Abilitec TD 4750
+#                       @Class = 999999
+			# 20091203 GT BR_755 Modified Class value.
+			@Class = 2000000
+                        #@Class = 0
+			# 20091203 End of Change.
+			@OwnerGID = 591
+                        $TempDoLookup = 2
+#		20080325	End of Change
+                        @Severity = 4
+                        @Type = 1
+
+		default:
+			@AlertGroup = "TelNetcool"
+			@AlertKey = $Profile
+			@Summary = "Unknown Profile " + $Profile
+			@Class = $ClassID
+			@Severity = 1
+			@Type = 1
+	}
+        $tempIdentifier = lower($Nodealias) + "SOCKETPROD" + @Class + @AlertGroup + @AlertKey + $tempAddId

@@ -1,0 +1,6 @@
+map(name="MonzOS_WMSB_tics",bgColor="#003366",w=130,h=200,acl="*")
+button(name="Cnt__TICS",label="TICS",x=100,y=5,action="Active Event List (AEL)",url="",target="main",entity="zOS_tics",datasource="NCOMS",flash="true",w=30,h=25,type="rectangle",arc diameter=20,legend=Metric,font="Helvetica",size=12,font color="black",style="p")
+text(name="Text: PROD_tics",label="PROD_tics",x=0,y=25,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="white")
+button(name="Cnt__CSE",label="CSE",x=100,y=45,action="Active Event List (AEL)",url="",target="main",entity="zOS_CSE",datasource="NCOMS",flash="true",w=30,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=12,font color="black",style="p")
+text(name="Text: SS02a4_CSE",label="SS02a4_CSE",x=0,y=65,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="white")
+text(name="Text: zOS - WMSB - tics_1",label="zOS - WMSB - tics",x=0,y=0,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="white")

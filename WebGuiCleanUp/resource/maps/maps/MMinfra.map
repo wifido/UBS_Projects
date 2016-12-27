@@ -1,0 +1,5 @@
+map(name="MMinfra",bgColor="white",w=472,h=291,acl="*")
+text(name="visual_4",label="Chat: #micromuse_support",x=160,y=271,action="go",url="",target="_self",entity="",font="Helvetica",size=15,justify="center",style="p",color="black")
+text(name="visual_3",label="E-mail: Sh-Micromuse-Support",x=148,y=250,action="go",url="",target="_self",entity="",font="Helvetica",size=15,justify="center",style="p",color="black")
+text(name="visual_2",label="Micromuse Availability Monitoring",x=57,y=66,action="go",url="",target="_self",entity="",font="Helvetica",size=25,justify="center",style="p",color="black")
+monitor(name="visual_1",label="Micromuse Infrastructure Global",x=128,y=81,action="go",url="$(SERVER)/Template/openPageWide.html?System_Filter=GlobalInfra",target="hidden",entity="GlobalInfra",w=230,h=140,w=230,h=140,type="lavalamp",show label=true,show total=true,show highest=true,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

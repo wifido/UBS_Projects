@@ -1,0 +1,6 @@
+map(name="WMSB_OEM",bgColor="#003366",w=230,h=519,acl="*")
+button(name="wmsb_oem_pilot",label="untitled",x=162,y=63,action="Active Event List (AEL)",url="",target="main",entity="wmsb_oem_pilot",datasource="NCOMS",flash="true",w=31,h=20,type="rounded",arc diameter=10,legend=Count,font="Helvetica",size=10,font color="blue",style="p")
+text(name="WMSB_OEM_name_block2",label="base and OEM alerts",x=13,y=78,action="Open URL",url="",target="main",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=14,justify="center",style="p",color="white")
+text(name="WMSB_OEM_name_block1",label="Pilot",x=13,y=38,action="Open URL",url="",target="main",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=14,justify="center",style="p",color="white")
+line(name="visual_2",label="untitled",x=9,y=46,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=4,x2=223,y2=46)
+line(name="visual_1",label="untitled",x=7,y=14,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=4,x2=221,y2=14)

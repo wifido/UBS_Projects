@@ -1,0 +1,4 @@
+map(name="APP_IT_FX_FSM_UDM001_PROD",bgImage="",bgColor="#003366",w="650",h="650",acl="*")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="80",x="26",w="50",entity="APP_IBAG_UDM001_DMGL_VIEW_PROD",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_3")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="white",label="DMGL",style="p",y="72",url="",size="16",name="visual_2",x="25")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="white",label="UDM001 / DMG",style="p",y="37",url="",size="22",name="visual_1",x="22")

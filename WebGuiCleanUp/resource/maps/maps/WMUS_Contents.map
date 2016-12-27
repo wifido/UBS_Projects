@@ -1,0 +1,8 @@
+map(name="WMUS_Contents",bgImage="",bgColor="#003366",w="195",h="240",acl="*")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="total entity",font color="black",y="180",x="120",w="21",entity="WMUS_All",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="21",style="p",target="main",name="total entity")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="Total",style="",y="196",url="",size="12",name="Total text",x="13")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="100",x="120",w="21",entity="WMUS_NLNH0001PSQ",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="21",style="p",target="main",name="visual_3")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="140",x="120",w="21",entity="WMUS_NNSH0001PSQ",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="21",style="p",target="main",name="visual_2")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="NNSH1000PSQ",style="",y="156",url="",size="12",name="NNSH1000PSQ_text",x="12")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="Microsoft SQL Servers",style="b",y="59",url="",size="14",name="Infrastructure_lbl",x="17")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="NLNH0001PSQ",style="",y="116",url="",size="12",name=" NLNH0001PSQ_text",x="13")

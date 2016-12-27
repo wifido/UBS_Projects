@@ -1,0 +1,2 @@
+map(name="APP_GSD_RISK_SRMOVIEW",bgImage="SRM_overview.GIF",bgColor="white",w=800,h=576,acl="*")
+button(name="EE",label="EE",x=231,y=332,action="Active Event List (AEL)",url="",target="_self",entity="APP_GSD_RISK_SRM_app",datasource="NCOMS",w=32,h=43,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="+_fontStyle+")

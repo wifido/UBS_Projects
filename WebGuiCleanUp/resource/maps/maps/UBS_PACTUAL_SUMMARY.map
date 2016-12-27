@@ -1,0 +1,4 @@
+map(name="UBS_PACTUAL_SUMMARY",bgImage="",bgColor="#003366",w="195",h="200",acl="*")
+monitor(show highest="false",type="histogram",url="",show lowest="false",show highest severity as border="false",datasource="NCOMS",label="RJ4",show total="false",y="42",x="42",w="100",entity="UBS_PACTUAL_SUMMARY",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",style="p",show label="false",h="79",foreground color="black",background color="lightGray",show metric="false",target="main",name="rj4")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="Infrastructure",y="18",style="b",url="",size="14",name="Infrastructure_lbl",x="43")
+text(datasource="NCOMS",action="go",flash="true",target="_self",entity="",justify="left",font="Helvetica",color="white",label="All MOM Alerts",y="38",style="",url="",size="12",name="All MOM Alerts",x="69")

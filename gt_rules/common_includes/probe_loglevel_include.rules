@@ -1,0 +1,152 @@
+#########################################################################################################
+#
+#	probe_loglevel.include.rules
+#
+#	Allows the logging level of a probe to be changed by sending an event containing the 
+#	desired logging level.
+#	Should the event come from a snmp trap the desired log level should be included in
+#	the first varbind. Should the event come via a socket probe it should be inclluded in 
+#	a token called 'LogLevel'. Valid log levels include the following: 'warn', 'info', 'debug',
+#	'error', 'fatal' and 'previous'
+#
+#	Original	Jun 2006	Neil Wood of Abilitec
+#
+#########################################################################################################
+
+case "Abilitec_Probe_LogLevel": 
+
+# N Wood 20070813 Switch on specific trap for probe log level or push failed.
+	@UserData2 = $specific-trap + " " + $1
+	@Description = "%CML = " + %Current_Message_Level + " %PML = " + %Previous_Message_Level + " %ML = " + %MessageLevel
+	update (@Description)
+	$LookupVersion=lookup("lookup_version", LookupVersion)
+
+	update (@UserData2)
+
+# Set up the common stuff here. 
+	$ruleset = $ruleset + " Probe_LogLevel"
+	@Manager = "Probe Log Level" 
+	@Agent = %Name 
+	switch(@Agent) 
+	{ 
+		case "ubs_ssm_mttrapd" | "ubs_mttrapd" | "ubs_hbt_mttrapd": 
+			$LogLevel = $1 
+			@NodeAlias= getenv("PROF_FQDN") 
+			$ruleset = $ruleset + " Trap Event"
+		default: 
+			# Do nothing here. either default to unsuppress events from source, or event is from the socket probe in which case 
+			# all required tokens already come in with the event. 
+	} 
+	@Node = getenv("PROF_IP") 
+#	@NodeAlias= getenv("PROF_FQDN") 
+	@Location = getenv("PROF_LOCN") 
+	@Region = getenv("PROF_REG") 
+	@AlertGroup = "PROBE" 
+	@AlertKey = $NewRulesVersion + "  " + $LogLevel 
+	update (@AlertKey)
+	@Class = 230008 
+	$TempDoLookup = 2 
+	@OwnerUID = 65534 
+	@OwnerGID = 2 
+
+	$ruleset = $ruleset + " Loglevel " + $LogLevel + " ST = " + $specific-trap
+
+switch($specific-trap)
+{
+case "1":
+# Takes log level token and converts to lower case $Desired_Message_Level.
+#	Changes for auto lookup tables push N Wood Abilitec 20070830
+#	End of change 20070830
+	$Desired_Message_Level=lower($LogLevel)
+#	Check that %Current_Message_Level is not a nul
+	@Severity = 3
+
+#	is it the first time through
+	if (length(%Current_Message_Level) >0)
+	{
+		$ruleset = $ruleset + " len CML > 0"
+		if (!match(%Current_Message_Level,$Desired_Message_Level)) # if they don't match.
+		{
+			switch($Desired_Message_Level)
+			{
+				case "previous":
+					$ruleset = $ruleset + "previous"
+					$Desired_Message_Level = %Previous_Message_Level
+					@Severity = 2
+					update (@Severity)
+				default:
+			}
+		}
+		else
+		{
+			# no change is requiredi
+			$ruleset = $ruleset + "nochange"
+			$Desired_Message_Level = "nochange"
+		}
+	}
+	else if (!match(%MessageLevel,$Desired_Message_Level))
+	{
+		$ruleset = $ruleset + " opt 2 "
+		%Current_Message_Level = %MessageLevel
+		%Previous_Message_Level = %MessageLevel
+	}	
+	else
+	{
+		$ruleset = $ruleset + " opt 3 "
+		# no change is requiredi
+		$Desired_Message_Level = "nochange"
+	}
+	$ruleset = $ruleset + " DML = " + $Desired_Message_Level
+	switch ($Desired_Message_Level)
+	{
+		case "warn":
+			setlog(WARN)
+			%Previous_Message_Level = %Current_Message_Level
+			%Current_Message_Level = $Desired_Message_Level
+		case "error":
+			setlog (ERROR)
+			%Previous_Message_Level = %Current_Message_Level
+			%Current_Message_Level = $Desired_Message_Level
+		case "debug":
+			setlog (DEBUG)
+			%Previous_Message_Level = %Current_Message_Level
+			%Current_Message_Level = $Desired_Message_Level
+		case "fatal":
+			setlog (FATAL)
+			%Previous_Message_Level = %Current_Message_Level
+			%Current_Message_Level = $Desired_Message_Level
+		case "info":
+			setlog (INFO)
+			%Previous_Message_Level = %Current_Message_Level
+			%Current_Message_Level = $Desired_Message_Level
+		case "nochange":
+			log(ERROR,"No change required as logging already at desired level.")
+		default:
+			@Severity = 1
+                        $AddToIdentifier = "default"
+			log(ERROR,"Invalid value received for $LogLevel")
+			@Summary = "Invalid value received for $LogLevel"
+	}
+	@ExpireTime = 1800
+
+	@Summary = @Summary + " RulesVersion = " + $RulesVersion + " LookupVersion = " + $LookupVersion + " Previous Mess Lev = " + %Previous_Message_Level + "  Current Mess Lev = " + %Current_Message_Level
+
+	$tempIdentifier = @Agent + @NodeAlias + @Manager + $AddToIdentifier
+	@UserData = $RulesVersion
+	@UserData1 = $LookupVersion
+	update(@UserData1)
+			 log(ERROR,"Probe version for probe_loglevel is " +  $RulesVersion)
+			 log(ERROR,"probe_lookup_version is " +  $LookupVersion)
+case "2":
+		if(!match(@Agent,"ubs_socket"))
+		{
+			@NodeAlias = $1
+		}
+                log(ERROR,"Rules / lookup push failed.")
+		@AlertKey = "push_failed"
+                @Severity = 5
+                @Summary = "Rules / Lookup push Failed"
+		$tempIdentifier = @Agent + @NodeAlias + @Manager +@LastOccurrence + " Push Failed"
+	default:
+		#nothing to do
+}

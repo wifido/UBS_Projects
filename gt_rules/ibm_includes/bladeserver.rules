@@ -1,0 +1,283 @@
+case "netfinitySupportProcessor":
+$ruleset = $ruleset + "IBM"
+$ibmSpTrapDateTime = $1
+$ibmSpTrapAppId = $2
+$ibmSpTrapSpTxtId = $3
+$ibmSpTrapSysUuid = $4
+$ibmSpTrapSysSern = $5
+$ibmSpTrapAppType = $6
+
+#	20070110	temp Change by Chris Janes of Abilitec
+$ruleset = $ruleset + " ibmSpTrapAppType = " + $ibmSpTrapAppType
+#	20070110	End of Change
+
+$ibmSpTrapPriority = $7
+$ibmSpTrapMsgText = $8
+$ibmSpTrapHostContact = $9
+$ibmSpTrapHostLocation = $10
+$ibmSpTrapBladeName = $11
+$ibmSpTrapBladeSern = $12
+$ibmSpTrapBladeUuid = $13
+
+#######################################################################
+# this section added by Chris Janes to see what we are being sent!!
+
+@Description = " ibmSpTrapDateTime = " + $1 + " ibmSpTrapAppId = " + $2 + "ibmSpTrapSpTxtId = " + $3 + " ibmSpTrapSysUuid = " + $4 + " ibmSpTrapSysSern = " +  $5 + " ibmSpTrapAppType = " +  $6 + " ibmSpTrapPriority = " +  $7 + " ibmSpTrapMsgText = " +  $8 + " ibmSpTrapHostContact = " +  $9 + " ibmSpTrapHostLocation = " + $10 + " ibmSpTrapBladeName = " + $11 + " ibmSpTrapBladeSern = " + $12 + " ibmSpTrapBladeUuid = " + $13
+
+#######################################################################
+
+
+@Summary = $8 + " " + $ibmSpTrapHostLocation
+@AlertKey= "BLADECENTER"
+@Grade=0
+@Impact = 1
+@AlertGroup= "UNIX"
+@Agent="IBM"
+
+#	20070110	temp Change by Chris Janes of Abilitec
+@Type = 1
+#	20070110	End of Change
+
+# The next few fields put the event into the correct Class and Ownership .
+@OwnerGID=468
+@OwnerUID=65534
+@Class=123000
+$TempDoLookup=2
+$tempIdentifier = substr(@Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager,1,255)
+        switch($ibmSpTrapPriority)
+                {
+                case "0":
+                @Severity=5
+                case "2":
+                @Severity=4
+                case "4":
+                @Severity=3
+                case "8":
+                @Severity=1
+#		20070110	temp Change by Chris Janes of Abilitec
+		@Type = 2
+#		20070110	End of Change
+                case "255":
+                @Severity=2
+                default:
+                       $tempIdentifier = substr(@Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager,1,255)
+                }
+
+	$ruleset = $ruleset + "spec-trap" + $specific-trap
+	switch($specific-trap) 
+		{
+		case "0": ### - ibmSpTrapTempC
+			# SNMPv1
+			# Critical Alert: Temperature threshold exceeded.
+			@Severity = 5 
+
+		case "1": ### - ibmSpTrapVoltC
+			# SNMPv1
+			# Critical Alert: Voltage threshold exceeded.
+			@Severity = 5 
+
+		case "2": ### - ibmSpTrapTampC
+			# SNMPv1
+			# Critical Alert: Physical intrusion of system has occurred.
+			@Severity = 5 
+
+		case "3": ### - ibmSpTrapMffC
+			# SNMPv1
+			# Critical Alert: Multiple fan failure.
+			@Severity = 5 
+
+		case "4": ### - ibmSpTrapPsC
+			# SNMPv1
+			# Critical Alert: Power supply failure.
+			@Severity = 5 
+
+		case "5": ### - ibmSpTrapHdC
+			# SNMPv1
+			# Critical Alert: Hard disk drive failure.
+			@Severity = 5 
+
+		case "6": ### - ibmSpTrapVrmC
+			# SNMPv1
+			# Critical Alert: Voltage Regulator Module(VRM) failure.
+			@Severity = 5 
+
+
+#	20080204	Additions by Chris Janes of Abilitec see HDLDN0001705518
+                case "7": ### - mmTrapLogFullN
+                        # SNMPv1
+                        # Non-Critical Alert: Event Log 100% Full
+                        @Severity = 1
+
+#	20080204	End of Changes
+
+		case "10": ### - ibmSpTrapRdpsN
+			# SNMPv1
+			# Non-Critical Alert: Redundant Power Supply failure.
+			@Severity = 4 
+
+		case "11": ### - ibmSpTrapSffC
+			# SNMPv1
+			# Critical Alert: Single Fan failure.
+			@Severity = 5 
+
+		case "12": ### - ibmSpTrapTempN
+			# SNMPv1
+			# Non-Critical Alert: Temperature threshold exceeded.
+			@Severity = 5 
+
+		case "13": ### - ibmSpTrapVoltN
+			# SNMPv1
+			# Non-Critical Alert: Voltage threshold exceeded.
+			@Severity = 5 
+
+		case "15": ### - ibmSpTrapSecDvS
+			# SNMPv1
+			# System Alert: Secondary Device warning.
+			@Severity = 3 
+
+		case "20": ### - ibmSpTrapPostToS
+			# SNMPv1
+			# System Alert: Post Timeout value exceeded.
+			@Severity = 3 
+
+		case "21": ### - ibmSpTrapOsToS
+			# SNMPv1
+			# System Alert: OS Timeout value exceeded.
+			@Severity = 3 
+
+		case "22": ### - ibmSpTrapAppS
+			# SNMPv1
+			# System Alert: Application Alert.
+			@Severity = 3 
+
+		case "23": ### - ibmSpTrapPoffS
+			# SNMPv1
+			# System Alert: Power Off.
+			@Severity = 3 
+
+		case "24": ### - ibmSpTrapPonS
+			# SNMPv1
+			# System Alert: Power On.
+			@Severity = 4 
+
+		case "25": ### - ibmSpTrapBootS
+			# SNMPv1
+			# System Alert: System Boot Failure.
+			@Severity = 3 
+
+		case "26": ### - ibmSpTrapLdrToS
+			# SNMPv1
+			# System Alert: OS Loader Timeout.
+			@Severity = 3 
+
+		case "27": ### - ibmSpTrapPFAS
+			# SNMPv1
+			# System Alert: Predictive Failure Analysis(PFA) information.
+#	200080211	Changes by Chris Janes of Abilitec see HDLDN0001705518
+#			@Severity = 3 
+			if( nmatch(@Summary, "System Memory Error"))
+			{
+				@Severity = 5
+			}
+			# GT 20090409 TD 5245
+			if (regmatch(@Summary, "Power modules"))
+			{
+				@Severity = 5
+			}
+			# end TD5245
+			else
+			{
+				@Severity = 3 
+			}
+#	20080211	End of Changes
+
+#	20080204	Additions by Chris Janes of Abilitec see HDLDN0001705518
+                case "30": ### - mmTrapRemoteLoginS
+                        # SNMPv1
+                        # System Alert: Remote Login
+                        @Severity = 1
+
+#	20080204	End of Changes
+		case "31": ### - ibmSpTrapMsC
+			# SNMPv1
+			# Critical Alert: Multiple switch module failure.
+			@Severity = 5 
+
+		case "32": ### - ibmSpTrapRmN
+			# SNMPv1
+			# Non-Critical Alert: Redundant module.
+			#TD 5276 - MK
+			@Severity = 2
+
+		case "33": ### - ibmSpTrapKVMSwitchS
+			# SNMPv1
+			# System Alert: Keyboard/Video/Mouse(KVM) or Medial Tray(MT) switching failure.
+			@Severity = 5 
+
+		case "34": ### - ibmSpTrapSysInvS
+			# SNMPv1
+			# System Alert: Inventory.
+			@Severity = 2 
+
+		case "35": ### - ibmSpTrapSysLogS
+			# SNMPv1
+			# System Alert: System Log 75% full.
+			@Severity = 3 
+
+		case "36": ### - ibmSpTrapIhcC
+			# SNMPv1
+			# Critical Alert: Incompatible hardware configuration.
+			@Severity = 5 
+
+		case "37": ### - ibmSpTrapNwChangeS
+			# SNMPv1
+			# System Alert: Network change notification.
+			#TD 5276 - MK
+			@Severity = 2
+
+		case "38": ### - Unknown IBM alert
+			# SNMPv1
+			# 
+			@Severity = 1 
+
+#	20080204	Changes by Chris Janes of Abilitec see HDLDN0001705518
+		case "39": ### - mmTrapBlThrS
+#		case "39": ### - Unknown IBM alert
+			# SNMPv1
+			# System Alert: Blade Throttle
+#	20080204	End of Changes
+
+#		20060609	Change by Chris Janes of Abilitec  HDLDN0000449554
+#			@Severity = 1 
+ 			@Severity = 5
+#		20060609	End of Changes 
+
+#	20080204	Additions by Chris Janes of Abilitec see HDLDN0001705518
+                case "40": ### - mmTrapPwrMgntS
+                        # SNMPv1
+                        # System Alert: Power Management
+                        @Severity = 1
+
+                case "128": ### - mmTrapBladeC
+                        # SNMPv1
+                        # Critical Alert: Blade
+                        @Severity = 1
+
+
+#	20080204	End of Changes
+
+		default:
+			@Severity = 1
+                        @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+	}
+        switch($ibmSpTrapPriority)
+        {
+                case "8":
+                @Severity=0
+#		20070110	temp Change by Chris Janes of Abilitec
+		@Type = 2
+#		20070110	End of Change
+                default:
+                       $tempIdentifier = substr(@Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager,1,255)
+        }
+$tempIdentifier = substr(@Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager,1,255)

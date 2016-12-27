@@ -1,0 +1,64 @@
+#####################################################################################ction
+#
+#	bam.rules - rules associated with Operational Efficiency(OPEX)
+#
+#	20090818	MK	Original
+#	20090922	GT	Split rules file to create seperate rules for test events and return action events
+#
+#####################################################################################
+
+case "OPEXTEST":
+	# Rule set for events sent via synthetic alert generator
+	$ruleset =  $ruleset + ' - bam synthetic'
+	@Agent = "BAM"
+	@NodeAlias = lower($Nodealias)
+	
+	$tempNowTime = getdate
+	
+	# Description set for test purpose
+	# @Description = '$ActionCode = ' + $ActionCode + ' $ActionStatus = ' + $ActionStatus + ' $ActionResult = ' + $ActionResult
+	@Class = $SubClass
+	@OwnerGID = $Userint
+	@ActionTime = getdate
+	@AlertGroup = $EventIdentifier
+	@AlertKey = $Component
+	@Summary = $MessageText
+	@ActionCode = $ActionCode
+	@Environment = $OSENV
+	@SLA_Time = getdate + int($SLAtime)
+	# added by sharif johnson by user request to have control of Region field from the synthetic alert generator
+	@Region = $Region
+	# end edit by sharif johnson 20091109
+	if( exists( $Severity))
+	{
+		switch($Severity)
+		{
+			case "FATAL":
+				@Severity = 5
+				@Type = 1
+			case "MAJOR":
+				@Severity = 4
+				@Type = 1
+			case "MINOR":
+				@Severity = 3
+				@Type = 1
+			case "INFO":
+				@Severity = 2
+				@Type = 1
+			default:
+				@Severity = 1
+				@Type = 1
+		}
+	}
+	else
+	{
+		@Severity = 5
+		@Type = 1
+	}
+
+	@UserInt = $Userint
+	@UserData = $UserData
+	# Set TempDoLookup to 2 to ensure, OwnerGID is not overrridden
+	$TempDoLookup = 2
+
+	$tempIdentifier = lower($Nodealias) + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + $tempNowTime 

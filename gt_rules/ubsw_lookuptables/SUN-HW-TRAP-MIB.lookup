@@ -1,0 +1,29 @@
+table SunHwTrapThresholdType =
+{
+	{"1","upper"}
+	{"2","lower"}
+}
+default = {"unknown"}
+
+table SunHwTrapHAState =
+{
+	{"2","initializing"}
+	{"3","standalone"}
+	{"4","standby"}
+	{"5","master"}
+}
+default = {"other"}
+
+table SunHwTrapHardDriveStates =
+{
+	{"2","present"}
+	{"3","fault"}
+	{"4","predictiveFailure"}
+	{"5","hotSpare"}
+	{"6","consistencyCheckInProgress"}
+	{"7","inCriticalArray"}
+	{"8","inFailedArray"}
+	{"9","rebuildInProgress"}
+	{"10","rebuildAborted"}
+}
+default = {"unknown"}

@@ -1,0 +1,5 @@
+map(name="FIRC_KESTREL_PRODUCTION",bgImage="Kestrel_2.jpg",bgColor="white",w="517",h="400",acl="*")
+text(color="black",action="Open URL",label="Kestrel",target="_self",style="b",y="254",entity="",url="",size="10",name="lblKestrel_1",x="168",justify="center",font="Helvetica")
+text(color="black",action="Open URL",label="Kestrel",target="_self",style="b",y="253",entity="",url="",size="10",name="lblKestrel",x="274",justify="center",font="Helvetica")
+button(name="visual_3",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="firc_kestrel_bridge_prod",h="34",font color="black",target="_blank",type="rectangle",y="244",x="141",label="Production Bridge",legend="Label",w="88",arc diameter="20",size="10")
+button(name="visual_2",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="firc_kestrel_bridge_backup",h="34",font color="black",target="_blank",type="rectangle",y="244",x="246",label="Back-Up Bridge",legend="Label",w="88",arc diameter="20",size="10")

@@ -1,0 +1,2 @@
+map(name="MAP_CREDITDELTA_MENU",bgImage="",bgColor="white",w="250",h="250",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="black",label="untitled",style="p",y="103",url="",size="10",name="visual_1",x="80")

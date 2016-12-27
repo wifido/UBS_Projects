@@ -1,0 +1,39 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2003 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    ucdavis.include.snmp.rules 1.0 2003/12/12 Robert Cowart
+#
+###############################################################################
+#
+# 1.0 - Initial Release.
+#
+###############################################################################
+
+table ucdSnmpAgentPlatforms =
+{
+    {"1","HP-UX 9.x"}, ### hpux9
+    {"2","SunOS 4.x"}, ### sunos4
+    {"3","Solaris"}, ### solaris
+    {"4","OSF"}, ### osf
+    {"5","Ultrix"}, ### ultrix
+    {"6","HP-UX 10.x"}, ### hpux10
+    {"7","NetBSD 1.x"}, ### netbsd1
+    {"8","FreeBSD"}, ### freebsd
+    {"9","Irix"}, ### irix
+    {"10","Linux"}, ### linux
+    {"11","BSDI"}, ### bsdi
+    {"12","OpenBSD"}, ### openbsd
+    {"255","Unknown"} ### unknown
+}
+default = "Unknown"
+

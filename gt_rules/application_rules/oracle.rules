@@ -1,0 +1,408 @@
+#
+# Initial Oracle Intelligent Agent rules for characterisation - Alan Charlton - Abilitec
+#
+# Subsequently improved by David Butler, Abilitec
+#
+
+    case "oraAgentTraps":
+    	$ruleset = $ruleset + "-oracle.rules" + "-case:oracle oraAgentTraps"
+	@Class = 120000
+	@OwnerGID = 239
+	@OwnerUID = 65534
+	$TempDoLookup = 2
+        switch ($specific-trap)  {
+            case "2": # oraAgentEventOcc
+                $ruleset = $ruleset + "-case:2"
+                switch ($5)  {
+                    case "1":
+                        $ruleset = $ruleset + "-case:1"
+                        @Severity = 3
+                        @Type = 1
+                    case "2":
+                        $ruleset = $ruleset + "-case:2"
+                        @Severity = 4
+                        @Type = 1
+                    case "-1":
+                        $ruleset = $ruleset + "-case:-1"
+                        @Severity = 1
+                        @Type = 2
+                    default:
+                        $ruleset = $ruleset + "-case:default"
+                        @Severity = 2
+                        @Type = 1
+                }
+		$instance = $3
+		$thisTest = extract($1, "^.*/([^/]+)")
+		$ruleset = $ruleset + " - " + $thisTest
+		switch($thisTest)  {
+		    case "arcfulpct":
+		        $ruleset = $ruleset + "-case:arcfulpct"
+			$fileSys = extract($10, "^([^ ]+) [^ ]+")
+			$pctFree = extract($10, "^[^ ]+ ([^ ]+)")
+			$summaryText = "Archive Redo Log Directory Full - " + $fileSys + " has " + $pctFree + "% free space remaining"
+		    case "proclmt":
+		        $ruleset = $ruleset + "-case:proclmt"
+			if (regmatch($10, "^[0-9]+")) {
+				$numUsed = extract($10, "(^[0-9]+)")
+			}
+			if (regmatch($10, "^[0-9]+ [0-9]+")) {
+				$numLimit = extract($10, "^[0-9]+ ([0-9]+)")
+			}
+			$summaryText = "Process Limit Reached - " + $numUsed + " of " + $numLimit
+		    case "cpuutil":
+		        $ruleset = $ruleset + "-case:cpuutil"
+			$summaryText = "CPU Uilisation High - " + $10 + "%used"
+		    case "dskfulpct":
+		        $ruleset = $ruleset + "-case:dskfulpct"
+			$summaryText = "ORADUMPS Filesystem Full"
+		    case "userblk":
+		        $ruleset = $ruleset + "-case:userblk"
+			$summaryText = "User Blocks Detected"
+		    case "alert":
+		        $ruleset = $ruleset + "-case:alert"
+			$summaryText = "Errors In Alert Log : " + $10
+			@UserData = $10
+		    case "bufcache":
+		        $ruleset = $ruleset + "-case:bufcache"
+			$summaryText = "Buffer Cache Hit Ration Low"
+		    case "memsort":
+		        $ruleset = $ruleset + "-case:memsort"
+			$summaryText = "Disk Sorts High"
+		    case "sesslmt":
+		        $ruleset = $ruleset + "-case:sesslmt"
+			if (regmatch($10, "^[0-9]+")) {
+				$numUsed = extract($10, "(^[0-9]+)")
+			}
+			if (regmatch($10, "^[0-9]+ [0-9]+")) {
+				$numLimit = extract($10, "^[0-9]+ ([0-9]+)")
+			}
+			$summaryText = "Session Limit Reached - " + $numUsed + " of " + $numLimit
+		    case "maxext":
+		        $ruleset = $ruleset + "-case:maxext"
+			$summaryText = "MaxExtents Reached"
+		    case "tbspfull":
+		        $ruleset = $ruleset + "-case:tbspfull"
+			if (regmatch($10, "\{.*\}")) {
+				$tblSpcNames = extract ($10, "^[^\{]*(\{[^\}]*\})")
+			} else {
+				$tblSpcNames = extract ($10, "^([^ ]+) ")
+			}
+			$summaryText = "Tablespace Full : " + $tblSpcNames
+			@UserData = $10
+		    case "dgmetric":
+		        $ruleset = $ruleset + "-case:dgmetric"
+			$summaryText = "Test dgmetric: " + $10
+		    case "updown":
+		        $ruleset = $ruleset + "-case:updown"
+			switch ($1) {
+				case "/oracle/host/fault/updown":
+					$summaryText = "Node Down"
+				case "/oracle/rdbms/fault/updown":
+					$summaryText = "Database Down : " + $instance
+				case "/oracle/sqlnet/fault/updown":
+					$summaryText = "Listener Down"
+				default:
+					$summaryText = "Unrecognised updown test: " + $1
+			}
+		    default:
+		        $ruleset = $ruleset + "-case:default"
+			$ruleset = $ruleset + " - Default"
+			$summaryText = "Unknown test: " + $1
+		}
+                @AlertGroup = $thisTest
+                @AlertKey = $3
+                #@Summary = "Trap oraAgentEventOcc received, oraAgentEventName=" + $1 + ", oraAgentEventID=" + $2 + ", oraAgentEventService=" + $3 + ", oraAgentEventTime=" + $4 + ", oraAgentEventSeverity=" + $5 + ", oraAgentEventUser=" + $6 + ", oraAgentEventAppID=" + $7 + ", oraAgentEventMessage=" + $8 + ", oraAgentEventArguments=" + $9 + ", oraAgentEventResults=" + $10 + ""
+		@Summary = $summaryText
+		@SysInt = int($2)
+                
+            default:
+		$ruleset = $ruleset + " -case:Default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        }
+    @Agent = "Oracle (" + $enterprise-name + ")"
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + $1 + $2 + $3 + $5 + $6 + $7
+
+            
+    case "oraListenerTraps":
+    	$ruleset = $ruleset + "-orcale.rules" + "-case:oracle oraListenerTraps"
+	@Class = 120000
+	@OwnerGID = 239
+	@OwnerUID = 65534
+	$TempDoLookup = 2
+        switch ($specific-trap)  {
+            case "1":
+                # oraListenerStateChange
+                $ruleset = $ruleset + "-case:1"
+                switch ($1)  {
+                    case "1":
+                        $ruleset = $ruleset + "-case:1"
+                        $listenerState = "up"
+                        @Severity = 1
+                        @Type = 2
+                    case "2":
+                        $ruleset = $ruleset + "-case:2"
+                        $listenerState = "down"
+                        @Severity = 4
+                        @Type = 1
+                    default:
+                }
+                @AlertKey = ""
+                @AlertGroup = "oraListenerStateChange"
+                @Summary = "Listener changed state to " + $listenerState
+
+            default:
+		$ruleset = $ruleset + "-case:Default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        }        
+    @Agent = "Oracle (" + $enterprise-name + ")"
+    $tempIdentifier = $Node + $enterprise  + $generic-trap + $specific-trap + $1
+        
+    case "oraInterchgTraps":
+        $ruleset = $ruleset + "-oracle.rules" + "-case:oraInterchgTraps"
+	@Class = 120000
+	@OwnerGID = 239
+	@OwnerUID = 65534
+	$TempDoLookup = 2
+        switch ($specific-trap)  {
+            case "1":
+                # oraNavigatorStateChange
+		$ruleset = $ruleset + "-case:1"
+                switch ($1)  {
+                    case "1":
+                        $ruleset = $ruleset + "-case:1"
+                        $navState = "up"
+                        @Severity = 1
+                        @Type = 2
+                    case "2":
+                        $ruleset = $ruleset + "-case:2"
+                        $navState = "down"
+                        @Severity = 4
+                        @Type = 1
+                    default:
+                }
+                @AlertKey = ""
+                @AlertGroup = "oraNavigatorStateChange"
+                @Summary = "Navigator state changed to " + $navState
+
+            case "2":
+                # oraCmanagerStateChange
+                $ruleset = $ruleset + "-case:2"
+		$ruleset = $ruleset + " - oraCmanagerStateChange"
+                switch ($1)  {
+                    case "1":
+                        $ruleset = $ruleset + "-case:1"
+                        $cmState = "up"
+                        @Severity = 1
+                        @Type = 2
+                    case "2":
+                        $ruleset = $ruleset + "-case:2"
+                        $cmState = "down"
+                        @Severity = 4
+                        @Type = 1
+                    default:
+                }
+                @AlertKey = ""
+                @AlertGroup = "oraCmanagerStateChange"
+                @Summary = "Connection Manager state changed to " + $cmState
+
+            default:
+		$ruleset = $ruleset + "-case:Default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        }
+    @Agent = "Oracle (" + $enterprise-name + ")"
+    $tempIdentifier = $Node + $enterprise  + $generic-trap + $specific-trap + $1
+
+    case "rdbmsTraps":
+    	$ruleset = $ruleset + "-case:oracle rdbmsTraps"
+	@Class = 120000
+	@OwnerGID = 239
+	@OwnerUID = 65534
+	$TempDoLookup = 2
+        switch ($specific-trap)  {
+            case "1":         
+                # rdbmsStateChange
+    		$ruleset = $ruleset + "-case:1 : rdbmsStateChange"
+                switch ($1)  {
+                    case "1":
+                        $ruleset = $ruleset + "-case:1"
+                        $relState = "other"
+                        @Severity = 3
+                        @Type = 1
+                    case "2":
+                        $ruleset = $ruleset + "-case:2"
+                        $relState = "active"
+                        @Severity = 1
+                        @Type = 2
+                    case "3":
+                        $ruleset = $ruleset + "-case:3"
+                        $relState = "available"
+                        @Severity = 1
+                        @Type = 2
+                    case "4":
+                        $ruleset = $ruleset + "-case:4"
+                        $relState = "restricted"
+                        @Severity = 4
+                        @Type = 1
+                    case "5":
+                        $ruleset = $ruleset + "-case:5"
+                        $relState = "unavailable"
+                        @Severity = 5
+                        @Type = 1
+                    default:
+                }
+                @AlertKey = ""
+                @AlertGroup = "rdbmsStateChange"
+                @Summary = "Database state changed to " + $relState
+          
+            case "2":
+                # rdbmsOutOfSpace
+    		$ruleset = $ruleset + "-case:2-rdbmsOutOfSpace"
+                @AlertKey = "" 
+                @AlertGroup = "rdbmsOutOfSpace"
+                @Summary = "Database out of space " + $1 + " time(s)"
+                @Severity = 4
+
+            default:
+		$ruleset = $ruleset + "-case:default" + "- Default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        } 
+    @Agent = "Oracle (" + $enterprise-name + ")"
+    $tempIdentifier = $Node + $enterprise  + $generic-trap + $specific-trap + $1
+
+
+    case "oraEM4Traps":
+
+
+        $ruleset = $ruleset + "-oracle oraEM4Traps " 
+        @Class = 120000
+        @OwnerGID = 239
+        @OwnerUID = 65534
+        $TempDoLookup = 2
+	$ruleset = $ruleset + " " + $specific-trap
+        switch ($specific-trap) {
+            case "1": # oraEM4EventOcc
+		$ruleset = $ruleset + " >" + $8 + "<"
+                switch ($8)  {
+                    case "Warning":
+                        @Severity = 3
+                        @Type = 1
+                    case "Errors":
+                        @Severity = 4
+                        @Type = 1
+                    case "Critical":
+                        @Severity = 5
+                        @Type = 1
+                    case "Target Down":
+                        @Severity = 5
+                        @Type = 1
+                    case "Agent Unreachable":
+                        @Severity = 5
+                        @Type = 1
+                    case "Unreachable Start":
+                        @Severity = 5
+                        @Type = 1
+                    case "Clear":
+                        @Severity = 1
+                        @Type = 2
+                    case "Unreachable Clear":
+                        @Severity = 1
+                        @Type = 2
+                    case "Cleared":
+                        @Severity = 1
+                        @Type = 2
+
+
+                    case "Blackout Start":
+                        @Severity = 2
+                        @Type = 1
+                    case "Blackout End":
+                        @Severity = 2
+                        @Type = 2
+
+
+                    case "Blacked Out":
+                        @Severity = 1
+                        @Type = 2
+                    case "Unknown Availability":
+                        @Severity = 1
+                        @Type = 2
+                    default:
+                        $ruleset = $ruleset + "-def"
+
+                	if (nmatch($8, "Agent is Unreachable"))
+			{
+				$ruleset = $ruleset + " Agent is Unreachable"
+				@Severity = 5
+                        	@Type = 1
+			}
+			else
+			{        
+				$ruleset = $ruleset + " else"
+				@Severity = 2
+                        	@Type = 1
+			}
+
+                }
+
+		@Summary = $9
+
+		@Node = "139.149.61.203"
+		@NodeAlias = $3
+		if (match($6, ""))
+		{
+			@AlertGroup = $4 + ": " + $2
+			$ruleset = $ruleset + "-t6"
+		} else {
+			@AlertGroup = $4 + ": " + $2 + $6
+			$ruleset = $ruleset + "+t6"
+		}
+                @AlertKey = $1
+
+		if (regmatch($9, "^User [A-Z]+.*$"))
+		{
+			$ruleset = $ruleset + ":User"
+			[$oraUser, $oraHost] = scanformat($9, "User %s logged on from %s")
+			$tempIdAdditional = $oraUser + "@" + $oraHost
+		}
+		else if (regmatch($9, "^Filesystem.*$"))
+		{
+			$ruleset = $ruleset + ":FS"
+			$oraFS = extract($9, "^Filesystem (.+) has.*$")
+			$tempIdAdditional = $oraFS
+			@AlertGroup = @AlertGroup + ": " + $oraFS
+		}
+		else if (regmatch($9, "^[0-9]+.*dump area.*$"))
+		{
+                        $ruleset = $ruleset + ":Dumps"
+                        $oraDump = extract($9, "^[0-9]+% of (.+) dump.*$")
+                        $tempIdAdditional = $oraDump
+                }
+
+
+		@Stream = $9
+		@UserData = $10
+
+	default:
+		$ruleset = $ruleset + "-def"
+		@Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+		@Severity = 2
+		@AlertGroup = $enterprise-name
+		@AlertKey = $specific-trap
+        }
+
+	@Agent = "OEM"
+
+
+	$tempIdentifier = $enterprise  + $generic-trap + $specific-trap + @AlertKey + @Type + $4 + $6 + $tempIdAdditional

@@ -1,0 +1,625 @@
+#################################################################################
+#
+#    CYCLADES-ACS-TRAP-MIB rules file original generated bu Chris's Mib2Rules script
+#
+#################################################################################
+
+
+
+case "CYCLADES-ACS-TRAP-MIB" :
+	$ruleset = $ruleset + " CYCLADES-ACS-TRAP-MIB"
+	@Agent = $enterprise
+#	These are temp values that need to be set correctly
+	@Class = 2071939
+	@Subclass = "CYCLADES-ACS"
+	@OwnerGID = 468
+	$ruleset = $ruleset + " ST = " + $specific-trap
+
+#	20080917	Change by Chris Janes of Abilitec	TD 5052
+##Added by Simon Waller 20070403
+#@Description = " IPaddress = " + $IPaddress + "    PeerAddress = " + $PeerAddress
+#	20080917	End of Change
+
+	@Node = $IPaddress
+	@NodeAlias = $PeerAddress 
+#Completed Simon Waller
+
+	switch ($specific-trap)  
+	{
+        case "1":
+              $cyAcsTrapObjectUserName = $1
+
+              @AlertGroup = "RebootStarted"
+              @AlertKey = $cyAcsTrapObjectUserName
+              @Summary = "The appliance is rebooting. Command issued by user: " + $cyAcsTrapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $cyAcsTrapObjectUserName = $1
+#              $cyAcsTrapObjectSessionType = $2
+#		Section added by postmib2rules
+               switch ($2)
+               {
+                  case "1" :
+                         $cyAcsTrapObjectSessionType = "SSH"
+                  case "2" :
+                         $cyAcsTrapObjectSessionType = "Telnet"
+                  case "3" :
+                         $cyAcsTrapObjectSessionType = "WEBUI`"
+                  case "4" :
+                         $cyAcsTrapObjectSessionType = "Console"
+                  case "5" :
+                         $cyAcsTrapObjectSessionType = "ModemPCMCIA"
+                  default:
+                         $cyAcsTrapObjectSessionType = "Invalid"
+               }
+
+              @AlertGroup = "UserLogin"
+              @AlertKey = $cyAcsTrapObjectUserName
+              @Summary = "A user logged into the appliance. User: " + $cyAcsTrapObjectUserName + "Session type: " + $cyAcsTrapObjectSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "3":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSessionType = $2
+
+              @AlertGroup = "UserLogout"
+              @AlertKey = $cyAcsTrapObjectUserName
+              @Summary = "A user logged out of the appliance. User: " + $cyAcsTrapObjectUserName + "Session type: " + $cyAcsTrapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "4":
+              $cyAcsTrapObjectUserName = $1
+
+              @AlertGroup = "AuthenticationFailure"
+              @AlertKey = $cyAcsTrapObjectUserName
+              @Summary = "User authentication failed. User: " + $cyAcsTrapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "5":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPortName = $2
+              $cyAcsTrapObjectSerialPort = $3
+#		Section added by postmib2rules
+               switch ($4)
+               {
+                  case "1" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-SSH"
+                  case "2" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-Telnet"
+                  case "3" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-RawDate"
+                  case "4" :
+                         $cyAcsTrapObjectSerialSessionType = "TS"
+                  case "5" :
+                         $cyAcsTrapObjectSerialSessionType = "Dial-in"
+                  default:
+                         $cyAcsTrapObjectSerialSessionType = "Invalid"
+               }
+#		End of Section added by postmib2rules
+
+              @AlertGroup = "SerialSessionStarted"
+              @AlertKey = $cyAcsTrapObjectUserName + " " + $cyAcsTrapObjectSerialSessionType
+              @Summary = "Serial session started. User: " + $cyAcsTrapObjectUserName + "Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort + " Session type: " + $cyAcsTrapObjectSerialSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "6":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPortName = $2
+              $cyAcsTrapObjectSerialPort = $3
+#		Section added by postmib2rules
+               switch ($4)
+               {
+                  case "1" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-SSH"
+                  case "2" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-Telnet"
+                  case "3" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-RawDate"
+                  case "4" :
+                         $cyAcsTrapObjectSerialSessionType = "TS"
+                  case "5" :
+                         $cyAcsTrapObjectSerialSessionType = "Dial-in"
+                  default:
+                         $cyAcsTrapObjectSerialSessionType = "Invalid"
+               }
+#		End of Section added by postmib2rules
+
+              @AlertGroup = "SerialSessionStopped"
+              @AlertKey = $cyAcsTrapObjectUserName + " " + $cyAcsTrapObjectSerialSessionType
+              @Summary = "Serial session stopped. User: " + $cyAcsTrapObjectUserName + "Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort + " Session type: " + $cyAcsTrapObjectSerialSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "7":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPortName = $2
+              $cyAcsTrapObjectSerialPort = $3
+#		Section added by postmib2rules
+               switch ($4)
+               {
+                  case "1" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-SSH"
+                  case "2" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-Telnet"
+                  case "3" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-RawDate"
+                  case "4" :
+                         $cyAcsTrapObjectSerialSessionType = "TS"
+                  case "5" :
+                         $cyAcsTrapObjectSerialSessionType = "Dial-in"
+                  default:
+                         $cyAcsTrapObjectSerialSessionType = "Invalid"
+               }
+#		End of Section added by postmib2rules
+
+              @AlertGroup = "PortAuthenticationFailure"
+              @AlertKey = $cyAcsTrapObjectUserName + " " + $cyAcsTrapObjectSerialSessionType
+              @Summary = "Serial session authentication failed. User: " + $cyAcsTrapObjectUserName + "Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort + " Session type: " + $cyAcsTrapObjectSerialSessionType 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "8":
+              $cyAcsTrapObjectSerialPortName = $1
+              $cyAcsTrapObjectSerialPort = $2
+              $cyAcsTrapObjectAlertIndex = $3
+              $cyAcsTrapObjectAlertString = $4
+              $cyAcsTrapObjectAlertMessage = $5
+
+              @AlertGroup = "PortAlert"
+              @AlertKey = $cyAcsTrapObjectUserName + " " + $cyAcsTrapObjectSerialSessionType
+              @Summary = "A port alert was detected on a serial port. Port name: " + $cyAcsTrapObjectSerialPortName + " Port number: " + $cyAcsTrapObjectSerialPort + " Port alert index: " + $cyAcsTrapObjectAlertIndex + " Port alert string: " + $cyAcsTrapObjectAlertString + " Line text: " + $cyAcsTrapObjectAlertMessage
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "9":
+              $cyAcsTrapObjectSerialPortName = $1
+              $cyAcsTrapObjectSerialPort = $2
+
+              @AlertGroup = "cyAcsPortPowerOnDetectTrap"
+              @AlertKey = ""
+              @Summary = "Power on detected on a serial port. Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort 
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "10":
+              $cyAcsTrapObjectSerialPortName = $1
+              $cyAcsTrapObjectSerialPort = $2
+
+              @AlertGroup = "cyAcsPortPowerOffDetectTrap"
+              @AlertKey = ""
+              @Summary = "Power off detected on a serial port. Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "11":
+              $cyAcsTrapObjectSerialPortName = $1
+              $cyAcsTrapObjectSerialPort = $2
+
+              @AlertGroup = "cyAcsDaemonStarted"
+              @AlertKey = ""
+              @Summary = "A daemon started. User: " + $cyAcsTrapObjectSerialPortName + "Daemon name: " + $cyAcsTrapObjectSerialPort
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "12":
+              $cyAcsTrapObjectSerialPortName = $1
+              $cyAcsTrapObjectSerialPort = $2
+
+              @AlertGroup = "cyAcsDaemonStoped"
+              @AlertKey = ""
+              @Summary = "A daemon stopped. User: " + $cyAcsTrapObjectSerialPortName + "Daemon name: " + $cyAcsTrapObjectSerialPort
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "13":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectTargetUserName = $2
+
+              @AlertGroup = "cyAcsAdminSessionTerminatedTrap"
+              @AlertKey = ""
+              @Summary = "Admin session terminated. Command issued by user: " + $cyAcsTrapObjectUserName + "Terminated user: " + $cyAcsTrapObjectTargetUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "14":
+              $cyAcsTrapObjectUserName = $1
+
+              @AlertGroup = "cyAcsConfigurationSavedTrap"
+              @AlertKey = ""
+              @Summary = "Configuration saved to flash. User: " + $cyAcsTrapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "15":
+              $cyAcsTrapObjectUserName = $1
+
+              @AlertGroup = "cyAcsConfigurationActivatedTrap"
+              @AlertKey = ""
+              @Summary = "Configuration activated. User: " + $cyAcsTrapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "16":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectTargetUserName = $2
+
+              @AlertGroup = "cyAcsLocalUserAddedTrap"
+              @AlertKey = ""
+              @Summary = "A user was added to the local user database." 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "17":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectTargetUserName = $2
+
+              @AlertGroup = "cyAcsLocalUserDeletedTrap"
+              @AlertKey = ""
+              @Summary = "A user was deleted to the local user database." 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "18":
+              $cyAcsTrapObjectDataBufferSize = $1
+
+              @AlertGroup = "cyAcsDataBufferFullThresholdLowTrap"
+              @AlertKey = ""
+              @Summary = "Data Buffering for DSView data log is getting full" 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "19":
+              $cyAcsTrapObjectDataBufferSize = $1
+
+              @AlertGroup = "cyAcsDataBufferFullThresholdMedTrap"
+              @AlertKey = ""
+              @Summary = "Data Buffering for DSView data log is almost full "
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "20":
+              $cyAcsTrapObjectDataBufferSize = $1
+
+              @AlertGroup = "cyAcsDataBufferFullLostDataTrap"
+              @AlertKey = ""
+              @Summary = "Data Buffering for DSView data log had data loss because buffer full." 
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "21":
+              $cyAcsTrapObjectProcessID = $1
+              $cyAcsTrapObjectUserName = $2
+
+              @AlertGroup = "cyAcsApplianceLostDataTrap"
+              @AlertKey = ""
+              @Summary = "Appliance data log loss. Process ID: " + $cyAcsTrapObjectProcessID + "User: " + $cyAcsTrapObjectUserName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "22":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketCount = $4
+              $cyAcsTrapObjectPMType = $5
+
+              @AlertGroup = "cyPMOnlineTrap"
+              @AlertKey = ""
+              @Summary = "A power device is online. Port number: " + $cyAcsTrapObjectSerialPort + "Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Number of sockets: " + $cyAcsTrapObjectPMSocketCount + " Type: " + $cyAcsTrapObjectPMType
+
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "23":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketCount = $4
+              $cyAcsTrapObjectPMType = $5
+
+              @AlertGroup = "cyPMOfflineTrap"
+              @AlertKey = ""
+              @Summary = "A power device is online. Port number: " + $cyAcsTrapObjectSerialPort + "Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Number of sockets: " + $cyAcsTrapObjectPMSocketCount + " Type: " + $cyAcsTrapObjectPMType
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "24":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPort = $2
+              $cyAcsTrapObjectPMSocketNumber = $3
+              $cyAcsTrapObjectPMNumber = $4
+              $cyAcsTrapObjectPMId = $5
+              $cyAcsTrapObjectPMSocketName = $6
+
+              @AlertGroup = "cyPMOutletOnTrap"
+              @AlertKey = ""
+              @Summary = "The on command was issued to a power device socket. Command issued by user: " + $cyAcsTrapObjectUserName + " Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMSocketNumber + " Power device ID: " + $cyAcsTrapObjectPMNumber + " Socket number: " + $cyAcsTrapObjectPMId + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "25":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPort = $2
+              $cyAcsTrapObjectPMSocketNumber = $3
+              $cyAcsTrapObjectPMNumber = $4
+              $cyAcsTrapObjectPMId = $5
+              $cyAcsTrapObjectPMSocketName = $6
+
+              @AlertGroup = "cyPMOutletOffTrap"
+              @AlertKey = ""
+              @Summary = "The off command was issued to a power device socket. Command issued by user: " + $cyAcsTrapObjectUserName + " Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMSocketNumber + " Power device ID: " + $cyAcsTrapObjectPMNumber + " Socket number: " + $cyAcsTrapObjectPMId + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "26":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPort = $2
+              $cyAcsTrapObjectPMSocketNumber = $3
+              $cyAcsTrapObjectPMNumber = $4
+              $cyAcsTrapObjectPMId = $5
+              $cyAcsTrapObjectPMSocketName = $6
+
+              @AlertGroup = "cyPMOutletCycleFinishedTrap"
+              @AlertKey = ""
+              @Summary = "The cycle command was issued to a power device socket. Command issued by user: " + $cyAcsTrapObjectUserName + " Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMSocketNumber + " Power device ID: " + $cyAcsTrapObjectPMNumber + " Socket number: " + $cyAcsTrapObjectPMId + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "27":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMPhase = $4
+              $cyAcsTrapObjectPMCurrentValue = $5
+
+              @AlertGroup = "cyPMMaxLoadThresholdReachedTrap"
+              @AlertKey = ""
+              @Summary = "Power device exceeded the total load maximum threshold. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Phase: " + $cyAcsTrapObjectPMPhase + " Current detected: " + $cyAcsTrapObjectPMCurrentValue + " amps"
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "28":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMPhase = $4
+              $cyAcsTrapObjectPMCurrentValue = $5
+
+              @AlertGroup = "cyPMMinLoadThresholdReachedTrap"
+              @AlertKey = ""
+              @Summary = "Power device exceeded the total load maximum threshold. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Phase: " + $cyAcsTrapObjectPMPhase + " Current detected: " + $cyAcsTrapObjectPMCurrentValue + " amps"
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "29":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectAlertIndex = $2
+              $cyAcsTrapObjectAlertString = $3
+              $cyAcsTrapObjectAlertMessage = $4
+
+              @AlertGroup = "cyAcsApplianceAlertTrap"
+              @AlertKey = ""
+              @Summary = "An appliance alert was detected. User: " + $cyAcsTrapObjectUserName + " Alert index: " + $cyAcsTrapObjectAlertIndex + " Alert string: " + $cyAcsTrapObjectAlertString + " Line text: " + $cyAcsTrapObjectAlertMessage
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "30":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapFirmwareVersion = $2
+              $cyAcsTrapNewFirmwareVersion = $3
+
+              @AlertGroup = "cyAcsFirmwareUpgradeStarted"
+              @AlertKey = ""
+              @Summary = "Image upgrade started by DSView. User: " + $cyAcsTrapObjectUserName + " Current version: " + $cyAcsTrapFirmwareVersion + " New version: " + $cyAcsTrapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "31":
+              $cyAcsTrapFirmwareUpgradeResult  = $1
+              $cyAcsTrapNewFirmwareVersion = $2
+
+              @AlertGroup = "cyAcsFirmwareUpgradeResultsTrap"
+              @AlertKey = ""
+              @Summary = "Image upgrade result. Result: " + $cyAcsTrapFirmwareUpgradeResult  + "New firmware version: " + $cyAcsTrapNewFirmwareVersion 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "32":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPort = $2
+              $cyAcsTrapObjectPMNumber = $3
+              $cyAcsTrapFirmwareVersion = $4
+              $cyAcsTrapNewFirmwareVersion = $5
+
+              @AlertGroup = "cyAcsPMFirmwareUpgradeStarted"
+              @AlertKey = ""
+              @Summary = "PM image upgrade started. User: " + $cyAcsTrapObjectUserName + " Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device port number: " + $cyAcsTrapObjectPMNumber + " Current version: " + $cyAcsTrapFirmwareVersion + " New version: " + $cyAcsTrapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "33":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapFirmwareUpgradeResult = $3
+              $cyAcsTrapNewFirmwareVersion = $4
+
+              @AlertGroup = "cyAcsPMFirmwareUpgradeResultsTrap"
+              @AlertKey = ""
+              @Summary = "PM image upgrade result. Power device port " + $cyAcsTrapObjectSerialPort + "Power device number: " + $cyAcsTrapObjectPMNumber + " Result: " + $cyAcsTrapFirmwareUpgradeResult + " New firmware version: " + $cyAcsTrapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "35":
+              $cyAcsTrapObjectUserName = $1
+              $cyAcsTrapObjectSerialPortName = $2
+              $cyAcsTrapObjectSerialPort = $3
+#		Section added by postmib2rules
+               switch ($4)
+               {
+                  case "1" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-SSH"
+                  case "2" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-Telnet"
+                  case "3" :
+                         $cyAcsTrapObjectSerialSessionType = "CAS-RawDate"
+                  case "4" :
+                         $cyAcsTrapObjectSerialSessionType = "TS"
+                  case "5" :
+                         $cyAcsTrapObjectSerialSessionType = "Dial-in"
+                  default:
+                         $cyAcsTrapObjectSerialSessionType = "Invalid"
+               }
+#		End of Section added by postmib2rules
+
+              @AlertGroup = "cyAcsSerialSessionStoppedPortInUseTrap"
+              @AlertKey = ""
+              @Summary = "Serial session stopped. User: " + $cyAcsTrapObjectUserName + "Port name: " + $cyAcsTrapObjectSerialPortName + "Port number: " + $cyAcsTrapObjectSerialPort + "Session type: " + $cyAcsTrapObjectSerialSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "36":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketNumber = $4
+              $cyAcsTrapObjectPMSocketName = $5
+
+              @AlertGroup = "cyPMOutletStatusOnTrap"
+              @AlertKey = ""
+              @Summary = "Power device socket state changed to on. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Socket number: " + $cyAcsTrapObjectPMSocketNumber + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "37":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketNumber = $4
+              $cyAcsTrapObjectPMSocketName = $5
+
+              @AlertGroup = "cyPMOutletStatusOffTrap"
+              @AlertKey = ""
+              @Summary = "Power device socket state changed to off. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Socket number: " + $cyAcsTrapObjectPMSocketNumber + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "38":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketNumber = $4
+              $cyAcsTrapObjectPMSocketName = $5
+
+              @AlertGroup = "cyPMOutletOnSenseFailTrap"
+              @AlertKey = ""
+              @Summary = "Power device socket on sense failure. "
+              @Summary = "Power device socket on sense failure. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Socket number: " + $cyAcsTrapObjectPMSocketNumber + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "39":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketNumber = $4
+              $cyAcsTrapObjectPMSocketName = $5
+
+              @AlertGroup = "cyPMOutletOffSenseFailTrap"
+              @AlertKey = ""
+              @Summary = "Power device socket off sense failure. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Socket number: " + $cyAcsTrapObjectPMSocketNumber + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "40":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMSocketNumber = $4
+              $cyAcsTrapObjectPMSocketOldName = $5
+              $cyAcsTrapObjectPMSocketName = $6
+
+              @AlertGroup = "cyPMOutletNameChangedTrap"
+              @AlertKey = ""
+              @Summary = "Power device socket on sense failure. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Socket number: " + $cyAcsTrapObjectPMSocketNumber + " Socket name: " + $cyAcsTrapObjectPMSocketName
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "41":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMPhase = $4
+
+              @AlertGroup = "cyPMInletTotalLoadHighTrap"
+              @AlertKey = ""
+              @Summary = "Power device inlet exceeded the total load maximum threshold. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Inlet: " + $cyAcsTrapObjectPMPhase
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "42":
+              $cyAcsTrapObjectSerialPort = $1
+              $cyAcsTrapObjectPMNumber = $2
+              $cyAcsTrapObjectPMId = $3
+              $cyAcsTrapObjectPMPhase = $4
+
+              @AlertGroup = "cyPMInletTotalLoadLowTrap"
+              @AlertKey = ""
+              @Summary = "Power device inlet is back below the total load maximum threshold. Power device port number: " + $cyAcsTrapObjectSerialPort + " Power device number: " + $cyAcsTrapObjectPMNumber + " Power device ID: " + $cyAcsTrapObjectPMId + " Inlet: " + $cyAcsTrapObjectPMPhase
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+

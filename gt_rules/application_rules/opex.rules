@@ -1,0 +1,124 @@
+#####################################################################################ction
+#
+#	bam.rules - rules associated with Operational Efficiency(OPEX)
+#
+#	20090818	MK	Original
+#	20090922	GT	Split rules file to create seperate rules for test events and return action events
+#
+#####################################################################################
+
+
+# Set up some defaults here as we now bypass the bulk of socket.rules.
+@ProbeHostName = hostname()
+@Manager = %Name
+[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $UBS_CAHOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+switch ($UBS_OS)
+{
+	include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+}
+$tempserver = $UBS_OS
+# These fields are set temporarily here to provide values for Probeloads stats. The correct values will be added further down. 
+# DO NOT CHANGE THESE.
+@Class = 999
+@Severity = 5
+@Type = 1
+@NodeAlias = lower(substr($EventIdentifier,1,11))
+include "$OMNIHOME/all_rules/ubsw/common_includes/probe_load.include.rules"
+# Now the Opex stuff.
+
+####
+# Subclass -> ActionStatus
+# Userdata -> ActionResult
+# Userint -> ActionTime
+###	
+
+$tempTimeNow = getdate
+#$ActionStatus = int($Subclass)
+$ActionStatus = upper($Subclass)
+$EscMethod = int($Component)
+@Identifier = $EventIdentifier
+
+switch($ActionStatus)
+{
+	case 'UPDATE':
+		# Action Update
+		@ActionResult = $Userdata
+		@ActionStatus = 4
+		@ActionTime = $tempTimeNow
+		@Description = "User int =>" + $Userint + "<"
+		update(@Description)
+		# Supply a  sensible default value for Userint
+		if (exists($Userint)) {
+			if (int($Userint) < 60 && int($Userint) > 0) {
+				$Userint = 60
+				@SLA_Time = getdate + int($Userint)
+				update(@SLA_Time)
+			}
+			else if (int($Userint) <= 3600) {
+				@SLA_Time = getdate + int($Userint)
+				update(@SLA_Time)
+			}
+			else if (int($Userint) > 3600) {
+				$Userint = 3600
+				@SLA_Time = getdate + int($Userint)
+				update(@SLA_Time)
+			}
+			else {
+				update(@SLA_Time,false)
+			}
+		}
+		else {
+			update(@SLA_Time,false)
+		}
+		update(@Severity, false)
+
+	case 'FAIL' | 'ESCALATE':
+		# Action Failure
+		@ActionResult = $Userdata
+		@ActionStatus = 6
+		@ActionTime = $tempTimeNow
+		switch($EscMethod)
+		{
+			case '1':	# Raises an Auto Ticket
+				@TTicket_Status = 8
+				@TT_UpdateTime  = $tempTimeNow
+				update(@TTicket_Status)
+				update(@TT_UpdateTime)
+			default:
+				# Walk on by
+	
+		}
+		@Acknowledged = 0
+		@OwnerUID = 65534
+		@Display_Hide = 0
+
+       		update(@Acknowledged)
+       		update(@OwnerUID)
+		update(@Display_Hide)
+		update(@Severity, false)
+	
+
+	case 'PASS' | 'SUCCESS':
+		# Action Success
+		@ActionResult = $Userdata
+		@ActionStatus = 5
+		@ActionTime = $tempTimeNow
+		# Note : Severity set to 0 and ExpireID set to 65505 to stop
+		# generic clear from operatin on these events.
+		@Severity = 0
+		@ExpireID = 65505
+
+		update(@ExpireID)
+		update(@Severity)		
+		
+	default:
+	
+}
+
+	
+update(@NodeAlias,false)
+update(@Class,false)
+update(@Type,false)
+update(@ActionStatus)
+update(@ActionResult)
+update(@ActionTime)

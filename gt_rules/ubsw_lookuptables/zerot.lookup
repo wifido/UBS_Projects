@@ -1,0 +1,44 @@
+#################################################################################################
+#
+#	zerot.lookup created by Chris Janes of Abilitec
+#	
+#	20071218	Chris Janes	Original
+#
+#################################################################################################
+
+
+#	This Lookup sets suppot level dependent on host 
+#	30 means that the host is flaged as Zero Tolerance
+
+
+table ZeroTHost =
+{
+{"sstm1321por","30"} 
+{"snyc2569por","30"} 
+{"sstm7689por","30"}
+{"snyc0168por","30"}
+{"sstm7677por","30"}
+{"snyc0168por","30"}
+{"sstm2870por","30"}
+{"sstm7677por","30"}
+{"snyc0168por","30"}
+{"sstm0874por","30"}
+{"sstm1866psy","30"}
+{"sstm9732psy","30"}
+{"szur0330psy","30"}
+{"tk3p1036syb","30"}
+{"ssyd0071psy","30"}
+{"xstm0663psy","30"}
+{"xstm0664psy","30"}
+{"xnyc2390psy","30"}
+{"xstm0689psy","30"}
+{"xstm0690psy","30"}
+{"xnyc2391psy","30"}
+{"xstm6462psy","30"}
+{"xstm6461psy","30"}
+{"xldn1052dap","30"}
+}
+default = {"0"}
+
+
+

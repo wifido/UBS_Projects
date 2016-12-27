@@ -1,0 +1,47 @@
+#################################################################
+#
+#	risk.include.rules
+#	4th Sept 2006	Chris Janes oof Abilitec
+#
+#
+#################################################################
+
+$ruleset = $ruleset + " risk"
+
+
+@SLA_Time = 0 
+$RiskGroup = lookup(@Class,ClassRisk)
+if(match($RiskGroup, "None"))
+{
+#	$ruleset = $ruleset + " No CRG"
+	$RiskGroup = lookup(@OwnerGID,GroupRisk)
+}
+
+
+if(match($RiskGroup, "None"))
+{
+#	$ruleset = $ruleset + " No ORGroup"
+}
+else
+{
+	$ruleset = $ruleset + " " + $RiskGroup
+	[ $SLA_Critical, $SLA_Major, $SLA_Minor] = lookup($RiskGroup, RiskSevSLA)
+	if (match(@Severity, "5"))
+	{
+#		$ruleset = $ruleset + " " + @Severity + " " + $SLA_Critical
+		@SLA_Time = getdate + int($SLA_Critical)
+	}
+	else if (match(@Severity, "4"))
+        {
+#               $ruleset = $ruleset + " " + @Severity + " " + $SLA_Major
+                @SLA_Time = getdate + int($SLA_Major)
+        }
+        else if (match(@Severity, "3"))
+        {
+#                $ruleset = $ruleset + " " + @Severity + " " + $SLA_Minor
+                @SLA_Time = getdate + int($SLA_Minor)
+        }
+}
+
+
+

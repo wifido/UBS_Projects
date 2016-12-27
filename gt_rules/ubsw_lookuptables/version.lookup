@@ -1,0 +1,6 @@
+# File ammended 20091211 using the prepare_lookup_relset.ksh script
+table LookupVersion=
+{
+{"lookup_version","20091211"}
+}
+default={""}

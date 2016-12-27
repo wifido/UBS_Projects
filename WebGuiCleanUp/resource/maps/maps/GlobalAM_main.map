@@ -1,0 +1,8 @@
+map(name="GlobalAM_main",bgColor="#003366",w=250,h=430,acl="*")
+text(name="Infra",label="Infra",x=184,y=166,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="#81c2ff")
+text(name="visual_1",label="GlobalAM",x=6,y=216,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=13,justify="center",style="p",color="#81c2ff")
+button(name="GlobalAM_App",label="GlobalAM_App",x=77,y=197,action="Active Event List (AEL)",url="",target="main",entity="GlobalAM_App",datasource="NCOMS",flash="true",w=65,h=27,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+text(name="App",label="App",x=96,y=165,action="Open URL",url="",target="main",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="#81c2ff")
+line(name="visual_3",label="GlobalAM_Infra",x=3,y=175,color="black",thickness=1,x2=239,y2=175)
+text(name="GlobalAM",label="GlobalAM",x=59,y=54,action="Open URL",url="",target="main",entity="GlobalAM_Infra",datasource="NCOMS",flash="true",font="Helvetica",size=25,justify="center",style="p",color="#81c2ff")
+button(name="GlobalAM_Infra",label="GlobalAM_Infra",x=165,y=197,action="Active Event List (AEL)",url="",target="main",entity="GlobalAM_Infra",datasource="NCOMS",flash="true",w=65,h=27,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")

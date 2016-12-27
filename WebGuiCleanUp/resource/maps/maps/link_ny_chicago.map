@@ -1,0 +1,4 @@
+map(name="link_ny_chicago",bgColor="white",w=250,h=150,acl="*")
+text(name="visual_3",label="NY:Chicago Link",x=45,y=26,font="Helvetica",size=16,justify="center",style="b",color="black")
+icon(name="visual_2",label="RT_2",x=150,y=54,action="go",url="$(SERVER)/Template/openPage.html?System_Filter=RT_CHICAGO",target="hidden",entity="RT_CHICAGO",w=48,h=89,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",image="router.jpg")
+icon(name="visual_1",label="RT_1",x=41,y=54,action="go",url="$(SERVER)/Template/openPage.html?System_Filter=RT_NY",target="hidden",entity="RT_NY",w=48,h=89,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",image="router.jpg")

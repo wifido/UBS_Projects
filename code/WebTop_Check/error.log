@@ -1,0 +1,63 @@
+File       = /home/janesch/rules/entities/APP_OPS_GCFS_Messaging/entity.group
+EntityName = "APP_OPS_GCFS_Messaging_Unacknowledged_20+"
+EntityFilter = Acknowledged = 0 AND SLA_Time > 0 AND ( Class in ( 1056983,1056783,1056786,100392,1000059, 1057868, 1057622, 1057307, 1057869, 1057870 ) AND SLA_Time > getdate + 1200
+
+ERROR=Parse failure on line 1 of statement 'select * from alerts.status where
+Acknowledged = 0 AND SLA_Time > 0 AND ( Class in (
+1056983,1056783,1056786,100392,1000059, 1057868, 1057622, 1057307, 1057869,
+1057870 ) AND SLA_Time > getdate + 1200 ;...', at or near ';'
+
+
+File       = /home/janesch/rules/entities/FIRC_GSD/entity.group
+EntityName = "firc_trident_ALL_HOSTS"
+EntityFilter = NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com', 'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com', 'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2107pap.ldn.swissbank.com', 'sldn1392por.ldn.swissbank.com', 'sldn1599bor.ldn.swissbank.com', 'sldn0622pap.ldn.swissbank.com','sldn1597pap.ldn.swissbank.com'.'sldn0622pap.ldn.swissbank.com')
+
+ERROR=Parse failure on line 1 of statement 'select * from alerts.status where
+NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com',
+'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com',
+'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2...', at
+or near '.'
+
+
+File       = /home/janesch/rules/entities/FIRC_GSD/entity.group
+EntityName = "firc_trident_ALL_HOSTS_SEVL"
+EntityFilter = NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com', 'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com', 'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2107pap.ldn.swissbank.com', 'sldn1392por.ldn.swissbank.com', 'sldn1599bor.ldn.swissbank.com', 'sldn0622pap.ldn.swissbank.com','sldn1597pap.ldn.swissbank.com'.'sldn0622pap.ldn.swissbank.com')  AND ( Severity < 3 )
+
+ERROR=Parse failure on line 1 of statement 'select * from alerts.status where
+NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com',
+'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com',
+'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2...', at
+or near '.'
+
+
+File       = /home/janesch/rules/entities/FIRC_GSD/entity.group
+EntityName = "firc_trident_ALL_HOSTS_SEVH"
+EntityFilter = NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com', 'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com', 'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2107pap.ldn.swissbank.com', 'sldn1392por.ldn.swissbank.com', 'sldn1599bor.ldn.swissbank.com', 'sldn0622pap.ldn.swissbank.com','sldn1597pap.ldn.swissbank.com'.'sldn0622pap.ldn.swissbank.com')  AND ( Severity >= 3 )
+
+ERROR=Parse failure on line 1 of statement 'select * from alerts.status where
+NodeAlias in ('sldn2278bap.ldn.swissbank.com', 'sldn2279bap.ldn.swissbank.com',
+'sldn1270pww.ldn.swissbank.com', 'sldn0412pww.ldn.swissbank.com',
+'sldn1585pap.ldn.swissbank.com', 'sldn1586pap.ldn.swissbank.com', 'sldn2...', at
+or near '.'
+
+
+File       = /home/janesch/rules/entities/GSD_EQ_HFS/entity.group
+EntityName = "1_HFS_T24_Excal_1_Extract"
+EntityFilter = Class = 10000000000000000000000000
+
+ERROR=Numerical result out of range on line 1 of statement 'select * from
+alerts.status where Class = 10000000000000000000000000 ;...', at or near
+'10000000000000000000000000'
+
+
+File       = /home/janesch/rules/entities/Network/entity.group
+EntityName = "Americas_unack_1366"
+EntityFilter = (((Region in ('Americas',WMUS')) and ((Class in (200,204,205,304,305,306,310,311,312,315)) or ((Class=402) and (Severity>2))) and (Subclass<>'5') and (Acknowledged=0) and (OwnerUID=65534) and (Severity>0) and (AlertGroup not in ('RCMD-4-RSHPORTATTEMPT','CRYPTO-4-PKT_REPLAY_ERR','SNMP-3-AUTHFAIL')))
+
+ERROR=Parse failure on line 1 of statement 'select * from alerts.status where
+(((Region in ('Americas',WMUS')) and ((Class in
+(200,204,205,304,305,306,310,311,312,315)) or ((Class=402) and (Severity>2)))
+and (Subclass<>'5') and (Acknowledged=0) and (OwnerUID=65534) and (Severity>0)
+and (AlertGro...', at or near '')) and ((Class in (200,204,205,304,305,'
+
+

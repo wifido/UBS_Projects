@@ -1,0 +1,143 @@
+########################################################################################################
+#
+#	Author:		G.Thomas
+#	Date:		09th Dec 2009
+#	Version:	Beta-1
+########################################################################################################
+#	Tokens expected
+#
+#	$ClassID
+#	$timeReceived
+#	$timeCreated
+#	$alertId
+#	$alertType
+#	$toolId
+#	$toolType
+#	$OSISeverity
+#	$_domain
+#	$_domainClass
+#	$_objectClass
+#	$_object
+#	$_objectLocation
+#	$_parameterName
+#	$_parameterValue
+#	$SwId
+#	$MsgKeys
+#	$text
+#	$_itMgmtProcess
+
+# OK lets go...
+case "PEM_EHD":
+	$ruleset = $ruleset + "-BMC_PEM"
+	@Agent = 'BMC Patrol EHD'
+	@Description = "timeReceived=" + $timeReceived + " timeCreated=" + $timeCreated + " alertId=" + $alertId + " alertType=" + $alertType + " toolId=" + $toolId + " toolType=" + $toolType + " OSISeverity=" + $OSISeverity + " domain=" + $_domain + " domainClass=" + $_domainClass + " objectClass=" + $_objectClass + " object=" + $_object + " objectLocation=" + $_objectLocation + " parameterName=" + $_parameterName + " parameterValue=" + $_parameterValue + " SwId=" + $SwId + " MsgKeys=" + $MsgKeys + " text=" + $text + " itMgmtProcess=" + $_itMgmtProcess
+	
+	# Reset Time stuff here.
+	# We get 2 tokens $timeRecieved and $timeCreated. Both arrive in CET in format YYYYMMDDHHMMSS. This equates to %Y%m%d%H%M%S
+	# Sounds simple enough, however sometimes timeCreated has value 'N/A' rather than a real time.
+	# Ideally we will use timeCreated unless it is invalid, then we will use timeReceived.
+	# A test on the length of timeCreated should suffice. Valid format is 14 characters.
+	# Once we establish which time token, we need to append CET so that we convert back to UTC for Netcool.
+        #$timeCreatedlength = length($timeCreated)
+        #if (int($timeCreatedlength) == 14) {
+		#$tmpPEMTime1 = $timeCreated + " MET"
+	#} else {
+		#$tmpPEMTime1 = $timeRecieved + " MET"
+	#}
+	if (regmatch($timeCreated,"[0-9]+")) {
+		$tmpPEMTime1 = $timeCreated
+		#$tmpPEMTime1 = $timeCreated + " CET"
+		$ts = 1
+	} 
+	else {
+		$tmpPEMTime1 = $timeReceived
+		#$tmpPEMTime1 = $timeReceived + " CET"
+		$ts = 2
+	}
+	$tz_def = "GMT+1"
+	#$tz_def = "CET"
+	$ct = getdate
+	$tmpPEMFinalTime = datetotime($tmpPEMTime1 + " " + $tz_def,"%Y%m%d%H%M%S %Z")
+	#$tmpPEMFinalTime = datetotime($tmpPEMTime1,"%Y%m%d%H%M%S %Z")
+	@FirstOccurrence = $tmpPEMFinalTime
+	@LastOccurrence  = $tmpPEMFinalTime
+	@Description = @Description + " TS=" + $ts + " tmpPEMTime1=" + $tmpPEMTime1 + " tmpPEMFinalTime=" + $tmpPEMFinalTime + " CT=" + $ct
+
+	# Now lets get NodeAlias and Node values.
+	# Initially set @Node to same value as NodeAlias
+	if (exists($_domain)) {
+		if (match(lower($_domain),"unknown")) {
+			# This is most likely a locally generated event on PEM server, such as filter path stop/start.
+			@NodeAlias  = $FQDN
+			@Node       = $Hostname
+			@AlertGroup = $toolId + " " + $toolType + " " + $_objectClass + " " + $_object
+			@AlertKey   = @AlertGroup
+		}
+		else {
+			$tmpdomainlength = length($_domain)
+			if (int($tmpdomainlength) > 0 ) {
+				@NodeAlias = $_domain
+				@Node      = $_domain
+			} 
+			else {
+				# Default back to PEM system if nothing better.
+				@NodeAlias  = $FQDN
+				@Node       = $Hostname
+			}
+			@AlertKey     = $alertType + " " + $_parameterName + " " + $_object
+			@AlertGroup   = $toolId + " " + $toolType + " " + $_objectClass
+		} 
+	}
+	else {
+		# Default back to PEM system if nothing better. We should never really get here..
+		@NodeAlias  = $FQDN
+		@Node       = $Hostname
+		@AlertKey   = $alertType + " " + $_parameterName + " " + $_object
+		@AlertGroup = $toolId + " " + $toolType + " " + $_objectClass
+	}
+	@Origin       = $FQDN
+	@Summary      = $text
+
+	# We will probably use the token domainClass to assign ownership and Class at a later date, hard code it for the present.
+	@Class        = 4600
+	@Subclass     = $_domainClass
+	@OwnerGID     = 0
+	@OwnerUID     = 65534
+	# Hard code Location and Region here for the time being.
+	@Location     = "Zurich"
+	@Region       = "Switzerland"
+	@UserInt      = $alertId
+	@UserData     = $SwId + "|" + $MsgKeys
+	@UserData1    = $_parameterName + " = " + $_parameterValue
+	@UserData2    = $_itMgmtProcess
+	$TempDoLookup = 2
+	
+
+	# Now set Severity
+	switch ($OSISeverity) {
+		case "1"| "INFORMATION" | "INFORMATIONAL" | "9" | "SKIP" | "INFORMATION_CA" | "INFO":
+			$Severity = 2
+			@Type     = 1
+		case "2" | "3" | "WARNING" | "WARN"| "MINOR" | "WARNING_CA":
+			$Severity = 3
+			@Type     = 1
+		case "4" | "MAJOR":
+			$Severity = 4
+			@Type     = 1
+		case "5" | "CRITICAL":
+			$Severity = 5
+			@Type     = 1
+		case "0" | "CANCEL_CA" | "CLEAR":
+			$Severity = 1
+			@Type     = 2
+		default:
+			$Severity = 1
+			@Type     = 1
+	}
+	# As Severity was not set when SevLookUp was previously called, re make that call here.
+	[@Severity, @ExpireTime] = lookup($Severity,SevLookUp)
+	
+	#$tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass + " " + $alertId
+	$tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass
+
+	

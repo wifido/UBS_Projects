@@ -1,0 +1,69 @@
+case "ubsw_abilisoft":
+
+	$ruleset          = $ruleset + "ubsw_abilisoft"
+        $abiliAgent       = "UBSW_Abilisoft"
+	$abiliOwnerGID    = 468
+	$abiliDescription = "Community=" + $community + "<oid1=" + $1 + "<oid2=" + $2 + "<oid3=" + $3 + "<oid4=" + $4 + "<oid5=" + $5 + "<oid6=" + $6 + "<oid7=" + $7 + "<oid8=" + $8 + "<oid9=" + $9 + "<oid10=" + $10 + "<"
+        # Generic assignments
+	$abiliMonitor     = $1
+	$abiliObservation = $2	
+        $abiliAlertKey    = $3
+        $abiliAlertGroup  = $4
+        $abiliClass       = $5
+	$abiliSubclass    = $6
+        $abiliSummary     = $7
+        $abiliSeverity    = $8
+        $abiliSysDesig    = $9
+	$abiliBusUnit     = $10
+
+        # Work out Type field...
+        switch ($abiliSeverity)
+	{
+                case "0":
+			# This is a Clear Event. reset abiliSeverity so that generic clear works.
+			$abiliSeverity = 1
+			$abiliType     = 2
+		case "1":
+			# This is a Clear Event.
+			$abiliType = 2
+
+		default:
+			# This is a problem event.
+			$abiliType = 1
+	}
+
+	switch($specific-trap)
+	{
+        # Make changes here to override the previous defaults, based on specific trap instance.
+
+		case "1":
+                        # Make changes here
+
+		default:
+
+			$abiliAlertGroup  = "Unknown"
+			$abiliAlertKey    = "Unknown"
+			$abiliSummary     = "Unknown abilisoft Trap " + $specific-trap
+			$abiliSeverity    = 1
+			$abiliType        = 0
+	}
+
+	# tmpIdentifier definition
+	$tempIdentifier = $Node + "-" + $abiliAlertGroup + "-" + $abiliAlertKey + "-" + $abiliSeverity + "-" + $abiliType + "-" + $abiliMonitor + "-" + $abiliObservation
+        $TempDoLookup   = 2
+
+
+	# Define Omnibus fields here
+	@Agent        = $abiliAgent
+	@AlertGroup   = $abiliAlertGroup
+	@AlertKey     = $abiliAlertKey
+	@Class        = $abiliClass
+	@Description  = $abiliDescription
+	@OwnerGID     = $abiliOwnerGID
+	@Summary      = $abiliSummary
+	@Severity     = $abiliSeverity
+	@Type         = $abiliType
+	@SystemDesig  = $abiliSysDesig
+	
+			
+			

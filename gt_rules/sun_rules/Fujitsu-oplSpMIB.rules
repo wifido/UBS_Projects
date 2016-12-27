@@ -1,0 +1,204 @@
+###############################################################################
+#
+#	Fujitsu-OPL-SP-MIB.rules
+#	Rulesfile based OPL-SP-MIB
+#
+#	20080507	Chris Janes	Original
+#
+###############################################################################
+case "scfMIBTrapPrefix":
+
+
+@Agent = "OPL-SP-MIB"
+$ruleset = $ruleset + " " + @Agent
+@Class = 999996
+
+#################################################################################
+#
+#	20080213	Following section Added for development only
+
+@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6 + " $7 = " + $7 + " $8 = " + $8 + " $9 = " + $9 + " $10 = " + $10 
+
+#
+#
+#################################################################################
+
+$ruleset = $ruleset + " " + $specific-trap
+switch($specific-trap) 
+	{
+		case "1": ### - scfSPFailover
+			#################################################
+        		# Indicates that a failover from the active SP to the standby 
+			# SP has occurred.  The Board ID included is the ID of the 
+			# SP that has been failed over to."
+			#################################################
+			$scfAgentIndex = $1	# SCF board ID
+
+
+                        @AlertGroup = "SP Failover"
+                        @AlertKey = $scfAgentIndex
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "A failover from the active SP to the standby  SP has occurred.  The ID of the SP that has been failed over to is " + $scfAgentIndex
+                        @Description = ""
+                        
+                        
+		case "2": ### - scfComponentEvent
+			#################################################
+        		# Indicates that a component has been added to or removed from 
+			# the system.  The event will be based on the highest level 
+			# component possible.  For example, if a CMU is removed, then
+			# only a trap for the CMU is generated and not for the CPU and
+			# Memory that are on that CMU.
+			#################################################
+			$scfComponentSerialNumber = $1	# Component serial number
+			$scfTrapEventType = $2		# The event type of this notification
+			$scfTrapEventTypeTxt = lookup($scfTrapEventType, scfTrapEventType)
+
+                        @AlertGroup = "Component Event"
+                        @AlertKey = $scfComponentSerialNumber
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "A Component (" + $scfComponentSerialNumber + ") has been " + $scfTrapEventTypeTxt + "from the system"
+                        @Description = ""
+
+		case "3": ### - scfComponentStatusEvent
+			#################################################
+        		# Indicates that a component has changed to a status
+			# of interest, including fault, degraded, and recovery from
+			# a previous fault or degraded state condition."
+			#################################################
+			$scfComponentStatus = $1	# Component operational status
+			$scfComponentStatusTxt = lookup($scfComponentStatus, ScfStateTC)
+
+			$scfTrapStatusEventType = $2	# 
+			$scfTrapStatusEventTypeTxt = lookup($scfTrapStatusEventType, scfTrapStatusEventType)
+
+                        @AlertGroup = "$scfComponentStatusTxt"
+                        @AlertKey = "$scfTrapStatusEventTypeTxt"
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "Indicates that a component has changed to a status of interest, " + $scfTrapStatusEventTypeTxt + ", and recovery from  a previous fault or degraded state condition and has a status of " + $scfComponentStatusTxt
+                        @Description = ""
+
+		case "4": ### - scfXsbModeChangeEvent
+			#################################################
+        		# Indicates that an XSB mode has been changed to either
+			# a divided or non-divided state."
+			#################################################
+			$scfBoardXsbs = $1		# The total number of XSB partitions for this board
+
+                        @AlertGroup = "Xsb Mode Change"
+                        @AlertKey = $scfBoardXsbs
+                        @UserData = $sunHwTrapAdditionalInfo
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "XSB mode has been changed to either a divided or non-divided state, there are " + $scfBoardXsbs + " total number of XSB partitions for this board"
+                        @Description = ""
+
+		case "5": ### - scfDomainStatusAlarm
+			#################################################
+        		# Indicates that a status alarm condition has occurred on a 
+			# domain.  This includes a status change and a panic."
+			#################################################
+			$scfDomainStatus = $1			# Domain operational status.
+			$scfDomainStatusTxt = lookup($scfDomainStatus, ScfDomainStatusTC)
+
+			$scfTrapDomainStatusAlarmType = $2	# The type of this domain alarm that provides additional information on the reason that the notification was sent.
+			$scfTrapDomainStatusAlarmTypeTxt = lookup($scfTrapDomainStatusAlarmType, ScfDomainStatusAlarmType)
+
+                        @AlertGroup = $scfDomainStatusTxt
+                        @AlertKey = $scfTrapDomainStatusAlarmTypeTxt
+                        @UserData = $sunHwTrapAdditionalInfo
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = ""
+                        @Description = ""
+
+		case "6": ### - scfDomainXsbEvent
+			#################################################
+        		# Indicates that an XSB has been added to or removed from
+			# a domain."
+			#################################################
+			$scfXsbDomainId	= $1		# Active domain ID of the XSB
+
+			$scfTrapDomainStatusAlarmType = $2	# The type of this domain alarm that provides additional information on the reason that the notification was sent.
+			$scfTrapDomainStatusAlarmTypeTxt = lookup($scfTrapDomainStatusAlarmType, ScfDomainStatusAlarmType)
+
+                        @AlertGroup = "Domain Xsb"
+                        @AlertKey = $scfTrapDomainStatusAlarmTypeTxt
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "an XSB has been added to or removed from the domain " + $scfXsbDomainId
+                        @Description = ""
+
+
+		case "7": ### - scfIoBoxEvent
+			#################################################
+        		# Indicates that an I/O Box component has been added to or
+			# removed from the system."
+			#################################################
+			$scfTrapIoBoxId = $1		# Trap unique I/O Box identifier.  The persistent unique identifier for an I/O Box is it's serial number
+			$scfTrapIoBoxSubType = $2	# Type of the I/O Box component that a trap originated from
+			$scfTrapIoBoxSubTypeTxt = lookup($scfTrapIoBoxSubType, ScfIoBoxComponentType)
+			$scfTrapIoBoxSubId = $3		# Identifier for the I/O Box component that a trap originated from
+			$scfTrapEventType = $4
+			$scfTrapEventTypeTxt = lookup($scfTrapEventType, scfTrapEventType)
+			
+
+                        @AlertGroup = "Io Box"
+                        @AlertKey = $scfTrapIoBoxId
+                        @UserData = $sunHwTrapAdditionalInfo
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "an I/O Box component (" + $scfTrapIoBoxSubTypeTxt + ") has been added to or removed from the system"
+                        @Description = ""
+
+		case "8": ### - scfIoBoxLedEvent
+			#################################################
+        		# Indicates that an I/O Box component LED changed.  Depending
+			# on the LED type, this will notify of errors detected in an
+			# I/O Box component."
+			#################################################
+			$scfTrapIoBoxId = $1		# Trap unique I/O Box identifier.  The persistent unique identifier for an I/O Box is it's serial number
+			$scfTrapIoBoxSubType = $2	# Type of the I/O Box component that a trap originated from
+			$scfTrapIoBoxSubTypeTxt = lookup($scfTrapIoBoxSubType, ScfIoBoxComponentType)
+			$scfTrapIoBoxSubId = $3		# Identifier for the I/O Box component that a trap originated from
+			$scfTrapIoBoxLedType = $4	# LED Type for the I/O Box component that a trap originated from
+			$scfTrapIoBoxLedTypeTxt = lookup($scfTrapIoBoxLedType, ScfIoBoxLEDType)
+			$scfTrapIoBoxLedValue = $5	# LED Value for the I/O Box component LED that a trap originated from
+			$scfTrapIoBoxLedValueTxt = lookup($scfTrapIoBoxLedValue, ScfIoBoxLEDState)
+
+                        @AlertGroup = "Io Box Led"
+                        @AlertKey = $scfTrapIoBoxId
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "An I/O Box component LED changed to " + $scfTrapIoBoxLedValueTxt
+                        @Description = ""
+
+			
+		case "9": ### - scfIoBoxTemperatureEvent
+			#################################################
+        		# Indicates that an I/O Box temperature sensor has triggered
+			# an event."
+			#################################################
+			$scfTrapIoBoxId = $1		# Trap unique I/O Box identifier.  The persistent unique identifier for an I/O Box is it's serial number
+			$scfTrapIoBoxSubType = $2	# Type of the I/O Box component that a trap originated from
+			$scfTrapIoBoxSubTypeTxt = lookup($scfTrapIoBoxSubType, ScfIoBoxComponentType)
+			$scfTrapIoBoxSubId = $3		# Identifier for the I/O Box component that a trap originated from
+			$scfTrapIoBoxTempEventType = $4	# The event type of this notification.  This provides additional information on the reason that the notification was sent		
+ 			$scfTrapIoBoxTempEventTypeTxt = lookup($scfTrapIoBoxTempEventType, ScfTrapIoBoxTempEventTypeTC)
+                       
+                        @AlertGroup = "Io Box Temperature"
+                        @AlertKey = $scfTrapIoBoxId
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Summary = "An I/O Box temperature sensor has triggered " + $scfTrapIoBoxTempEventTypeTxt
+                        @Description = ""
+
+
+		default:
+			@Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+			@Severity = 1
+			@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+	}
+
+	
+	@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + $IdentifierAddon

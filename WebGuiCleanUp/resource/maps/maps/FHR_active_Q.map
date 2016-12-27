@@ -1,0 +1,2 @@
+map(name="FHR_active_Q",bgColor="white",w=250,h=250,acl="*")
+button(name="visual_1",label="Active Q",x=43,y=73,action="Open URL",url="$(SERVER)/Template/openPageWide.html?System_Filter=FHP_Active_Q",target="_hidden",entity="FHP_Active_Q",datasource="NCOMS",w=167,h=83,type="rectangle",arc diameter=20,legend=Label,font="Helvetica",size=10,font color="black",style="+_fontStyle+")

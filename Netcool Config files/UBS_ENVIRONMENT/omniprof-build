@@ -1,0 +1,218 @@
+#############################
+# 
+# UBS common environment file
+#
+# Author: Gary Thomas
+# Date: 15th June 2007
+# Works on Linux and Solaris
+#
+# Generic version created for all Omnibus versions.
+# BE CAREFUL in here please.
+
+# Set common variables here
+OMNIPROF_VERSION="3.0-beta"
+NCHOME=/sbclocal/V72_netcool
+NCLICENSE=${NCHOME}/common/license
+PROFHOST=`uname -n`
+PROFENV=`uname -n | cut -c9-12`
+PROFDOMAIN=`domainname`
+PROF_FQDN=${PROFHOST}.${PROFDOMAIN}
+if [ ${PROFDOMAIN} == "stm.swissbank.com" ]; then
+	PROF_LOCN="Stamford"
+	PROF_REG="USAPAC"
+elif [ ${PROFDOMAIN} == "ldn.swissbank.com" ]; then
+	PROF_LOCN="London"
+	PROF_REG="EMEA"
+elif [ ${PROFDOMAIN} == "opf.swissbank.com" ]; then
+	PROF_LOCN="Opfikon"
+	PROF_REG="EMEA"
+elif [ ${PROFDOMAIN} == "zur.swissbank.com" ]; then
+	PROF_LOCN="Zurich"
+	PROF_REG="EMEA"
+elif [ ${PROFDOMAIN} == "sng.swissbank.com" ]; then
+	PROF_LOCN="Singapore"
+	PROF_REG="PACIFIC"
+else
+	PROF_LOCN="Unknown"
+	PROF_REG="Unknown"
+fi
+
+## Set License Server variables here
+# LMGRD_LOCAL defines if Flex license server is remote=0 or local=1
+UBS_DOMAIN=swissbank.com
+IMP_US_LIC_SERV=xstm1521pap
+IMP_UK_LIC_SERV=xldn0628pap
+DEV_LIC_SERV=xstm5257dap
+ENG_LIC_SERV=xldn1052dap
+if [ ${PROFENV} == "pap" ]; then
+	# The majority of prod servers are licensed locally with the following exceptions.
+	if [ ${PROFHOST} == "xldn2929pap" ]; then
+		# US Impact Server (backup)
+		LMGRD_LOCAL=0
+		LICSERV_HOST=27000@${IMP_UK_LIC_SERV}.ldn.${UBS_DOMAIN}:27000@${IMP_US_LIC_SERV}.stm.${UBS_DOMAIN}
+	elif [ ${PROFHOST} == "xstm1522pap" ]; then
+		# UK Impact server (backup)
+		LMGRD_LOCAL=0
+		LICSERV_HOST=27000@${IMP_US_LIC_SERV}.stm.${UBS_DOMAIN}:27000@${IMP_UK_LIC_SERV}.ldn.${UBS_DOMAIN}
+	elif [ ${PROFHOST} == "xldn0028pap" ]; then
+		# This is a temporary addition while we test V7.
+		LMGRD_LOCAL=0
+		LICSERV_HOST=27000@${ENG_LIC_SERV}.ldn.${UBS_DOMAIN}
+	else
+		# Here is where the majority will fall through, as they are licensed locally.
+		LMGRD_LOCAL=1
+		LICSERV_HOST=27000@${PROFHOST}.${PROFDOMAIN}
+	fi
+elif [ ${PROFENV} == "por" ]; then
+	# This statement catches the Oracle gateways.
+	LMGRD_LOCAL=1
+	LICSERV_HOST=27000@${PROFHOST}.${PROFDOMAIN}
+elif [ ${PROFHOST} == "xstm5257dap" ]; then
+	# Here we set up for the Dev license server.
+	LMGRD_LOCAL=1
+	LICSERV_HOST=27000@${DEV_LIC_SERV}.stm.${UBS_DOMAIN}:27000@${ENG_LIC_SERV}.ldn.${UBS_DOMAIN}
+elif [ ${PROFHOST} == "xstm1935dap" ]; then
+	# The dev webtop server. It can use engineering licenses if neccessary.
+	LMGRD_LOCAL=0
+	LICSERV_HOST=27000@${DEV_LIC_SERV}.stm.${UBS_DOMAIN}:27000@${ENG_LIC_SERV}.ldn.${UBS_DOMAIN}
+elif [ ${PROFHOST} == "xstm9174dap" ]; then
+	# This is a temporary addition while we test V7.
+	LMGRD_LOCAL=0
+	LICSERV_HOST=27000@${DEV_LIC_SERV}.stm.${UBS_DOMAIN}
+elif [ ${PROFHOST} == "xldn1052dap" ]; then
+	# This is the Engineering License server.
+	LMGRD_LOCAL=1
+	LICSERV_HOST=27000@${PROFHOST}.${PROFDOMAIN}
+elif [ ${PROFENV} == "dap" ]; then
+	# The remaining dap servers are Engineering.
+	LMGRD_LOCAL=0
+	LICSERV_HOST=27000@${ENG_LIC_SERV}.ldn.${UBS_DOMAIN}
+else
+	echo "LMGRD_LOCAL and LICENSE VARIABLES incorrectly set" >> ${OMNIHOME}/log/OMNIPROF.log
+
+fi
+NETCOOL_LICENSE_FILE=${LICSERV_HOST}
+LM_LICENSE_FILE=${NETCOOL_LICENSE_FILE}
+
+export OMNIPROF_VERSION NCHOME LMGRD_LOCAL NCLICENSE PROFHOST PROFDOMAIN PROF_FQDN PROF_LOCN PROF_REG NETCOOL_LICENSE_FILE LM_LICENSE_FILE 
+
+# Detect system architecture here (we need it for some file locations and libraries).
+TMPUNAME=`uname -s`
+if [ ${TMPUNAME} = "Linux" ]; then
+	MUSE_ARCH=linux2x86
+elif [ ${TMPUNAME} = "SunOS" ]; then
+	MUSE_ARCH=solaris2
+else
+	MUSE_ARCH=UNKNOWN
+	echo "${MUSE_ARCH} is incorrectly set"
+fi
+
+export MUSE_ARCH
+if [ -h ${NCHOME}/omnibus ]; then
+	# Set Omnibus specific variables here
+	# Common variables across all versions
+	OMNIHOME=${NCHOME}/omnibus
+	OMNIENV=${NCHOME}/UBS_ENVIRONMENT
+	if [ -f ${NCHOME}/install/ncisetup ]; then
+		OMNI_BUILD=`${NCHOME}/install/ncisetup -report all | grep Netcool/OMNIbus | awk '{print $3}'`
+		
+		if [ ${OMNI_BUILD} == "7.2.0" ]; then
+			OMNITEMPLATES=${NCHOME}/UBS_TEMPLATES
+			OMNIUTILS=${NCHOME}/UBS_UTILS
+			OMNIRULES=${NCHOME}/UBS_RULES/ubsw
+			OMNIPROPS=${NCHOME}/UBS_PROPS
+			OMNILOG=${OMNIHOME}/log
+		else 
+			echo "ncisetup cannot identify version of Netcool/OMNIbus... Please check with Level 2 support."
+		fi
+	else
+		echo "Unable to Identify version of Netcool/OMNIbus installed... Please check with Level 2 support."
+	fi
+else 
+		echo "OMNIHOME directory not found in ${OMNIHOME}.... Is this an omnibus box?"
+fi
+export OMNI_BUILD OMNIENV OMNIHOME OMNITEMPLATES OMNIUTILS OMNIRULES OMNIPROPS OMNILOG
+
+## ISM environment settings.
+# ISM environment variables are redefined by ISM as Version 2.4 has proved to be incompatible with omnibus in a co-resident deployment.
+# These specific variables can now be found in /sbclocal/ism/ismprof.
+# This variable left here for PA to use.
+ISMHOME=/sbclocal/ism/ism
+
+export ISMHOME
+
+
+# Set Webtop variables here
+WEBTOP_HOME=${NCHOME}/webtop
+WEBTOPLOG=${NCHOME}/log/webtop
+
+export WEBTOP_HOME WEBTOPLOG
+
+# Set impact specific variables here
+IMPACT_HOME=${NCHOME}/impact
+IMPACTLOG=${NCHOME}/log/impact
+IATEMPDIR=/sbclocal/tmp
+
+export IMPACT_HOME IMPACTLOG IATEMPDIR
+
+# Set Rad specific variables here
+RAD_HOME=${NCHOME}/rad
+
+export RAD_HOME
+
+# Set Rad/Impact common variables here
+SM_HOME=${NCHOME}/sm
+NCSM_HOME=${NCHOME}/security
+NCSMLOG=${NCHOME}/log/security
+GUI_HOME=${NCHOME}/guiserver
+GUILOG=${NCHOME}/log/guiserver
+
+export SM_HOME NCSM_HOME NCSMLOG GUI_HOME GUILOG
+
+
+# Oracle related environment variables here
+if [ ${PROFHOST} = "sldn0150por" ]; then
+	ORACLE_SID=MMLDNP1
+elif [  ${PROFHOST} = "sstm8958por" ]; then
+	ORACLE_SID=MMSTMP1
+elif [  ${PROFHOST} = "sldn0871dor" ]; then
+	ORACLE_SID=MMLDND1
+fi
+
+LD_LIBRARY_PATH_64=/opt/EMCpower/lib/sparcv9
+ORACLE_HOME=/sbclocal/app/oracle/product/9.2.0.6.0.1
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}/lib32
+
+export ORACLE_SID LD_LIBRARY_PATH_64 ORACLE_HOME LD_LIBRARY_PATH
+
+
+# Set Operating system specific variables here. We already set MUSE_ARCH higher up.
+if [ ${MUSE_ARCH} = "linux2x86" ]; then
+	TMPDIR=/dev/shm
+	LANG=C
+	LC_ALL=en_GB
+	PROF_IP=`domainname -i`	
+	PERL5LIB=${OMNIHOME}/utils/perllib/custom/lib:${OMNIHOME}/utils/perllib/cpan/MUSE_CPAN_PROD/lib:${OMNIHOME}/utils/perllib/MUSE_PERL_PROD/lib
+	export MUSE_ARCH TMPDIR LANG LC_ALL PROF_IP PERL5LIB
+	ulimit -c unlimited				# Allows a core file to be generated
+	ulimit -n 8192					# Increases number of open files allowed
+	ulimit -s 2048					# Restricts Stack size to 2 Meg in line with Micromuse recommendation.
+
+elif [ ${MUSE_ARCH} = "solaris2" ]; then
+	LANG=C
+	LC_ALL=C
+	TZ=utc
+	export MUSE_ARCH LANG LC_ALL TZ 
+else
+	MUSE_ARCH=UNKNOWN
+	echo "${MUSE_ARCH} is incorrectly set"
+fi
+
+
+# Set Global environment stuff here
+PATH=${PATH}:${NCLICENSE}/bin:${NCHOME}/bin:${OMNIHOME}/bin:${OMNIHOME}/install:${OMNIHOME}/probes:${NCLICENSE}/platform/${MUSE_ARCH}/bin:${ISMHOME}/bin:${WEBTOP_HOME}/bin:${SM_HOME}/subscribers:${NCSM_HOME}/bin:${RAD_HOME}/bin:${GUI_HOME}/bin:${IMPACT_HOME}/bin
+LD_LIBRARY_PATH=${NCHOME}/platform/${MUSE_ARCH}/lib:${NCHOME}/platform/${MUSE_ARCH}/third_party_libs:${ISMHOME}/platform/${MUSE_ARCH}/lib:${OMNIHOME}/platform/${MUSE_ARCH}/lib:${OMNIHOME}/platform/${MUSE_ARCH}/syb12/lib:${LD_LIBRARY_PATH}
+
+export PATH LANG
+
+# End of File

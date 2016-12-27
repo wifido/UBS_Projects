@@ -1,0 +1,1591 @@
+#############################################################################################
+#
+# 	rmonEventsV2 include file
+#
+#	20080805	Chris Janes	New Mib - dated 27 January, 2005
+#	20091201	Gary Thomas	Merged all events to come in Class=2525251 and OwnerGID=257 BR_754
+#					
+#
+#############################################################################################
+
+case "rmonEventsV2":
+	@Agent = "rmonEventsV2"
+	@OwnerGID = 257
+	@OwnerUID = 65534
+	@Class = 2525251
+	@Subclass = 'DataFort Tape Encryption RMON'
+	$TempDoLookup = 2
+	$TD_Num = "BR_754"
+	$ruleset = $ruleset + " - rmonEventsV2 " + $specific-trap
+
+	switch($specific-trap) 
+	{
+
+		case "1" :
+			$TrapType = "Rising"
+		case "1" :
+			$TrapType = "Falling"
+	        default:
+			$TrapType = "Unknown"
+	}
+	$alarmIndex = $1
+	$alarmVariable = $2
+	$alarmSampleType = $3
+	$alarmValue = $4
+	$alarmRisingThreshold = $5
+
+
+	if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.5.0")) ### dcrChsStatBatCharger.0
+	{
+		@Class = "2525251"
+		@AlertGroup = "Battery charger status"
+		@AlertKey = $alarmIndex
+		@Description = "If value is stopped(0), or error(-1), reboot DataFort. If the message persists after a reboot, call Decru Technical Support."
+		$ruleset = $ruleset + " AValue = " + $alarmValue
+		switch($alarmValue)
+		{
+			case "0": ### stopped
+				@Summary = "Battery charger Stopped"
+				@Severity = 5
+				@Type = 1
+
+                        case "1": ### Working
+                                @Summary = "Battery charger Working"
+                                @Severity =1
+                                @Type = 2
+
+                        case "3": ### Charging
+                                @Summary = "Battery charger Charging"
+                                @Severity = 1
+                                @Type = 2
+
+                        default: ### Error
+                                @Summary = "Battery charger Error"
+                                @Severity = 5
+                                @Type = 1
+		}
+	}
+
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.6.0")) ### dcrChsStatBattery.0
+        {
+		@Class = "2525251"
+                @AlertGroup = "Battery status"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "Battery Status Alert"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.3.0")) ### :dcrChsStatGPIOPins.0
+        {
+		@Class = "2525251"
+                @AlertGroup = "GPIO pins position"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "GPIO pins position Alert"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.1.0")) ### :dcrChsStatLCD.0
+        {
+		@Class = "2525251"
+                @AlertGroup = "LCD controller status"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "LCD controller status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.4.0")) ### dcrChsStatMicroController.0
+        {
+		@Class = "2525251"
+                @AlertGroup = "Microcontroller status"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "Microcontroller Status Error"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.2.2.2.0")) ### dcrChsStatSDRAM.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "SDRAM Controller"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "SDRAM Controller Status Error"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.3.1.3")) ### dcrFanSpeed
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $FanNo = SplitArray[13]
+                @AlertGroup = "Fan Speed"
+                @AlertKey = "MB" + $FanNo + " " + $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support."
+                @Summary = "MB" + $FanNo + " Fan Speed is " + $alarmValue + " RPM"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.1")) ### dcrHBAOperStatus.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "Host 0 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Host 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.2")) ### dcrHBAOperStatus.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "Storage 0 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Storage 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.3")) ### dcrHBAOperStatus.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "Host 1 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Host 1 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.4")) ### dcrHBAOperStatus.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "Storage 1 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Storage 1 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.5")) ### dcrHBAOperStatus.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "Host 2 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Host 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.6")) ### dcrHBAOperStatus.6
+        {
+                @Class = "2525251"
+                @AlertGroup = "Storage 2 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Storage 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.7")) ### dcrHBAOperStatus.7
+        {
+                @Class = "2525251"
+                @AlertGroup = "Host 3 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Host 3 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.8")) ### dcrHBAOperStatus.8
+        {
+                @Class = "2525251"
+                @AlertGroup = "Storage 3 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Storage 3 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.9")) ### dcrHBAOperStatus.9
+        {
+                @Class = "2525251"
+                @AlertGroup = "Host 4 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Host 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.7.1.3.10")) ### dcrHBAOperStatus.10
+        {
+                @Class = "2525251"
+                @AlertGroup = "Storage 4 HBA Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check Fibre connection. If the HBA is connected, reboot the DataFort. If the condition persists after the reboot, call Decru Technical Support."
+                @Summary = "Storage 0 HBA Status"
+                @Severity = 5
+                @Type = 1
+        }
+	else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.6.1.3")) ### dcrPowerSupplyStatus
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $PsuNo = SplitArray[13]
+                @AlertGroup = "Power Supply Status"
+                @AlertKey = "PSU" + $PsuNo + " " + $alarmIndex
+                @Description = "If value is acLost(8), check the power cable: if the power cord is plugged in and the error persists, call Decru Technical Support."
+                switch($alarmValue)
+		{
+			case "1": ### OK
+				@Summary = "PSU " + $PsuNo + " OK"
+	                	@Severity = 1
+	                	@Type = 2
+			case "2": ### No Sensor
+				@Summary = "PSU " + $PsuNo + " Has No Sensor"
+	                	@Severity = 3
+	                	@Type = 1
+			case "3": ### Not Present
+				@Summary = "PSU " + $PsuNo + " is not present"
+	                	@Severity = 3
+	                	@Type = 1
+			case "4": ### Error Found
+				@Summary = "PSU " + $PsuNo + " has an Error"
+        	        	@Severity = 5
+	                	@Type = 1
+			case "8": ### AC Lost
+				@Summary = "PSU " + $PsuNo + " has no AC"
+        	        	@Severity = 5
+	                	@Type = 1
+			default:
+                }
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.4.1.3.1")) ### dcrTempSensorValue.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "MB Temp Sensor"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "MB temperature value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.4.1.3.2")) ### dcrTempSensorValue.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "CPU Temp Sensor"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "CPU temperature value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.4.1.3.1")) ### dcrTempSensorValue.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "PSU Temp Sensor"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "PSU temperature value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.4.1.3.4")) ### dcrTempSensorValue.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "DCC Temp Sensor"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "DCC temperature value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.1")) ### dcrVoltSensorValue.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.2 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.2 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.2")) ### dcrVoltSensorValue.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.25 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.25 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.3")) ### dcrVoltSensorValue.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.8 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.8 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.4")) ### dcrVoltSensorValue.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.8 VSB Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.8 VSB Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.5")) ### dcrVoltSensorValue.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "2.5 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "2.5 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.6")) ### dcrVoltSensorValue.6
+        {
+                @Class = "2525251"
+                @AlertGroup = "3.30 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "3.30 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.7")) ### dcrVoltSensorValue.7
+        {
+                @Class = "2525251"
+                @AlertGroup = "3.30 Volt AUX Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "3.30 AUX Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.8")) ### dcrVoltSensorValue.8
+        {
+                @Class = "2525251"
+                @AlertGroup = "3.30 Volt VSB Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "3.30 VSB Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.9")) ### dcrVoltSensorValue.9
+        {
+                @Class = "2525251"
+                @AlertGroup = "5.00 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "5.00 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.10")) ### dcrVoltSensorValue.10
+        {
+                @Class = "2525251"
+                @AlertGroup = "5.00 VSB Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "3.30 VSB Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.11")) ### dcrVoltSensorValue.11
+        {
+                @Class = "2525251"
+                @AlertGroup = "12.00 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "12.00 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.12")) ### dcrVoltSensorValue.12
+        {
+                @Class = "2525251"
+                @AlertGroup = "12.00 VRM Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "12.00 VRM Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.13")) ### dcrVoltSensorValue.13
+        {
+                @Class = "2525251"
+                @AlertGroup = "M 12.00 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "M 12.00 VSBoltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.14")) ### dcrVoltSensorValue.14
+        {
+                @Class = "2525251"
+                @AlertGroup = "VBAT Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "VBAT Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.15")) ### dcrVoltSensorValue.15
+        {
+                @Class = "2525251"
+                @AlertGroup = "CPU Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "CPU Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.16")) ### dcrVoltSensorValue.16
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.50 NIC Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.50 NIC Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.17")) ### dcrVoltSensorValue.17
+        {
+                @Class = "2525251"
+                @AlertGroup = "1.50 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "1.50 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.18")) ### dcrVoltSensorValue.18
+        {
+                @Class = "2525251"
+                @AlertGroup = "3.30 STBY Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "3.30 STBY Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.19")) ### dcrVoltSensorValue.19
+        {
+                @Class = "2525251"
+                @AlertGroup = "5.00 STBY Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "5.00 STBY Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.20")) ### dcrVoltSensorValue.20
+        {
+                @Class = "2525251"
+                @AlertGroup = "SEP 0 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "SEP 0 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.21")) ### dcrVoltSensorValue.21
+        {
+                @Class = "2525251"
+                @AlertGroup = "SEP 1 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "SEP 1 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.22")) ### dcrVoltSensorValue.22
+        {
+                @Class = "2525251"
+                @AlertGroup = "SEP 2 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "SEP 2 VSB Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.23")) ### dcrVoltSensorValue.23
+        {
+                @Class = "2525251"
+                @AlertGroup = "SEP 3 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "SEP 3 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.2.5.1.3.24")) ### dcrVoltSensorValue.24
+        {
+                @Class = "2525251"
+                @AlertGroup = "SEP 4 Volt Sensor Value"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort. If the message reappears, call Decru Technical Support.."
+                @Summary = "SEP 4 Voltage value " + $alarmValue + " degf"
+                @Severity = 5
+                @Type = 1
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.6.6.0")) ### dcrCrptIntFPGAError.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crpt Int FPGA Error"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort will automatically reboot if this alarm is seen. If the message persists after the reboot, call Decru Technical Support.."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "There is no Crypt Int FPGA Error"
+	                	@Severity = 1
+	                	@Type = 2
+			default: ### Error
+				@Summary = "Unrecoverable FPGA error;"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.6.5.0")) ### dcrCrptIntLinkStatus.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crpt Int Link Status"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort will automatically reboot if this alarm is seen. If the message persists after the reboot, call Decru Technical Support.."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Link status between a smart card's microcontroller and its device driver is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			default: ### Error
+				@Summary = "Link status between a smart card's microcontroller and its device driver has an Error"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.6.1.0")) ### dcrCrptIntMasterKey.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crpt Int Master Key"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort will automatically reboot if this alarm is seen. If the message persists after the reboot, call Decru Technical Support.."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Number of fatal interrupts during Master Key operation inside crypto sub-system is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			default: ### Error
+				@Summary = "Number of fatal interrupts during Master Key operation inside crypto sub-system has an Error"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.6.3.0")) ### dcrCrptIntPublicKey.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crpt Int Public Key"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort will automatically reboot if this alarm is seen. If the message persists after the reboot, call Decru Technical Support.."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Number of fatal interrupts during Public Key operation inside crypto sub-system is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			default: ### Error
+				@Summary = "Number of fatal interrupts during Public Key operation inside crypto sub-system has an Error"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.1.0")) ### dcrCrptStatDriver.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crypto driver status;"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort will automatically reboot if this alarm is seen. If the message persists after the reboot, call Decru Technical Support.."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Crypto driver status is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			default: ### Error
+				@Summary = "Crypto driver status has an Error"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.5.0")) ### dcrCrptStatInit.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crypto Status Init;"
+                @AlertKey = $alarmIndex
+                @Description = "Initialize DataFort if it has not already been initialized. Reinsert the System Card and reboot if DataFort has been initialized. If the message persists after the reboot and initialization, call Decru Technical Support."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Crypto sub-system initialized status is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			case "1": ### OK
+				@Summary = "Crypto sub-system initialized status is New Card Expected"
+	                	@Severity = 5
+	                	@Type = 1
+			case "2": ### OK
+				@Summary = "Crypto sub-system initialized status is Not Found"
+	                	@Severity = 5
+	                	@Type = 1
+			case "3": ### masterKeyNotLoaded
+				@Summary = "Crypto sub-system initialized status is Master Key Not Loaded"
+	                	@Severity = 5
+	                	@Type = 1
+			case "4": ### notInitialized
+				@Summary = "Crypto sub-system initialized status is Not Initialized"
+	                	@Severity = 5
+		               	@Type = 1
+			default: ### unknownError
+				@Summary = "Crypto driver status has an unknownError"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.3.0")) ### dcrCrptStatSelfTest.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crypto Status Self Test"
+                @AlertKey = $alarmIndex
+                @Description = "Reboot the DataFort if this alarm is seen. If the message persists after the reboot, call Decru Technical Support."
+                @Summary = "Crypto self-test Error"
+                @Severity = 5
+                @Type = 1
+        }
+	else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.4.0")) ### dcrCrptStatSmartCard.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crypto Status Smart Card;"
+                @AlertKey = $alarmIndex
+                @Description = "Check the System Card if the value is notFound(2). Reinsert the System Card and reboot if the value is notFound(2). If the value is notFound(2) and the message persists after the reboot, call Decru Technical Support. If the value is notInitialize(1), initialize the DataFort appliance."
+                switch($alarmValue)
+		{
+			case "0": ### OK
+				@Summary = "Crypto Status Smart Card status is OK"
+	                	@Severity = 1
+	                	@Type = 2
+			case "1": ### OK
+				@Summary = "Crypto Status Smart Card status is not Initialized"
+	                	@Severity = 5
+	                	@Type = 1
+			case "2": ### OK
+				@Summary = "Crypto Status Smart Card status is not Found"
+	                	@Severity = 5
+	                	@Type = 1
+			default: ### unknownError
+				@Summary = "Crypto Status Smart Card status has an unknownError"
+	                	@Severity = 5
+	                	@Type = 1
+                }
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.3.2.2.0")) ### dcrCrptStatTamper.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Crypto Status Tamper"
+                @AlertKey = $alarmIndex
+                @Description = "Reset tamper and reboot. If the message persists after the reboot, call Decru Technical Support."
+                @Summary = "Crypto Tamper Error"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.2.2.3.0")) ### dcrCfgDbFree.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Configuration database space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support."
+                @Summary = "The Confiuration Database has " + $alarmIndex + " % free space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.2.5.1.0")) ### dcrClusterState.0
+        {
+                @Class = "2525251"
+                @AlertGroup = "Cluster Status"
+                @AlertKey = $alarmIndex
+                @Description = "Check cluster status. Manually recover cluster. If cluster cannot be re-established, call Decru Technical Support"
+                @Summary = "Cluster Status Error."
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.4.1")) ### :dcrFsFree.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "Root Filesystem % Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Root Filesystem has " + $alarmValue + "% Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.4.2")) ### :dcrFsFree.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "Flash Filesystem % Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Flash Filesystem has " + $alarmValue + "% Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.4.3")) ### :dcrFsFree.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "Flash2 Filesystem % Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Flash2 Filesystem has " + $alarmValue + "% Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.4.4")) ### :dcrFsFree.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "Log Filesystem % Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Log Filesystem has " + $alarmValue + "% Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.4.5")) ### :dcrFsFree.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "Scratch Filesystem % Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Scratch Filesystem has " + $alarmValue + "% Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.3.1")) ### :dcrFsSize.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "Root Filesystem Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Root Filesystem has " + $alarmValue + " Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.3.2")) ### :dcrFsSize.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "Flash Filesystem Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Flash Filesystem has " + $alarmValue + " Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.3.3")) ### :dcrFsSize.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "Flash2 Filesystem Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Flash2 Filesystem has " + $alarmValue + " Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.3.4")) ### :dcrFsSize.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "Log Filesystem Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Log Filesystem has " + $alarmValue + " Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.5.1.3.5")) ### :dcrFsSize.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "Scratch Filesystem Free Space"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "Scratch Filesystem has " + $alarmValue + " Free Space"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.1")) ### :dcrLicenseHoursLeft.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "Cluster license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The Cluster license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.2")) ### :dcrLicenseHoursLeft.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "Tape license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The Tape license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.3")) ### :dcrLicenseHoursLeft.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "Disk license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The Disk license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.4")) ### :dcrLicenseHoursLeft.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "IPSec license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The IPSec license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.5")) ### :dcrLicenseHoursLeft.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "Hashimport license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The Hashimport license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.8.1.4.6")) ### :dcrLicenseHoursLeft.6
+        {
+                @Class = "2525251"
+                @AlertGroup = "DHA license"
+                @AlertKey = $alarmIndex
+                @Description = "Call Decru Technical Support"
+                @Summary = "The DHA license is valid for " + $alarmValue + " hours"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.2.4.1.1.0")) ### :dcrNetIpColTime.0
+        {
+                @Class = "2525252"
+                @AlertGroup = "IP collision"
+                @AlertKey = $alarmIndex
+                @Description = "DataFort has detected two or more systems with the same IP address. Make sure that each system has a unique IP address."
+                @Summary = $alarmValue + " seconds since the last IP collision was detected"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.1.")) ### dcrProcCPU.1.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[13]
+                @AlertGroup = "Cron CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Cron Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.2.")) ### dcrProcCPU.2.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Syslogd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Syslogd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.3.")) ### dcrProcCPU.3.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "LCDD CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "LCDD Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.4.")) ### dcrProcCPU.4.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxman CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxman Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.5.")) ### dcrProcCPU.5.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "SSHD CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "SSHD Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.6.")) ### dcrProcCPU.6.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Httpd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Httpd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.7.")) ### dcrProcCPU.7.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Snmpd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Snmpd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.8.")) ### dcrProcCPU.8.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Port Map CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Port Map Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.9.")) ### dcrProcCPU.9.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Pmountd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Pmountd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.10.")) ### dcrProcCPU.10.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Plockd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Plockd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.11.")) ### dcrProcCPU.11.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "WDD CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "WDD Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.12.")) ### dcrProcCPU.12.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Batd CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Batd Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.13.")) ### dcrProcCPU.13.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Mount_mfs CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Mount_mfs Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.14.")) ### dcrProcCPU.14.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxlogger CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxlogger Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.15.")) ### dcrProcCPU.15.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Sh CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Sh Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.16.")) ### dcrProcCPU.16.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Menush CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Menush Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.17.")) ### dcrProcCPU.17.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Getty CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Getty Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.3.18.")) ### dcrProcCPU.18.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxcli CPU Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxcli Instance " + $Instance + " CPU Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.1.")) ### dcrProcMemPercent.1.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Cron Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Cron Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.2.")) ### dcrProcMemPercent.2.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Syslogd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Syslogd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.3.")) ### dcrProcMemPercent.3.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "LCDD Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "LCDD Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.4.")) ### dcrProcMemPercent.4.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxman Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxman Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.5.")) ### dcrProcMemPercent.5.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Sshd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Sshd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.6.")) ### dcrProcMemPercent.6.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Httpd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Httpd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.7.")) ### dcrProcMemPercent.7.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Snmpd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Snmpd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.8.")) ### dcrProcMemPercent.8.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Port Map Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Port Map Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.9.")) ### dcrProcMemPercent.9.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Pmountd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Pmountd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.10.")) ### dcrProcMemPercent.10.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Plockd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Plockd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.11.")) ### dcrProcMemPercent.11.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Wdd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Wdd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.12.")) ### dcrProcMemPercent.12.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Batd Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Batd Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.13.")) ### dcrProcMemPercent.13.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Mount_mfs Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Mount_mfs Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.14.")) ### dcrProcMemPercent.14.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxlogger Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxlogger Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.15.")) ### dcrProcMemPercent.15.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Sh Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Sh Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.16.")) ### dcrProcMemPercent.16.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Menush Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Menush Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.17.")) ### dcrProcMemPercent.17.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Getty Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Getty Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (nmatch($alarmVariable , ".1.3.6.1.4.1.12962.1.1.4.1.5.18.")) ### dcrProcMemPercent.18.x
+        {
+                @Class = "2525251"
+                $NoElements = split($alarmVariable, SplitArray, ".")
+                $Instance = SplitArray[14]
+                @AlertGroup = "Boxcll Memory Usage"
+                @AlertKey = "Instance " + $Instance + " " + $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Boxcll Instance " + $Instance + " Memory Usage is  " + $alarmValue
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.1")) ### dcrProgProcNum.1
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Cron"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Cron Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.2")) ### dcrProgProcNum.2
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Syslogd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Syslogd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.3")) ### dcrProgProcNum.3
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "LCDD"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of LCDD Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.4")) ### dcrProgProcNum.4
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Boxman"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Boxman Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.5")) ### dcrProgProcNum.5
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Sshd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Sshd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.6")) ### dcrProgProcNum.6
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Httpd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Httpd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.7")) ### dcrProgProcNum.7
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Snmpd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Snmpd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.8")) ### dcrProgProcNum.8
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Port map"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Port map Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.9")) ### dcrProgProcNum.9
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Pmountd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Pmountd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.10")) ### dcrProgProcNum.10
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Plockd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Plockd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.11")) ### dcrProgProcNum.11
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Wdd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Wdd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.12")) ### dcrProgProcNum.12
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Batd"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Batd Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.13")) ### dcrProgProcNum.13
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Mount_mfs"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Mount_mfs Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.14")) ### dcrProgProcNum.14
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Boxlogger"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Boxlogger Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.15")) ### dcrProgProcNum.15
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Sh"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Sh Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.16")) ### dcrProgProcNum.16
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Menush"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Menush Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.17")) ### dcrProgProcNum.17
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Getty"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Getty Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.3.1.3.18")) ### dcrProgProcNum.18
+        {
+                @Class = "2525251"
+                @AlertGroup = "Max Number of Processes"
+                @AlertKey =  "Boxcll"
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump."
+                @Summary = "Max Number of Boxcll Processes Reached (" + $alarmValue + ")"
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.2.3.3.0")) ### dcrRekeyError
+        {
+                @Class = "2525251"
+                @AlertGroup = "ReKey Error"
+                @AlertKey = $alarmIndex
+                @Description = "Note the error condition and retry the rekey operation. If condition persists, call Decru Technical Support."
+                @Summary = "Error code of the last rekeying is " + $alarmValue + " If it is 0, then no error has occurred "
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.2.3.2.0")) ### dcrRekeyProgress
+        {
+                @Class = "2525251"
+                @AlertGroup = "ReKey Progress"
+                @AlertKey = $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump.."
+                @Summary = "Percentage of re-key progress is " + $alarmValue + " If it is -1, then system is not re-keying "
+                @Severity = 5
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.1.7.0")) ### dcrSysInitialized
+        {
+                @Class = "2525251"
+                @AlertGroup = "System initialization status"
+                @AlertKey = $alarmIndex
+                switch($alarmValue)
+                {
+                	case "1":
+                		$Status = "Not Initialised (1)"
+		                @Severity = 5
+		                @Type = 1
+                	case "2":
+                		$Status = "Unknown (2) This is returned when DataFort is under extreme high load,"
+		                @Severity = 4
+		                @Type = 1
+                	case "3":
+                		$Status = "Initialised (3)"
+		                @Severity = 1
+		                @Type = 2
+                	default:
+                		$Status = "Unknown (" + $alarmValue + ")"
+		                @Severity = 4
+		                @Type = 1
+                		
+                }
+                @Description = "Initialize the system if it has not yet been initialized. The value is notInitialized(1) before the Setup Wizard is completed and becomes initialized(3) after the Setup Wizard is completed. When the DataFort is under extreme high load, unknown(2) is returned"
+                @Summary = "System initialization status is " + $Status
+                @Type = 1
+        }
+        else  if (match($alarmVariable , ".1.3.6.1.4.1.12962.1.1.7.2.0")) ### dcrSysMemFree
+        {
+                @Class = "2525251"
+                @AlertGroup = "free physical memory"
+                @AlertKey = $alarmIndex
+                @Description = "If DataFort performance is poor, Decru Technical Support may ask you to perform a techdump.."
+                @Summary = "Percentage of free physical memory is " + $alarmValue 
+                @Severity = 5
+                @Type = 1
+        }
+	else
+	{
+		 @Class = "2525252"
+		 @AlertGroup = "Unknown Event"
+		 @AlertKey = $alarmVariable
+		 @Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5
+		 @Summary = "Unknown Event " + $alarmVariable + " received for enterprise " + $enterprise
+		 @Severity = 5
+		 @Type = 1
+	}
+
+ 
+
+
+
+$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+

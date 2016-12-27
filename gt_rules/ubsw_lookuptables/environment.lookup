@@ -1,0 +1,64 @@
+#################################################################################################
+#
+#	environment.lookup created by Chris Janes of Abilitec
+#
+#	These tables are used to set the environment field from systemdesig for mttrapd
+#	events to be compatible with soocket events
+#	
+#	20080303	Chris Janes	Original
+#
+#################################################################################################
+
+
+#	This Lookup sets $tmpSetEnv to 1 if the class requires the env. field to be set
+
+
+table SetEnvClass =
+{
+{"999999","1"} 
+{"1057095","1"}
+{"2222231","1"}
+{"2222232","1"}
+{"1057460","1"}
+{"2222242","1"}
+{"2222244","1"}
+{"1016189","1"}
+{"2222250","1"}
+{"2222240","1"}
+{"2222243","1"}
+{"2222251","1"}
+{"2222246","1"}
+{"1057089","1"}
+{"1054241","1"}
+{"2076087","1"}
+{"1057643","1"}
+{"2071002","1"}
+{"2070993","1"}
+{"1058650","1"}
+{"5009214","1"}
+{"5009194","1"}
+{"5009201","1"}
+{"5009213","1"}
+# 20090005	Added By Chris Janes HDSTM0002427280
+{"1058653","1"}
+}
+default = {"0"}
+
+table EnvText =
+{
+{"1","Prod"}
+{"2","UAT"}
+{"3","Dev"}
+{"4","Eng"}
+{"5","QA"}
+{"6","BCP"}
+{"1000","AppHbt"}
+{"1001","ISM Res"}
+{"1002","AppHA"}
+{"1003","Citra"}
+{"1004","Impact"}
+{"1005","Latency"}
+{"1006","ISM Prob"}
+}
+default = {"Undefined"}
+

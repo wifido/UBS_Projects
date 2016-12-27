@@ -1,0 +1,46 @@
+###################
+###
+# This file has been modified at David Maxwells request to switch the values of @AlertKey and @AlertGroup 16/11/4
+#
+
+#############################################################################
+# This next section added at David Maxwells request.
+# The AlertGroup value for these Class IDs is needed to lower the granularity of dedup.
+# The current event rate is excessive from these sources, and the users have requested
+# they be over deduped while they modify their source codes verbosity.
+case "1057315" | "1056627" | "1057316" | "1056513" | "1057317" :
+$ruleset = $ruleset + "-consolidated_alertkey.include.rules" + "-case:1057315"
+
+@Agent = $Transport
+@Class = $ClassID
+@Summary = $MessageText
+@Stream = $Stream
+
+$temp_length_location = length($Location)
+if (exists($Location) && int($temp_length_location) > 0)
+{
+        @Location = $Location
+        $ruleset = $ruleset + "-exits"
+}
+@Environment = $Environment
+@Subclass = $Subclass
+@UserData = $Userdata
+@UserInt = $Userint
+@SAPNumber = $SAPnumber
+
+# Create the AlertKey field here. Value will change
+# dependant on presence of $Component token.
+
+if (exists($Component))
+        {
+        @AlertKey = $Component
+        $ruleset = $ruleset + "-if(exists$Component)"
+        }
+else
+        {
+        @AlertKey = $SAPname
+        $ruleset = $ruleset + "-else-$SAPname"
+        }
+@AlertGroup = "Consolidated"
+@Type = $EventType
+$tempIdentifier = @NodeAlias + " " + @AlertGroup +  " " + @AlertKey +  " " + @Type + " " + @Agent + " " + @Manager + " " + @Class +  " " + @Subclass + " " + @Environment

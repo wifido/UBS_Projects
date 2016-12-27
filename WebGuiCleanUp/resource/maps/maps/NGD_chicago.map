@@ -1,0 +1,8 @@
+map(name="NGD_chicago",bgColor="#000033",w=620,h=385,acl="*")
+button(name="446S_Michigan",label="untitled",x=410,y=334,action="go",url="",target="",entity="AllEvents",datasource="NCOMS",w=25,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="25S_Wacker",label="untitled",x=217,y=261,action="go",url="",target="",entity="lan-madrid-sla",datasource="NCOMS",w=25,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="210W_Randolph",label="untitled",x=327,y=164,action="go",url="",target="",entity="APAC-voice",datasource="NCOMS",w=25,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="500N_State",label="untitled",x=359,y=43,action="go",url="",target="",entity="application-database",datasource="NCOMS",w=25,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="342_Columbus",label="untitled",x=462,y=117,action="",url="",target="hidden",entity="APAC-systems",datasource="NCOMS",w=25,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+icon(name="visual_1",label="untitled",x=5,y=5,image="ChicagoMap.gif")
+button(name="visual_2",label="untitled",x=5,y=5,action="go",url="",target="_self",w=719,h=375,color="#b5c6d6",type="rectangle",arc diameter=20,transparent=false,legend=None,font="Helvetica",size=10,font color="black")

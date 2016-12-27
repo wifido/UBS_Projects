@@ -1,0 +1,50 @@
+#####################################################################################
+#
+#	pdh_include.rules - rules associated with Accelerated Event Notification
+#
+#	20070322	Chris Janes	Origional
+#
+#
+#####################################################################################
+
+
+case "1640":
+
+
+	$ruleset = $ruleset + ' - PDH(socket)'
+	@Class = $ClassID
+	@OwnerGID = 468
+	$TempDoLookup = 2
+        @Agent = $Transport
+	@NodeAlias = lower($Nodealias)
+        @Summary = $MessageText
+        @Stream = $Stream
+        @Subclass = $Subclass
+        @Type = $EventType
+	if( match ($Userdata, ""))
+	{
+		@UserData = "Automatic"
+		$ruleset = $ruleset + ' - Does Match'
+	}
+	else
+	{
+        	@UserData = $Userdata
+		$ruleset = $ruleset + ' - Not Match'
+	}
+
+#	20080917	Change by Chris Janes of Abilitec
+#@Description = "OS = " + $OS
+#
+
+        @UserData1 = $Nodealias
+        @UserData2 = $Userdata2
+        @UserInt1 = $Userint1
+	@Severity = 2	
+	@FirstOccurrence = $StartTime
+	@XtraTime = $EndTime
+	@UserInt = 1	
+        Update(@FirstOccurrence)	
+	Update(@UserInt)	
+	Update(@XtraTime)
+	$tempIdentifier = lower($Nodealias) + "SOCKETPROD" + $Transport + $EventIdentifier + $EventType + @UserInt1 + @Class + @FirstOccurrence + @XtraTime + @OwnerGID
+	

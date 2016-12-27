@@ -1,0 +1,32 @@
+$NCHOME/omnibus/bin/nco_dbinit -server AGG_P -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/aggregation.sql
+
+$NCHOME/omnibus/bin/nco_dbinit -server AGG_B -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/aggregation.sql
+
+$NCHOME/omnibus/bin/nco_dbinit -server COL_P_1 -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/collection.sql
+
+$NCHOME/omnibus/bin/nco_dbinit -server COL_B_1 -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/collection.sql
+
+$NCHOME/omnibus/bin/nco_dbinit -server DIS_1 -desktopserver -dsddualwrite -dsdprimary AGG_V -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/display.sql
+
+$NCHOME/omnibus/bin/nco_dbinit -server DIS_2 -desktopserver -dsddualwrite -dsdprimary AGG_V -customconfigfile $NCHOME/omnibus/extensions/multitier/objectserver/display.sql
+
+cp $NCHOME/omnibus/extensions/multitier/gateway/AGG_GATE.* $NCHOME/omnibus/etc/.
+
+cp $NCHOME/omnibus/extensions/multitier/gateway/C_TO_A_GATE.map $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/C_TO_A_GATE_P_1.* $NCHOME/omnibus/etc/.
+
+cp $NCHOME/omnibus/extensions/multitier/gateway/C_TO_A_GATE.map $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/C_TO_A_GATE_B_1.* $NCHOME/omnibus/etc/.
+
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE.map $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE.tblrep.def $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE_1.props $NCHOME/omnibus/etc/.
+
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE.map $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE.tblrep.def $NCHOME/omnibus/etc/.
+cp $NCHOME/omnibus/extensions/multitier/gateway/A_TO_D_GATE_2.props $NCHOME/omnibus/etc/.
+
+cp /etc/pam.d/passwd /etc/pam.d/nco_objserv
+cp /etc/pam.d/passwd /etc/pam.d/nco_g_objserv_uni
+cp /etc/pam.d/passwd /etc/pam.d/nco_g_objserv_bi
+cp /etc/pam.d/passwd /etc/pam.d/netcool

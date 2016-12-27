@@ -1,0 +1,44 @@
+	# Date:   August 4th 2003.
+	# Author: Gary Thomas
+	# Uncomment to see everything
+	$ruleset = $ruleset + "No Class"
+	#
+	# These are default settings just to put the event into the Object Server. Details will
+	# be turned on, to enable better examination of the event stream. These settings will
+	# assist in developing more meaningful rules sets. In the interests of preventing a storm
+	# dragging down the Object Server, these events will over deduplicate. This will not be
+	# an issue once a few events have been recieved, and more appropriate include.rules exist.
+	# After the first time this section of rules has been used, it is likely that the
+	# following rules will need to be embedded in some form of switch or if statement.
+
+	$tempEventTime = getdate
+	@AlertGroup = "UnknownEvent"
+	@AlertKey = @Node
+	@Summary = "Unknown event. Please see Details..."
+	@Agent = "Socket Probe"
+	@Severity = 1
+	@Type = 0
+	@FirstOccurrence = $tempEventTime
+	@LastOccurrence = $tempEventTime
+
+#	20060922	Change by Chris Janes of Abilitec
+	@Class = 6999
+
+#	20060922	End of Change
+
+#	20080304	Changes by Chris Janes of Abilitec
+#			These changes to help us track down where these events are coming from
+
+	@UserData = $Userdata
+	@UserData1 = $Component
+	@UserData2 = $EventIdentifier
+	@Description = $MessageText
+	@Environment = $Environment
+        @Stream = $Stream
+        @Subclass = $Subclass
+        @Type = $EventType
+
+#	20080304	End of Changes
+	
+
+	$tempIdentifier = @Node + " " + @Agent + " " + @AlertGroup

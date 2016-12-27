@@ -1,0 +1,2 @@
+map(name="FIRC_OBS_TEST",bgImage="fire.jpg",bgColor="white",w="475",h="280",acl="*")
+

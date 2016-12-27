@@ -1,0 +1,34 @@
+######################################################################################
+#
+#	supt_lvl.include.rules
+#	
+#	20071224	Chris Janes	zerot added to support level
+#
+######################################################################################
+
+
+#	20080516	Changes by Chris Janes of Abilitec TD 4832
+
+@NodeAlias = lower(@NodeAlias)
+
+        if(int(@Class) == 120000 || int(@Class) == 121000)
+        {
+		#	set supt_lvl for DB services Boxes only
+                $ruleset = $ruleset + "DB Supt_Lvl "
+                @Supt_Lvl = lookup(@NodeAlias, DB_SLA_lookup)
+
+		#	if they are ZeroT add to the Supt_lvl
+	        $NoElements = split(@NodeAlias, SplitArray, ".")
+	        $ZeroT = lookup(SplitArray[1], ZeroTHost)
+	        @Supt_Lvl = int(@Supt_Lvl) + int($ZeroT)
+
+        }
+	else
+	{
+		#	set supt_lvl for all other events
+	        @Supt_Lvl = lookup(@NodeAlias,SLA_lookup)
+	}
+        update(@Supt_Lvl)
+
+
+#	20080512	End of Changes

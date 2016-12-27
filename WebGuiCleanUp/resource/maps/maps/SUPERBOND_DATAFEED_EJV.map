@@ -1,0 +1,2 @@
+map(name="SUPERBOND_DATAFEED_EJV",bgImage="Datafeed_EJV.jpg",bgColor="white",w="1100",h="610",acl="*")
+button(legend="Label",arc diameter="20",type="rounded",url="",datasource="NCOMS",label="bridgebonds",font color="black",y="141",x="488",w="133",entity="SBbridgebonds",font="Helvetica",size="12",flash="true",action="Active Event List (AEL)",h="29",style="p",target="",name="bridgebonds")

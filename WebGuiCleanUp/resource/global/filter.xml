@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <filterbox name="global">
+
+    
+    <filter
+         name="AllEvents"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Severity &gt;= 0">
+    </filter>
+    
+    <filter
+         name="Default"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="AutoConf"
+         viewtype="global"
+         sql="Severity = 5">
+    </filter>
+    
+    <filter
+         name="DefaultTable"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="AutoConf"
+         viewtype="global"
+         sql="Severity = 5">
+    </filter>
+    
+    <filter
+         name="Escalated"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Manager not like '^.*Watch$' and SuppressEscl &lt; 4 and SuppressEscl &gt; 0">
+    </filter>
+    
+    <filter
+         name="InMaintenance"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Manager not like '^.*Watch$' and SuppressEscl = 6">
+    </filter>
+    
+    <filter
+         name="Information"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Manager not like '^.*Watch$' and SuppressEscl &lt; 4 and Type = 13">
+    </filter>
+    
+    <filter
+         name="Last10Mins"
+         description=""
+         os="NCOMS"
+         mode="advanced"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="( ( LastOccurrence &gt;= getdate - 600 ) and ( Manager not like '^.*Watch$' ) ) and ( Severity &gt; 0 )">
+    </filter>
+    
+    <filter
+         name="NetcoolStatus"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Manager like '^.*Watch$'">
+    </filter>
+    
+    <filter
+         name="TaskList"
+         description=""
+         os="NCOMS"
+         mode="basic"
+         metriclabel="Metric:"
+         metricshow="Average"
+         metricof="Severity"
+         view="Default"
+         viewtype="global"
+         sql="Manager not like '^.*Watch$' and SuppressEscl &lt; 4 and TaskList = 1">
+    </filter>
+  
+</filterbox>

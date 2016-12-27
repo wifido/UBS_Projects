@@ -1,0 +1,38 @@
+<Fragment>
+  <!-- User fragment for Sysunit testing -->
+  <!-- sysunit user can do everything -->
+  <User name="sysunit" pwd="t3stu5er">
+    <Feature name="ma.aapi.GetLogLevel">1</Feature>
+    <Feature name="ma.aapi.GetCfg">1</Feature>
+    <Feature name="ma.aapi.Query">1</Feature>
+    <Feature name="ma.aapi.SetCfg">1</Feature>
+    <Feature name="ma.aapi.SetLogLevel">1</Feature>
+    <Feature name="ma.aapi.GetCfgAll">1</Feature>
+    <Feature name="ma.aapi.ServiceStatus">1</Feature>
+    <Feature name="ma.aapi.Manifest">1</Feature>
+    <Feature name="ma.aapi.Status">1</Feature>
+    <Feature name="ma.aapi.Check">1</Feature>
+    <Feature name="ma.aapi.rpc_Status">1</Feature>
+    <Feature name="ma.aapi.rpc_Query">1</Feature>
+    <Feature name="ma.aapi.rpc_Check">1</Feature>
+    <Feature name="ma.aapi.rpc_Manifest">1</Feature>
+  </User>
+  <User name="sysunit_e" encrypted="true" pwd="AIod-QNBlTPDZttqxD7qMaCll-BZlocgNZONKq3wrUYaKx9sm0U_8P01O-4Awjo9nuAWH3EHJMNQ5mztipKQNDYJZeXMPYQiV6MfFHPxZCJs7i5p2sqr0aGW5YrtWahek8ogCXzGhC_ysosWtbsZ-S_xHPbtFlDdrA_eM0AS-6X4K_59VCev1taPGqfcG15iSOdaXsFd0LlFp12EckXGCa2qwwne1pfuyUC7dX2OKGTxiIKnnkv-QlivTYBUtZlsrmQfyt1unVNpRL9oZZWes2FQXd5uwV6vi7V-omSwKcU1ggiRO6_X7KYjCLUO4w9VIqG_5LKZRjTc2QRJh4IWIu6_UXyC">
+    <Feature name="ma.aapi.GetLogLevel">1</Feature>
+    <Feature name="ma.aapi.GetCfg">1</Feature>
+    <Feature name="ma.aapi.Query">1</Feature>
+    <Feature name="ma.aapi.SetCfg">1</Feature>
+    <Feature name="ma.aapi.SetLogLevel">1</Feature>
+    <Feature name="ma.aapi.GetCfgAll">1</Feature>
+    <Feature name="ma.aapi.ServiceStatus">1</Feature>
+    <Feature name="ma.aapi.Manifest">1</Feature>
+    <Feature name="ma.aapi.Status">1</Feature>
+    <Feature name="ma.aapi.Check">1</Feature>
+  </User>
+  <User name="sysunit_xmlrpc_e" encrypted="true" pwd="AIod-QNgy6xyWmH5NgjHrxWonYtDuF2K-Cw2exIMXd8NfpT-xonZoPpkqBogE2Eq9x4T2bLHUwq9qfMCu2ewSDy7UV2M93m6-Ai6Q4-14KdZ31jzekfri3Dt03sIeHObF1_B9cD5QuKgcN2SJ3jZTce37t1_pq-iBWxVMyajCsScRKPFOLce09YNG0eAI1ociOlPQViRnyfB5XDKOUXj369m4rvp1Dyjlv7UXyivHX4kBO1wMVk4spNb-AOSd1OmrRS3xOr0eCwLFbkfI9YBGCNDPDTLfmBUGOXV0k7hPY2jZhtbHRpBx2f7DVG9_zWLB2hwYnLfyW9AJM63bSRX2VOuPptP">
+    <Feature name="ma.aapi.rpc_Status">1</Feature>
+  </User>
+  <User name="sysunit_xmlrpc" pwd="t3stu5er">
+    <Feature name="ma.aapi.rpc_Status">1</Feature>
+  </User>
+</Fragment>

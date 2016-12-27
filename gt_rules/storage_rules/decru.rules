@@ -1,0 +1,41 @@
+#########################################################################################################
+#
+#    3par.rules 
+#
+#########################################################################################################
+#
+# 1.0 - Initial Release. 20071210	Chris Janes of Abilitec
+#					Based on DECRU-BASE-MIB DEFINITIONS
+#
+# 1.1 - Pre cutover to GOC rules	GThomas.
+#
+#########################################################################################################
+
+
+
+
+case "decru":
+
+	$ruleset = $ruleset + " Decru "
+
+
+	@Agent      = 'DECRU'
+	#@AlertGroup = ''
+	#@AlertKey  = ''
+	@AlertGroup = 'State Tape Encryption'
+	@AlertKey   = 'State Tape Encryption'
+	@Class      = 2525251
+	@OwnerGID   = lookup(@Class,SocketClassGID)
+	@Severity   = 5
+	#@Severity   = 4
+	@Summary    = 'DataFort has detected security related event'
+	@Type       = 1
+        @Subclass   = 'DataFort Tape Encryption'
+
+	$TempDoLookup = 2
+    	@Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + @UserData
+
+
+
+
+

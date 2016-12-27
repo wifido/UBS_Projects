@@ -1,0 +1,24 @@
+case "UBSWTrapLatency":
+	$ruleset = $ruleset + "UBSW Trap Latency"
+
+	@Class = 49900
+	@OwnerGID = 1
+	$TempDoLookup = 2
+	@AlertKey = $1
+	@AlertGroup = $2
+	@Severity = $3
+	@Summary = $4
+	@UserData = $5
+#	20080104 Change by GT
+	@SystemDesig = 1005
+	@Poll = 600
+#	20080104 End of Change
+	#Sharif Johnson Added userint and type
+	@UserInt = $6
+	@Type = $7
+	update(@UserData)
+        # Changes made by Mahesh Kumar
+        # Set identifier to use ProbeHostName. Will not be overridden in mttrapd rules. TD #5201
+        $TD_Num = 5201
+        $tempIdentifier = @ProbeHostName  + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + %Manager
+

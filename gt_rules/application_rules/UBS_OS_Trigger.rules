@@ -1,0 +1,249 @@
+case "Object Server Triggers":
+	
+	# The tokens supplied by these events do NOT adhere to the normal tokens supplied by log4x.	
+	
+	$ruleset		= $ruleset + "OS_triggers"
+	@Agent			= "Send_OS_Event script"
+
+	# Set Class and Ownership stuff here. We will set Class, and Ownership here then bypass the lookup later in the main rules file.
+	@Class			= 0
+	@OwnerUID		= 65534
+	@OwnerGID		= 591
+	$TempDoLookup		= 2
+	@Description		= $Server + " - " + $TriggerName + " - " + $SignalVars
+
+	# Set timing info here
+	@FirstOccurrence	= $EventTime
+	@LastOccurrence		= $EventTime
+
+	# Split out variables contained within the $SignalVars token.
+	# First flush out any old rubbish from the SplitArray 
+	clear(SplitArray)
+	$sigvar_num 		= split($SignalVars,SplitArray,":")
+
+	# Now lets work out what the event is.
+	switch($TriggerName)	
+	{
+		case "UBS_system_watch_shutdown":
+			# SignalVars mapping:
+			# SignalVars 1	= %signal.node
+			# End of Mapping.
+			$sigvar1	= SplitArray[1]
+			@Manager	= "SystemWatch"
+			@AlertGroup	= "Object Server Restart"
+			@AlertKey	= $Server
+			@Severity	= 5
+			@Type		= 1
+			@Summary	= "Object Server " + $Server + " on " + $sigvar1 + " shutdown."
+
+		case "UBS_system_watch_startup":
+			# SignalVars mapping:
+			# SignalVars 1	= %signal.node
+			# End of Mapping.
+			$sigvar_node	= SplitArray[1]
+			@Manager	= "SystemWatch"
+			@AlertGroup	= "Object Server Restart"
+			@AlertKey	= $Server
+			@Severity	= 1
+			@Type		= 2
+			@Summary	= "Object Server " + $Server + " on " + $sigvar1 + " started."
+
+		case "UBS_connection_watch_disconnect":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.process
+			# SignalVars 2	= %signal.description
+			# SignalVars 3	= %signal.username
+			# SignalVars 4	= %signal.node
+			$sigvar_proc	= SplitArray[1]
+			$sigvar_desc	= SplitArray[2]
+			$sigvar_user	= SplitArray[3]
+			$sigvar_node	= SplitArray[4]
+			@Manager	= "ConnectionWatch"
+			@AlertGroup	= "Object Server Connection"
+			@AlertKey	= $Server + " - " + $sigvar_proc + " - " + $sigvar_desc + " - " + $sigvar_user	
+			@Severity	= 4
+			@Type		= 1
+			@Summary	= $sigvar_desc + " " + $sigvar_proc + " running as " + $sigvar_user + " on " + $sigvar_node + " has disconnected from " + $Server
+			
+			# This will be an AEN eligible event.
+			$AENFlag	= 1
+			$AENChannel	= "Monitoring"
+
+		case "UBS_connection_watch_connect":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.process
+			# SignalVars 2	= %signal.description
+			# SignalVars 3	= %signal.username
+			# SignalVars 4	= %signal.node
+			$sigvar_proc	= SplitArray[1]
+			$sigvar_desc	= SplitArray[2]
+			$sigvar_user	= SplitArray[3]
+			$sigvar_node	= SplitArray[4]
+			@Manager	= "ConnectionWatch"
+			@AlertGroup	= "Object Server Connection"
+			@AlertKey	= $Server + " - " + $sigvar_proc + " - " + $sigvar_desc + " - " + $sigvar_user	
+			@Severity	= 1
+			@Type		= 2
+			@Summary	= $sigvar_desc + " " + $sigvar_proc + " running as " + $sigvar_user + " on " + $sigvar_node + " has connected to " + $Server
+
+		case "UBS_disconnect_iduc_missed":
+			# SignalVars mapping
+			# SignalVars 1	= $signal.process
+			# SignalVars 2	= %signal.description
+			# SignalVars 3	= %signal.username
+			# SignalVars 4	= %signal.node	
+			# SignalVars 5	= %signal.missed_cycles
+			$sigvar_proc	= SplitArray[1]
+			$sigvar_desc	= SplitArray[2]
+			$sigvar_user	= SplitArray[3]
+			$sigvar_node	= SplitArray[4]
+			$sigvar_cycle	= SplitArray[5]
+			@Manager	= "SystemWatch"
+			@AlertGroup	= "IDUC Missed"
+			@AlertKey	= $Server + ":" + $sigvar_proc + ":" + $sigvar_desc
+			@Severity	= 4
+			@Type		= 1
+			@Summary	= $Server + " has disconnected " + $sigvar_proc + " process " + $sigvar_desc + " connected as user " + $sigvar_user + " : Reason - Missed " + $sigvar_cycle + " IDUC cycles"
+
+
+
+		case "UBS_gw_counterpart_down":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.server
+			# SignalVars 2	= %signal.node
+			# SignalVars 3	= %signal.gateway_name
+			$sigvar_server	= SplitArray[1]
+			$sigvar_node	= SplitArray[2]
+			$sigvar_gw	= SplitArray[3]
+			@Manager	= "ConnectionWatch"
+			@AlertGroup	= "Object Server Gateway"
+			@AlertKey	= $Server + " - " + $sigvar_gw
+			@Severity	= 4
+			@Type		= 1
+			@Summary	= $sigvar_gw + " has disconnected from " + $sigvar_server + ". Suspect Object Server crash or Network issue."
+		
+			# This will be an AEN eligible event.
+			$AENFlag	= 1
+			$AENChannel	= "Monitoring"
+			
+		case "UBS_gw_counterpart_up":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.server
+			# SignalVars 2	= %signal.node
+			# SignalVars 3	= %signal.gateway_name
+			$sigvar_server	= SplitArray[1]
+			$sigvar_node	= SplitArray[2]
+			$sigvar_gw	= SplitArray[3]
+			@Manager	= "ConnectionWatch"
+			@AlertGroup	= "Object Server Gateway"
+			@AlertKey	= $Server + " - " + $sigvar_gw
+			@Severity	= 1
+			@Type		= 2
+			@Summary	= $sigvar_gw + " has connected to " + $sigvar_server
+
+		case "UBS_backup_failed":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.node
+			# SignalVars 2	= %signal.elasped_time
+			# SignalVars 3	= %signal.path_prefix
+			# SignalVars 4	= %signal.error
+			$sigvar_node	= SplitArray[1]
+			$sigvar_elapse	= SplitArray[2]
+			$sigvar_path	= SplitArray[3]
+			$sigvar_err	= SplitArray[4]
+			@Manager	= "BackupWatch"
+			@AlertGroup	= "Automatic Backup System"
+			@AlertKey	= $Server + " - BACKUP" 
+			@Severity	= 5
+			@Type		= 1
+			@Summary	= "Backup to " + $sigvar_path + " failed. " + $sigvar_err + ". Operation took " + $sigvar_elapse + " seconds."
+
+		case "UBS_backup_succeeded":
+			# SignalVars mapping
+			# SignalVars 1	= %signal.node
+			# SignalVars 2	= %signal.elasped_time
+			# SignalVars 3	= %signal.path_prefix
+			$sigvar_node	= SplitArray[1]
+			$sigvar_elapse	= SplitArray[2]
+			$sigvar_path	= SplitArray[3]
+			@Manager	= "BackupWatch"
+			@AlertGroup	= "Automatic Backup System"
+			@AlertKey	= $Server + " - BACKUP"
+			@Severity	= 1
+			@Type		= 2
+			@Summary	= "Backup to " + $sigvar_path + " succeeded. Operation took " + $sigvar_elapse + " seconds."
+
+		case "UBS_profiler_toggle":
+			# SignalVars mapping
+			# SignalVars 1	= $signal.node
+			# SignalVars 2	= $signal.enabled (boolean) Modified in trigger to represent enabled or disabled
+			$sigvar_node	= SplitArray[1]
+			$sigvar_enable	= SplitArray[2]
+			@Manager	= "ProfileWatch"
+			@AlertGroup	= "Profile Enable/Disable"
+			@AlertKey	= $Server
+			@Summary	= "Object Server " + $Server + " Profiling " + $sigvar_enable
+			switch($sigvar_enable)
+			{
+				case "enabled":
+					@Severity	= 1
+					@Type		= 2
+				
+				case "disabled":
+					@Severity	= 3
+					@Type		= 1
+				
+				default:	
+					# Should never get here..... Do nothing
+			}
+
+		case "UBS_profiler_group_report":
+			# SignalVars mapping
+			# SignalVars 1	= $signal.EventSev	This is artificially created in the trigger.
+			# SignalVars 2	= $signal.total		This is artificially created in the trigger
+			$sigvar_sev	= SplitArray[1]
+			$sigvar_tot	= SplitArray[2]
+			@Manager	= "ProfileWatch"
+			@AlertGroup	= "Object Server Profiling"
+			@AlertKey	= $Server
+			@Severity	= $sigvar_sev
+			switch(@Severity)
+			{
+				case "1":
+				# This is a resolution event.
+					@Type = 2
+				default:
+				# This is not.
+					@Type = 1
+			}
+			@Summary	= "Profiling time on " + $Server + " is " + $sigvar_tot + " seconds"
+		
+		
+		case "UBS_Rem_Auto_TT":
+			# SignalVars mapping
+			# SignalVars 1  = $signal.msg
+			# End of mapping.
+			@Manager        = "SystemWatch"
+			@AlertGroup     = "Remedy AutoTT Load"
+			@AlertKey       = $Server
+			@Severity       = 5
+			@Summary        = $SignalVars
+			@ExpireTime     = 60
+			
+			
+		default:
+			# An unknown trigger is sending events (well to the rules file anyway)... Lets try and do something meaningful.
+			@Manager	= "TriggerWatch"
+			@AlertGroup	= "Undefined Trigger Rule"
+			@AlertKey	= $Server + " - " + $TriggerName
+			@Severity	= 4
+			@Type		= 1
+			@Summary	= "No Rule defined for this trigger event. See Description for tokens."
+	}
+
+	# Set ExpireTime here
+	[@Severity,@ExpireTime] = lookup(@Severity,SevLookUp)
+	# Ok most of the event is now ready for despatch to the Object Server. Lets set an Identifier
+	$tempIdentifier	= $Server + ":" + $TriggerName + ":" + @Manager + ":" + @AlertGroup + ":" + @AlertKey + ":" + @Type
+	
+			

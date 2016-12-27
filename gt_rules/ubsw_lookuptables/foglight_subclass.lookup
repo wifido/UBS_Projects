@@ -1,0 +1,8 @@
+table foglight_subclass =
+{
+        {"T24_CUSTODY_PR","556"}
+        {"ECT_TEST","66"}
+        {"ALL","66"}
+        {"HFS_SABRE","556"}
+}
+default = "66"

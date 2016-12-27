@@ -1,0 +1,1218 @@
+
+
+	    case "46": ### logMonXFileMatch
+
+            ##########
+            # The SNMP trap that is generated when a line in the log file
+            # matches the regular expression.
+            #
+            # $1 = logMonXControlLogFile - Absolute path to the log file being
+            #        monitored. This field can include the wildcards '*' or '?'
+            #        to monitor multiple files. For example: to monitor all
+            #        files is /var/log you would enter '/var/log/*'.
+            # $2 = logMonXHistoryLine - A line from the log file that matched
+            #        the filter in this entry's associated control row.
+            # $3 = logMonXHistoryLevel - Log entry level, if known.
+            # $4 = logMonXControlDescription - A description of the control
+            #        row.
+            ##########
+		$ruleset = $ruleset + ' - Trap 46'
+
+
+
+
+
+            $logMonXControlLogFile = $1
+            $logMonXHistoryLine = $2
+            $logMonXHistoryLevel = $3
+            $logMonXControlDescription = $4
+            #
+            # We switch on the "logMonXControlDescription" token, which ultimately defines the top-level
+            # "branch" of the SSM config and therefore the logs that we should expect to process for each "branch"
+            #
+
+            #
+            # The $severityOverRide token allows us to selectively allow the SSM Agent's configured Severity to
+            # take precedence over the log file's priority (if one exists).
+            #
+            $severityOverRide = 0
+
+	    #
+	    # The following section enables us to process fixed-format configuration entries before we fall into the
+	    # various includes that try to work out what the event is
+	    #
+
+	if (nmatch ($logMonXControlDescription, "ssm_logmon_app"))
+	{
+		$ruleset = $ruleset + ' Extract'
+		$LogDesc = extract($logMonXControlDescription, '^([^:]+):[^:]+:[^:]+:[^:]+:[^:]+$')
+		$lowerLogDesc = lower($LogDesc)
+	}
+	else if (nmatch ($logMonXControlDescription, "ssm_logmon_sdpc"))
+	{
+		$ruleset = $ruleset + ' Extract sdpc'
+		$LogDesc = extract($logMonXControlDescription, '^([^:]+):[^:]+:[^:]+:[^:]+:[^:]+$')
+		$lowerLogDesc = lower($LogDesc)
+	}
+	else
+	{
+		$ruleset = $ruleset + ' Not Extract'
+	    	$lowerLogDesc = lower($logMonXControlDescription)
+	}
+
+
+
+	    #
+	    # First various syslog entries
+	    #
+	    switch ($lowerLogDesc) {
+#	20060203	Changes by Chris Janes of Abilitec
+		case "ssm_logmon_nbsyslog_5":
+			$ruleset = $ruleset + ' - ssm_logmon_nbsyslog_5'
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_nbsyslog_include.rules"
+			$logMonXHistoryLineERRLVL = "crit"
+			$ssmType = 1
+
+		case "ssm_logmon_nbsyslog_4":
+			$ruleset = $ruleset + ' - ssm_logmon_nbsyslog_4'
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_nbsyslog_include.rules"
+			$logMonXHistoryLineERRLVL = "major"
+			$ssmType = 1
+
+
+		case "ssm_logmon_nbsyslog_3":
+			$ruleset = $ruleset + ' - ssm_logmon_nbsyslog_3'
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_nbsyslog_include.rules"
+			$logMonXHistoryLineERRLVL = "minor"
+			$ssmType = 1
+
+		case "ssm_logmon_nbsyslog_2":
+			$ruleset = $ruleset + ' - ssm_logmon_nbsyslog_2'
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_nbsyslog_include.rules"
+			$logMonXHistoryLineERRLVL = "info"
+			$ssmType = 1
+
+		case "ssm_logmon_nbsyslog_1":
+			$ruleset = $ruleset + ' - ssm_logmon_nbsyslog_1'
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_nbsyslog_include.rules"
+			$logMonXHistoryLineERRLVL = "clear"
+			$ssmType = 2
+
+
+		case "ssm_logmon_syslog_5":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_5'
+
+                        $ssmClassGidKey = $ssm_community
+
+			$logMonXHistoryLineERRLVL = "crit"
+			$ssmType = 1
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_syslog_include.rules"
+			# This switch on tempIDOverRide added bt GT 9/2/6 in order to dedup memory events better.
+			switch ($tempIDOverRide) {
+				case "1":
+					# Leave $tempIdentifier as it is
+					# I.E. Do Nothing
+				default:
+					$tempIdentifier = $tempIdentifier + $ssmSummary
+			}
+#	20081118	Change by Chris Janes of Abilitec	TD 5150
+			if(nmatch($ssmSummary, "Improved failure detection"))
+			{
+				$tempMarkForDiscard = 2
+			}
+			else if (nmatch($ssmSummary, "Cannot meet requested failure detection"))
+			{
+				$tempMarkForDiscard = 2
+			}
+
+#	20081118	End of Change
+
+		case "ssm_logmon_syslog_4":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_4'
+                        $ssmClassGidKey = $ssm_community
+
+                        $ssmClassGidKey = $ssm_community
+			$logMonXHistoryLineERRLVL = "major"
+			$ssmType = 1
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_syslog_include.rules"
+			# This switch on tempIDOverRide added bt GT 9/2/6 in order to dedup memory events better.
+			switch ($tempIDOverRide) {
+				case "2":
+					$tempIdentifier = $tempIdentifier + $tempIdAddOn
+					$ruleset = $ruleset + ' - lpfc'
+				case "1":
+					# Leave $tempIdentifier as it is
+					# I.E. Do Nothing
+				default:
+					$tempIdentifier = $tempIdentifier + $ssmSummary
+			}
+
+		case "ssm_logmon_syslog_3":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_3'
+
+                        $ssmClassGidKey = $ssm_community
+			$logMonXHistoryLineERRLVL = "minor"
+			$ssmType = 1
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_syslog_include.rules"
+			# This switch on tempIDOverRide added bt GT 9/2/6 in order to dedup memory events better.
+			switch ($tempIDOverRide) {
+				case "1":
+					# Leave $tempIdentifier as it is
+					# I.E. Do Nothing
+				default:
+					$tempIdentifier = $tempIdentifier + $ssmSummary
+			}
+
+		case "ssm_logmon_syslog_2":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_2'
+
+                        $ssmClassGidKey = $ssm_community
+			$logMonXHistoryLineERRLVL = "info	"
+			$ssmType = 1
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_syslog_include.rules"
+			# This switch on tempIDOverRide added bt GT 9/2/6 in order to dedup memory events better.
+			switch ($tempIDOverRide) {
+				case "1":
+					# Leave $tempIdentifier as it is
+					# I.E. Do Nothing
+				default:
+					$tempIdentifier = $tempIdentifier + $ssmSummary
+			}
+
+		case "ssm_logmon_syslog_0":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_0'
+
+                        $ssmClassGidKey = $ssm_community
+			$logMonXHistoryLineERRLVL = "clear"
+			$ssmType = 2
+            		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_syslog_include.rules"
+			# This switch on tempIDOverRide added bt GT 9/2/6 in order to dedup memory events better.
+			switch ($tempIDOverRide) {
+				case "1":
+					# Leave $tempIdentifier as it is
+					# I.E. Do Nothing
+				default:
+					$tempIdentifier = $tempIdentifier + $ssmSummary
+			}
+
+		case "ssm_logmon_syslog_sunfire_5":
+			$ruleset = $ruleset + ' - ssm_logmon_syslog_sunfire_5'
+
+                        $ssmClassGidKey = $ssm_community
+			$ssmSeverity = 5
+			$ssmType = 1
+			$severityOverRide = 9
+			$ssmAlertGroup = extract($logMonXHistoryLine, "^[^ ]+[ ]+[^ ]+ [^ ]+ [^ ]+ ([^:]+):.*$")
+			$ssmAlertKey =  $logMonXControlLogFile 
+			$temp = extract($ssmAlertKey, "^[^\.]+\.([^\.]+).*$")
+#			20060518 Change by Chris Janes of Abilitec HDLDN0000406911
+#			$ssmSummary = "scloghost reports errors in /var/log/sunfire/0.messages " + $temp + "...Please investigate"
+			$ssmSummary = "/var/log/sunfire/0.messages " + $temp + "...Please investigate"
+#			20060518 End of Change
+#			20060509 Change by Chris Janes as requested by Nathan (Via Kris Newport)
+#			$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup 
+			$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertKey 
+#			20060509	End of Change
+				 
+			
+
+
+	    	#
+	    	# Next old Command Post logs inherited from Patrol
+	    	#
+		case "ssm_logmon_app_cp":
+			$ruleset = $ruleset + ' - ssm_logmon_app_cp'
+			$ssmTempClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+
+
+
+			if ( regmatch($logMonXHistoryLine, "^\[[^]]+\][^:]+:[^:]+:[^:]+:[^:]+:[^:]+$"))
+                	{
+                		$ruleset = $ruleset + "-ext1"
+				$ssmPatrolLogString = extract($logMonXHistoryLine, "^\[[^]]+\][^:]+:(.*)$")
+				@UserData = $ssmPatrolLogString
+				$ssmAlertGroup = extract($ssmPatrolLogString, '^([^:]+):[^:]+:[^:]+:[^:]+$')
+				$ssmAlertKey = extract($ssmPatrolLogString, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+				$logMonXHistoryLevelName = extract($ssmPatrolLogString, '^[^:]+:[^:]+:([^:]+):[^:]+$')
+				$ssmSummary = extract($ssmPatrolLogString, '^[^:]+:[^:]+:[^:]+: ?([^:]+)$')
+                	}
+        		else if ( regmatch($logMonXHistoryLine, "^\[[^]]+\][^:]+:[^:]+:[^:]+:[^:]+:[^:]+:.*$"))
+                	{
+                		$ruleset = $ruleset + "-ext2"
+				$ssmPatrolLogString = extract($logMonXHistoryLine, "^\[[^]]+\](.*)$")
+				@UserData = $ssmPatrolLogString
+				$severityOverRide = 3
+
+				$NoElements = split($ssmPatrolLogString, SplitArray, ":")
+				$tmplowSeverity = lower(SplitArray[4])
+				[$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+
+
+				if (int($ssmSeverity) == 1)
+				{
+					$tmplowSeverity = lower(SplitArray[5])
+					[$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+				}
+
+				$ssmAlertGroup = SplitArray[2]
+
+				$ssmAlertKey = SplitArray[3]
+				$ssmSummary = SplitArray[5] + SplitArray[6] + SplitArray[7] + SplitArray[8] + SplitArray[9]
+
+                	}
+			else if ( regmatch($logMonXHistoryLine, "^.*:[^:]+:[^:]+$"))
+                	{
+                		$ruleset = $ruleset + "-ext3"
+                		$logMonXHistoryLevelName = extract($ssmPatrolLogString, "^.*:([^:]+):[^:]+$")
+                		$ssmSummary = extract($ssmPatrolLogString, "^.*:[^:]+:([^:]+)$")
+                	}
+			else 
+			{
+                		$ruleset = $ruleset + "-oops wrong"
+				$ssmSummary = $logMonXHistoryLine
+                	}
+
+
+			$ssmClassGidKey = $ssmAlertGroup
+           		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $logMonXHistoryLevelName + $ssmSummary
+
+
+
+
+		case "ssm_logmon_app_fixweb":
+			$ruleset = $ruleset + ' - ssm_logmon_app_fixweb'
+			$ssmTempClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+
+        		if ( regmatch($logMonXHistoryLine, "^\[[^]]+\][^:]+:[^:]+:[^:]+:[^:]+:[^:]+:.*$"))
+                	{
+                		$ruleset = $ruleset + "-ext1"
+				$ssmPatrolLogString = extract($logMonXHistoryLine, "^\[[^]]+\](.*)$")
+                		$ssmAlertGroup = extract($ssmPatrolLogString, "^([^:]+):[^:]+:[^:]+:[^:]+:[^:]+:.*$")
+                		$ssmAlertKey = extract($ssmPatrolLogString, "^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+:.*$")
+                		$logMonXHistoryLevelName = extract($ssmPatrolLogString, "^[^:]+:+[^:]+:+[^:]+:([^:]+):.*$")
+                		$ssmSummary = extract($ssmPatrolLogString, "^[^:]+:+[^:]+:+[^:]+:+[^:]+:+([^:]+:+.*)$")
+                	}
+			else 
+			{
+                		$ruleset = $ruleset + "-def"
+				$ssmSummary = $logMonXHistoryLine
+                	}
+
+
+
+			$severityOverRide = 1
+           		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $logMonXHistoryLevelName + $ssmSummary
+
+		case "ssm_logmon_spam_001_4":
+			$ruleset = $ruleset + " - ssm_logmon_spam_001_4"
+			$ssmAlertKey = "Syslog SPAM"         
+			$ssmAlertGroup = $logMonXControlLogFile
+			$ssmSummary = "syslog reporting Corrected Memory Errors"
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 4 
+			$ssmType = 1
+			@Class = 999998
+			
+		case "ssm_logmon_spam_002_4":
+			$ruleset = $ruleset + " - ssm_logmon_spam_002_4"
+			$ssmAlertKey = "Syslog SPAM"         
+			$ssmAlertGroup = $logMonXControlLogFile
+			$ssmSummary = "syslog reporting Intermittent, Persistent and Sticky Softerrors"
+			$severityOverRide = 3
+           		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 4 
+			$ssmType = 1
+			@Class = 999998
+			
+		case "ssm_logmon_spam_003_4":
+			$ruleset = $ruleset + " - ssm_logmon_spam_003_4"
+			$ssmAlertKey = "Syslog SPAM"         
+		        $ssmAlertGroup = $logMonXControlLogFile
+			$ssmSummary = "syslog reporting 'lpfc, FCP completion errors', possible path to SAN storage fault"
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 4 
+               	        $ssmType = 1
+			@Class = 999998
+			
+		case "ssm_logmon_spam_004_4":
+			$ruleset = $ruleset + " - ssm_logmon_spam_004_4"
+			$ssmAlertKey = "Syslog SPAM"         
+			$ssmAlertGroup = $logMonXControlLogFile
+			$ssmSummary = "syslog reporting Corrected system bus event, further hardware checks may be needed"
+			$severityOverRide = 3
+           		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 4 
+			$ssmType = 1
+			@Class = 999998
+			
+		case "ssm_logmon_spam_005_4":
+			$ruleset = $ruleset + " - ssm_logmon_spam_005_4"
+			$ssmAlertKey = "Syslog SPAM"         
+			$ssmAlertGroup = $logMonXControlLogFile
+#			20051219	Change by Chris Janes of Abilitec
+			$ssmSummary = "syslog reporting veritas filesystem inode read errors, filesystem may need fsck, check syslog for details"
+#			20051219	End of Change
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 4 
+			$ssmType = 1
+			@Class = 999998
+
+                case "ssm_logmon_spam_006_3":
+                        $ruleset = $ruleset + " - ssm_logmon_spam_006_3"
+                        $ssmAlertKey = "Syslog SPAM"
+                        $ssmAlertGroup = $logMonXControlLogFile
+                        $ssmSummary = "unexpected-free-inode problem with filesystem, see syslog for details"
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+                        $ssmSeverity = 3
+                        $ssmType = 1
+                        @Class = 999998
+
+#		20080828	Changes by Chris Janes of Abilitec TD 5030
+
+                case "ssm_logmon_spam_007_5":
+                        $ruleset = $ruleset + " - ssm_logmon_spam_007_5"
+			# GT 20090915 BR_670 This AlertKey does not pass through ssm_logmonx_syslog, so we need to set AlertGroup here.
+                        $ssmAlertKey = "Privileged Rctl"
+                        #$ssmAlertGroup = $logMonXControlLogFile
+			$ssmAlertGroup  = "Swap"
+			# GT 20090915 End.
+			$tempSummaryLeft = extract($logMonXHistoryLine,'^.*\] (.*) by process.*$')
+			$tempSummaryRight = extract($logMonXHistoryLine,'^.* (zone .*)$')
+			@UserData = $tempSummaryRight
+                        $ssmSummary = $tempSummaryLeft + " " + $tempSummaryRight
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $tempSummaryRight
+                        $ssmSeverity = 5
+                        $ssmType = 1
+                        @Class = 123000
+
+                case "ssm_logmon_app_fx2b_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_app_fx2b_5'
+                        $ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                        $ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $ssmSummary = substr ($logMonXHistoryLine, 18, 255)
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+                        $ssmSeverity = 5
+                        $ssmType = 1
+
+
+
+ 		case "ssm_logmon_fuji_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_fuji_5'
+
+
+                 	$ssmAppClass = $CommunityClass
+	$ssmAlertKey = "Fujitsu"
+
+			$ssmAlertGroup = $logMonXControlLogFile
+                        $ssmSummary = substr($logMonXHistoryLine,16,255)
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1 + $ssmSummary
+                        $ssmSeverity = 5
+                        $ssmType = 1
+
+
+                case "ssm_logmon_app_oasis":
+                        $ruleset = $ruleset + ' - ssm_logmon_app_oasis'
+			$NoElements = split($logMonXControlDescription, SplitArray, ":")
+			$ruleset = $ruleset + ' NumSplit = ' + $NoElements
+			$ssmAppClass = SplitArray[2]
+			@Subclass = SplitArray[3]
+			@SystemDesig = SplitArray[4]
+			$ssmAlertGroup = SplitArray[5]
+
+
+			$NoElements = split($logMonXHistoryLine, SplitArray, ":")
+			$ruleset = $ruleset + ' NumSplit = ' + $NoElements
+			$SevCode = SplitArray[7]
+                       $tmplowSeverity = lower($SevCode)
+                        [$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+			if (int($ssmType) == 0)
+			{
+				$ruleset = $ruleset + '2nd Sev Lookup'
+				$SevCode = SplitArray[8]
+				$tmplowSeverity = lower($SevCode)
+				[$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+				$ssmAlertKey = SplitArray[9]
+				$ssmSummary = SplitArray[9] + SplitArray[10] + SplitArray[11]
+			}
+			else
+			{
+				$ssmAlertKey = SplitArray[8]
+				$ssmSummary = SplitArray[8] + SplitArray[9] + SplitArray[10]
+			}
+                        $severityOverRide = 4
+			if(nmatch($ssmAlertKey, "Failed to retrieve the conversation"))
+			{
+				$ruleset = $ruleset + ' AK = Failled...'
+				$ssmAlertKey = "Failed to retrieve a conversation"
+			}
+@Description = @Description + ' SevCode = ' + $SevCode
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+
+
+                case "ssm_logmon_sdpc":
+                        $ruleset = $ruleset + ' - ssm_logmon_sdpc'
+                        $ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                        $ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$NoElements = split($logMonXHistoryLine, SplitArray, ":")
+			$logMonXHistoryLevelName=SplitArray[8]
+                        $severityOverRide = 1
+			$ssmSummary = SplitArray[9]
+
+
+
+
+                case "ssm_logmon_sdpc_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_sdpc_5'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 5
+                        $ssmType = 1
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+                        $NoElements = split($logMonXHistoryLine, SplitArray, ":")
+                        $ssmSummary = SplitArray[8]
+                        $UserData = SplitArray[7]
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+                case "ssm_logmon_sdpc_4":
+                        $ruleset = $ruleset + ' - ssm_logmon_sdpc_4'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 4
+                        $ssmType = 1
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+                        $NoElements = split($logMonXHistoryLine, SplitArray, ":")
+                        $ssmSummary = SplitArray[8]
+                        $UserData = SplitArray[7]
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+                case "ssm_logmon_sdpc_3":
+                        $ruleset = $ruleset + ' - ssm_logmon_sdpc_3'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 3
+                        $ssmType = 1
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+                        $NoElements = split($logMonXHistoryLine, SplitArray, ":")
+                        $ssmSummary = SplitArray[8]
+                        $UserData = SplitArray[7]
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+
+                case "ssm_logmon_app_drive_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_app_drive_5'
+                        # New prefix added by Mahesh Kumar. TD #5219
+                        # In order to seperate events based on drive down, Set AlertKey to drive.
+                        # Drive down info can be grabbed from logMonXHistoryLine
+                        $ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                        $ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+                        $ssmAlertKey = $logMonXControlLogFile
+
+                        if(regmatch($logMonXHistoryLine, "DOWN\'ed drive")) {
+                            $TD_Num = "5219"
+                            $tempDeviceString = ltrim(extract($logMonXHistoryLine, '([^:]+)$'))
+                            $NoElements = split($tempDeviceString, SplitArray, " ")
+                            $ssmAlertKey = SplitArray[9]
+                        }
+                        if(match($ssmAppClass, "1057089"))
+                        {
+                                $ruleset = $ruleset + ' ETL'
+                                $ssmSummary = $2_text
+                        }
+                        else
+                        {
+                                $ssmSummary = $logMonXHistoryLine
+                        }
+
+
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+                        $ssmSeverity = 5
+                        $ssmType = 1
+                        switch ($ssmShortDesc)
+                        {
+                                include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+                                default:
+                        }
+ 
+		case "ssm_logmon_app_5":
+			$ruleset = $ruleset + ' - ssm_logmon_app_5'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+
+			if(match($ssmAppClass, "1057089"))
+			{
+				$ruleset = $ruleset + ' ETL'
+				$ssmSummary = $2_text
+			}
+			else
+			{
+				$ssmSummary = $logMonXHistoryLine
+			}
+
+
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 5 
+			$ssmType = 1
+			switch ($ssmShortDesc)  
+			{
+		    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+		    		default:
+			}
+		case "ssm_logmon_app_4":
+			$ruleset = $ruleset + ' - ssm_logmon_app_4'
+                       	$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$') 
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $ssmSummary = $logMonXHistoryLine
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+                        $ssmSeverity = 4
+                        $ssmType = 1
+			switch ($ssmAppClass)
+			{
+                                case "1057618":
+                                $ruleset = $ruleset + ' - TAD '
+                                $ssmTempSummary = $logMonXHistoryLine
+                                $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1 + $ssmTempSummary
+
+				case "1057772":
+			       	$ruleset = $ruleset + ' - Raptor Au' 
+				$ssmTempSummary = substr($logMonXHistoryLine, 17,1000)			
+				$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1 + $ssmTempSummary
+				default:	
+			}
+			#Simon Waller Abilitec 20060508 end of changes 
+			switch ($ssmShortDesc)
+                      	{
+			   	include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+               		        default:
+		        }
+		case "ssm_logmon_app_3":
+			$ruleset = $ruleset + ' - ssm_logmon_app_3'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+			$ssmSummary = $logMonXHistoryLine
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 3 
+			$ssmType = 1
+			switch ($ssmShortDesc)  
+			{
+		    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+		    		default:
+			}
+
+		case "ssm_logmon_app_2":
+			$ruleset = $ruleset + ' - ssm_logmon_app_2'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+			$ssmSummary = $logMonXHistoryLine
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 2 
+			$ssmType = 1
+			switch ($ssmShortDesc)  
+			{
+		    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+		    		default:
+			}
+
+		case "ssm_logmon_app_0":
+			$ruleset = $ruleset + ' - ssm_logmon_app_0'
+
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+			$ssmSummary = $logMonXHistoryLine
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 0 
+			$ssmType = 1
+			switch ($ssmShortDesc)  
+			{
+		    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+		    		default:
+			}
+
+                case "ibm_blade_chassis_5":
+
+                        $ruleset = $ruleset + ' - ssm_ibm_blade_chassis_5'
+                      # $ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                 	$ssmAppClass = $CommunityClass
+                        $logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+                        $ssmAlertGroup = extract ($logMonXHistoryLine,'^[^:]+:[^:]+:[^ ]+ ([^ ]+) .*$') 
+                        $ssmTmpSummary = extract($logMonXHistoryLine1, '^[^ ]+ (.*)$')
+                        $ssmSummary = ltrim($ssmTmpSummary)
+                        $blade = extract ($logMonXHistoryLine,'^[^:]+:[^:]+:[^:]+:[^0-9]+([0-9]+) .*$')
+			$err_msg = extract ($ssmTmpSummary,'^[^:]+:[^:]+:[^:]+:[0-9]+ [A-Z]+ [0-9]+ (.*)$')
+                        $tmpFQDN = extract($logMonXHistoryLine1, '^[^ ]+ ([^:]+):.*$')
+			$tmpSupt_Lvl = lookup($tmpFQDN, SLA_lookup)
+                        $ssmAlertKey = $tmpFQDN 
+			@UserData = $tmpSupt_Lvl
+			@Supt_Lvl = $tmpSupt_Lvl
+			$severityOverRide = 3
+                        $ssmSeverity = 5
+                        $ssmType = 1
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $ssmSeverity + $OID1 
+
+
+		case "ssm_logmon_app_klc_5":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_5'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 5 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+		case "ssm_logmon_app_klc_4":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_4'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 4 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+		
+		case "ssm_logmon_app_klc_3":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_3'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 3 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+		
+		case "ssm_logmon_app_klc_2":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_2'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 2 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+		
+		case "ssm_logmon_app_klc_1":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_1'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc 
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 1 
+			$ssmType = 2
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+		
+		case "ssm_logmon_app_klc_0":
+			$ruleset = $ruleset + ' - ssm_logmon_app_klc_0'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc 
+			$logMonXHistoryLine1 = substr($logMonXHistoryLine, 24, 1000)
+			$ssmAlertKey = extract($logMonXHistoryLine1, '^[^:]+:([^:]+):[^:]+:[^:]+$')
+			$ssmTmpSummary = extract($logMonXHistoryLine1, '^[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = ltrim($ssmTmpSummary)
+			$severityOverRide = 3
+			$ssmSeverity = 0 
+			$ssmType = 2
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+		
+		# 20050909	End of addition	
+
+                case "ssm_logmon_app_remedy":
+                        $ruleset = $ruleset + ' case - ssm_logmon_remedy:'
+                        $ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                        $ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertGroup = $ssmShortDesc         
+                        $ssmAlertKey = $logMonXControlLogFile
+			$ssmArserverdValue = extract($logMonXHistoryLine, '^[^0-9]+[0-9]+[^0-9]+([0-9]+)[^0-9]+$')
+			@UserData = $ssmArserverdValue
+			if (int($ssmArserverdValue) < 2300 )
+			{
+				$ssmSeverity = 2
+				$ssmType = 2
+				$ssmSummary = "Arserverd is " + $ssmArserverdValue + " Mb"
+				$ruleset = $ruleset + ' Clear Event'
+			} 
+			 else if (int($ssmArserverdValue) < 2500 )
+			{
+				$ssmSeverity = 3
+				$ssmType = 1
+				$ssmSummary = "Arserverd has exceeded  " + $ssmArserverdValue + " Mb"
+				$ruleset = $ruleset + ' Warning Event'
+			} 
+			 else
+			{
+				$ssmSeverity = 5
+				$ssmType = 1
+				$ssmSummary = "Arserverd has exceeded  " + $ssmArserverdValue + " Mb"
+				$ruleset = $ruleset + ' Critical Event'
+			} 
+                        $severityOverRide = 9
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+
+
+		case "ssm_logmon_app_vcs_5":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_5'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 5 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+
+		case "ssm_logmon_app_vcs_4":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_4'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 4 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+		case "ssm_logmon_app_vcs_3":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_3'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 3 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+		case "ssm_logmon_app_vcs_2":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_2'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 2 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+		case "ssm_logmon_app_vcs_1":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_1'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 1 
+			$ssmType = 1
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+		case "ssm_logmon_app_vcs_0":
+			$ruleset = $ruleset + 'chris - ssm_logmon_app_vcs_0'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			$ssmAlertGroup = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAlertKey = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmSummary = extract ($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$') 
+			$severityOverRide = 9
+			$ssmSeverity = 0 
+			$ssmType = 2
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSeverity + $OID1
+
+
+
+		case "ssm_logmon_app":
+			$ruleset = $ruleset + ' - ssm_logmon_app:'
+			$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+			$ssmSummary = $logMonXHistoryLine
+			$severityOverRide = 2
+
+#
+#		Changed identifier - Removed $1 and added ssmSummary - David Butler, Abilitec, 19/5/2005
+#		Took out $ssmSummary, as date in the summary and no deduplication on the events causing spam.  Kris Newport 20/05/05
+#            	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $4 + $ssmSummary
+#		$Severity added to identifier as this is the only difference betwen the Events - Chris Janes of Abilitec 10-60-05 
+#		$OID1 added to identifier Chris Janes of Abilitec - 16-6-2005
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+
+			switch ($ssmShortDesc)  {
+		    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_app_include.rules"
+		    		default:
+			}
+	    
+		case "impactexception" | "javaexception":
+			include "$OMNIHOME/all_rules/ubsw/ssm_rules/impact.include.rules"
+
+                case "netcool gateway problem":
+                        $ruleset = $ruleset + ' - Ngm'
+                        $tempIdentifer = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $1 + $3 + $4
+		        $ssmSummary = extract($2, '^[^:]+:[^:]+:[^:]+:[^:]+:(.*)$')	
+                        $ssmAlertGroup = $4
+                        $ssmAlertKey = $1
+		        $ssmClassGidKey = "MICROMUSE"	
+                 #######Simon Waller Abilitec 20060228 - remove date from identifer
+
+		case "ssm_logmon_app_netcon_5":
+			$ruleset = $ruleset + ' - ssm_logmon_app_netcon_5'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+
+			$ssmAlertGroup = $ssmShortDesc          ### David Butler, Abilitec, 06/05/2005
+			$ssmAlertKey = $logMonXControlLogFile
+
+                        $NoElements = split($logMonXHistoryLine, SplitArray, " ")
+                        $tmpHostName = SplitArray[4]
+			$ssmSummary = " Kernel panic detected on " + $tmpHostName + ", check syslog on rhnetcon for more info"
+
+			$severityOverRide = 3
+            		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+			$ssmSeverity = 5 
+			$ssmType = 1
+
+
+                case "ssm_logmon_app_megaide_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_app_megaide_5'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+
+
+                        $ssmAlertGroup = $ssmShortDesc         
+                        $ssmAlertKey = $logMonXControlLogFile
+
+                        $NoElements = split($logMonXHistoryLine, SplitArray, " ")
+                        $tmpHostName = SplitArray[4]
+
+                        $ssmSummary = $tmpHostName + " megaide read errors detected on IBM 8832 blade, pls contact local admins and hardware team for investigation"
+
+                        $severityOverRide = 3
+                        $ssmSeverity = 5
+                        $ssmType = 1
+
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $Severity + $OID1
+
+                case "ssm_logmon_app_veritas_5":
+                        $ruleset = $ruleset + ' - ssm_logmon_veritas_5'
+			$NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+			@Subclass = SplitArray[3]
+			@SystemDesig = SplitArray[4]
+			$ssmShortDesc = SplitArray[5]
+			$ssmSummary = $logMonXHistoryLine
+                        $ssmAlertGroup = $ssmShortDesc 
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 5
+                        $ssmType = 1
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+
+                case "ssm_logmon_app_veritas_4":
+                        $ruleset = $ruleset + ' - ssm_logmon_veritas_4'
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmSummary = $logMonXHistoryLine
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 4
+                        $ssmType = 1
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+
+                case "ssm_logmon_app_veritas_0":
+                        $ruleset = $ruleset + ' - ssm_logmon_veritas_0'
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmSummary = $logMonXHistoryLine
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        $severityOverRide = 3
+                        $ssmSeverity = 1
+                        $ssmType = 2
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+                case "ssm_logmon_app_nb_scratch":
+                        $ruleset = $ruleset + ' - ssm_logmon_app_nb_scratch'
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+			$NoElements = split($logMonXHistoryLine, SplitArray, ":")
+			@Origin = @NodeAlias
+			@Region = SplitArray[3]
+			@Location = SplitArray[4]
+			@NodeAlias = SplitArray[5]
+			@Node = SplitArray[6]
+                        $ssmSummary = "Minimum Tape = " + SplitArray[7] + "  Availible Tape = " + SplitArray[8]
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+
+#			$logMonXHistoryLineERRLVL = SplitArray[2]
+			switch(SplitArray[2])
+			{
+				case "WARN":
+					$severityOverRide = 3
+                        		$ssmSeverity = 4
+                        		$ssmType = 1
+ 				default:
+					$tempMarkForDiscard = 2
+			}
+                        $tempIdentifier = @Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey 
+
+                case "ssm_logmon_app_vmwlic_0":
+			#       20090220        Change by Mahesh Kumar       TD 5214
+                        $ruleset = $ruleset + ' - ssm_logmon_vmwlic'
+
+                        $NoElements = split($logMonXControlDescription, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmShortDesc = SplitArray[5]
+                        $ssmAlertGroup = $ssmShortDesc
+                        $ssmAlertKey = $logMonXControlLogFile
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+                       
+			# regmatch on logMonXHistoryline and extract - AlertKey, Severity, Summary
+                        if ( regmatch($logMonXHistoryLine, "^\[[^]]+\][^:]+.*$"))
+                        {
+                                $ruleset = $ruleset + "-ext"
+                                $ssmTimeLogString = extract($logMonXHistoryLine, "^\[([^]]+)\].*")
+                                @UserData = $ssmTimeLogString
+				$NoElements = split($ssmTimeLogString, SplitArray, " ")
+				$templowseverity = ltrim(lower(SplitArray[5]))
+				[$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($templowseverity, app_MttrapdSeverity)
+				$ssmAlertKey = SplitArray[3]
+				$ssmSummary = ltrim(extract($logMonXHistoryLine, "^\[[^]]+\](.*)$"))
+                        }
+                        else
+                        {
+                                $ruleset = $ruleset + "-def"
+                                $ssmSummary = $logMonXHistoryLine
+                        }
+
+                        ## Reset severity, appropriately.
+			if ( int($ssmSeverity) == 5 ) {
+				$ssmType = 1
+				$ssmSeverity = 5
+
+			}
+			if ( int($ssmSeverity) == 4 ) {
+				$ssmType = 1
+				$ssmSeverity = 4
+
+			}
+			else if ( int($ssmSeverity) == 3 ) {
+				$ssmType = 1
+				$ssmSeverity = 4
+
+			}
+			else if ( int($ssmSeverity) == 2 ) {
+				$ssmType = 2
+				$ssmSeverity = 2
+
+			}
+			else {
+				$ssmType = 1
+				$ssmSeverity = 1
+			}
+                        $severityOverRide = 3
+                        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $ssmAppClass + $ssmAlertGroup + $ssmAlertKey
+
+		default:
+	    		#
+	    		# Finally we extract detail from the logs based on "logMonXControlDescription" to work out what it is
+	    		#
+			$ruleset = $ruleset + ' Default case ' + ' - ' + $logMonXControlDescription
+                	switch ($logMonXControlDescription)  {
+            	    		include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_logmonx_include.rules"
+            	    		default:
+					$ruleset = $ruleset + ' - Default'
+            	        		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $1 + $2 + $3 + $4 
+            	        		$ssmSummary = $2
+            	        		$ssmAlertGroup = $4
+            	        		$ssmAlertKey = $1
+        		}
+	    }
+
+            #
+            # Get the "default" text conversion of the Severity from the SSM trap
+            # and set the Severity from there unless overridden in the file included above
+            #
+	    if (not exists($logMonXHistoryLevelName))  {
+		$logMonXHistoryLevelName = lookup($logMonXHistoryLevel, LogMonXLevel)
+	    }
+            
+            if (exists($logMonXHistoryLineERRLVL))  {
+                $ErrLvlLen = length($logMonXHistoryLineERRLVL)
+            }
+            else  {
+                $ErrLvlLen = 0
+            }
+	$ruleset = $ruleset + "SevOR Case = " + $severityOverRide
+            switch ($severityOverRide)  {
+                case "0":
+                    if (int($ErrLvlLen) > 0)  {
+                        $ruleset = $ruleset + "ErrLvlLen) > 0"
+			$tmplowSeverity = lower($logMonXHistoryLineERRLVL)
+                        [$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+                    }
+                    else  {
+                        $ruleset = $ruleset + "ErrLvlLen) = 0"
+                        $tmplowSeverity = lower($logMonXHistoryLevelName)
+                        [$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+                    }
+                case "1":
+                        $tmplowSeverity = lower($logMonXHistoryLevelName)
+                        [$ssmSeverity, $ssmType, $ssmFlashDiscard] = lookup($tmplowSeverity, app_MttrapdSeverity)
+		case "2":
+			$ssmSeverity = int($logMonXHistoryLevel) + 1
+			$ssmType = 1
+                default:
+			$ruleset = $ruleset + " SOR-def"
+			# Here we effectively allow the Severity and Type to be set on a per-event basis
+			# By setting $severityOverRide >= 2
+            }
+            @Severity = $ssmSeverity
+            @Type = $ssmType
+            @Summary = $ssmSummary
+            @AlertGroup = $ssmAlertGroup
+            @AlertKey = $ssmAlertKey
+

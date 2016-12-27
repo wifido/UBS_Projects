@@ -1,0 +1,182 @@
+# Default Expiretimes set in looluptables: app_severity.lookup socket.include.lookup
+# Severity 5:   86400 (345600)Change under GCMS 321927 17th May 2007
+# Severity 4:   43200 (86400) Change under GCMS 321927 17th May 2007
+# Severity 3:   43200
+# Severity 2:   3600
+# Severity 1:   0
+#
+# Exceptions as built in automations outlined below
+
+$expirerule = "-exp: default"
+
+############# Replace KillSecurityAlerts #########################
+switch(@AlertGroup)
+{
+       case "ITSEC" | "runaway" | "CLAS" | "SECURITY" | "HistDB":
+               @ExpireTime = 3600
+       default:
+}
+##################################################################
+
+switch(@Class)
+	{
+############# Replace ClearGMS_Alerts #################
+	case "20010":			# GMS
+        	{
+        	switch(@Severity)
+                	{
+                	case "2" | "3" | "4":
+                        	@ExpireTime = 28800
+				$expirerule = "-exp: ClearGMS_Alerts"
+                	default:
+                	}
+        	}
+
+############# Replace Clear_Old_FW_Alerts #################
+        case "301":			# Firewall	
+        	@ExpireTime = 345600
+		$expirerule = "-exp: Clear_Old_FW_Alerts"
+
+############# Replace Kill_DB_Alerts ######################
+	case "120000" | "121000":	# Oracle | Sybase
+        	{
+        	switch(@Severity)
+                	{
+                	case "2" | "3" | "4":
+                        	@ExpireTime = 3600
+				$expirerule = "-exp: Kill_DB_Alerts"
+                	default:
+                	}
+        	}
+############# Replace ClearMOM_Alerts ######################
+        case "124000":			# Wintel / MOM
+                {
+                @ExpireTime = 3600
+		$expirerule = "-exp: ClearMOM_Alerts"
+                }
+############# Replace Clear_Old_Cisco_Alerts ######################
+        case "200":			# Syslog
+        	@ExpireTime = 345600
+		$expirerule = "-exp: Clear_Old_Cisco"
+
+############# Replace CleanUnixAlerts ################
+        case "123000":			# Unix
+                {
+                switch(@Severity)
+                        {
+                        case "2" | "3":
+                                @ExpireTime = 3600
+				$expirerule = "-exp: CleanUnixAlerts"
+                        case "4":
+				@ExpireTime = 50400
+				$expirerule = "-exp: CleanUnixAlerts"
+                        case "5":
+                                @ExpireTime = 86400
+				$expirerule = "-exp: CleanUnixAlerts"
+                        default:
+                        }
+                }
+
+############# Expires for Unassigned SSM Alerts ################
+	case "5200":                  # Unassigned SSM Alerts
+                {
+                switch(@Severity)
+                        {
+                        case "2" | "3":
+                                @ExpireTime = 3600
+                                $expirerule = "-exp: CleanUnnasignSSMAlerts"
+                        case "4" | "5":
+                                @ExpireTime = 28800
+                                $expirerule = "-exp: CleanUnnasignSSMAlerts"
+                                default:
+                        }
+                }
+
+############# Replace Clear_Old_Passport_Alerts ################
+	case "402":			# Passport
+        	@ExpireTime = 108000
+		$expirerule = "-exp: Clear_Old_Passport"
+
+############# Expire  "Probe_loglevel" events N Wood Abilitec Jun 2007 ################
+        case "230008":
+                @ExpireTime = 1800
+                $expirerule = "-exp: Clear_Probe_LogLevel"
+
+############# Expire SSM "Telemetry" and "Heartbeat" messages quickly ################
+        case "5201" | "1601":
+                @ExpireTime = 600
+                $expirerule = "-exp: Clear_HB_Tele"
+
+
+#	20080730	Change by GT Added shortened expire time for PDH suppression events in prod.
+############ Expire PDH Suppression insert events in collection layer fairly quickly. #############
+	case "1640":
+		@ExpireTime = 120
+		$expirerule = "-exp: PDH_Ins"
+
+#	2080730		End of change.
+
+
+#	20080513	Changes by ChrisJanes of Abilitec TD 4834
+	case "65999":
+		@ExpireTime = 600
+		$expirerule = "-exp: Autosys"
+
+
+### This is the Default for the case switch ########################
+	default:
+	}
+
+#######################################################
+
+############# Replace Clear_anything_less_than_major_older_then_24hrs ##########
+	switch(@Stream)
+		{
+		case "NWFW" | "NWPassport" | "NWCisco" | "NWOV" | "NWSwitch" | "NWRouter" | "NWContent" | "NWModemPool" | "NWOptera":
+			@ExpireTime = 345600
+			$expirerule = "-exp: Clear_anything"
+		default:
+		}
+
+############# Replace Keep_Dev_Clean #################
+
+
+############# Replace UBS_Expire ########################
+if (int(@Type) > 10)
+{
+	@ExpireTime = @Type
+	$expirerule = "-exp: UBS_Expire"
+}
+#########################################################
+
+switch(@OwnerGID)
+	{
+	case "6":		# 3KEYS_NETWORKS
+		@ExpireTime = 345600
+		$expirerule = "-exp: GSD_CFI_PFCA"
+	case "407":			#IT FX FSM OPERATIONS
+		switch(@Severity)
+                {
+                        case "5":
+                                @ExpireTime = 345600
+                                $expirerule = "-exp: IT FX FSM OPERATIONS"
+                        case "4":
+                                @ExpireTime = 86400
+                                $expirerule = "-exp: IT FX FSM OPERATIONS"
+			default:
+		}
+	default:
+	}
+
+
+if(exists($BypassExpire))
+{
+	$ruleset = $ruleset + " BypassExpire"
+	@ExpireTime = $BypassExpire
+}
+
+
+
+
+$ruleset = $ruleset + $expirerule
+

@@ -1,0 +1,37 @@
+Thoughts about UBS DBaaS Monitoring
+
+We need to Identify:
+	Events to be Monitored
+		OEM
+		Databases
+			alerts and job status
+
+
+				•The following components (And more) can be monitored using Enterprise Manager
+				•Databases hosts
+				•Exadata Cells
+				•Cisco switch
+				•KVM (Keyboard, Video, Mouse)
+				•ILOM Monitoring
+				•Infiniband switch
+				•Power distribution unit (PDU)
+		
+		For this we need latest MiB
+		Check latest rules
+		how do we interface with SLOW
+		how do we enrich events from CMDB (atrium)
+		can we get some raw capture for OEM4 Events
+		can we use a right click tool to access MyOracle support KB
+		
+	Dashboard Design Requirements
+		Business Goals
+		User requirements
+			Define target audience
+			Core user requirements
+			Core user wishes
+			Task analysis
+			size of page?
+		Review Process
+				
+			
+			

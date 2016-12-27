@@ -1,0 +1,8 @@
+map(name="APP_GSD_SMB_ALL",bgColor="white",w=175,h=600,acl="*")
+text(name="app_name_2",label="SMB",x=66,y=47,action="Open URL",url="",target="_self",entity="SMB",datasource="NCOMS",flash="true",font="Helvetica",size=18,justify="center",style="b",color="blue")
+monitor(name="visual_6",label="SMB All Events",x=27,y=69,action="Active Event List (AEL)",url="",target="main",entity="SMB_AllEvents",datasource="NCOMS",flash="true",w=130,h=85,w=130,h=85,type="lavalamp",show label=true,show total=true,show highest=false,show lowest=false,show metric=true,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)
+line(name="visual_11",label="untitled",x=156,y=400,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=157,y2=400)
+line(name="visual_10",label="untitled",x=107,y=401,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=107,y2=401)
+line(name="visual_9",label="untitled",x=100,y=426,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=101,y2=422)
+line(name="visual_8",label="untitled",x=119,y=401,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=119,y2=401)
+line(name="visual_7",label="untitled",x=126,y=401,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=126,y2=401)

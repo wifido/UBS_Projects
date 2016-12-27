@@ -1,0 +1,63 @@
+#######################################################################
+#
+#       Copyright (C) 1997, 1998, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+#######################################################################
+
+#######################################################################
+#
+# Properties supported by this module:
+#
+# Property Name                 Default
+#
+#######################################################################
+#
+# Property Name                                 Default
+#
+# Generic Properties
+#
+# AuthPassword                  :       ""
+# AuthUserName                  :       ""
+# AutoSAF                       :       0
+# BufferSize                    :       10
+# Buffering                     :       0
+# LookupTableMode               :       3
+# MaxRawFileSize                :       -1
+# MaxSAFFileSize                :       1048576
+# NetworkTimeout                :       0
+# RawCapture                    :       0
+# RawCaptureFile                :       "$OMNIHOME/var/objectserver.cap"
+# RawCaptureFileAppend          :       0
+# RawCaptureFileBackup          :       0
+# RetryConnectionCount          :       15
+# RetryConnectionTimeOut        :       30
+# RulesFile                     :       "$OMNIHOME/monitors/<arch>/objectserver.rules"
+# SAFFileName                   :       ""
+# Server                        :       "NCOMS"
+# ServerBackup                  :       ""
+# StoreAndForward               :       1
+# Version                       :       0
+#
+#######################################################################
+Server : "EMEA"
+PollServer : 60
+NetworkTimeout : 120 
+MessageLevel : "debug"
+MsgDailyLog : 1
+MessageLog : "/sbclocal/netcool/omnibus/log/ubsw_ism.log"
+MaxLogFileSize : 40960000
+RulesFile : "/sbclocal/netcool/omnibus/all_rules/ubsw/ism.rules"
+DataLog : 1
+Buffering : 1
+BufferSize : 200

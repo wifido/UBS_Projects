@@ -1,0 +1,209 @@
+table prof_class = 
+{
+	{"IT_EQ_ERD","55100","",""}
+	{"HaloServerMonitor","50405","",""}
+	{"IT_EQ_ERD_MPP","55110","",""}
+	{"PSM2","124010","",""}
+	{"Wttd_LDAP_Facade","1057969","",""}
+	{"SwissKeyExecution","50700","",""}
+	{"Load_Balancer","302","",""}
+	{"Swiskey_Online_Clearing","54880","",""}
+	{"CMIS_Reporting","1007253","",""}
+	{"Equity_Consol","1056697","",""}
+	{"UBSW_Consol","1056686","",""}
+	{"Ranger","1052225","",""}
+	{"Holmes","1052913","",""}
+	{"DMSI","1056745","",""}
+	{"Credit_Research","1056988","",""}
+	{"Credit_Delta","1056409","",""}
+	{"CDS","1057131","",""}
+	{"COD","1056586","",""}
+	{"Creation","1054919","",""}
+	{"Credit_Engine","1006089","",""}
+	{"Crelox","1056019","",""}
+	{"FIT_GCT","1058530","",""}
+	{"FIT_GCT_MDA","1058529","",""}
+	{"FIT_GCT_TES","1058528","",""}
+	{"FIT_GCT_GCTC","1058530","",""}
+	{"GRT","1056563","",""}
+	{"QRC_Angel","1057443","",""}
+	{"Risk_Reporting_Warehouse","110030","",""}
+	{"SDR","1056504","",""}
+	{"Spyda","1056631","",""}
+	{"TRaPA","1056609","",""}
+	{"VARGATE","1057239","",""}
+	{"XCOL","110010","",""}
+	{"Inform_CRM_System","1057331","",""}
+	{"New_Issues","1054241","",""}
+	{"Dealogic_DealAxis","2076087","",""}
+	{"GGL_RAM","1057052","",""}
+	{"CDE_QA","2055140","",""}
+	{"ECP_QA","2054950","",""}
+	{"RPP_QA","2055040","",""}
+	{"RAP_QA","2018741","",""}
+	{"CMDB","2100000","",""}
+	{"CompassSearch","1057556","",""}
+	{"Client_Portal","1056365","",""}
+	{"Compass_Home","1057555","",""}
+	{"Content_Publisher","1057557","",""}
+	{"Docbase","1056625","",""}
+	{"Teldir","1056970","",""}
+	{"EF_ASAP","1057031","",""}
+       	{"Worldclock","1057577","",""}
+	{"RiskOnline","1056680","",""}
+	{"BPS_Monitoring_Support","0","",""}
+	{"IMP","2070993","",""}
+	{"IMS_WIS_IMP","2070993","",""}
+	{"IMP_TEST","2070993","",""}
+	{"IMS_WIS","2070998","",""}
+	{"IMS_WIS_STM","2070998","",""}
+	{"IMS_WIS_STM_TEST","2071000","",""}
+	{"IMS_WIS_TEST","2071000","",""}
+	{"Evidence","1057988","",""}
+	{"ICC_Portal","1058253","",""}
+	{"GLS","1054224","",""}
+	{"GSS","1056954","",""}
+	{"Actimize","1057644","",""}
+	{"KeyAlert","1057645","",""}
+	{"PAD","1057653","",""}
+	{"Feedback","1057652","",""}
+	{"IBSS","1057508","",""}
+	{"TGRS","1056896","",""}
+	{"AOL","1056895","",""}
+	{"CBT","1007356","",""}	
+	{"GCIS","1057648","",""}
+	{"ETWeb","1056239","",""}
+	{"KMP","1057113","",""}
+	{"GSP","1056912","",""}
+	{"DOX","1057805","",""}
+	{"CCM","1058656","",""}
+	{"CAT","1058657","",""}
+	{"RAR","1057805","",""}
+	{"FUNDGATE","4203406","",""}
+	{"GLOBAL_ONE","50400","",""}
+	{"DEV_External_SSO_Suite","5009194","Eng-UAT","3"}
+	{"DEV_Internal_Directory_Suite","5009213","Eng-UAT","3"}
+	{"DEV_Internal_Provisioning_Suite","5009214","Eng-UAT","3"}
+	{"DEV_Internal_SSO_Suite","5009201","Eng-UAT","3"}
+	{"PROD_External_SSO_Suite","5009194","Production","1"}
+	{"PROD_Internal_Directory_Suite","5009213","Production","1"}
+	{"PROD_Internal_Provisioning_Suite","5009214","Production","1"}
+	{"PROD_Internal_SSO_Suite","5009201","Production","1"}
+	{"UAT_External_SSO_Suite","5009194","Man-UAT","2"}
+	{"UAT_Internal_Directory_Suite","5009213","Man-UAT","2"}
+	{"UAT_Internal_Provisioning_Suite","5009214","Man-UAT","2"}
+	{"UAT_Internal_SSO_Suite","5009201","Man-UAT","2"}
+
+#Below Entries added by Umashankar on 20090821 as per CHGLDN001079280
+
+{"CLIENT_POLL","5005882","",""}  
+{"CLIENT_PORTAL_HEADER_FRAMESET","5005880","",""}
+{"CLIENT_PORTAL_HEADER_TOOL","5005885","",""}
+{"CLIENT_PORTAL_HOMEPAGE","5005881","",""}
+{"COMPASS","5005870","",""}
+{"COMPASS_SEARCH","5005873","",""}
+{"CONTENT_PUBLISHER","5009904","",""}
+{"DEVKIT","5005889","",""}
+{"ECONTRACT_MANAGEMENT","5005886","",""}
+{"FAILOVER","5005888","",""}
+{"FEEDBACK_TOOL","5005883","",""}
+{"MARCOMMS_PLANNER","5005871","",""}
+{"PUBLIC_WEB_SITE","5005878","",""}
+{"ROADMAP","5005890","",""}
+{"TELDIRECTORY","5005875","",""}
+{"USAGE_TOOL","5005887","",""}
+{"WORLDCLOCK","5005877","",""}
+
+#Above Entries added by Umashankar on 20090821 as per CHGLDN001079280
+
+{"FIT_DSS","5000230","",""} #Added by Umashankar on 20091214 as per the request CHGLDN001155554
+#Below entry added by Suresh K S  on 20090909 as per CHGLDN001089919
+{"KeyInvest","1056744","",""}
+
+#Below entry added by Amrut on 20090924 as per CHGLDN001101517
+	{"BIMS_MOM","1057438","",""}
+
+#Following entry is added by Rajshekhar on 20090904 as per CHGLDN001088066
+	{"CBP","2057645","",""}
+	{"BookHierarchy","5010182","",""}
+#Above enties are added by Rajshekhar on 20090904 as per CHGLDN001088066
+
+# Below entries added by Ranjeet Karan on 20090327 as per CHGLDN000973162
+	{"SharePoint07_Prod","208870","","1"}
+# Above entries added by Ranjeet Karan on 20090327 as per CHGLDN000973162
+
+#Following  entry added by Surendra on 20090722 as per CHGLDN001056870 
+       {"IMS_L2_BO_BUSINESSOBJECTS","5004110","",""} 
+
+# Below entries added by Suresh K S  on 20090731 as per CHGLDN001063584
+
+        {"SharePointSTS2001","208870","",""}
+        {"SharePoint03_BCP","208870","",""}
+
+# Above entries added by Suresh K S on 20090731 as per CHGLDN001063584
+
+# Entry added by Suresh K S on 20091209 as per CHGLDN001153090
+{"UDP_QUANTS","54940","",""}
+{"EQ_PORTAL_RESEARCH","54950","",""}
+{"RESEARCH_WIRE","55050","",""}
+{"CENTRALISED_PRINT_MANAGEMENT","55090","",""}
+{"RESEARCH_TERMINAL_SERVER_PLATFORM","55100","",""}
+{"MULTIMEDIA_PRODUCTION_PLATFORM","55110","",""}
+{"CONTENT_DISTRIBUTION_ENGINE","55140","",""}
+{"RADAR_V2","1056377","",""}
+{"RADAR_TELEPHONY","1056377","",""}
+{"ERDS","1056759","",""}
+{"EVALUATE","1057784","",""}      
+
+# Entry added by Suresh K S on 20091209 as per CHGLDN001153136
+{"SCREENSAVER","5005884","",""}
+
+# Entry added by Suresh K S on 20091023 as per CHGLDN001122934
+
+      {"SoftDollar","5004757","",""} 
+
+# Below entries added by Suresh K S  on 20090731 as per CHGLDN001064160
+
+       {"TRACS","5010231","",""}
+
+# Above entries added by Suresh K S on 20090731 as per CHGLDN001064160
+
+#Following entry is added by Rajshekhar on 20091014 as per CHGLDN001116714
+	{"PEM","0","",""}
+#Above entry is added by Rajshekhar on 20091014 as per CHGLDN001116714
+#Below entry added by Amrut Mahapatra on 20090401 as per CHGLDN000976213
+
+        {"PRIS","2500005","",""}
+#Below entry added by Rayagouda Patil on 20090914 as per CHGLDN001094255
+{"RAS_WigWam","5004761","",""} 
+#Below entry added by Rayagouda Patil on 20090717 as per CHGLDN001053792
+{"Radar_CRM","1056377","",""}
+
+#Above entry added by Amrut as per Udo's request on 20090401 
+#Follwoing Entries added by Santhosh on 20091009 as per CHGLDN001110359 
+{"UPSELLING","5009465","",""}
+#Following entries added by Santhosh on 20091009 as per CHGLDN001112749
+{"MSO_DCTM","1056625","",""}
+#The following entry is added by raj as per CHGLDN001139816
+{"CRM_INTERFACE","5007842","",""}
+# Added by Amrut Mahapatra on 20090107 for CHGLDN000905887
+
+        {"ECP_Derivatives","55030","",""}
+	{"ECP_Research","54950","",""}
+
+	# Added by Tejraj as per Simon's Request 20081204 
+	
+	{"Documentum","1057113","",""}
+	{"LCIT","1056239","",""}
+	{"WebEditor","1056895","",""}
+
+#Following entry added by Surendra as per request CHGLDN001141474
+	{"GETIT_PORTAL_HOMEPAGE","1056950","",""}
+
+#Following entry added by Surendra as per request CHGLDN001145525 on 20091127
+	{"RESEARCH_PUBLISHING_PLATFORM","55040","",""}
+	{"RESEARCH_AUTHORING_PLATFORM","1018741","",""}
+	{"RADAR_WEB_MAILER","1056377","",""}
+
+}
+default = {"6050","",""}

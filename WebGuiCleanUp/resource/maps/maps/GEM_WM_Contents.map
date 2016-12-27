@@ -1,0 +1,8 @@
+map(name="GEM_WM_Contents",bgColor="#003366",w=255,h=662,acl="*")
+text(name="WM Production",label="PRD",x=90,y=60,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="",color="white")
+text(name="ALL",label="ALL",x=60,y=60,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="",color="white")
+line(name="visual_1",label="untitled",x=5,y=40,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=2,x2=198,y2=40)
+text(name="WM_1",label="Wealth Management",x=5,y=35,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=20,justify="left",style="b",color="white")
+button(name="WM EV",label="WM Prod",x=90,y=65,action="Active Event List (AEL)",url="",target="main",entity="AS_WM_EV_Jobs",datasource="NCOMS",flash="true",w=30,h=18,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+text(name="WM",label="Autosys",x=10,y=80,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="",color="white")
+button(name="WM Jobs",label="WM Prod",x=55,y=65,action="Active Event List (AEL)",url="",target="main",entity="AS_WM_Jobs_ALL",datasource="NCOMS",flash="true",w=30,h=18,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")

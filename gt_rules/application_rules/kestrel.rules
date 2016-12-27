@@ -1,0 +1,188 @@
+#
+# Initial Kestrel Konnekt rules for characterisation - Alan Charlton - Abilitec
+#
+
+    case "kestrelGeneric":
+    $ruleset = $ruleset +  "Kestrel" + "-case : kestrelGeneric"
+        switch ($specific-trap)  {
+            case "1":
+                # kestrelNotifyProcessStart
+                $ruleset = $ruleset + "-case : 1 # kestrelNotifyProcessStart"
+                @AlertKey = $1
+                @AlertGroup = "kestrelNotifyProcessStart"
+                #@Summary = "Trap kestrelNotifyProcessStart received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 1
+                @Type = 2
+                
+            case "2":
+                # kestrelNotifyProcessStop
+                $ruleset = $ruleset + "-case : 2 # kestrelNotifyProcessStop"
+                @AlertKey = $1
+                @AlertGroup = "kestrelNotifyProcessStop"
+                #@Summary = "Trap kestrelNotifyProcessStop received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 4
+                @Type = 1
+                
+            case "3":
+                # kestrelNotifyProcessDeath
+                $ruleset = $ruleset + "-case : 3 # kestrelNotifyProcessDeath" 
+                @AlertKey = $1
+                @AlertGroup = "kestrelNotifyProcessDeath"
+                #@Summary = "Trap kestrelNotifyProcessDeath received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 5
+                @Type = 1
+                                
+            default:
+                $ruleset = $ruleset + "-case : default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+                
+        }
+        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey
+        @Agent = $enterprise-name
+	@Class = 2057252
+	@OwnerGID = 463
+	@OwnerUID = 65534
+	$TempDoLookup = 2
+
+    case "kestrelKonnekt":
+        $ruleset = $ruleset + "-case : kestrelKonnekt"
+        switch ($specific-trap)  {
+            case "1":
+                # konnektNotifyProcessStart
+                $ruleset = $ruleset + "-case : 1 # konnektNotifyProcessStart"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyProcessStart"
+                #@Summary = "Trap konnektNotifyProcessStart received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 1
+                @Type = 2
+                
+            case "2":
+                # konnektNotifyProcessStop
+                $ruleset = $ruleset + "-case : 2 # konnektNotifyProcessStop"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyProcessStop"
+                #@Summary = "Trap konnektNotifyProcessStop received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 4
+                @Type = 1
+                
+            case "3":
+                # konnektNotifyProcessDeath
+                $ruleset = $ruleset + "-case : 3 # konnektNotifyProcessDeath"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyProcessDeath"
+                #@Summary = "Trap konnektNotifyProcessDeath received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 5
+                @Type = 1
+                
+            case "4":
+                # konnektNotifyInterfaceHeartbeat
+                $ruleset = $ruleset + "-case : 4 # konnektNotifyInterfaceHeartbeat"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyInterfaceHeartbeat"
+                #@Summary = "Trap konnektNotifyInterfaceHeartbeat received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 1
+                @Type = 2
+                
+            case "5":
+                # konnektNotifyInterfaceMissedHeartbeat
+                $ruleset = $ruleset + "-case : 5 # konnektNotifyInterfaceMissedHeartbeat"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyInterfaceMissedHeartbeat"
+                #@Summary = "Trap konnektNotifyInterfaceMissedHeartbeat received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 3
+                @Type = 1
+           
+            case "6":
+                # konnektNotifyError
+                $ruleset = $ruleset + "-case : 6 # konnektNotifyError" 
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyError"
+                #@Summary = "Trap konnektNotifyError received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 4
+                @Type = 1
+
+            case "7":
+                # konnektNotifyLogon
+                $ruleset = $ruleset + "-case : 7 # konnektNotifyLogon"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyLogon"
+                #@Summary = "Trap konnektNotifyLogon received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 2
+                @Type = 1
+                
+            case "8":
+                # konnektNotifySessionCreated
+                $ruleset = $ruleset + "-case : 8 # konnektNotifySessionCreated"
+                @AlertKey = $1
+                @AlertGroup = ""
+                #@Summary = "Trap konnektNotifySessionCreated received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 2
+                @Type = 1
+                
+            case "9":
+                # konnektNotifyLogoff
+                $ruleset = $ruleset + "-case : 9 # konnektNotifyLogoff"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyLogoff"
+                #@Summary = "Trap konnektNotifyLogoff received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 2
+                @Type = 1
+                
+            case "10":
+                # konnektNotifyBrokerMappingError
+                $ruleset = $ruleset + "-case : 10 # konnektNotifyBrokerMappingError"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyBrokerMappingError"
+                #@Summary = "Trap konnektNotifyBrokerMappingError received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 4
+                @Type = 1
+
+            case "11":
+                # konnektNotifyTicketDK
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyTicketDK"
+                #@Summary = "Trap konnektNotifyTicketDK received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 3
+                @Type = 1
+                $ruleset = $ruleset + "-case : 11"
+
+            case "12":
+                # konnektNotifyTicketProcessed
+                $ruleset = $ruleset + "-case : 12 # konnektNotifyTicketProcessed"
+                @AlertKey = $1
+                @AlertGroup = "konnektNotifyTicketProcessed"
+                #@Summary = "Trap konnektNotifyTicketProcessed received, kestrelNotifyingProcess=" + $1 + ", kestrelNotifyingMessage=" + $2 + ""
+                @Summary = $2
+                @Severity = 3
+                @Type = 1
+                
+            default:
+                $ruleset = $ruleset + "-case : default"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap             
+        }
+        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey
+        @Agent = $enterprise-name
+	@Class = 2057252
+	@OwnerGID = 463
+	@OwnerUID = 65534
+	$TempDoLookup = 2

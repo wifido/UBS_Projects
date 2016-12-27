@@ -1,0 +1,46 @@
+table unixAGorg=
+{
+	{"automountd","NFS"}
+	{"automount","SAN"}
+	{"clurgmgrd","Cluster"}
+	{"ds_lic","License"}
+	{"Error for Command","SAN"}
+	{"emlxs","SAN"}
+	{"Fault_PC","Hardware"}
+	{"fctl","SAN"}
+	{"FJSVmadm","Hardware"}
+	{"fenced","Cluster"}
+	{"fmd","Hardware"}
+	{"genunix","Network"}
+	{"in.mpathd","Network"}
+	{"kernel","NFS"}
+	{"lpfc","SAN"}
+	{"lpfc0","SAN"}
+	{"lpfc1","SAN"}
+	{"lpfc 0000","SAN"}
+	{"md_stripe","Disk"}
+	{"md_mirror","Disk"}
+	{"MPxIO","SAN"}
+	{"multipathd","SAN"}
+	{"nfs","NFS"}
+	{"nscd","NFS"}
+	{"ODS Error","Disk"}
+	{"Privileged Rctl","Swap"}
+	{"picld","Power"}
+	{"qfe","Network"}
+	{"REC-ACTION","Hardware"}
+	{"r5d","Baydel"}
+	{"rmclomv","Hardware"}
+	{"SC Alert","Power"}
+	{"SCSI transport failed","SAN"}
+	{"Server Administrator","Power"}
+	{"scsi","Disk"}
+	{"svc.startd","Process"}
+	{"unix","NFS"}
+	{"VFS","NFS"}
+	{"VxVM Error","VERITAS"}
+	{"vxio","Disk"}
+	{"ypcat","SAN"}
+}
+default={"/var/adm/messages"}
+

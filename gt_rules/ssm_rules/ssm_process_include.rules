@@ -1,0 +1,203 @@
+case "Netcool":
+	$ruleset = $ruleset + "Netcool Process"
+    switch(extract($11, ".*nco_([A-Za-z]+).*"))  {
+        case "adduser":
+	    $ruleset = $ruleset + " adduser"
+            $psControlDescription = "Netcool/OMNIbus User Administration Utility (Configuration May Be Modified)"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "admin":
+	    $ruleset = $ruleset + " admin"
+            $psControlDescription = "Netcool/OMNIbus Configuraton Manager (Configuration May Be Modified)"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "confpack":
+	    $ruleset = $ruleset + " confpack"
+            $psControlDescription = "Netcool ObjectServer Configuration Packer (Configuration May Be Modified)"
+            $ssmAlertKey = extract($11, "(nco_confpack.*)$")
+            $ReverseLogicAlive = 1
+        case "event":
+	    $ruleset = $ruleset + " event"
+            $psControlDescription = "Netcool Event List"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "g":
+	    $ruleset = $ruleset + " g"
+            $psControlDescription = "Netcool Gateway"
+            $ssmAlertKey = "nco_g_" + extract($11, ".*nco_g_([A-Za-z0-9_\-]+).*")
+        case "gate":
+	    $ruleset = $ruleset + " gate"
+            $psControlDescription = "Netcool Gateway"
+            if(regmatch($11, "-name [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_gate " + extract($11, "(-name [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = "" + extract($11, "(nco_gate.*)$")
+            }
+        case "gwconv":
+	    $ruleset = $ruleset + " gwconv"
+            $psControlDescription = "Netcool Gateway Conversion Table Utility (Configuration May Be Modified)"
+            if(regmatch($11, "-server [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_gwconv " + extract($11, "(-server [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_gwconv.*)$")
+            }
+            $ReverseLogicAlive = 1
+        case "igen"|"xigen":
+	    $ruleset = $ruleset + " (x)igen"
+            $psControlDescription = "Netcool Interfaces File Generator (Interfaces File May Be Modified)"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "m":
+	    $ruleset = $ruleset + " m"
+            $psControlDescription = "Netcool Monitor"
+            $ssmAlertKey = "nco_m_" + extract($11, ".*nco_m_([A-Za-z0-9_\-]+).*")
+        case "migrate":
+	    $ruleset = $ruleset + " migrate"
+            $psControlDescription = "Netcool ObjectServer Migration Utility (ObjectServer DB Modified)"
+            if(regmatch($11, "-server [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_migrate " + extract($11, "(-server [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_migrate.*)$")
+            }
+            $ReverseLogicAlive = 1
+        case "objserv":
+	    $ruleset = $ruleset + " objserv"
+            $psControlDescription = "Netcool ObjectServer"
+            if(regmatch($11, "-name [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_objserv " + extract($11, "(-name [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_objserv.*)$")
+            }
+        case "ov":
+	    $ruleset = $ruleset + " ov"
+            $psControlDescription = "Netcool ObjectiveView"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "ove":
+	    $ruleset = $ruleset + " ove"
+            $psControlDescription = "Netcool ObjectiveView Editor (Maps May Be Modified)"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "p":
+	    $ruleset = $ruleset + " p"
+            $psControlDescription = "Netcool Probe"
+            $ssmAlertKey = "nco_p_" + extract($11, ".*nco_p_([A-Za-z0-9_\-]+).*")
+        case "pa":
+	    $ruleset = $ruleset + " pa"
+            $psControlDescription = "Netcool Process Control Utility (Configuration May Be Modified)"
+            if(regmatch($11, "-server [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_pa_" + extract($11, ".*nco_pa_([A-Za-z0-9_\-]+).*") + " " + extract($11, "(-server [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_pa_.*)$")
+            }
+            $ReverseLogicAlive = 1
+        case "pad":
+	    $ruleset = $ruleset + " pad"
+            $psControlDescription = "Netcool Process Control"
+            if(regmatch($11, "-name [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_pad " + extract($11, "(-name [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_pad.*)$")
+            }
+        case "patch":
+	    $ruleset = $ruleset + " patch"
+            $psControlDescription = "Netcool/OMNIbus Patch Utility (Configuration May Be Modified)"
+            $ssmAlertKey = extract($11, "(nco_.*)$")
+            $ReverseLogicAlive = 1
+        case "proxyserv":
+	    $ruleset = $ruleset + " proxtserv"
+            $psControlDescription = "Netcool Proxy Server"
+            if(regmatch($11, "-name [A-Za-z0-9_\-]+"))  {
+                $ssmAlertKey = "nco_proxyserv " + extract($11, "(-name [A-Za-z0-9_\-]+)")
+            }
+            else  {
+                $ssmAlertKey = extract($11, "(nco_proxyserv.*)$")
+            }
+        case "removeuser":
+	    $ruleset = $ruleset + " removeuser"
+            $psControlDescription = "Netcool/OMNIbus User Administration Utility (Configuration May Be Modified)"
+            $ssmAlertKey = "nco_" + extract($11, ".*nco_([A-Za-z0-9_\-]+).*")
+            $ReverseLogicAlive = 1
+        case "ssladmin":
+	    $ruleset = $ruleset + " ssladmin"
+            $psControlDescription = "Netcool SSL Certificate Administrator (Configuration May Be Modified)"
+            $ssmAlertKey = "nco_ssladmin"
+            $ReverseLogicAlive = 1
+        case "t":
+	    $ruleset = $ruleset + " t"
+            $psControlDescription = "Netcool TSM"
+            $ssmAlertKey = "nco_t_" + extract($11, ".*nco_t_([A-Za-z0-9_\-]+).*")
+        case "xprops":
+	    $ruleset = $ruleset + " xprops"
+            $psControlDescription = "Netcool ObjectServer Properties Editor (Configuration May Be Modified)"
+            $ssmAlertKey = "nco_xprops"
+            $ReverseLogicAlive = 1
+        default:
+	    $ruleset = $ruleset + " default"
+            $psControlDescription = "Netcool/OMNIbus Process"
+            $ssmAlertKey = "Process: " + extract($11, "(nco_.*)$")
+            $ReverseLogicAlive = 1
+    }
+    $ssmClassGidKey = "MICROMUSE"
+    $ssmAlertGroup = $psControlDescription
+
+case "AgentStartEvent" | "NetcoolTestEvent":
+    $ruleset = $ruleset + " AgentStartEvent NetcoolTestEvent"
+    $ssmAlertGroup = "Agent"
+    $ssmAlertKey = "StartStop"
+#       20070525        Change by Chris Janes for Start Stop event suppression on Agent install
+        @Manager = "StartStop"
+#       20050525        End of Changes
+
+    $ssmSummary = "SSM Agent starting on " + $3
+    @Severity = 1
+    @Type = 2
+    $ssmClassGidKey = "MICROMUSE"
+
+case "Unix process":
+    $ruleset = $ruleset + " Unix process"
+    $ssmAlertGroup = $psControlDescription
+    $ssmAlertKey = $psExceptionMatch
+    $ssmAppClass = 123000
+
+    switch($8)
+    {
+        case "1": ### Alive
+            if(match($ReverseLogicAlive, "1"))
+            {
+                $ruleset = $ruleset + "process case 1"
+                switch($12)
+                {
+                    case "-1": ### false
+                        @Severity = 2
+                    case "0": ### false
+                        @Severity = 2
+                    case "1": ### true
+                        @Severity = 2
+                    default:
+                        @Severity = 2
+                }
+            }
+            else
+            {
+                $ruleset = $ruleset +  "process case 2"
+                switch($12)
+                {
+                    case "-1": ### false
+                        @Severity = 5
+                    case "0": ### false
+                        @Severity = 5
+                    case "1": ### true
+                        @Severity = 1
+                    default:
+                        @Severity = 2
+                }
+            }
+        default:
+    }

@@ -1,0 +1,491 @@
+#################################################################################
+#
+#    SYMARK-POWERKEEPER-MIB rules file original generated bu Chris's Mib2Rules script
+#
+#	20070417	
+#################################################################################
+
+case "sypkPowerKeeper" :
+        $ruleset = $ruleset + " " + $enterprise-name
+        @Agent = $enterprise-name
+        @Class = 1057923
+        @Subclass = ""
+        @OwnerGID = 615
+        $ruleset = $ruleset + " ST = " + $specific-trap
+        switch ($specific-trap)
+        {
+        case "1":
+		@AlertGroup = "AppHeartbeat" 
+		@AlertKey = $1
+		@Summary = "Powerkeeper Heartbeat Event "
+		@Severity = 3
+		@Type = 2
+		@Subclass = "MOM Synthetic Event"
+		@UserInt = 1000
+
+		$IdentifierAddOn = "" 
+        case "2":
+		@AlertGroup = $1
+		@AlertKey = $2
+		@Summary = "Powerkeeper event."  + $specific-trap
+		@Severity = 3
+		@Type = 1
+		$IdentifierAddOn = $1 + $2 + $3 + $4
+        case "3":
+		@AlertGroup = $1
+		@AlertKey = $2
+		@Summary = "Powerkeeper event. "  + $specific-trap
+		@Severity = 3
+		@Type = 1
+		$IdentifierAddOn = $1 + $2 + $3 + $4
+        case "3":
+		@AlertGroup = $1
+		@AlertKey = $2
+		@Summary = "Powerkeeper event. "  + $specific-trap
+		@Severity = 3
+		@Type = 1
+		$IdentifierAddOn = $1 + $2 + $3 + $4
+        case "5":
+		@AlertGroup = $1
+		@AlertKey = $2
+		@Summary = "Powerkeeper event. "  + $specific-trap
+		@Severity = 3
+		@Type = 1
+		$IdentifierAddOn = $1 + $2 + $3 + $4
+
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+        }
+        $tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+
+case "sypkHeartbeatAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkHeartbeatAgentMessage = $1
+
+              @AlertGroup = "HeartbeatAgentStart"
+              @AlertKey = $sypkHeartbeatAgentMessage
+              @Summary = "The Heartbeat Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkHeartbeatAgentMessage = $1
+
+              @AlertGroup = "HeartbeatAgentStop"
+              @AlertKey = $sypkHeartbeatAgentMessage
+              @Summary = "The Heartbeat Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkHeartbeatAgentMessage = $1
+
+              @AlertGroup = "HeartbeatAgentError"
+              @AlertKey = $sypkHeartbeatAgentMessage
+              @Summary = "The Heartbeat Agent is reporting an error condition. " + $sypkHeartbeatAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+
+
+case "sypkChangeAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkChangeAgentMessage = $1
+
+              @AlertGroup = "ChangeAgentStart"
+              @AlertKey = $sypkChangeAgentMessage
+              @Summary = "The Change Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkChangeAgentMessage = $1
+
+              @AlertGroup = "ChangeAgentStop"
+              @AlertKey = $sypkChangeAgentMessage
+              @Summary = "The Change Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkChangeAgentMessage = $1
+
+              @AlertGroup = "ChangeAgentError"
+              @AlertKey = $sypkChangeAgentMessage
+              @Summary = "The Change Agent is reporting an error condition. " + $sypkChangeAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+
+
+case "sypkTestAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkTestAgentMessage = $1
+
+              @AlertGroup = "TestAgentStart"
+              @AlertKey = $sypkTestAgentMessage
+              @Summary = "The Test Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkTestAgentMessage = $1
+
+              @AlertGroup = "TestAgentStop"
+              @AlertKey = $sypkTestAgentMessage
+              @Summary = "The Test Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkTestAgentMessage = $1
+
+              @AlertGroup = "TestAgentError"
+              @AlertKey = $sypkTestAgentMessage
+              @Summary = "The Test Agent is reporting an error condition. " + $sypkTestAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkMailAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkMailAgentMessage = $1
+
+              @AlertGroup = "MailAgentStart"
+              @AlertKey = $sypkMailAgentMessage
+              @Summary = "The Mail Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkMailAgentMessage = $1
+
+              @AlertGroup = "MailAgentStop"
+              @AlertKey = $sypkMailAgentMessage
+              @Summary = "The Mail Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkMailAgentMessage = $1
+
+              @AlertGroup = "MailAgentError"
+              @AlertKey = $sypkMailAgentMessage
+              @Summary = "The Mail Agent is reporting an error condition. " + $sypkMailAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkReplicationAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkReplicationAgentMessage = $1
+
+              @AlertGroup = "ReplicationAgentStart"
+              @AlertKey = $sypkReplicationAgentMessage
+              @Summary = "The Replication Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkReplicationAgentMessage = $1
+
+              @AlertGroup = "ReplicationAgentStop"
+              @AlertKey = $sypkReplicationAgentMessage
+              @Summary = "The Replication Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkReplicationAgentMessage = $1
+
+              @AlertGroup = "ReplicationAgentError"
+              @AlertKey = $sypkReplicationAgentMessage
+              @Summary = "The Replication Agent is reporting an error condition. " + $sypkReplicationAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkRecoveryAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkRecoveryAgentMessage = $1
+
+              @AlertGroup = "RecoveryAgentStart"
+              @AlertKey = $sypkRecoveryAgentMessage
+              @Summary = "The Recovery Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkRecoveryAgentMessage = $1
+
+              @AlertGroup = "RecoveryAgentStop"
+              @AlertKey = $sypkRecoveryAgentMessage
+              @Summary = "The Recovery Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkRecoveryAgentMessage = $1
+
+              @AlertGroup = "RecoveryAgentError"
+              @AlertKey = $sypkRecoveryAgentMessage
+              @Summary = "The Recovery Agent is reporting an error condition. " + $sypkRecoveryAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkFirewallAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkFirewallAgentMessage = $1
+
+              @AlertGroup = "FirewallAgentStart"
+              @AlertKey = $sypkFirewallAgentMessage
+              @Summary = "The Firewall Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkFirewallAgentMessage = $1
+
+              @AlertGroup = "FirewallAgentStop"
+              @AlertKey = $sypkFirewallAgentMessage
+              @Summary = "The Firewall Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkFirewallAgentMessage = $1
+
+              @AlertGroup = "FirewallAgentError"
+              @AlertKey = $sypkFirewallAgentMessage
+              @Summary = "The Firewall Agent is reporting an error condition. " + $sypkFirewallAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkDomainAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkDomainAgentMessage = $1
+
+              @AlertGroup = "DomainAgentStart"
+              @AlertKey = $sypkDomainAgentMessage
+              @Summary = "The Domain Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $sypkDomainAgentMessage = $1
+
+              @AlertGroup = "DomainAgentStop"
+              @AlertKey = $sypkDomainAgentMessage
+              @Summary = "The Domain Agent is stopping. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+        case "3":
+              $sypkDomainAgentMessage = $1
+
+              @AlertGroup = "DomainAgentError"
+              @AlertKey = $sypkDomainAgentMessage
+              @Summary = "The Domain Agent is reporting an error condition. " + $sypkDomainAgentMessage 
+              @Severity = 4
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+
+case "sypkTestTrapAgent" :
+	$ruleset = $ruleset + " " + $enterprise-name
+	@Agent = $enterprise-name
+	@Class = 1057923
+	@Subclass = ""
+	@OwnerGID = 615
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $sypkTestAgentMessage = $1
+
+              @AlertGroup = "TestAgentStart"
+              @AlertKey = $sypkTestAgentMessage
+              @Summary = "The Test Agent is starting. " 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise-name
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise-name + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+

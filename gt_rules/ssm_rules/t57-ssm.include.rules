@@ -1,0 +1,507 @@
+
+	    case "57": ### harmoniEventsV2
+
+	######################################################################################################
+	# The SNMP trap that is generated when a line in the log file
+	# matches the regular expression.
+	#
+	# $1 = arControlDescription - 	<Prefix>:<Class>:<Subclass>:<Environment>:<AlertGroup>
+	#				eg "ssm_fsmon_system:123000:Unix:1:/sbclocal"
+	#
+	# $2 = arControlExpression - 	The expression to be evaluated. This expression is evaluated every
+	#         			Interval seconds. Note however that the expression cannot be fully
+        #				evaluated until at least Window samples have occured AND Toggle is set
+        #				to on. 
+	#
+	# $3 = arControlResult1 -	This is specific to each Prefix and should be defined within the prefix
+	#
+	######################################################################################################
+
+	$arControlDescription = $1
+	$arControlExpression = $2
+	$arControlResult1 = $3
+
+	$ruleset = $ruleset + " T57 "
+	$NoElements = split($arControlDescription, SplitArray, ":")
+	$ssmPrefix = SplitArray[1]
+	$ssmAppClass = SplitArray[2]
+
+#	20080523	Change by Chris Janes of Abilitec	TD 4851
+	if(match($ssmAppClass, "123000"))
+	{
+		$ssmAppClass =$CommunityClass
+	}
+#	20080523	 End of Change
+
+	@Subclass = SplitArray[3]
+	@SystemDesig = SplitArray[4]
+	$ssmAlertGroup = SplitArray[5]
+
+	$ruleset = $ruleset + $ssmPrefix
+
+	switch($ssmPrefix)
+	{
+		case "ssm_fsmon_system":
+			# format for arControlResult1 is <Severity>:<size(units)>:<used(units)>:<allocation unit size>:<used(%)>:<delta(kB)>:<threshold(%)>:<MountPoint>
+			# ie "4:@size:@used:@units:@ps:@change:$disk_thres_1:@part"
+			
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+
+			$NoElements = split($arControlResult1, SplitArray, ":")
+			$ssmSeverity = SplitArray[1]
+			$UnitsTotal = SplitArray[2]
+			$UnitsUsed = SplitArray[3]
+			$UnitSize = SplitArray[4]
+			$ssmUsedPer = SplitArray[5]
+			$ssmDelta = SplitArray[6]
+			$ssmThreshold = SplitArray[7]
+			$ssmMountPoint = SplitArray[8]
+			$ssmAlertGroup = "Disk usage"
+			
+			$SizeMaxMb = real($UnitsTotal) * real($UnitSize) / 1000000
+			$SizeUsedMb = real($UnitsUsed) * real($UnitSize) / 1000000
+			
+			# Convert to appropriate units (taken from t34 rules)
+			if (int($SizeMaxMb) < 1000 )
+			{
+				$DispSizeUsedMbCalc = int($SizeUsedMb)
+				$DispSizeMaxMbCalc = int($SizeMaxMb)
+				$DispUsage = $DispSizeUsedMbCalc  + " of " + $DispSizeMaxMbCalc + " Mb Used"
+			}
+			else if (int($SizeMaxMb) < 1000000 )
+			{
+				$DispSizeUsedMbCalc = real($SizeUsedMb)/1000
+				$DispSizeMaxMbCalc = real($SizeMaxMb)/1000
+				$DispUsage = substr($DispSizeUsedMbCalc,1,4) + " of " + substr($DispSizeMaxMbCalc,1,4) + " Gb Used"
+			}
+			else
+			{
+				$DispSizeUsedMbCalc = int($SizeUsedMb)/1000
+				$DispSizeMaxMbCalc = int($SizeMaxMb)/1000
+				$DispUsage = $DispSizeUsedMbCalc + " of " + $DispSizeMaxMbCalc + " Gb Used"
+			}
+
+			if (int($ssmDelta) > 0)
+			{
+				$ssmSummary = "Disk usage for " + $ssmMountPoint + " is " + $ssmUsedPer + "% full (" + $DispUsage + ") and rising"
+			}
+			else if (int($ssmDelta) < 0)
+			{
+				$ssmSummary = "Disk usage for " + $ssmMountPoint + " is " + $ssmUsedPer + "% full (" + $DispUsage + ") and falling"
+			}
+			else
+			{
+				$ssmSummary = "Disk usage for " + $ssmMountPoint + " is " + $ssmUsedPer + "% full (" + $DispUsage + ")"
+			}
+			
+			$ssmAlertKey = $ssmMountPoint
+			$ssmType = 1
+			$ssmPrefixIdentifier = $ssmAlertKey
+
+
+		case "ssm_ldmon_system":
+			# format for arControlResult1 is <Severity>:<Device>:<Summary>
+
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+
+			$NoElements = split($arControlResult1, SplitArray, "/")
+			$ssmSeverity = SplitArray[1]
+			$ssmDevice = SplitArray[2]
+			$ssmSummary = SplitArray[3]
+
+			$ssmAlertKey = $ssmDevice
+			if (int($ssmSeverity) > 1) 
+			{
+				$ssmType = 1
+			} 
+			else 
+			{
+				$ssmType = 2
+			}
+			$ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+
+		case "ssm_ifmon_system":
+			# format for arControlResult1 is <Severity>:<Interface>:<Summary>
+
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+
+			$NoElements = split($arControlResult1, SplitArray, ":")
+			$ssmSeverity = SplitArray[1]
+			$ssmInterface = SplitArray[2]
+			$ssmSummary = SplitArray[3]
+			$ssmAlertKey = $ssmInterface
+
+			if (int($ssmSeverity) > 1) 
+			{
+				$ssmType = 1
+			} 
+			else 
+			{
+				$ssmType = 2
+			}
+			$ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+#                       200800814       Changes by Chris Janes of Abilitec
+
+@Description = "ssmAppClass = " + $ssmAppClass + "ssmType = " + $ssmType
+
+
+ 
+                        if ((match($ssmAppClass,"2071002")) && (match($ssmType,"2")))
+                        {
+
+                                if (match($ssmSummary,"Average CPU - cleared") || match($ssmSummary,"Average CPU -Cleared") ||  match($ssmSummary,"Average CPU for Java exceeded - cleared"))
+                                {
+					$ruleset = $ruleset + " selected "
+                                        switch(@SystemDesig)
+                                        {
+                                                case "1":
+                                                        @SystemDesig = "1010"
+                                                case "2":
+                                                        @SystemDesig = "1011"
+                                                default:
+                                        }
+                                }
+                        }
+#			200800814	End of Changes
+
+
+                case "ssm_hpmon_temp":
+                        # format for arControlResult1 is <Severity>:<Locale>:<Summary>
+
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+                        $ssmSeverity = SplitArray[1]
+                        $ssmLocale = SplitArray[2]
+                        $ssmSummary = SplitArray[3]
+                        $ssmAlertKey = lookup($ssmLocale,ssm_hpmon_locale)
+
+                        if (int($ssmSeverity) > 1) 
+			{
+                                $ssmType = 1
+                        }
+ 			else 
+			{
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+
+                case "ssm_dskmon_app":
+                        # format for arControlResult1 is <Severity>:<AlertKey>:<Summary>
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+                        $ssmSeverity = SplitArray[1]
+                        $ssmAlertKey = SplitArray[2]
+                        $ssmSummary = SplitArray[3]
+
+                        if (int($ssmSeverity) > 1) 
+			{
+                                $ssmType = 1
+                        } 
+			else 
+			{
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+
+
+#	20071101	Changes by Chris Janes of Abilitec at the request of Grahame Brown - Platform Agent Team
+
+
+		case "ssm_arith_disk":
+			# Format for arControlResult1 is <Severity>:<partition>:<available in MB>
+			# ie, 4:@disk:@avail_mb
+	
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+	
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+			$ssmSeverity = SplitArray[1]
+			$ssmPartition = SplitArray[2]
+			$ssmAvail_mb = SplitArray[3]
+			$ssmAvail_gb = real($ssmAvail_mb)/1024
+			$ssmSummary = "Partition " + $ssmPartition + " has " + $ssmAvail_mb + "MB (approximately " + $ssmAvail_gb + "GB) remaining."
+			$ssmAlertKey = $ssmPartition
+
+                        if (int($ssmSeverity) > 1) 
+			{
+                                $ssmType = 1
+                        } 
+			else 
+			{
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+
+
+	
+		case "ssm_arith_cpuhog":
+			# Format for arControlResult1 is <Severity>:<cpu_usage>:<process>:<process_cpu>
+			# ie., 5:@cpu:@process:@proc_cpu
+			
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+			
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+			$ssmSeverity = SplitArray[1]
+			$ssmCpu = SplitArray[2]
+			$ssmProcess = SplitArray[3]
+			$ssmProcCpu = SplitArray[4]
+			$ssmSummary = "Total CPU at " + $ssmCpu + "%. " + $ssmProcess + " is currently using " + $ssmProcCpu + "% of Total CPU."
+			$ssmAlertKey = $ssmCpu + " " + $ssmProcess
+
+                        if (int($ssmSeverity) > 1) 
+			{
+                                $ssmType = 1
+                        } 
+			else 
+			{
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmProcess + $ssmType
+	
+
+#	20071101	End of Changes
+#	20071126	Changes by Chris Janes of Abilitec for Grahame Brown of Platform Agent team HDLDN0001561452
+#			this is a **TEMPFIX**
+
+		case "ssm_if_inbound":
+			# Format for arControlResult1 is <Interface>:<If_Inbound_Errors>
+
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+ 			$Interface = SplitArray[1]
+			$If_Inbound_Errors = SplitArray[2]
+
+			$ssmAlertKey = $Interface
+			$ssmSummary = $If_Inbound_Errors + " Errors Inbound on Interface " + $Interface
+			$ssmSeverity = 2
+                        if (int($ssmSeverity) > 1)
+                        {
+                                $ssmType = 1
+                        }
+                        else
+                        {
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $Interface + $ssmType
+
+#		20080407	Change by Chris Janes of Abilitec	TD 4768
+
+		case "ssm_logmon":
+			# format for arControlResult1 is <Severity>:<used>:<delta(kB)>:<LogFile>
+			# ie "4:@Used:@change:file.log"
+			
+			# Clear Array
+			$NoElements = 0
+			clear(SplitArray)
+
+			$NoElements = split($arControlResult1, SplitArray, ":")
+			$ssmSeverity = SplitArray[1]
+			$ssmUsed = SplitArray[2]
+			$ssmDelta = SplitArray[3]
+			$ssmLogFile = SplitArray[4]
+			$ssmAlertGroup = "Log usage"
+			
+
+			if (int($ssmDelta) > 0)
+			{
+				$ssmSummary = "Log usage for " + $ssmLogFile + " is " + $ssmUsed + "k and rising"
+			}
+			else if (int($ssmDelta) < 0)
+			{
+				$ssmSummary = "Log usage for " + $ssmLogFile + " is " + $ssmUsed + "k and falling"
+			}
+			else
+			{
+				$ssmSummary = "Log usage for " + $ssmLogFile + " is " + $ssmUsed + "k"
+			}
+			
+			$ssmAlertKey = $ssmLogFile
+			$ssmType = 1
+			$ssmPrefixIdentifier = $ssmAlertKey
+
+#               20080407	End of Change
+
+#		20080422	Change by Chris Janes of Abilitec TD 4805
+                case "ssm_arith_runqueue":
+                        # Format for arControlResult1 is <Severity>:<NoProc>:<RunQueue>
+                        # ie., 5:4:5
+
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+                        $ssmSeverity = SplitArray[1]
+                        $NoProc = SplitArray[2]
+                        $RunQueue = SplitArray[3]
+                        $ssmSummary = "All " + $NoProc + " Processors in use, RunQueue is " + $RunQueue 
+                        $ssmAlertKey = "RunQueue is " + $RunQueue
+
+                        if (int($ssmSeverity) > 1)
+                        {
+                                $ssmType = 1
+                        }
+                        else
+                        {
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmProcess + $ssmType
+
+#		20080422	End of Change
+
+
+#		20080513	Changes by Chris Janes of Abilitec
+		case "ssm_t57_generic":
+			# Format for arControlResult1 is <Severity>:<Summary>:<Alertkey>
+			# ie 5:Summary Text:AlertKey Text
+
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+                        $ssmSeverity = SplitArray[1]
+                        $ssmSummary = SplitArray[2]
+                        $ssmAlertKey = SplitArray[3]
+ 
+                        if (int($ssmSeverity) > 1)
+                        {
+                                $ssmType = 1
+                        }
+                        else
+                        {
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+#               20080513        End of Change
+
+#               20081202        Changes by Chris Janes of Abilitec  TD 5175
+                case "ssm_t57_generic_pipe":
+                        # Format for arControlResult1 is <Severity>|<Summary>|<Alertkey>
+                        # ie 5|Summary Text|AlertKey Text
+
+                        # Clear Array
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, "|")
+                        $ssmSeverity = SplitArray[1]
+                        $ssmSummary = SplitArray[2]
+                        $ssmAlertKey = SplitArray[3]
+
+                        if (int($ssmSeverity) > 1)
+                        {
+                                $ssmType = 1
+                        }
+                        else
+                        {
+                                $ssmType = 2
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertGroup + $ssmAlertKey + $ssmType
+
+#               20081202        End of Change
+
+
+#		20081020	Change by Chris Janes of Abilitec
+                case "ssm_arith_disk_per":
+                        # Format for arControlResult1 is <Severity>:<disc>:<percent>:<threshold>:<size_use_Mb>:<total_avail_Mb>:<allocation unit size>
+                        # ie, 4:@disk:@per_used:@threshold:@sz:@mb:@Alloc
+
+                        # Clear Array
+                        #$TD_Num = 5097
+                        ## Changes made by Mahesh Kumar TD 5197
+                        $TD_Num = 5197
+
+                        $NoElements = 0
+                        clear(SplitArray)
+
+                        $NoElements = split($arControlResult1, SplitArray, ":")
+                        $ssmSeverity = SplitArray[1]
+                        $ssmDisk = SplitArray[2]
+                        $ssmPercent = SplitArray[3]
+                        $ssmThreshold = SplitArray[4]
+                        $ssmUnitsUsed = SplitArray[5]
+                        $ssmUnitsTotal = SplitArray[6]
+                        $ssmAllocUnit = SplitArray[7]
+                        
+			#$ssmSizeMaxMb 
+			#$ssmSizeUsedMb 
+                        $ssmSizeMaxMb = real($ssmUnitsTotal) * real($ssmAllocUnit) / 1000000
+                        $ssmSizeUsedMb = real($ssmUnitsUsed) * real($ssmAllocUnit) / 1000000
+
+			
+			# Convert to appropriate units (taken from t34 rules)
+			if (int($ssmSizeMaxMb) < 1000 )
+			{
+				$ruleset = $ruleset + " ssmSizeMaxMb < 1000"
+				$DispSizeUsedMbCalc = int($ssmSizeUsedMb)
+				$DispSizeMaxMbCalc = int($ssmSizeMaxMb)
+				$DispUsage = $DispSizeUsedMbCalc  + " of " + $DispSizeMaxMbCalc + " Mb Used"
+			}
+			else if (int($ssmSizeMaxMb) < 1000000 )
+			{
+				$ruleset = $ruleset + " ssmSizeMaxMb < 1000000"
+				$DispSizeUsedMbCalc = real($ssmSizeUsedMb)/1000
+				$DispSizeMaxMbCalc = real($ssmSizeMaxMb)/1000
+				$DispUsage = substr($DispSizeUsedMbCalc,1,4) + " of " + substr($DispSizeMaxMbCalc,1,4) + " Gb Used"
+			}
+			else
+			{
+				$ruleset = $ruleset + " ssmSizeMaxMb > 1000000"
+				$DispSizeUsedMbCalc = int($ssmSizeUsedMb)/1000
+				$DispSizeMaxMbCalc = int($ssmSizeMaxMb)/1000
+				$DispUsage = $DispSizeUsedMbCalc + " of " + $DispSizeMaxMbCalc + " Gb Used"
+			}
+
+                        $ssmSummary = "Disk space for " + $ssmDisk + " filesystem has exceeded the " + $ssmThreshold + "% threshold, it is " + $ssmPercent + "% full (" + $DispUsage + " )"
+                        $ssmAlertKey = $ssmDisk
+                        $ssmAlertGroup = "Disk usage"
+                        @SysInt = $ssmPercent
+
+                        if (int($ssmSeverity) > 1)
+                        {
+                                $ssmType = 1
+
+                        }
+                        else
+                        {
+                                $ssmType = 2
+                                $ssmSummary = "Disk space for " + $ssmDisk + " filesystem has fallen below the " + $ssmThreshold + "% threshold, it is " + $ssmPercent + "% full (" + $DispUsage + " )"
+                        }
+                        $ssmPrefixIdentifier = $ssmAlertKey + $ssmType
+
+
+		default:
+			$ssmSummary = "Unknown Prefix " + $ssmPrefix + " Extracted from " + $arControlDescription
+			$ssmAlertGroup = "Unknown Prefix "
+			$ssmSeverity = 1
+
+	}
+
+	@Severity = $ssmSeverity
+	@Type = $ssmType
+	@Summary = $ssmSummary
+	@AlertGroup = $ssmAlertGroup
+	@AlertKey = $ssmAlertKey
+
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmPrefix + $ssmPrefixIdentifier 
+
+

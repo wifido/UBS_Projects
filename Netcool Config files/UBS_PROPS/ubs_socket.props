@@ -1,0 +1,123 @@
+#######################################################################
+#
+#       Copyright (C) 2002 Micromuse Ltd. All rights reserved.
+
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: mkprops 1.20 2003/01/29 16:41:34 kris Development $
+#
+#######################################################################
+
+#######################################################################
+#
+# Property Name					Default
+#
+# Generic Properties
+#
+# AuthPassword          	: ''
+# AuthUserName          	: ''
+# AutoSAF               	: 0
+# Buffering             	: 0
+# BufferSize            	: 10
+# Help                  	: 0
+# LookupTableMode       	: 3
+# Manager               	: 'socket'
+# MaxLogFileSize        	: 1048576
+# MaxRawFileSize        	: -1
+# MaxSAFFileSize        	: 1048576
+# MessageLevel          	: 'warn'
+# MessageLog            	: '$OMNIHOME/log/socket.log'
+# MsgDailyLog           	: 0
+# MsgTimeLog            	: '0000'
+# Name                  	: 'socket'
+# NameToUpper           	: 0
+# NetworkTimeout        	: 0
+# PollServer            	: 0
+# PropsFile             	: '$OMNIHOME/probes/<arch>/socket.props'
+# RawCapture            	: 0
+# RawCaptureFile        	: '$OMNIHOME/var/socket.cap'
+# RawCaptureFileAppend  	: 0
+# RawCaptureFileBackup  	: 0
+# RetryConnectionCount  	: 15
+# RetryConnectionTimeOut	: 30
+# RulesFile             	: '$OMNIHOME/probes/<arch>/socket.rules'
+# SAFFileName           	: ''
+# Server                	: 'NCOMS'
+# ServerBackup          	: ''
+# StoreAndForward       	: 1
+# Version               	: 0
+#
+# Specific Properties
+#
+# Delimiter             	: ''
+# EventReadString       	: ''
+# EventTerminator       	: '\n\n'
+# Footer                	: ''
+# Header                	: ''
+# LineTerminator        	: '\\n'
+# LoginScript           	: ''
+# MaxEvents             	: 10
+# NoNameResolution      	: 0
+# NoTrim                	: 0
+# ParseAsLines          	: 0
+# PortNumber            	: 4567
+# Props.CheckNames      	: TRUE
+# ReadTimeOut           	: 1
+# ReportStatus          	: 1
+# SingleLines           	: 0
+# SocketBuffer          	: 1024
+# StreamCapture         	: 0
+# StreamCaptureFilename 	: '$OMNIHOME/var/socket.stream'
+# StripChars            	: ''
+#
+#######################################################################
+
+#######################################################################
+#
+# Add your settings here
+#
+#######################################################################
+Name				: "ubs_socket"
+Server				: "STMENG"
+PollServer			: 60
+NetworkTimeout			: 15
+Manager				: "STMSKTENG1"
+LineTerminator			: "\n"
+EventTerminator			: "\n\n"
+StoreAndForward			: 1
+#PropsFile			: "$OMNIPROPS/ubs_socket.props"
+PropsFile			: "$OMNIHOME/probes/linux2x86/ubs_socket.props"
+Rulesfile			: "$OMNIRULES/socket.rules"
+#Rulesfile			: "/sbclocal/netcool_ci/omnibus/all_rules/ubsw/socket.rules"
+PortNumber			: 2004
+MessageLog			: "$NCHOME/log/omnibus/ubs_socket.log"
+#MessageLog			: "/sbclocal/netcool_ci/log/omnibus/ubs_socket.log"
+MsgDailyLog			: 0
+MaxLogFileSize			: 51200000
+StripChars			: "\r"
+#StreamCapture			: 1
+#StreamCaptureFilename		: "$NCHOME/log/omnibus/ubs_socket.stream"
+#RawCapture			: 1
+#RawCaptureFile			: "$NCHOME/log/omnibus/ubs_socket.cap"
+MessageLevel			: "debug"
+ReadTimeOut			: 20
+MaxEvents			: 1000 
+AutoSAF                         : 1
+MaxEventSize			: 8192
+Timeout				: 30
+Buffering			: 0
+BufferSize			: 50
+BufferTimer			: 10
+ThreadPoolSize			: 30
+SocketBuffer			: 8192
+ReportStatus 		      	: 0

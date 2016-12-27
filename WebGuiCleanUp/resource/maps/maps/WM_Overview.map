@@ -1,0 +1,5 @@
+map(name="WM_Overview",bgImage="",bgColor="#003366",w="200",h="100",acl="*")
+text(color="white",action="Open URL",label="Infrastructure",target="_self",style="p",y="81",entity="",url="",size="10",name="_visual_2",x="19",justify="center",font="Helvetica")
+text(color="white",action="Open URL",label="Application",target="_self",style="p",y="38",entity="",url="",size="10",name="visual_1",x="25",justify="center",font="Helvetica")
+button(name="WMApp",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="WM_Apps",h="37",font color="black",target="main",type="rectangle",y="16",x="89",label="WMApp",legend="Count",w="54",arc diameter="20",size="10")
+button(name="WMInfra",url="",style="+_fontStyle+",font="Helvetica",action="Lightweight Event List (LEL)",entity="WM_Infra",h="37",font color="black",target="main",type="rectangle",y="58",x="89",label="WMInfra",legend="Count",w="54",arc diameter="20",size="10")

@@ -1,0 +1,571 @@
+case "SyslogMessage" | "DELLServer":
+    	$severityOverRide = 1
+
+    	$ssmClassGidKey = "ssm_community"
+
+    	if (regmatch($logMonXHistoryLine, "^[aA-zZ]+ [aA-zZ]+ +[^ ]+ +[^ ]+ [0-9]+ .*$"))  
+	{
+
+		$ruleset = $ruleset + " patrol = 1"
+
+
+        	$patrol = 1
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 26, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 24)
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([^ ]+) .*$")
+    	}
+    	else  
+	{
+
+		$ruleset = $ruleset + " patrol = 0"
+
+        	$patrol = 0
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 17, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 16)
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, '^[^ ]+ ([^:]+):.*$')
+    	}
+    
+    	if (regmatch($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [^]]+\].*$"))  
+	{
+
+		$ruleset = $ruleset + " syslog = 1"
+
+        	$logMonXHistoryLineEVENTID = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID ([0-9]+) [^]]+\] .*$")
+        	$logMonXHistoryLineERRLVL = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [0-9]+ [^\.]+\.([^]]+)\] .*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [^]]+\] (.*)$")
+    	}
+    	# Matches Cisco syslog events which should already be handled by Dominic's syslog probes
+    	else if (regmatch($logMonXHistoryLineNODATE, "^[^%]+%[^:]+: .*$"))  
+	{
+
+		$ruleset = $ruleset + " syslog = 2"
+
+		$logMonXHistoryLineSUBSYSTEM = "cisco"
+    	}
+    	else if (int($patrol) == 0) 
+	{
+
+		$ruleset = $ruleset + " syslog = 3"
+
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: (.*)$")
+    	}
+    	else  
+	{
+
+		$ruleset = $ruleset + " syslog = 4"
+
+        	$logMonXHistoryLineSUMMARY = $logMonXHistoryLineNODATE
+    	}
+    
+    	#
+    	# Final effort to get a sensible Summary if one doesn't already exist
+    	#
+    	if (match($logMonXHistoryLineSUMMARY, ""))  
+	{
+
+		$ruleset = $ruleset + " Summary Modified"
+
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ (.*)$")
+    	}
+    
+    	#
+    	# Is this a syslog message from a Netcool Process Agent?
+    	#
+    	if (regmatch($logMonXHistoryLineSUMMARY, "^\[[A-Z]+_MSG\]:"))  
+	{
+
+		$ruleset = $ruleset + " Netcool PA"
+        	$logMonXHistoryLinePASTATUS = extract($logMonXHistoryLineSUMMARY, "^\[([A-Z]+)_MSG\]:.*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineSUMMARY, "^[^ ]+ (.*)$")
+        	$ssmClassGidKey = "MICROMUSE"
+        	$severityOverRide = 0
+		$ruleset = $ruleset + " PASTATUS = " + $logMonXHistoryLinePASTATUS
+
+        	switch ($logMonXHistoryLinePASTATUS)  
+		{
+            		case "ALERT":
+                		$logMonXHistoryLineERRLVL = "critical"
+            		case "RESTORE":
+                		$logMonXHistoryLineERRLVL = "clear"
+            		default:
+        	}
+    	}
+    	#
+    	# Does this event have a unique PID associated with it?  If so, zap it to decrease uniqueness
+    	#
+    	if (regmatch($logMonXHistoryLineSUBSYSTEM, "^[^[]+\[[0-9]+\]$"))  
+	{
+		$ruleset = $ruleset + " Unique ID "
+        	$ssmAlertKey = extract($logMonXHistoryLineSUBSYSTEM, "^([^[]+)\[[0-9]+\]$")
+    	}
+   	else  
+	{
+		$ruleset = $ruleset + " No Unique ID "
+        	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+    	}
+    
+    	#
+    	# Let's see if this is a syslog event that we really don't want to spam us
+    	#
+    	$ssmDiscardEvent = lookup($ssmAlertKey, SSMDiscardMap)
+	$ruleset = $ruleset + " ssmDiscardEvent = " + $ssmDiscardEvent
+	switch ($ssmDiscardEvent)  
+	{
+		case "0":
+		    	if (int($DEV) == 1)  
+			{
+				log(ERROR, "Discarding events for " + $Node + ", process " + $ssmAlertKey)
+	    		}
+#	    		discard
+			$tempMarkForDiscard = 2
+		case "1":
+	    		if (int($DEV) == 1)  
+			{
+				log(ERROR, "Deduplicating events for " + $Node + ", process " + $ssmAlertKey)
+	    		}
+	    		$ssmTempId = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+		case "2":
+	    		# Do nothing
+		default:
+    	}
+
+	$ruleset = $ruleset + " ssmAlertKey = " + $ssmAlertKey
+    	switch ($ssmAlertKey)  
+	{
+        	case "ypbind":
+        	    	$severityOverRide = 0
+            		if (regmatch($logMonXHistoryLineSUMMARY, '.*OK.*$'))  
+			{
+                		$logMonXHistoryLineERRLVL = "clear"
+                		$ypbindtype2 = 2 ### debug stuff
+				$ruleset = $ruleset + " ypbind 1"
+            		}
+            		else  
+			{
+               		 	$logMonXHistoryLineERRLVL = "info"
+                		$ypbindtype2 = 1
+				$ruleset = $ruleset + " ypbind 2"
+            		}
+        	case "kernel":
+            		$severityOverRide = 0
+            		if (regmatch($logMonXHistoryLineSUMMARY, '.*OK.*$'))  
+			{
+                		$logMonXHistoryLineERRLVL = "clear"
+				$ruleset = $ruleset + " kernel 1"
+            		}
+            		else  
+			{
+				$ruleset = $ruleset + " kernel 2"
+
+            		}
+        	case "procmon":
+            		$severityOverRide = 0
+            		$ssmAlertKey = $ssmAlertKey + "-" + extract($logMonXHistoryLineSUMMARY, "^Netcool process [^ ]+ \([^)]\).*$")
+            		$ssmClassGidKey = "MICROMUSE"
+            		$logMonXHistoryLineERRLVL = "minor"
+		case "lw8":
+            		$severityOverRide = 0
+                	$ssmClassGidKey = "ssm_community"
+            		$logMonXHistoryLineERRLVL = "critical"
+        	default:
+    	}
+
+# 	This allows us to override the default mapping of AlertGroup to $1 by predefining $ssmAlertGroup
+    	if (not exists($ssmAlertGroup))  
+	{
+		$ssmAlertGroup = $1
+		$ruleset = $ruleset + " ssmAlertGroup not exist"
+    	}
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+
+#
+# Here we set the Identifier, but only if it has not been overridden by the "SSMDiscardMap" lookup above
+#
+    	if (not exists($ssmTempId))  
+	{
+		$ruleset = $ruleset + " ssmTempId not exist"
+
+		if (exists($logMonXHistoryLineEVENTID))  
+		{
+			$ruleset = $ruleset + " logMonXHistoryLineEVENTID not exist"
+	    		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey + $logMonXHistoryLineEVENTID
+		}
+		else  
+		{
+			$ruleset = $ruleset + " logMonXHistoryLineEVENTID does exist"
+	    		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey + $ssmSummary
+		}
+    	}
+    	else  
+	{
+		$ruleset = $ruleset + " ssmTempId does exist"
+		$tempIdentifier = $ssmTempId
+    	}
+
+case "Netcool":
+    	if (regmatch($logMonXHistoryLine, "^[A-Z][a-z]+ +[0-9]+ [^:]+:[^:]+:[^ ]+ [^:]+: .*$"))  
+	{
+        	#
+        	# Standard Netcool log file format
+        	#
+
+		$ruleset = $ruleset + " Std Netcool log format"
+
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 23, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 20)
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([^:]+):.*$")
+        	$logMonXHistoryLineERRLVL = extract($logMonXHistoryLineNODATE, "^[^:]+: ([^: ]+)[: ]+.*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^:]+: [^: ]+[: ]+(.*)$")
+    	}
+    	else if (regmatch($logMonXHistoryLine, "^[A-Z][a-z]+ [A-Z][a-z]+ +[0-9]+ [^:]+:[^:]+:[^ ]+ [^:]+: .*$")) 
+	{
+        	#
+        	# one of the "new-style" v7 log formats (e.g. H-P Oracle gateway)
+        	#
+
+		$ruleset = $ruleset + " Netcool V7 log format"
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 26, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 24)
+
+		$NoElements = split($logMonXHistoryLineNODATE, SplitArray, ":")
+		@UserInt = $NoElements
+
+		$logMonXHistoryLineERRLVL = SplitArray[1]
+		$logMonXHistoryLineSUBSYSTEM = SplitArray[2]
+		switch ($NoElements)
+                {
+                	case "4":
+				$logMonXHistoryLineSUMMARY = SplitArray[3] + SplitArray[4]
+                	case "5":
+				$logMonXHistoryLineSUMMARY = SplitArray[3] + SplitArray[4] + SplitArray[5]
+                	case "6":
+				$logMonXHistoryLineSUMMARY = SplitArray[3] + SplitArray[4] + SplitArray[5] + SplitArray[6]
+			default:
+				$logMonXHistoryLineSUMMARY = SplitArray[3]
+		}
+
+
+        	#
+        	# If we have an empty summary we must have a strange line in the log file, so fudge it
+        	#
+        	if (match($logMonXHistoryLineSUMMARY, ""))  
+		{
+
+			$ruleset = $ruleset + " No Summary"
+        	    	$logMonXHistoryLineSUMMARY = $logMonXHistoryLine
+            		$logMonXHistoryLineERRLVL = "warn"
+            		$logMonXHistoryLineSUBSYSTEM = "nco_g_oracle"
+        	}
+    	}
+    	else  
+	{
+        	#
+        	# Netcool probe log
+        	#
+
+		$ruleset = $ruleset + " Unknown netcool log format"
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 27, 1000)
+
+		if (nmatch($logMonXHistoryLineNODATE, "Connection to object server"))
+		{
+			$ssmSummary = $logMonXHistoryLineNODATE
+			$NoElements = split($logMonXHistoryLineNODATE, SplitArray, "'")
+			$logMonXHistoryLineSUBSYSTEM = SplitArray[2]
+			$logMonXHistoryLineERRLVL = "major"
+		}
+		else
+		{
+                        $ssmSummary = "Event from Unknown Netcool Log Format - Please see UserData for Log Line"
+                        $logMonXHistoryLineSUBSYSTEM = "Netcool Log"
+                        $logMonXHistoryLineERRLVL = "major"
+			@UserData = $logMonXHistoryLine
+		}
+
+    	}
+    	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+    	$ssmAlertGroup = $1
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	$ssmSummaryLen = length($ssmSummary)
+    	if (int($ssmSummaryLen) == 0)  
+	{
+		$ruleset = $ruleset + " Summary Modifies"
+        	$ssmSummary = $logMonXHistoryLine
+    	}
+    	$ssmClassGidKey = "MICROMUSE"
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+
+case "WebtopFailover" | "Webtop":
+    	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 31, 1000)
+    	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 28)
+    	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([aA-zZ]+).*$")
+    	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[aA-zZ]+(.*)$")
+    	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+    	$ssmAlertGroup = $1
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	$ssmSummaryLen = length($ssmSummary)
+    	if (int($ssmSummaryLen) == 0)  
+	{
+		$ruleset = $ruleset + " Summary Modifies"
+        	$ssmSummary = $logMonXHistoryLine
+    	}
+    	$ssmClassGidKey = "MICROMUSE"
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+
+case "SSMLogFile":
+    	$ssmClassGidKey = "MICROMUSE"
+
+	# @UserData being used to identify why substr is inconsistent and causing regexp errors on subsequent extracts for these events.
+    	@UserData = "GT-" + $logMonXHistoryLine
+
+
+    	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 27, 1000)
+    	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 25)
+    	$logMonXHistoryLineERRLVL = extract($logMonXHistoryLineNODATE, "^\[([^]]+)\] .*$")
+    	if (regmatch($logMonXHistoryLineNODATE, "\[[^]]+\] [A-Z]+ .*$"))  
+	{
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "\[[^]]+\] ([^ ]+) .*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "\[[^]]+\] [^ ]+ (.*)$")
+		$ssmAlertGroup = $1
+		$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+		$ruleset = $ruleset + "SSMlogRule 1"
+		if (match($logMonXHistoryLineSUBSYSTEM, "DISK"))  
+		{
+			$ruleset = $ruleset + " DISK"
+            		$ssmAlertGroup = "Disk usage"
+            		$ssmAlertKey = extract($logMonXHistoryLineSUMMARY, '^.*partition ([^ ]+) .*$')
+                	$ssmClassGidKey = "ssm_community"
+
+##      #########################################################################
+##      #                                                                       #
+##      #  This bit added as a temporary fix. Requested by John Irvine 10.5.05  #
+##      #                                                                       #
+##      #  If the OID is .1.3.6.1.4.1977.9.7.2.1.3.4 and the node is a Sybase   #
+##      #  or Oracle box, set the Class depending on values of AlertGroup       #
+##      #                                                                       #
+##      #########################################################################
+
+			if ((nmatch (@AlertKey, "/sbc")) || (nmatch(@AlertKey, "/tempdb"))) 
+			{
+				## Check if Sybase or Oracle box
+				$hostType = substr (@NodeAlias, 9, 3)
+				$ruleset = $ruleset + " hostType = " + $hostType
+				switch ($hostType) 
+				{
+					case "dor" | "por" | "ora" :
+						@Class = 120000
+						@Subclass = "ROC"
+						@OwnerGID = 239
+						@OwnerUID = 65534
+						$TempDoLookup = 2
+					case "psy" | "syb" | "dsy" :
+						@Class = 121000
+						@Subclass = "ROC"
+						@OwnerGID = 239
+						@OwnerUID = 65534
+						$TempDoLookup = 2
+					default :
+						@Class = 5200
+						@OwnerGID = 239
+						@OwnerUID = 65534
+						$TempDoLookup = 2
+				}
+			}
+
+##      #########################################################################
+##      #                                                                       #
+##      # End of temporary fix                                                  #
+##      #                                                                       #
+##      #########################################################################
+
+		}
+    	}
+    	else  
+	{
+        	$logMonXHistoryLineSUBSYSTEM =  extract($logMonXHistoryLineNODATE, "^\[([^]]+)\] .*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^\[[^]]+\] (.*)$")
+		$ssmAlertGroup = $1
+		$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+		$ruleset = $ruleset + "SSMlogRule 2"
+    	}
+    	#
+    	# Check to see if we can GenericClear this event
+    	#
+    	if (regmatch($logMonXHistoryLineSUMMARY, "^Agent on [^ ]+ is up and running.*$") || regmatch($logMonXHistoryLineSUMMARY, "^Running configuration file [^ ]+ is dated .*$"))  
+	{
+		$severityOverRide = 3
+		$ssmType = 2
+		$ssmSeverity = 1
+        	$ssmAlertGroup = "Agent"
+        	$ssmAlertKey = "StartStop"
+            	@Manager = "StartStop"
+    	}
+	if (nmatch($logMonXHistoryLineSUMMARY, "Processing bottleneck"))
+	{
+
+                $ssmClassGidKey = "ssm_community"
+	}
+
+
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+
+case "PolicyException" | "ImpactServer" | "ConnectionRefused":
+    	if (regmatch($logMonXHistoryLine, "^[aA-zZ]+ [aA-zZ]+ [0-9]+ [0-9]+:[0-9]+:[0-9]+ [A-Z]+ [^ ]+ [0-9]+:"))  
+	{
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 38, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 37)
+    	}
+    	else  
+	{
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 31, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 30)
+    	}
+    	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([^:]+):.*$")
+    	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^:]+: (.*)$")
+    	$ssmClassGidKey = "MICROMUSE"
+    	$ssmAlertGroup = $1
+    	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	$ssmSummaryLen = length($ssmSummary)
+    	if (int($ssmSummaryLen) == 0)  
+	{
+        	$ssmSummary = $logMonXHistoryLine
+    	}
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+
+case "ESSOC-MerlinLogfileException":
+    	if (regmatch($logMonXHistoryLine, "^[^/]+/[^/]+/[^ ]+ +[^:]+:[^:]+:[^ ]+ [^/]+/[^ ]+ +- [^ ]+ .*$"))  
+	{
+        	$logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 22, 1000)
+        	$logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 20)
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([^ ]+) .*$")
+        	$logMonXHistoryLineERRLVL = extract($logMonXHistoryLineNODATE, "^[^ ]+  - ([^ ]+) .*$")
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+  - [^ ]+ +(.*)$")
+        	$essoc = 1 ### debug stuff
+    	}
+    	else  
+	{
+        	$logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLine, "^([^ ]+) .*$")
+        	$logMonXHistoryLineERRLVL = extract($logMonXHistoryLine, '^[^ ]+ [^ ]+ [^ ]+ [^ ]+ "([^ ]+) .*$')
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLine, '^[^:]+: ([^"]+)".*$')
+        	$essoc = 2
+    	}
+    	$ssmClassGidKey = "ESSOC"
+    	$ssmAlertGroup = $1
+    	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+    	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $4 + $1 + $ssmAlertKey
+
+case "OracleError":
+
+    	$ssmClassGidKey = "ORACLE"
+    	if (!regmatch($logMonXHistoryLine, "^\[.*\].*\:Oracle.*$"))  
+	{
+		$tempMarkForDiscard = 2
+		$ruleset = $ruleset + " Discards"
+		if (regmatch($logMonXHistoryLine, "^\[ [0-9]+ [A-Z][a-z]+[0-9]+-[0-9]+:[0-9]+-.*:Oracle:.*\]$"))
+		{
+			$ssmClassGidKey = "DUFFORA"
+			$ruleset = $ruleset + " Case 1"
+			$NoElements = split($logMonXHistoryLine, SplitArray, ":")
+			@UserInt = $NoElements
+			$instance = substr(SplitArray[2],4,255)
+			$logMonXHistoryLineSUBSYSTEM = SplitArray[4]	
+			$logMonXHistoryLineERRLVL= SplitArray[5]
+			switch($NoElements)
+			{
+			case "6":
+				$logMonXHistoryLineSUMMARY = SplitArray[6]
+			case "7":
+				$logMonXHistoryLineSUMMARY = SplitArray[6] + SplitArray[7]
+			case "8":
+				$logMonXHistoryLineSUMMARY = SplitArray[6] + SplitArray[7] + SplitArray[8]
+			case "9":
+				$logMonXHistoryLineSUMMARY = SplitArray[6] + SplitArray[7] + SplitArray[8] + SplitArray[9]
+			default:
+				$logMonXHistoryLineSUMMARY = $logMonXHistoryLine
+				$ruleset = $ruleset + " Summary Overflow"
+			}
+			if(regmatch($logMonXHistoryLineSUMMARY, "^.*\]$"))
+			{
+				$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineSUMMARY, "(^.*)\]$")
+			} 
+
+		@Description = "logMonXControlLogFile = " + $logMonXControlLogFile + "logMonXControlLogFile = " + $logMonXControlLogFile + "logMonXHistoryLevel = " + $logMonXHistoryLevel +"logMonXControlDescription = " + $logMonXControlDescription 
+		}
+		else
+		{
+			$ssmClassGidKey = "DUFFORA"
+			@Description = "logMonXControlLogFile = " + $logMonXControlLogFile + "logMonXControlLogFile = " + $logMonXControlLogFile + "logMonXHistoryLevel = " + $logMonXHistoryLevel +"logMonXControlDescription = " + $logMonXControlDescription 
+		}
+#		20061106	End of Change
+    	}
+
+	# This test for $logMonXHistoryLine placed in order to better identify regexp failures in prod GT 21/11/05
+    	else if (regmatch($logMonXHistoryLine, "LOGIX")) 
+	{
+		$postamble = substr($logMonXHistoryLine,25,255)
+		$instance = "LOGIX"
+		$logMonXHistoryLineSYSTEM = "LOGIX"
+		$logMonXHistoryLineSUMMARY = extract($postamble, "^LOGIX (.*)$")
+    	}
+
+    	else 
+	{
+
+        	$postamble = extract($logMonXHistoryLine, "^[^-]+-[^-]+-(.*)$")
+        	$instance = extract($postamble, "^([^:]+):[^:]+:[^:]+:[^:]+:.*$")
+        	$logMonXHistoryLineSYSTEM = extract($postamble, "^[^:]+:([^:]+):[^:]+:[^:]+:.*$")
+        	$logMonXHistoryLineSUBSYSTEM = extract($postamble, "^[^:]+:[^:]+:([^:]+):[^:]+:.*$")
+        	$logMonXHistoryLineERRLVL = extract($postamble, "^[^:]+:[^:]+:[^:]+:([^:]+):.*$")
+        	$logMonXHistoryLineSUMMARY = extract($postamble, "^[^:]+:[^:]+:[^:]+:[^:]+:(.*)$")
+    	}
+
+    	$severityOverRide = 0
+
+    	$ssmAlertKey = $instance
+    	$ssmAlertGroup = $logMonXHistoryLineSUBSYSTEM
+    	if (match($logMonXHistoryLineSUMMARY, ""))  
+	{
+        	$ssmSummary = $logMonXHistoryLine
+		$logMonXHistoryLineERRLVL = "info"
+    	}
+    	else  
+	{
+        $ssmSummary = $logMonXHistoryLineSUMMARY
+    	}
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $1 + $postamble
+
+case "SybaseError":
+
+    	if (regmatch($logMonXHistoryLine, "^\[.*\].?$"))  
+	{
+#		discard
+		$tempMarkForDiscard = 2
+    	}
+    	else  
+	{
+        	$preamble = extract($logMonXHistoryLine, "^([^-]+-[^-]+-).*$")
+        	$postamble = extract($logMonXHistoryLine, "^[^-]+-[^-]+-(.*)$")
+        	$instance = extract($postamble, "^([^:]+):[^:]+:[^:]+:[^:]+:.*$")
+        	$logMonXHistoryLineSYSTEM = extract($postamble, "^[^:]+:([^:]+):[^:]+:[^:]+:.*$")
+        	$logMonXHistoryLineSUBSYSTEM = extract($postamble, "^[^:]+:[^:]+:([^:]+):[^:]+:.*$")
+        	$logMonXHistoryLineERRLVL = extract($postamble, "^[^:]+:[^:]+:[^:]+:([^:]+):.*$")
+        	$logMonXHistoryLineSUMMARY = extract($postamble, "^[^:]+:[^:]+:[^:]+:[^:]+:(.*)$")
+    	}
+
+    	$severityOverRide = 0
+    	$ssmClassGidKey = "SYBASE"
+    	$ssmAlertKey = $instance
+    	$ssmAlertGroup = $logMonXHistoryLineSUBSYSTEM
+    	if (match($logMonXHistoryLineSUMMARY, ""))  
+	{
+        	$ssmSummary = $logMonXHistoryLine
+		$logMonXHistoryLineERRLVL = "info"
+    	}
+    	else  
+	{
+        	$ssmSummary = $logMonXHistoryLineSUMMARY
+    	}
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $1 + $postamble
+

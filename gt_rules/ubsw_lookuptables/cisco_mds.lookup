@@ -1,0 +1,883 @@
+# Table for Cisco/other Fibre Channel device status mappings
+table FCStatusMap = 
+{
+	{"cefcModuleStatusChange:1","4","1","Module in unknown state"}
+	{"cefcModuleStatusChange:2","0","2","Module is operational"}
+	{"cefcModuleStatusChange:3","3","1","Module is administratively disabled"}
+	{"cefcModuleStatusChange:4","2","1","Module is operational but there is some diagnostic information available"}
+	{"cefcModuleStatusChange:5","2","1","Module is currently in the process of booting"}
+	{"cefcModuleStatusChange:6","2","1","Module is performing selfTest"}
+	{"cefcModuleStatusChange:7","5","1","Module has failed owing to unknown condition"}
+	{"cefcModuleStatusChange:8","5","1","Module has been provisioned, but it is missing"}
+	{"cefcModuleStatusChange:9","4","1","Module is not compatible with parent entity. Module has not been provisioned and wrong type of module is plugged in."}
+	{"cefcModuleStatusChange:10","4","1","Module is not compatible with the current configuration.Module was correctly provisioned earlier, however the module was replaced by an incompatible module."}
+	{"cefcModuleStatusChange:11","5","1","Module diagnostic test failed due to some hardware failure"}
+	{"cefcModuleStatusChange:12","4","1","Module is waiting for an external or internal event to become operational"}
+	{"cefcModuleStatusChange:13","3","1","Module is administratively set to be powered on but out of service"}
+	{"cefcModuleStatusChange:14","5","1","Module is powered on but out of service, due to environmental temperature problem"}
+	{"cefcModuleStatusChange:15","5","1","Module is in powered down state"}
+	{"cefcModuleStatusChange:16","0","1","Module is in powered up state"}
+	{"cefcModuleStatusChange:17","4","1","System does not have enough power in power budget to power on this module"}
+	{"cefcModuleStatusChange:18","4","1","Module is being power cycled"}
+	{"cefcModuleStatusChange:19","5","1","Module is drawing more power than allocated to this module. The module is still operational but may go into a failure state"}
+	{"cefcModuleStatusChange:20","5","1","Module is drawing more power than this module is designed to handle. The module is still operational but may go into a failure state and could potentially take the system down"}
+	{"cefcModuleStatusChange:21","2","1","Synchronization in progress.This transitional state specifies the synchronization of data between the active and standby modules"}
+	{"cefcPowerStatusChange:1","5","1","FRU is powered off because of an unknown problem"}
+	{"cefcPowerStatusChange:2","0","2","FRU is powered on"}
+	{"cefcPowerStatusChange:3","3","1","FRU is administratively off"}
+	{"cefcPowerStatusChange:4","5","1","FRU is powered off because available system power is insufficient"}
+	{"cefcPowerStatusChange:5","5","1","FRU is powered off because of power problem in the FRU"}
+	{"cefcPowerStatusChange:6","5","1","FRU is powered off because of a temperature problem"}
+	{"cefcPowerStatusChange:7","5","1","FRU is powered off because of fan problems"}
+	{"cefcPowerStatusChange:8","5","1","FRU is in failed state"}
+	{"cefcPowerStatusChange:9","5","1","FRU is on, but fan has failed"}
+	{"cefcPowerStatusChange:10","5","1","FRU is powered off because of the system's insufficient cooling capacity"}
+	{"cefcPowerStatusChange:11","5","1","FRU is powered off because of the system's connector rating exceeded"}
+	{"cefcFanTrayStatusChange:1","4","1","Fan tray status is unknown"}
+	{"cefcFanTrayStatusChange:2","0","2","Fan tray is OK"}
+	{"cefcFanTrayStatusChange:3","5","1","Fan tray is powered down"}
+	{"cefcFanTrayStatusChange:4","5","1","fan tray has partially failed"}
+	{"ciscoCFSFeatureActionNotif:1","1","2","CFS no operation"}
+	{"ciscoCFSFeatureActionNotif:2","1","2","CFS Distribution Enable"}
+	{"ciscoCFSFeatureActionNotif:3","3","1","CFS Distribution Disable"}
+	{"ciscoCFSFeatureActionNotif:4","1","2","CFS Commit"}
+	{"ciscoCFSFeatureActionNotif:5","4","1","CFS Abort"}
+	{"ciscoCFSFeatureActionNotif:6","2","1","CFS Clear"}
+	{"ciscoFeatureOpStatusChange:1","3","1","Feature has unknown status"}
+	{"ciscoFeatureOpStatusChange:2","1","2","Feature is operational and available"}
+	{"ciscoFeatureOpStatusChange:3","3","1","Feature is disabled and not available"}
+	{"vsanStatusChange:1","0","2","VSAN is up - see AlertKey for VSAN ID"}
+	{"vsanStatusChange:2","4","1","VSAN is down - see AlertKey for VSAN ID"}
+	{"ciscoFCCCongestionStateChange:1","1","2","Congestion condition cleared"}
+	{"ciscoFCCCongestionStateChange:2","4","1","Congestion condition occurring"}
+	{"ciscoFCCCongestionStateChange:3","5","1","Severe congestion occurring"}
+	{"fspfIfNbrState:1","4","1","down"}
+	{"fspfIfNbrState:2","3","1","initialising"}
+	{"fspfIfNbrState:3","3","1","database exchange"}
+	{"fspfIfNbrState:4","3","1","database ack-wait"}
+	{"fspfIfNbrState:5","3","1","database wait"}
+	{"fspfIfNbrState:6","1","2","fully operational"}
+	{"civrZoneSetActvatDeactvatResult:1","2","2","Activation successful for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:2","3","1","Activation failed (no members) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:3","3","1","Activation failed (one or fewer members) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:4","3","1","Activation failed (no IVR topology) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:5","3","1","Activation failed (VSAN activation failure) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:6","3","1","Activation failed (no zoneset) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:7","3","1","Activation failed (no active VSAN) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:8","4","1","Activation failed (fabric unstable) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:9","2","2","Deactivation successful for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:10","3","1","Deactivation failed (no active zoneset) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:11","3","1","Deactivation failed (VSAN deactivation failure) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:12","4","1","Deactivation failed (fabric unstable) for zoneset "}
+	{"civrZoneSetActvatDeactvatResult:13","2","1","Activating zoneset "}
+	{"civrZoneSetActvatDeactvatResult:14","2","1","Deactivating zoneset "}
+	{"civrZoneSetActvatDeactvatResult:15","2","1","Idle zoneset "}
+	{"rscnNotifications:1","4","1","no error"}
+	{"rscnNotifications:2","4","1","req contains an invalid command code"}
+	{"rscnNotifications:3","4","1","req contains an invalid version number"}
+	{"rscnNotifications:4","4","1","there is a logical error"}
+	{"rscnNotifications:5","4","1","Information Unit (IU) size is invalid"}
+	{"rscnNotifications:6","4","1","the module is busy"}
+	{"rscnNotifications:7","4","1","there is a protocol error"}
+	{"rscnNotifications:8","4","1","the command specified in the req could not be executed"}
+	{"rscnNotifications:9","4","1","the command is not supported"}
+	{"rscnNotifications:10","4","1","specific vendor error: "}
+	{"zoneBehaviour:1","1","2","Communication for members of the default zone allowed on this VSAN"}
+	{"zoneBehaviour:2","3","1","Communication for members of the default zone denied on this VSAN"}
+	{"lunDiscovery:1","1","1","LUN discovery in progress"}
+	{"lunDiscovery:2","1","2","LUN discovery completed successfully"}
+	{"lunDiscovery:3","4","1","LUN discovery failed"}
+	{"ccCopyState:1","2","1","waiting"}
+	{"ccCopyState:2","2","1","running"}
+	{"ccCopyState:3","2","2","successful"}
+	{"ccCopyState:4","3","1","failed"}
+	{"ccCopyFailCause:1","0","0",""}
+	{"ccCopyFailCause:2","0","0",": check your file name/path/permissions"}
+	{"ccCopyFailCause:3","0","0",": network overload or remote host not responding"}
+	{"ccCopyFailCause:4","0","0",": agent unable to allocate memory for the config-copy operation"}
+	{"ccCopyFailCause:5","0","0",": configuration file not found"}
+	{"ccCopyFailCause:6","0","0",": unsupported protocol"}
+	{"ccCopyFailCause:7","0","0",": one or more configuration entries failed"}
+	{"CseHaRestartReason:1","3","1","unknown reason"}
+	{"CseHaRestartReason:2","3","1","ungraceful exit"}
+	{"CseHaRestartReason:3","3","1","service got some other signal"}
+	{"CseHaRestartReason:4","3","1","received SIGTERM"}
+	{"CseHaRestartReason:5","3","1","software upgrade"}
+	{"CseHaRestartReason:6","3","1","config update"}
+	{"CseHaRestartReason:7","3","1","config removal"}
+	{"CseHaRestartReason:8","3","1","manually shutdown"}
+	{"CseHaRestartReason:9","3","1","aborted"}
+	{"CseHaRestartReason:10","3","1","heartbeat failure"}
+	{"CseHaRestartReason:11","3","1","user termnation"}
+	{"CseHaRestartReason:12","3","1","graceful exit"}
+}
+default = {"2","1","Unknown event"}
+
+# Table for mapping of FC ports, this is the output of Sergey Kurganov's port mapping perl script.
+table FCPortMap = 
+{
+	{"portindex:16777216","fc 1/1"}
+	{"portindex:16781312","fc 1/2"}
+	{"portindex:16785408","fc 1/3"}
+	{"portindex:16789504","fc 1/4"}
+	{"portindex:16793600","fc 1/5"}
+	{"portindex:16797696","fc 1/6"}
+	{"portindex:16801792","fc 1/7"}
+	{"portindex:16805888","fc 1/8"}
+	{"portindex:16809984","fc 1/9"}
+	{"portindex:16814080","fc 1/10"}
+	{"portindex:16818176","fc 1/11"}
+	{"portindex:16822272","fc 1/12"}
+	{"portindex:16826368","fc 1/13"}
+	{"portindex:16830464","fc 1/14"}
+	{"portindex:16834560","fc 1/15"}
+	{"portindex:16838656","fc 1/16"}
+	{"portindex:16842752","fc 1/17"}
+	{"portindex:16846848","fc 1/18"}
+	{"portindex:16850944","fc 1/19"}
+	{"portindex:16855040","fc 1/20"}
+	{"portindex:16859136","fc 1/21"}
+	{"portindex:16863232","fc 1/22"}
+	{"portindex:16867328","fc 1/23"}
+	{"portindex:16871424","fc 1/24"}
+	{"portindex:16875520","fc 1/25"}
+	{"portindex:16879616","fc 1/26"}
+	{"portindex:16883712","fc 1/27"}
+	{"portindex:16887808","fc 1/28"}
+	{"portindex:16891904","fc 1/29"}
+	{"portindex:16896000","fc 1/30"}
+	{"portindex:16900096","fc 1/31"}
+	{"portindex:16904192","fc 1/32"}
+	{"portindex:16908288","fc 1/33"}
+	{"portindex:16912384","fc 1/34"}
+	{"portindex:16916480","fc 1/35"}
+	{"portindex:16920576","fc 1/36"}
+	{"portindex:16924672","fc 1/37"}
+	{"portindex:16928768","fc 1/38"}
+	{"portindex:16932864","fc 1/39"}
+	{"portindex:16936960","fc 1/40"}
+	{"portindex:16941056","fc 1/41"}
+	{"portindex:16945152","fc 1/42"}
+	{"portindex:16949248","fc 1/43"}
+	{"portindex:16953344","fc 1/44"}
+	{"portindex:16957440","fc 1/45"}
+	{"portindex:16961536","fc 1/46"}
+	{"portindex:16965632","fc 1/47"}
+	{"portindex:16969728","fc 1/48"}
+	{"portindex:17301504","fc 2/1"}
+	{"portindex:17305600","fc 2/2"}
+	{"portindex:17309696","fc 2/3"}
+	{"portindex:17313792","fc 2/4"}
+	{"portindex:17317888","fc 2/5"}
+	{"portindex:17321984","fc 2/6"}
+	{"portindex:17326080","fc 2/7"}
+	{"portindex:17330176","fc 2/8"}
+	{"portindex:17334272","fc 2/9"}
+	{"portindex:17338368","fc 2/10"}
+	{"portindex:17342464","fc 2/11"}
+	{"portindex:17346560","fc 2/12"}
+	{"portindex:17350656","fc 2/13"}
+	{"portindex:17354752","fc 2/14"}
+	{"portindex:17358848","fc 2/15"}
+	{"portindex:17362944","fc 2/16"}
+	{"portindex:17367040","fc 2/17"}
+	{"portindex:17371136","fc 2/18"}
+	{"portindex:17375232","fc 2/19"}
+	{"portindex:17379328","fc 2/20"}
+	{"portindex:17383424","fc 2/21"}
+	{"portindex:17387520","fc 2/22"}
+	{"portindex:17391616","fc 2/23"}
+	{"portindex:17395712","fc 2/24"}
+	{"portindex:17399808","fc 2/25"}
+	{"portindex:17403904","fc 2/26"}
+	{"portindex:17408000","fc 2/27"}
+	{"portindex:17412096","fc 2/28"}
+	{"portindex:17416192","fc 2/29"}
+	{"portindex:17420288","fc 2/30"}
+	{"portindex:17424384","fc 2/31"}
+	{"portindex:17428480","fc 2/32"}
+	{"portindex:17432576","fc 2/33"}
+	{"portindex:17436672","fc 2/34"}
+	{"portindex:17440768","fc 2/35"}
+	{"portindex:17444864","fc 2/36"}
+	{"portindex:17448960","fc 2/37"}
+	{"portindex:17453056","fc 2/38"}
+	{"portindex:17457152","fc 2/39"}
+	{"portindex:17461248","fc 2/40"}
+	{"portindex:17465344","fc 2/41"}
+	{"portindex:17469440","fc 2/42"}
+	{"portindex:17473536","fc 2/43"}
+	{"portindex:17477632","fc 2/44"}
+	{"portindex:17481728","fc 2/45"}
+	{"portindex:17485824","fc 2/46"}
+	{"portindex:17489920","fc 2/47"}
+	{"portindex:17494016","fc 2/48"}
+	{"portindex:17825792","fc 3/1"}
+	{"portindex:17829888","fc 3/2"}
+	{"portindex:17833984","fc 3/3"}
+	{"portindex:17838080","fc 3/4"}
+	{"portindex:17842176","fc 3/5"}
+	{"portindex:17846272","fc 3/6"}
+	{"portindex:17850368","fc 3/7"}
+	{"portindex:17854464","fc 3/8"}
+	{"portindex:17858560","fc 3/9"}
+	{"portindex:17862656","fc 3/10"}
+	{"portindex:17866752","fc 3/11"}
+	{"portindex:17870848","fc 3/12"}
+	{"portindex:17874944","fc 3/13"}
+	{"portindex:17879040","fc 3/14"}
+	{"portindex:17883136","fc 3/15"}
+	{"portindex:17887232","fc 3/16"}
+	{"portindex:17891328","fc 3/17"}
+	{"portindex:17895424","fc 3/18"}
+	{"portindex:17899520","fc 3/19"}
+	{"portindex:17903616","fc 3/20"}
+	{"portindex:17907712","fc 3/21"}
+	{"portindex:17911808","fc 3/22"}
+	{"portindex:17915904","fc 3/23"}
+	{"portindex:17920000","fc 3/24"}
+	{"portindex:17924096","fc 3/25"}
+	{"portindex:17928192","fc 3/26"}
+	{"portindex:17932288","fc 3/27"}
+	{"portindex:17936384","fc 3/28"}
+	{"portindex:17940480","fc 3/29"}
+	{"portindex:17944576","fc 3/30"}
+	{"portindex:17948672","fc 3/31"}
+	{"portindex:17952768","fc 3/32"}
+	{"portindex:17956864","fc 3/33"}
+	{"portindex:17960960","fc 3/34"}
+	{"portindex:17965056","fc 3/35"}
+	{"portindex:17969152","fc 3/36"}
+	{"portindex:17973248","fc 3/37"}
+	{"portindex:17977344","fc 3/38"}
+	{"portindex:17981440","fc 3/39"}
+	{"portindex:17985536","fc 3/40"}
+	{"portindex:17989632","fc 3/41"}
+	{"portindex:17993728","fc 3/42"}
+	{"portindex:17997824","fc 3/43"}
+	{"portindex:18001920","fc 3/44"}
+	{"portindex:18006016","fc 3/45"}
+	{"portindex:18010112","fc 3/46"}
+	{"portindex:18014208","fc 3/47"}
+	{"portindex:18018304","fc 3/48"}
+	{"portindex:18350080","fc 4/1"}
+	{"portindex:18354176","fc 4/2"}
+	{"portindex:18358272","fc 4/3"}
+	{"portindex:18362368","fc 4/4"}
+	{"portindex:18366464","fc 4/5"}
+	{"portindex:18370560","fc 4/6"}
+	{"portindex:18374656","fc 4/7"}
+	{"portindex:18378752","fc 4/8"}
+	{"portindex:18382848","fc 4/9"}
+	{"portindex:18386944","fc 4/10"}
+	{"portindex:18391040","fc 4/11"}
+	{"portindex:18395136","fc 4/12"}
+	{"portindex:18399232","fc 4/13"}
+	{"portindex:18403328","fc 4/14"}
+	{"portindex:18407424","fc 4/15"}
+	{"portindex:18411520","fc 4/16"}
+	{"portindex:18415616","fc 4/17"}
+	{"portindex:18419712","fc 4/18"}
+	{"portindex:18423808","fc 4/19"}
+	{"portindex:18427904","fc 4/20"}
+	{"portindex:18432000","fc 4/21"}
+	{"portindex:18436096","fc 4/22"}
+	{"portindex:18440192","fc 4/23"}
+	{"portindex:18444288","fc 4/24"}
+	{"portindex:18448384","fc 4/25"}
+	{"portindex:18452480","fc 4/26"}
+	{"portindex:18456576","fc 4/27"}
+	{"portindex:18460672","fc 4/28"}
+	{"portindex:18464768","fc 4/29"}
+	{"portindex:18468864","fc 4/30"}
+	{"portindex:18472960","fc 4/31"}
+	{"portindex:18477056","fc 4/32"}
+	{"portindex:18481152","fc 4/33"}
+	{"portindex:18485248","fc 4/34"}
+	{"portindex:18489344","fc 4/35"}
+	{"portindex:18493440","fc 4/36"}
+	{"portindex:18497536","fc 4/37"}
+	{"portindex:18501632","fc 4/38"}
+	{"portindex:18505728","fc 4/39"}
+	{"portindex:18509824","fc 4/40"}
+	{"portindex:18513920","fc 4/41"}
+	{"portindex:18518016","fc 4/42"}
+	{"portindex:18522112","fc 4/43"}
+	{"portindex:18526208","fc 4/44"}
+	{"portindex:18530304","fc 4/45"}
+	{"portindex:18534400","fc 4/46"}
+	{"portindex:18538496","fc 4/47"}
+	{"portindex:18542592","fc 4/48"}
+	{"portindex:18874368","fc 5/1"}
+	{"portindex:18878464","fc 5/2"}
+	{"portindex:18882560","fc 5/3"}
+	{"portindex:18886656","fc 5/4"}
+	{"portindex:18890752","fc 5/5"}
+	{"portindex:18894848","fc 5/6"}
+	{"portindex:18898944","fc 5/7"}
+	{"portindex:18903040","fc 5/8"}
+	{"portindex:18907136","fc 5/9"}
+	{"portindex:18911232","fc 5/10"}
+	{"portindex:18915328","fc 5/11"}
+	{"portindex:18919424","fc 5/12"}
+	{"portindex:18923520","fc 5/13"}
+	{"portindex:18927616","fc 5/14"}
+	{"portindex:18931712","fc 5/15"}
+	{"portindex:18935808","fc 5/16"}
+	{"portindex:18939904","fc 5/17"}
+	{"portindex:18944000","fc 5/18"}
+	{"portindex:18948096","fc 5/19"}
+	{"portindex:18952192","fc 5/20"}
+	{"portindex:18956288","fc 5/21"}
+	{"portindex:18960384","fc 5/22"}
+	{"portindex:18964480","fc 5/23"}
+	{"portindex:18968576","fc 5/24"}
+	{"portindex:18972672","fc 5/25"}
+	{"portindex:18976768","fc 5/26"}
+	{"portindex:18980864","fc 5/27"}
+	{"portindex:18984960","fc 5/28"}
+	{"portindex:18989056","fc 5/29"}
+	{"portindex:18993152","fc 5/30"}
+	{"portindex:18997248","fc 5/31"}
+	{"portindex:19001344","fc 5/32"}
+	{"portindex:19005440","fc 5/33"}
+	{"portindex:19009536","fc 5/34"}
+	{"portindex:19013632","fc 5/35"}
+	{"portindex:19017728","fc 5/36"}
+	{"portindex:19021824","fc 5/37"}
+	{"portindex:19025920","fc 5/38"}
+	{"portindex:19030016","fc 5/39"}
+	{"portindex:19034112","fc 5/40"}
+	{"portindex:19038208","fc 5/41"}
+	{"portindex:19042304","fc 5/42"}
+	{"portindex:19046400","fc 5/43"}
+	{"portindex:19050496","fc 5/44"}
+	{"portindex:19054592","fc 5/45"}
+	{"portindex:19058688","fc 5/46"}
+	{"portindex:19062784","fc 5/47"}
+	{"portindex:19066880","fc 5/48"}
+	{"portindex:19398656","fc 6/1"}
+	{"portindex:19402752","fc 6/2"}
+	{"portindex:19406848","fc 6/3"}
+	{"portindex:19410944","fc 6/4"}
+	{"portindex:19415040","fc 6/5"}
+	{"portindex:19419136","fc 6/6"}
+	{"portindex:19423232","fc 6/7"}
+	{"portindex:19427328","fc 6/8"}
+	{"portindex:19431424","fc 6/9"}
+	{"portindex:19435520","fc 6/10"}
+	{"portindex:19439616","fc 6/11"}
+	{"portindex:19443712","fc 6/12"}
+	{"portindex:19447808","fc 6/13"}
+	{"portindex:19451904","fc 6/14"}
+	{"portindex:19456000","fc 6/15"}
+	{"portindex:19460096","fc 6/16"}
+	{"portindex:19464192","fc 6/17"}
+	{"portindex:19468288","fc 6/18"}
+	{"portindex:19472384","fc 6/19"}
+	{"portindex:19476480","fc 6/20"}
+	{"portindex:19480576","fc 6/21"}
+	{"portindex:19484672","fc 6/22"}
+	{"portindex:19488768","fc 6/23"}
+	{"portindex:19492864","fc 6/24"}
+	{"portindex:19496960","fc 6/25"}
+	{"portindex:19501056","fc 6/26"}
+	{"portindex:19505152","fc 6/27"}
+	{"portindex:19509248","fc 6/28"}
+	{"portindex:19513344","fc 6/29"}
+	{"portindex:19517440","fc 6/30"}
+	{"portindex:19521536","fc 6/31"}
+	{"portindex:19525632","fc 6/32"}
+	{"portindex:19529728","fc 6/33"}
+	{"portindex:19533824","fc 6/34"}
+	{"portindex:19537920","fc 6/35"}
+	{"portindex:19542016","fc 6/36"}
+	{"portindex:19546112","fc 6/37"}
+	{"portindex:19550208","fc 6/38"}
+	{"portindex:19554304","fc 6/39"}
+	{"portindex:19558400","fc 6/40"}
+	{"portindex:19562496","fc 6/41"}
+	{"portindex:19566592","fc 6/42"}
+	{"portindex:19570688","fc 6/43"}
+	{"portindex:19574784","fc 6/44"}
+	{"portindex:19578880","fc 6/45"}
+	{"portindex:19582976","fc 6/46"}
+	{"portindex:19587072","fc 6/47"}
+	{"portindex:19591168","fc 6/48"}
+	{"portindex:19922944","fc 7/1"}
+	{"portindex:19927040","fc 7/2"}
+	{"portindex:19931136","fc 7/3"}
+	{"portindex:19935232","fc 7/4"}
+	{"portindex:19939328","fc 7/5"}
+	{"portindex:19943424","fc 7/6"}
+	{"portindex:19947520","fc 7/7"}
+	{"portindex:19951616","fc 7/8"}
+	{"portindex:19955712","fc 7/9"}
+	{"portindex:19959808","fc 7/10"}
+	{"portindex:19963904","fc 7/11"}
+	{"portindex:19968000","fc 7/12"}
+	{"portindex:19972096","fc 7/13"}
+	{"portindex:19976192","fc 7/14"}
+	{"portindex:19980288","fc 7/15"}
+	{"portindex:19984384","fc 7/16"}
+	{"portindex:19988480","fc 7/17"}
+	{"portindex:19992576","fc 7/18"}
+	{"portindex:19996672","fc 7/19"}
+	{"portindex:20000768","fc 7/20"}
+	{"portindex:20004864","fc 7/21"}
+	{"portindex:20008960","fc 7/22"}
+	{"portindex:20013056","fc 7/23"}
+	{"portindex:20017152","fc 7/24"}
+	{"portindex:20021248","fc 7/25"}
+	{"portindex:20025344","fc 7/26"}
+	{"portindex:20029440","fc 7/27"}
+	{"portindex:20033536","fc 7/28"}
+	{"portindex:20037632","fc 7/29"}
+	{"portindex:20041728","fc 7/30"}
+	{"portindex:20045824","fc 7/31"}
+	{"portindex:20049920","fc 7/32"}
+	{"portindex:20054016","fc 7/33"}
+	{"portindex:20058112","fc 7/34"}
+	{"portindex:20062208","fc 7/35"}
+	{"portindex:20066304","fc 7/36"}
+	{"portindex:20070400","fc 7/37"}
+	{"portindex:20074496","fc 7/38"}
+	{"portindex:20078592","fc 7/39"}
+	{"portindex:20082688","fc 7/40"}
+	{"portindex:20086784","fc 7/41"}
+	{"portindex:20090880","fc 7/42"}
+	{"portindex:20094976","fc 7/43"}
+	{"portindex:20099072","fc 7/44"}
+	{"portindex:20103168","fc 7/45"}
+	{"portindex:20107264","fc 7/46"}
+	{"portindex:20111360","fc 7/47"}
+	{"portindex:20115456","fc 7/48"}
+	{"portindex:20447232","fc 8/1"}
+	{"portindex:20451328","fc 8/2"}
+	{"portindex:20455424","fc 8/3"}
+	{"portindex:20459520","fc 8/4"}
+	{"portindex:20463616","fc 8/5"}
+	{"portindex:20467712","fc 8/6"}
+	{"portindex:20471808","fc 8/7"}
+	{"portindex:20475904","fc 8/8"}
+	{"portindex:20480000","fc 8/9"}
+	{"portindex:20484096","fc 8/10"}
+	{"portindex:20488192","fc 8/11"}
+	{"portindex:20492288","fc 8/12"}
+	{"portindex:20496384","fc 8/13"}
+	{"portindex:20500480","fc 8/14"}
+	{"portindex:20504576","fc 8/15"}
+	{"portindex:20508672","fc 8/16"}
+	{"portindex:20512768","fc 8/17"}
+	{"portindex:20516864","fc 8/18"}
+	{"portindex:20520960","fc 8/19"}
+	{"portindex:20525056","fc 8/20"}
+	{"portindex:20529152","fc 8/21"}
+	{"portindex:20533248","fc 8/22"}
+	{"portindex:20537344","fc 8/23"}
+	{"portindex:20541440","fc 8/24"}
+	{"portindex:20545536","fc 8/25"}
+	{"portindex:20549632","fc 8/26"}
+	{"portindex:20553728","fc 8/27"}
+	{"portindex:20557824","fc 8/28"}
+	{"portindex:20561920","fc 8/29"}
+	{"portindex:20566016","fc 8/30"}
+	{"portindex:20570112","fc 8/31"}
+	{"portindex:20574208","fc 8/32"}
+	{"portindex:20578304","fc 8/33"}
+	{"portindex:20582400","fc 8/34"}
+	{"portindex:20586496","fc 8/35"}
+	{"portindex:20590592","fc 8/36"}
+	{"portindex:20594688","fc 8/37"}
+	{"portindex:20598784","fc 8/38"}
+	{"portindex:20602880","fc 8/39"}
+	{"portindex:20606976","fc 8/40"}
+	{"portindex:20611072","fc 8/41"}
+	{"portindex:20615168","fc 8/42"}
+	{"portindex:20619264","fc 8/43"}
+	{"portindex:20623360","fc 8/44"}
+	{"portindex:20627456","fc 8/45"}
+	{"portindex:20631552","fc 8/46"}
+	{"portindex:20635648","fc 8/47"}
+	{"portindex:20639744","fc 8/48"}
+	{"portindex:20971520","fc 9/1"}
+	{"portindex:20975616","fc 9/2"}
+	{"portindex:20979712","fc 9/3"}
+	{"portindex:20983808","fc 9/4"}
+	{"portindex:20987904","fc 9/5"}
+	{"portindex:20992000","fc 9/6"}
+	{"portindex:20996096","fc 9/7"}
+	{"portindex:21000192","fc 9/8"}
+	{"portindex:21004288","fc 9/9"}
+	{"portindex:21008384","fc 9/10"}
+	{"portindex:21012480","fc 9/11"}
+	{"portindex:21016576","fc 9/12"}
+	{"portindex:21020672","fc 9/13"}
+	{"portindex:21024768","fc 9/14"}
+	{"portindex:21028864","fc 9/15"}
+	{"portindex:21032960","fc 9/16"}
+	{"portindex:21037056","fc 9/17"}
+	{"portindex:21041152","fc 9/18"}
+	{"portindex:21045248","fc 9/19"}
+	{"portindex:21049344","fc 9/20"}
+	{"portindex:21053440","fc 9/21"}
+	{"portindex:21057536","fc 9/22"}
+	{"portindex:21061632","fc 9/23"}
+	{"portindex:21065728","fc 9/24"}
+	{"portindex:21069824","fc 9/25"}
+	{"portindex:21073920","fc 9/26"}
+	{"portindex:21078016","fc 9/27"}
+	{"portindex:21082112","fc 9/28"}
+	{"portindex:21086208","fc 9/29"}
+	{"portindex:21090304","fc 9/30"}
+	{"portindex:21094400","fc 9/31"}
+	{"portindex:21098496","fc 9/32"}
+	{"portindex:21102592","fc 9/33"}
+	{"portindex:21106688","fc 9/34"}
+	{"portindex:21110784","fc 9/35"}
+	{"portindex:21114880","fc 9/36"}
+	{"portindex:21118976","fc 9/37"}
+	{"portindex:21123072","fc 9/38"}
+	{"portindex:21127168","fc 9/39"}
+	{"portindex:21131264","fc 9/40"}
+	{"portindex:21135360","fc 9/41"}
+	{"portindex:21139456","fc 9/42"}
+	{"portindex:21143552","fc 9/43"}
+	{"portindex:21147648","fc 9/44"}
+	{"portindex:21151744","fc 9/45"}
+	{"portindex:21155840","fc 9/46"}
+	{"portindex:21159936","fc 9/47"}
+	{"portindex:21164032","fc 9/48"}
+	{"portindex:21495808","fc 10/1"}
+	{"portindex:21499904","fc 10/2"}
+	{"portindex:21504000","fc 10/3"}
+	{"portindex:21508096","fc 10/4"}
+	{"portindex:21512192","fc 10/5"}
+	{"portindex:21516288","fc 10/6"}
+	{"portindex:21520384","fc 10/7"}
+	{"portindex:21524480","fc 10/8"}
+	{"portindex:21528576","fc 10/9"}
+	{"portindex:21532672","fc 10/10"}
+	{"portindex:21536768","fc 10/11"}
+	{"portindex:21540864","fc 10/12"}
+	{"portindex:21544960","fc 10/13"}
+	{"portindex:21549056","fc 10/14"}
+	{"portindex:21553152","fc 10/15"}
+	{"portindex:21557248","fc 10/16"}
+	{"portindex:21561344","fc 10/17"}
+	{"portindex:21565440","fc 10/18"}
+	{"portindex:21569536","fc 10/19"}
+	{"portindex:21573632","fc 10/20"}
+	{"portindex:21577728","fc 10/21"}
+	{"portindex:21581824","fc 10/22"}
+	{"portindex:21585920","fc 10/23"}
+	{"portindex:21590016","fc 10/24"}
+	{"portindex:21594112","fc 10/25"}
+	{"portindex:21598208","fc 10/26"}
+	{"portindex:21602304","fc 10/27"}
+	{"portindex:21606400","fc 10/28"}
+	{"portindex:21610496","fc 10/29"}
+	{"portindex:21614592","fc 10/30"}
+	{"portindex:21618688","fc 10/31"}
+	{"portindex:21622784","fc 10/32"}
+	{"portindex:21626880","fc 10/33"}
+	{"portindex:21630976","fc 10/34"}
+	{"portindex:21635072","fc 10/35"}
+	{"portindex:21639168","fc 10/36"}
+	{"portindex:21643264","fc 10/37"}
+	{"portindex:21647360","fc 10/38"}
+	{"portindex:21651456","fc 10/39"}
+	{"portindex:21655552","fc 10/40"}
+	{"portindex:21659648","fc 10/41"}
+	{"portindex:21663744","fc 10/42"}
+	{"portindex:21667840","fc 10/43"}
+	{"portindex:21671936","fc 10/44"}
+	{"portindex:21676032","fc 10/45"}
+	{"portindex:21680128","fc 10/46"}
+	{"portindex:21684224","fc 10/47"}
+	{"portindex:21688320","fc 10/48"}
+	{"portindex:22020096","fc 11/1"}
+	{"portindex:22024192","fc 11/2"}
+	{"portindex:22028288","fc 11/3"}
+	{"portindex:22032384","fc 11/4"}
+	{"portindex:22036480","fc 11/5"}
+	{"portindex:22040576","fc 11/6"}
+	{"portindex:22044672","fc 11/7"}
+	{"portindex:22048768","fc 11/8"}
+	{"portindex:22052864","fc 11/9"}
+	{"portindex:22056960","fc 11/10"}
+	{"portindex:22061056","fc 11/11"}
+	{"portindex:22065152","fc 11/12"}
+	{"portindex:22069248","fc 11/13"}
+	{"portindex:22073344","fc 11/14"}
+	{"portindex:22077440","fc 11/15"}
+	{"portindex:22081536","fc 11/16"}
+	{"portindex:22085632","fc 11/17"}
+	{"portindex:22089728","fc 11/18"}
+	{"portindex:22093824","fc 11/19"}
+	{"portindex:22097920","fc 11/20"}
+	{"portindex:22102016","fc 11/21"}
+	{"portindex:22106112","fc 11/22"}
+	{"portindex:22110208","fc 11/23"}
+	{"portindex:22114304","fc 11/24"}
+	{"portindex:22118400","fc 11/25"}
+	{"portindex:22122496","fc 11/26"}
+	{"portindex:22126592","fc 11/27"}
+	{"portindex:22130688","fc 11/28"}
+	{"portindex:22134784","fc 11/29"}
+	{"portindex:22138880","fc 11/30"}
+	{"portindex:22142976","fc 11/31"}
+	{"portindex:22147072","fc 11/32"}
+	{"portindex:22151168","fc 11/33"}
+	{"portindex:22155264","fc 11/34"}
+	{"portindex:22159360","fc 11/35"}
+	{"portindex:22163456","fc 11/36"}
+	{"portindex:22167552","fc 11/37"}
+	{"portindex:22171648","fc 11/38"}
+	{"portindex:22175744","fc 11/39"}
+	{"portindex:22179840","fc 11/40"}
+	{"portindex:22183936","fc 11/41"}
+	{"portindex:22188032","fc 11/42"}
+	{"portindex:22192128","fc 11/43"}
+	{"portindex:22196224","fc 11/44"}
+	{"portindex:22200320","fc 11/45"}
+	{"portindex:22204416","fc 11/46"}
+	{"portindex:22208512","fc 11/47"}
+	{"portindex:22212608","fc 11/48"}
+	{"portindex:22544384","fc 12/1"}
+	{"portindex:22548480","fc 12/2"}
+	{"portindex:22552576","fc 12/3"}
+	{"portindex:22556672","fc 12/4"}
+	{"portindex:22560768","fc 12/5"}
+	{"portindex:22564864","fc 12/6"}
+	{"portindex:22568960","fc 12/7"}
+	{"portindex:22573056","fc 12/8"}
+	{"portindex:22577152","fc 12/9"}
+	{"portindex:22581248","fc 12/10"}
+	{"portindex:22585344","fc 12/11"}
+	{"portindex:22589440","fc 12/12"}
+	{"portindex:22593536","fc 12/13"}
+	{"portindex:22597632","fc 12/14"}
+	{"portindex:22601728","fc 12/15"}
+	{"portindex:22605824","fc 12/16"}
+	{"portindex:22609920","fc 12/17"}
+	{"portindex:22614016","fc 12/18"}
+	{"portindex:22618112","fc 12/19"}
+	{"portindex:22622208","fc 12/20"}
+	{"portindex:22626304","fc 12/21"}
+	{"portindex:22630400","fc 12/22"}
+	{"portindex:22634496","fc 12/23"}
+	{"portindex:22638592","fc 12/24"}
+	{"portindex:22642688","fc 12/25"}
+	{"portindex:22646784","fc 12/26"}
+	{"portindex:22650880","fc 12/27"}
+	{"portindex:22654976","fc 12/28"}
+	{"portindex:22659072","fc 12/29"}
+	{"portindex:22663168","fc 12/30"}
+	{"portindex:22667264","fc 12/31"}
+	{"portindex:22671360","fc 12/32"}
+	{"portindex:22675456","fc 12/33"}
+	{"portindex:22679552","fc 12/34"}
+	{"portindex:22683648","fc 12/35"}
+	{"portindex:22687744","fc 12/36"}
+	{"portindex:22691840","fc 12/37"}
+	{"portindex:22695936","fc 12/38"}
+	{"portindex:22700032","fc 12/39"}
+	{"portindex:22704128","fc 12/40"}
+	{"portindex:22708224","fc 12/41"}
+	{"portindex:22712320","fc 12/42"}
+	{"portindex:22716416","fc 12/43"}
+	{"portindex:22720512","fc 12/44"}
+	{"portindex:22724608","fc 12/45"}
+	{"portindex:22728704","fc 12/46"}
+	{"portindex:22732800","fc 12/47"}
+	{"portindex:22736896","fc 12/48"}
+	{"portindex:23068672","fc 13/1"}
+	{"portindex:23072768","fc 13/2"}
+	{"portindex:23076864","fc 13/3"}
+	{"portindex:23080960","fc 13/4"}
+	{"portindex:23085056","fc 13/5"}
+	{"portindex:23089152","fc 13/6"}
+	{"portindex:23093248","fc 13/7"}
+	{"portindex:23097344","fc 13/8"}
+	{"portindex:23101440","fc 13/9"}
+	{"portindex:23105536","fc 13/10"}
+	{"portindex:23109632","fc 13/11"}
+	{"portindex:23113728","fc 13/12"}
+	{"portindex:23117824","fc 13/13"}
+	{"portindex:23121920","fc 13/14"}
+	{"portindex:23126016","fc 13/15"}
+	{"portindex:23130112","fc 13/16"}
+	{"portindex:23134208","fc 13/17"}
+	{"portindex:23138304","fc 13/18"}
+	{"portindex:23142400","fc 13/19"}
+	{"portindex:23146496","fc 13/20"}
+	{"portindex:23150592","fc 13/21"}
+	{"portindex:23154688","fc 13/22"}
+	{"portindex:23158784","fc 13/23"}
+	{"portindex:23162880","fc 13/24"}
+	{"portindex:23166976","fc 13/25"}
+	{"portindex:23171072","fc 13/26"}
+	{"portindex:23175168","fc 13/27"}
+	{"portindex:23179264","fc 13/28"}
+	{"portindex:23183360","fc 13/29"}
+	{"portindex:23187456","fc 13/30"}
+	{"portindex:23191552","fc 13/31"}
+	{"portindex:23195648","fc 13/32"}
+	{"portindex:23199744","fc 13/33"}
+	{"portindex:23203840","fc 13/34"}
+	{"portindex:23207936","fc 13/35"}
+	{"portindex:23212032","fc 13/36"}
+	{"portindex:23216128","fc 13/37"}
+	{"portindex:23220224","fc 13/38"}
+	{"portindex:23224320","fc 13/39"}
+	{"portindex:23228416","fc 13/40"}
+	{"portindex:23232512","fc 13/41"}
+	{"portindex:23236608","fc 13/42"}
+	{"portindex:23240704","fc 13/43"}
+	{"portindex:23244800","fc 13/44"}
+	{"portindex:23248896","fc 13/45"}
+	{"portindex:23252992","fc 13/46"}
+	{"portindex:23257088","fc 13/47"}
+	{"portindex:23261184","fc 13/48"}
+}
+default = {"Unknown port"}
+
+# Table derived from CISCO-FC-FE-mib.
+table fcIfOperStatusCodes = 
+{
+	{"1","other"}
+	{"2","none"}
+	{"3","hwFailure"}
+	{"4","loopbackDiagFailure"}
+	{"5","errorDisabled"}
+	{"6","swFailure"}
+	{"7","linkFailure"}
+	{"8","offline"}
+	{"9","nonParticipating"}
+	{"10","initializing"}
+	{"11","vsanInactive"}
+	{"12","adminDown"}
+	{"13","channelAdminDown"}
+	{"14","channelOperSuspended"}
+	{"15","channelConfigurationInProgress"}
+	{"16","rcfInProgress"}
+	{"17","elpFailureIsolation"}
+	{"18","escFailureIsolation"}
+	{"19","domainOverlapIsolation"}
+	{"20","domainAddrAssignFailureIsolation"}
+	{"21","domainOtherSideEportIsolation"}
+	{"22","domainInvalidRCFReceived"}
+	{"23","domainManagerDisabled"}
+	{"24","zoneMergeFailureIsolation"}
+	{"25","vsanMismatchIsolation"}
+	{"26","parentDown"}
+	{"27","srcPortNotBound"}
+	{"28","interfaceRemoved"}
+	{"29","fcotNotPresent"}
+	{"30","fcotVendorNotSupported"}
+	{"31","incompatibleAdminMode"}
+	{"32","incompatibleAdminSpeed"}
+	{"33","suspendedByMode"}
+	{"34","suspendedBySpeed"}
+	{"35","suspendedByWWN"}
+	{"36","domainMaxReTxFailure"}
+	{"37","eppFailure"}
+	{"38","portVsanMismatchIsolation"}
+	{"39","loopbackIsolation"}
+	{"40","upgradeInProgress"}
+	{"41","incompatibleAdminRxBBCredit"}
+	{"42","incompatibleAdminRxBufferSize"}
+	{"43","portChannelMembersDown"}
+	{"44","zoneRemoteNoRespIsolation"}
+	{"45","firstPortUpAsEport"}
+	{"46","firstPortNotUp"}
+	{"47","peerFCIPPortClosedConnection"}
+	{"48","peerFCIPPortResetConnection"}
+	{"49","fcipPortMaxReTx"}
+	{"50","fcipPortKeepAliveTimerExpire"}
+	{"51","fcipPortPersistTimerExpire"}
+	{"52","fcipPortSrcLinkDown"}
+	{"53","fcipPortSrcAdminDown"}
+	{"54","fcipPortAdminCfgChange"}
+	{"55","fcipSrcPortRemoved"}
+	{"56","fcipSrcModuleNotOnline"}
+	{"57","invalidConfig"}
+	{"58","portBindFailure"}
+	{"59","portFabricBindFailure"}
+	{"60","noCommonVsanIsolation"}
+	{"61","ficonVsanDown"}
+	{"62","invalidAttachment"}
+	{"63","portBlocked"}
+	{"64","incomAdminRxBBCreditPerBuf"}
+	{"65","tooManyInvalidFLOGIs"}
+	{"66","deniedDueToPortBinding"}
+	{"67","elpFailureRevMismatch"}
+	{"68","elpFailureClassFParamErr"}
+	{"69","elpFailureClassNParamErr"}
+	{"70","elpFailureUnknownFlowCTLCode"}
+	{"71","elpFailureInvalidFlowCTLParam"}
+	{"72","elpFailureInvalidPortName"}
+	{"73","elpFailureInvalidSwitchName"}
+	{"74","elpFailureRatovEdtovMismatch"}
+	{"75","elpFailureLoopbackDetected"}
+	{"76","elpFailureInvalidTxBBCredit"}
+	{"77","elpFailureInvalidPayloadSize"}
+	{"78","bundleMisCfg"}
+	{"79","bitErrRTThresExceeded"}
+	{"80","linkFailLinkReset"}
+	{"81","linkFailPortInitFail"}
+	{"82","linkFailPortUnusable"}
+	{"83","linkFailLossOfSignal"}
+	{"84","linkFailLossOfSync"}
+	{"85","linkFailNOSRcvd"}
+	{"86","linkFailOLSRcvd"}
+	{"87","linkFailDebounceTimeout"}
+	{"88","linkFailLRRcvdB2B"}
+	{"89","linkFailCreditLoss"}
+	{"90","linkFailRxQOverFlow"}
+	{"91","linkFailTooManyINTR"}
+	{"92","linkFailLIPRcvdB2B"}
+	{"93","linkFailCreditLossB2B"}
+	{"94","linkFailOPNYTMOB2B"}
+	{"95","linkFailOPNYRETB2B"}
+	{"96","linkFailLIPF8Rcvd"}
+	{"97","linkFailLineCardPortShutdown"}
+	{"98","fcspAuthenfailure"}
+	{"99","fcotChksumErr"}
+	{"100","ohmsExtLBTest"}
+	{"101","invalidFabricBindExh"}
+	{"102","tovMismatch"}
+	{"103","ficonNotEnabled"}
+	{"104","ficonNoPortnumber"}
+	{"105","ficonBeingEnabled"}
+	{"106","ePortProhibited"}
+	{"107","portGracefulShutdown"}
+	{"108","trunkNotFullyActive"}
+	{"109","fabricBindingSWWNNotFound"}
+	{"110","fabricBindingDomainInvalid"}
+	{"111","fabricBindingDBMismatch"}
+	{"112","fabricBindingNoRspFromPeer"}
+	{"113","vsanSuspended"}
+	{"114","vsanNotFound"}
+	{"115","trackedPortDown"}
+	{"116","ecSuspendedLoop"}
+	{"117","isolatedBundle"}
+	{"118","peerNotSupportBundle"}
+	{"119","portBringupIsolation"}
+	{"120","domainNotAllowedIsolated"}
+	{"121","virtualIvrDomainOverlapIsolation"}
+	{"122","outOfService"}
+	{"123","portAuthFailed"}
+	{"124","bundleStandby"}
+	{"125","portConnectorTypeErr"}
+	{"126","errorDisabledReInitLimitReached"}
+	{"127","ficonDupPortNum"}
+	{"128","localRcf"}
+	{"129","twoSwitchesWithSameWWN"}
+	{"130","invalidOtherSidePrincEFPReqRecd"}
+	{"131","domainOther"}
+	{"132","elpFailureAllZeroPeerWWNRcvd"}
+	{"133","preferredPathIsolation"}
+}
+default = {"Unknown Cause code"}

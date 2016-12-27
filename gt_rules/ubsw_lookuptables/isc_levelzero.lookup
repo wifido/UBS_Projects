@@ -1,0 +1,161 @@
+##################################################################################
+#
+#      isc_levelzero.lookup
+#      This contains the lookups used in defining the ISC's Level 0 Events
+#
+#	20081030	V1.0	Chris Janes
+#				Original
+#	20081205	V1.01	Rule 1008 removed TD 5183
+##################################################################################
+
+
+table isc_dbservices_AG =
+{
+	{"dbs_callNETBACKUP","0","1239"}		#	4001, 4004
+	{"netbck","0","1239"}				#	4002, 4005
+	{"SvrOkDown","0","1239"}			#	4007, 4009
+	{"dbs_oraconnectd","0","1239"}			#	4008, 4010
+}
+default={"0","0"} 
+
+table isc_dbservices_AGAK =
+{
+	{"It will never happen","0","1239"}
+}
+default={"0","0"} 
+
+table isc_unix_AG =
+{
+	{"Accelerator","0","1468"}			#	1001
+	{"PhysicalDrive","0","1468"}			#	1004
+	{"Drive Status","0","1468"}			#	1005
+	{"ECC Memory","0","1468"}			#	1006
+	{"PwrSupply","0","1468"}			#	1011
+	{"Hardware","0","1468"}				#	Added as part of TD5240
+	{"Power","0","1468"}				#	Added as part of TD5240
+}
+default={"0","0"} 
+
+table isc_unix_AGAK =
+{
+	{"Disk usage/sbclocal","0","1468"}		#	1002
+	{"/var/adm/messagesREC-ACTION","0","1468"}	#	1007
+#	{"/var/adm/messagesfmd","0","1468"}		#	1008 removes 20081205  Chris Janes TD 5186
+	{"/var/adm/messagespicld","0","1468"}		#	1009
+	{"/var/adm/messagesrmclomv","0","1468"}		#	1010
+}
+default={"0","0"} 
+
+table isc_storage_AG =
+{
+	{"It will never happen","0","1542"}		#	
+}
+default={"0","0"} 
+
+table isc_storage_AGAK =
+{
+	{"It will never happen","0","1542"}
+}
+default={"0","0"} 
+
+table isc_wintel_AG =
+{
+	{"A CLUSTER script failed","0","1008"}						#	2022
+	{"A CLUSTER script hung or exceeded its specified timeout","0","1008"}		#	2023
+#	{"Account lockout Monitoring for service account \"svc_gcdt\"","0","1008"}	#	2024
+	{"Computer Browser Health Check","0","1008"}					#	2025
+	{"Dell_OM_SA Chassis Intrusion Detected","0","1008"}				#	2026
+	{"Device Error","0","1008"}							#	2027
+	{"DFS could not contact the Active Directory","0","1008"}			#	2028
+	{"DHCP Client Health Check","0","1008"}						#	2029
+	{"DHCP Server Health Check","0","1008"}						#	2030
+	{"Disk is at or near capacity!","0","1008"}					#	2031
+	{"DNS Client Health Check","0","1008"}						#	2032
+	{"Drive Array Physical Drive degraded.","0","1008"}				#	2033
+	{"Drive Array Spare Drive degraded.","0","1008"}				#	2034
+	{"Error communicating with the MOM database","0","1008"}			#	2035
+	{"Error inserting alert data into the MOM database","0","1008"}			#	2036
+	{"FRS Health Check","0","1008"}							#	2037
+	{"FTP Service Health Check","0","1008"}						#	2038
+	{"Job Failed","0","1008"}							#	2039
+	{"Logical Disk Manager Health Check","0","1008"}				#	2040
+	{"Low disk space detected on volume C:","0","1008"}				#	2041
+	{"Low disk space detected on volume D:","0","1008"}				#	2042
+	{"Low disk space detected on volume E:","0","1008"}				#	2043	
+	{"Low disk space detected on volume F:","0","1008"}				#	2044
+	{"Low disk space detected on volume K:","0","1008"}				#	2045
+	{"Low disk space detected on volume N:","0","1008"}				#	2046
+	{"Low disk space detected on volume Q:","0","1008"}				#	2047
+	{"Low disk space detected on volume R:","0","1008"}				#	2048
+	{"Low disk space detected on volume S:","0","1008"}				#	2049
+	{"Low disk space detected on volume T:","0","1008"}				#	2050
+	{"Low disk space detected on volume V:","0","1008"}				#	2051
+	{"Low disk space detected on volume W:","0","1008"}				#	2052
+	{"Memory degraded.","0","1008"}							#	2053
+	{"Messenger Health Check","0","1008"}						#	2054
+	{"MOM Server - A script hung or exceeded its specified timeout","0","1008"}	#	2055
+	{"NNTP Service Health Check","0","1008"}					#	2056
+	{"NTDS - Replication Failure (Perot)","0","1008"}				#	2057
+	{"NTFS File System Corruption Error (Perot)","0","1008"}			#	2058
+	{"Power sub-system degraded.","0","1008"}					#	2059
+	{"Power sub-system failed.","0","1008"}						#	2060		
+	{"Print Server Spooler Service Health Check","0","1008"}			#	2061
+	{"Print Server: Failed to upgrade","0","1008"}					#	2062
+	{"Remote Procedure Call (RPC) Health Check","0","1008"}				#	2063
+	{"Report Server Service Health Check","0","1008"}				#	2064
+	{"Service Account Lock Out (Perot)","0","1008"}					#	2065
+	{"Service Discovery - Database Connectivty (DAS) Failure","0","1008"}		#	2066
+	{"SMTP Service Health Check","0","1008"}					#	2067
+	{"Tape Alert Error","0","1008"}							#	2068
+	{"Tape Alert Warning","0","1008"}						#	2069
+	{"The DHCP service failed to initialize the database.G","0","1008"}		#	2070
+	{"The DHCP service failed to see a directory server for authorization.","0","1008"}		#	2071
+	{"The event log file is full. New event instances will be discarded.","0","1008"}		#	2072
+	{"The maximum number of refused legacy client connections has been reached","0","1008"}		#	2073
+	{"The MOM Agent is unable to collect performance data for this computer","0","1008"}		#	2074
+	{"The MOM Server received too many data packets","0","1008"}			#	2075
+	{"The share configuration was invalid . The share is unavailable.","0","1008"}	#	2076
+	{"Virtual Machine IIS6-VS-9509-001 Heartbeat","0","1008"}			#	2077
+	{"VMWare Host CPU Utilization Alert (Yellow to Red)","0","1008"}		#	2078
+	{"UBS: Quest ERDisk Critical Events","0","1008"}				#	2079
+	{"UBS: UltraBac Critical Events","0","1008"}					#	2080
+	{"Wintel-StorageManagement - Below 1 Percent","0","1008"}			#	2081
+	{"AppHeartbeat","0","1008"}							#	2082
+
+}
+default={"0","0"} 
+
+table isc_wintel_AGAK =
+{
+	{"It will never happen","0","1008"}
+}
+default={"0","0"} 
+
+table isc_wintel_DOM =
+{
+	{"DMZ","0","1008"}		#	2001
+	{"SSZ","0","1008"}		#	2002
+#	{"SWISSKEY","0","1008"}		#	2003
+	{"UATAMENG","0","1008"}		#	2004
+	{"UBSAM","0","1008"}		#	2005
+	{"UBSAMERICAS","0","1008"}	#	2006
+	{"UBSAMERICASENG","0","1008"}	#	2007
+	{"UBSBAHPB","0","1008"}		#	2008
+	{"UBSCANPB","0","1008"}		#	2009
+	{"UBSCAYAM","0","1008"}		#	2010
+	{"UBSEURPB","0","1008"}		#	2011
+	{"UBSHKGPB","0","1008"}		#	2012
+	{"UBSJERPB","0","1008"}		#	2013
+	{"UBSLUXPB","0","1008"}		#	2014
+	{"UBSMEXPB","0","1008"}		#	2015
+	{"UBSMONPB","0","1008"}		#	2016
+	{"UBSSHRPB","0","1008"}		#	2017
+	{"UBSSNGPB","0","1008"}		#	2018
+	{"UBSTWNPB","0","1008"}		#	2019
+	{"UBSUSAPB","0","1008"}		#	2020
+	{"UBSWENERGY","0","1008"}	#	2021
+        {"UBSWRECOVER","0","1008"}      #       2083
+}
+default={"0","0"} 
+
+

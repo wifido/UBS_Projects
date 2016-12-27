@@ -1,0 +1,207 @@
+#############################################################################################
+#
+# 	data_domain include file
+#
+#	20080805	Chris Janes	New Mib - dated 27 January, 2005
+#
+#					
+#
+#############################################################################################
+
+case "dataDomainMibNotifications":
+	@Agent = "Data Domain"
+	@OwnerGID = 542
+	@OwnerUID = 65534
+	@Class = 2525261
+	$TempDoLookup = 2
+	$ruleset = $ruleset + " - Data Domain STrap " + $specific-trap
+
+	switch($specific-trap) {
+    		case "1" : ### powerSupplyFailedAlarm
+    			@Summary = "Power Supply failed"
+    			@AlertGroup = "Power Supply Failed Alarm"
+    			@AlertKey = ""
+    			@Description = "Meaning: Power Supply failed"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: replace the power supply"
+
+    		case "2" : ### systemOverheatWarningAlarm
+    			$tempSensorIndex = $1
+    			@Summary = "The temperature reading of Sensor No. " + $tempSensorIndex + " in the Chassis  has exceeded the warning temperature level"
+    			@AlertGroup = "System Overheat"
+    			@AlertKey = "Sensor No. " + $tempSensorIndex
+    			@Description = "Meaning: the temperature reading of one of the thermometers in the Chassis  has exceeded the 'warning' temperature level.  If it continues to rise, it may eventually trigger a shutdown of the DDR.  The index value of the alarm indicates the thermometer index that may be looked up in the environmentals table 'temperatures' for more information about the actual thermometer reading the high value."
+    			@Severity = 3
+    			@Type = 1
+    			@UserData = "What to do: check the Fan status, temperatures of the environment in which the DDR is, and other factors which may increase the temperature"
+
+    		case "3" : ### systemOverheatAlertAlarm
+    			$tempSensorIndex = $1
+    			@Summary = "the temperature reading of Sensor No. " + $tempSensorIndex + " in the Chassis is more than halfway between the 'warning' and 'shutdown' temperature levels"
+    			@AlertGroup = "System Overheat"
+    			@AlertKey = "Sensor No. " + $tempSensorIndex
+    			@Description = "Meaning: the temperature reading of one of the thermometers in the Chassis is more than halfway between the warning and shutdown temperature levels.  If it continues to rise, it may eventually trigger a shutdown of the DDR.  The index value of the alarm indicates the thermometer index that may be looked up in the environmentals table temperatures for more information about the actual thermometer reading the high value."
+    			@Severity = 4
+    			@Type = 1
+    			@UserData = "What to do: check the Fan status, temperatures of the environment in which the DDR is, and other factors which may increase the system temperature."
+
+    		case "4" : ### systemOverheatShutdowntAlarm
+    			$tempSensorIndex = $1
+    			@Summary = "the temperature of Sensor No. " + $tempSensorIndex + " in the Chassis has reached or exceeded the 'shutdown' temperature level"
+    			@AlertGroup = "System Overheat"
+    			@AlertKey = "Sensor No. " + $tempSensorIndex
+    			@Description = "Meaning: the temperature reading of one of the thermometers in the Chassis has reached or exceeded the 'shutdown' temperature level. The DDR will be shutdown to prevent damage to the system.  The index value of the alarm indicates the thermometer index that may be looked up in the environmentals table 'temperatures' for more information about the actual thermometer reading the high value."
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: Once the system has been brought back up, after checking for high environment temperatures or other factors which may increase the system temperature, check other environmental values, such as Fan Status, Disk Temperatures, etc..."
+
+    		case "5" : ### fanModuleFailedAlarm
+    			$fanIndex = $1
+    			@Summary = "Fan Module No. " + $fanIndex + " in the enclosure has failed"
+    			@AlertGroup = "Fan Module Failed"
+    			@AlertKey = "Fan Module No. " + $fanIndex
+    			@Description = "Meaning: a Fan Module in the enclosure has failed.  The index of the fan is given as the index of the alarm.  This same index can be looked up in the environmentals table 'fanProperies' for more information about which fan has failed."
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: replace the fan"
+
+    		case "6" : ### nvramFailingAlarm
+    			@Summary = "The system has detected that the NVRAM is potentially failing"
+    			@AlertGroup = "NVRAM"
+    			@AlertKey = ""
+    			@Description = "Meaning: The system has detected that the NVRAM is potentially failing.  There has been an excessive amount of PCI or Memory errors. The nvram tables nvramProperties and nvramStats may provide for information on why the NVRAM is failing"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: check the status of the NVRAM after reboot, and replace if the errors continue"
+
+    		case "7" : ### fileSystemFailedAlarm
+    			@Summary = "The File System process on the DDR has had a serious problem and has had to restart"
+    			@AlertGroup = "File System Failed"
+    			@AlertKey = ""
+    			@Description = "Meaning: The File System process on the DDR has had a serious problem and has had to restart"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: check the system logs for conditions that may be triggering the failure. Other alarms may also indicate why the File System is having problems."
+
+    		case "8" : ### fileSpaceMaintenanceAlarm
+    			$fileSystemResourceIndex = $1
+    			@Summary = "DDVAR File System Resource Space is running low for system maintenance activities"
+    			@AlertGroup = "File Space"
+    			@AlertKey = $fileSystemResourceIndex
+    			@Description = "Meaning: DDVAR File System Resource Space is running low for system maintenance activities.  The system may not have enough space for the routine system activities to run without error"
+    			@Severity = 2
+    			@Type = 1
+    			@UserData = "What to do: Delete unneeded files, such as old log files, support bundles, core files, upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding shelves to high-end units.  Reducing the retention times for backup data can also help. When files are deleted from outside of the /ddvar space, filesys clean will have to be done before the space is recovered"
+
+    		case "9" : ### fileSpaceWarningAlarm
+    			$fileSystemResourceIndex = $1
+    			@Summary = "A File System Resource (" + $fileSystemResourceIndex + ")space is 90% utilized"
+    			@AlertGroup = "File Space"
+    			@AlertKey = $fileSystemResourceIndex
+    			@Description = "Meaning: A File System Resource space is 90% utilized.  The index value of the alarm indicates the file system index that may be looked up in the fileSystem table fileSystemSpace for more information about the actual FS that is getting full. "
+    			@Severity = 3
+    			@Type = 1
+    			@UserData = "What to do: Delete unneeded files, such as old log files, support bundles, core files, upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding shelves to high-end units.  Reducing the retention times for backup data can also help. When files are deleted from outside of the /ddvar space, filesys clean will have to be done before the space is recovered."
+
+    		case "10" : ### fileSpaceSevereAlarm
+    			@Summary = "A File System Resource (" + $fileSystemResourceIndex + ") space is 100% utilized"
+    			@AlertGroup = "File Space"
+    			@AlertKey = $fileSystemResourceIndex
+    			@Description = "Meaning: A File System Resource space is 100% utilized.  The index value of the alarm indicates the file system index that may be looked up in the fileSystem table fileSystemSpace for more information about the actual FS that is full"
+    			@Severity = 4
+    			@Type = 1
+    			@UserData = "What to do: Delete unneeded files, such as old log files, support bundles, core files, upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding shelves to high-end units.  Reducing the retention times for backup data can also help. When files are deleted from outside of the /ddvar space, filesys clean will have to be done before the space is recovered"
+
+    		case "11" : ### fileSpaceCriticalAlarm
+    			@Summary = "A File System Resource (" + $fileSystemResourceIndex + ") space is 100% utilized"
+    			@AlertGroup = "File Space"
+    			@AlertKey = $fileSystemResourceIndex
+    			@Description = "Meaning: A File System Resource space is 100% utilized.  The index value of the alarm indicates the file system index that may be looked up in the fileSystem table fileSystemSpace for more information about the actual FS that is full"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: Delete unneeded files, such as old log files, support bundles, core files, upgrade rpm files stored in the /ddvar file system.  Consider upgrading the hardware or adding shelves to high-end units.  Reducing the retention times for backup data can also help. When files are deleted from outside of the /ddvar space, filesys clean will have to be done before the space is recovered"
+
+    		case "12" : ### diskFailingAlarm
+    			$diskPropIndex = $1
+    			@Summary = "Some problem has been detected about the indicated disk (" + $diskPropIndex + ")"
+    			@AlertGroup = "Disk Fail"
+    			@AlertKey = $diskPropIndex
+    			@Description = "Meaning: some problem has been detected about the indicated disk.  The index value of the alarm indicates the disk index that may be looked up in the disk tables diskProperties, diskPerformance, and diskReliability for more information about the actual disk that is failing"
+    			@Severity = 4
+    			@Type = 1
+    			@UserData = "What to do: monitor the status of the disk, and consider replacing if the problem continues"
+
+    		case "13" : ### diskFailedAlarm
+    			@Summary = "ome problem has been detected about the indicated disk (" + $diskPropIndex + ")"
+    			@AlertGroup = "Disk Fail"
+    			@AlertKey = $diskPropIndex
+    			@Description = "Meaning: some problem has been detected about the indicated disk.  The index value of the alarm indicates the disk index that may be looked up in the disk tables diskProperties, diskPerformance, and diskReliability for more information about the actual disk that is failing"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: replace the disk"
+
+    		case "14" : ### diskOverheatWarningAlarm
+    			$diskErrIndex = $1
+    			@Summary = "the temperature reading of the indicated disk (" + $diskErrIndex + ") has exceeded the warning temperature level"
+    			@AlertGroup = "Disk Overheat"
+    			@AlertKey = $diskErrIndex
+    			@Description = "Meaning: the temperature reading of the indicated disk has exceeded the warning temperature level.  If it continues to rise, it may eventually trigger a shutdown of the DDR.  The index value of the alarm indicates the disk index that may be looked up in the disk tables diskProperties, diskPerformance, and diskReliability for more information about the actual disk reading the high value"
+    			@Severity = 3
+    			@Type = 1
+    			@UserData = "What to do: check the disk status, temperatures of the environment in which the DDR is, and other factors which may increase the temperature"
+
+    		case "15" : ### diskOverheatAlertAlarm
+    			@Summary = "The temperature reading of the indicated disk (" + $diskErrIndex + ") is more than halfway between the warning and shutdown temperature levels"
+    			@AlertGroup = "Disk Overheat"
+    			@AlertKey = $diskErrIndex
+    			@Description = "Meaning: the temperature reading of the indicated disk is more than halfway between the warning and shutdown temperature levels. If it continues to rise, it will trigger a shutdown of the DDR.  The index value of the alarm indicates the disk index that may be looked up in the disk tables 'diskProperties', 'diskPerformance', and diskReliability for more information about the actual disk reading the high value"
+    			@Severity = 4
+    			@Type = 1
+    			@UserData = "What to do: check the disk status, temperatures of the environment in which the DDR is, and other factors which may increase the temperature.  If the temperature continues stays at this level or rises, and no other disks are reading this trouble, consider failing the disk, and get a replacement"
+ 
+ 		case "16" : ### diskOverheatShutdowntAlarm
+    			@Summary = "The temperature reading of the indicated disk (" + $diskErrIndex + ") has surpassed the shutdown temperature level. The DDR will be shutdown."
+    			@AlertGroup = "Disk Overheat"
+    			@AlertKey = $diskErrIndex
+    			@Description = "Meaning: the temperature reading of the indicated disk has surpassed the shutdown temperature level. The DDR will be shutdown.  The index value of the alarm indicates the disk index that may be looked up in the disk tables diskProperties, diskPerformance, and diskReliability for more information about the actual disk reading the high value"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: Boot the DDR and monitor the status and temperatures.  If the same disk has continued problems, consider failing it and get a replacement disk"
+
+    		case "17" : ### raidReconSevereAlarm
+    			@Summary = "Raid group reconstruction is currently active and has not completed after 71 hours."
+    			@AlertGroup = "Raid Reconstruction"
+    			@AlertKey = ""
+    			@Description = "Raid group reconstruction is currently active and has not completed after 71 hours.  Reconstruction occurs when the raid group falls into 'degraded' mode.  This can happen due to a disk failing at run-time or boot-up."
+    			@Severity = 3
+    			@Type = 1
+    			@UserData = "What to do: while it is still possible that the reconstruction could succeed, the disk should be replaced to ensure data safety"
+
+    		case "18" : ### raidReconCriticalAlarm
+    			@Summary = "Raid group reconstruction is currently active and has not completed after 72 hours"
+    			@AlertGroup = "Raid Reconstruction"
+    			@AlertKey = ""
+    			@Description = "Meaning: Raid group reconstruction is currently active and has not completed after 72 hours.  Reconstruction occurs when the raid group falls into 'degraded' mode.  This can happen due to a disk failing at run-time or boot-up."
+    			@Severity = 4
+    			@Type = 1
+    			@UserData = "What to do: the disk should be replaced to ensure data safety"
+
+    		case "19" : ### raidReconCriticalShutdownAlarm
+    			@Summary = "Raid group reconstruction is currently active and has not completed after more than 72 hours"
+    			@AlertGroup = "Raid Reconstruction"
+    			@AlertKey = ""
+    			@Description = "Meaning: Raid group reconstruction is currently active and has not completed after more than 72 hours.  Reconstruction occurs when the raid group falls into 'degraded' mode. This can happen due to a disk failing at run-time or boot-up"
+    			@Severity = 5
+    			@Type = 1
+    			@UserData = "What to do: the disk must be replaced."
+    		
+	        default:
+		        @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+		        @Identifier = @Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager
+        		@Severity = 1
+        		@AlertGroup = "$1 = " + $1
+        		@AlertKey = "$2 = " + $2 
+    }
+$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+

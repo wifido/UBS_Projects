@@ -1,0 +1,276 @@
+########################################################################
+#
+# Pontis EventLog trap rules
+#
+########################################################################
+case "ntEventLog":
+    $ruleset = $ruleset + "-microsoft.rules" + "-case:microsoft.rules"
+    @Agent = "PONTIS"
+    @OwnerGID = 993
+    @OwnerUID = 65534
+    @Class = 124000
+    $TempDoLookup = 2
+    @Summary = $6 + " (Event ID " + $1 + ")"
+    @Node = $5
+    @NodeAlias = $5
+    @Origin = $Node
+    @AlertGroup = $4
+    @AlertKey = ""
+
+    switch ($specific-trap)  {
+        case "1401":
+            # ntInformationEvent
+            $ruleset = $ruleset + "-case:1401"
+            @Severity = 2
+            @Type = 1
+            if (regmatch($6, "[hw]?[ai]s started|starting") || regmatch($6, "started"))  {
+                @Type = 2
+                $startKey = 1
+                @AlertKey = "startup"
+            }
+        case "1403":
+            $ruleset = $ruleset + "-case:1403"
+            # ntWarningEvent
+            @Severity = 3
+            @Type = 1
+        case "1405":
+            $ruleset = $ruleset + "-case:1405"
+            # ntErrorEvent
+            @Severity = 5
+            @Type = 1
+        case "1407":
+            $ruleset = $ruleset + "-case:1407"
+            # ntSuccessAudit
+            @Severity = 2
+            @Type = 1
+        case "1409":
+            $ruleset = $ruleset + "-case:1409" 
+            # ntFailureAudit
+            @Severity = 4
+            @Type = 1
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+    switch ($4)  {
+        case "Threshold Agent":
+            $ruleset = $ruleset + "-case:Threshold Agent"
+            @AlertKey = extract($6, "^[^[]+\[([^]]+)\]")
+            if (nmatch($6, "Performance threshold rearm event"))  {
+                @Type = 2
+            }
+        default:
+    }
+    
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey
+
+########################################################################
+#
+# MissionCritical Software (MOM) trap rules
+#
+########################################################################
+
+case "eemProductInfo":
+    $ruleset = $ruleset + "-microsoft.rules" + "-case:eemProductInfo"
+    @Agent = "MOM"
+    @OwnerGID = 993
+    @OwnerUID = 65534
+    @Class = 124000
+    $TempDoLookup = 2
+    $ruleset = "microsoft-" + $enterprise-name
+
+    switch ($specific-trap)  {
+        case "2":
+            # serviceGoingDown
+            $ruleset = $ruleset + "-case:2"
+            @AlertKey = "senderService"
+            @AlertGroup = "serviceStartStop"
+            @Summary = "The SeNTry EEM Sender service is stopping."
+            @Severity = 4
+            @Type = 1
+        case "3":
+            # serviceComingUp
+            $ruleset = $ruleset + "-case:3"
+            @AlertKey = "senderService"
+            @AlertGroup = "serviceStartStop"
+            @Summary = "The SeNTry EEM Sender service is starting."
+            @Severity = 1
+            @Type = 2
+        case "4":
+            # gathererServiceGoingDown
+            $ruleset = $ruleset + "-case:4"
+            @AlertKey = "gathererService"
+            @AlertGroup = "serviceStartStop"
+            @Summary = "The SeNTry EEM Gatherer service is stopping."
+            @Severity = 4
+            @Type = 1
+        case "5":
+            # gathererServiceComingUp
+            $ruleset = $ruleset + "-case:5"
+            @AlertKey = "gathererService"
+            @AlertGroup = "serviceStartStop"
+            @Summary = "The SeNTry EEM Gatherer service is starting."
+            @Severity = 1
+            @Type = 2
+        case "100":
+            # eemRedAlert
+            $ruleset = $ruleset + "-case:100"
+            @AlertKey = $4
+            @AlertGroup = $2
+            @Summary = $7 + " (Event ID " + $6 + ")"
+            @Severity = 5
+            @Type = 1
+            @Origin = $3
+        case "200":
+            # eemOrangeAlert
+            $ruleset = $ruleset + "-case:200"
+            @AlertKey = $4
+            @AlertGroup = $2
+            @Summary = $7 + " (Event ID " + $6 + ")"
+            @Severity = 4
+            @Type = 1
+            @Origin = $3
+        case "300":
+            # eemYellowAlert
+            $ruleset = $ruleset + "-case:300"
+            @AlertKey = $4
+            @AlertGroup = $2
+            @Summary = $7 + " (Event ID " + $6 + ")"
+            @Severity = 3
+            @Type = 1
+            @Origin = $3
+        case "400":
+            # eemBlueAlert
+            $ruleset = $ruleset + "-case:400"
+            @AlertKey = $4
+            @AlertGroup = $2
+            @Summary = $7 + " (Event ID " + $6 + ")"
+            @Severity = 2
+            @Type = 1
+            @Origin = $3
+        case "500":
+            # eemGreenAlert
+            $ruleset = $ruleset + "-case:500"
+            @AlertKey = $4
+            @AlertGroup = $2
+            @Summary = $7 + " (Event ID " + $6 + ")"
+            @Severity = 1
+            @Type = 1
+            @Origin = $3
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+        }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey
+  
+case "omProductInfo":
+    $ruleset = $ruleset + "-case:omProductInfo"
+    @Agent = "MOM"
+    @OwnerGID = 993
+    @OwnerUID = 65534
+    @Class = 124000
+    $TempDoLookup = 2
+
+    if (regmatch($4, "^[^(:]+\(.*\)"))  {
+        $ruleset = $ruleset + "-if:$agRule = 1"
+        $agRule = 1
+        $tempAlertGroup = extract($4, "^([^(]+) ?\(.*\)")
+        $tempAlertKey = extract($4, "^[^(]+ ?\(([^)]+)\)")
+    }
+    else if (regmatch($4, "^[^:]+:+ ?.*"))  {
+        $ruleset = $ruleset + "-if else:$agRule = 2"
+        $agRule = 2
+        $tempAlertGroup = extract($4, "^([^:]+) ?:+ ?.*")
+        $tempAlertKey = extract($4, "^[^:]+ ?:+ ?(.*)")
+    }
+    else if (regmatch($4, "^.* - .*"))  {
+        $ruleset = $ruleset + "-if else:$agRule = 3"
+        $agRule = 3
+        $tempAlertGroup = extract($4, "^(.*) - .*")
+        $tempAlertKey = extract($4, "^.* - (.*)")
+    }
+    else  {
+        $ruleset = $ruleset + "-else:$agRule = 4"
+        $agRule = 4
+        $tempAlertGroup = $4
+        $tempAlertKey = ""
+    }
+    @AlertGroup = $tempAlertGroup
+    @AlertKey = $tempAlertKey
+
+    if (regmatch($3, "^[^\]+\\[^\]+$"))  {
+        $tempNode = extract($3, "^[^\]+\\([^\]+)$")
+    }
+    else  {
+        $tempNode = $3
+    }
+    $location_key = lower(substr($tempNode, 2, 3))
+    [@Location, @Region, $tmpDomain] = lookup($location_key, regloc)
+    @Node = $tempNode
+    @NodeAlias = $3
+    @Origin = $Node
+    @Summary = $6
+    $tempUserData = $12
+    $tempIdentifier = $Node + $3 + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey
+    $ruleset = "microsoft-" + $enterprise-name
+
+    switch ($2)  {
+        case "Success":
+            @Type = 2
+        default:
+            @Type = 1
+    }
+    switch ($specific-trap)  {
+        case "10":
+            # omBlueAlert
+            @Severity = 2
+        case "20":
+            # omGreenAlert
+            switch ($4)  {
+                case "Security Eng Test"|"Security":
+                    if (nmatch($6, "Successful Network Logon"))  {
+                        @Severity = 1
+                        @Type = 2
+                        $ruleset = $ruleset + "-case:Security Eng Test"
+                    }
+                    else  {
+                        @Severity = 2
+                        @Type = 1
+                    }
+                default:
+                    $ruleset = $ruleset + "-case:default"
+                    $tempIdentifier = $tempIdentifier + $6
+                    @Severity = 2
+                    @Type = 1
+            }
+        case "30":
+            # omYellowAlert
+            $ruleset = $ruleset + "-case:30"
+            @Severity = 3
+        case "40":
+            # omOrangeAlert
+            $ruleset = $ruleset + "-case:40"
+            @Severity = 4
+        case "50":
+            # omRedCriticalErrorAlert
+            $ruleset = $ruleset + "-case:50"
+            @Severity = 5
+        case "60":
+            # omRedSecurityBreachAlert
+            $ruleset = $ruleset + "-case:60" 
+            @Severity = 5
+        case "70":
+            # omRedServiceUnavailableAlert
+            $ruleset = $ruleset + "-case:70"
+            @Severity = 5
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+    @UserData = $tempUserData

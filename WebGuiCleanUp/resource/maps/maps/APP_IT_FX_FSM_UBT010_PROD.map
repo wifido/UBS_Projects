@@ -1,0 +1,6 @@
+map(name="APP_IT_FX_FSM_UBT010_PROD",bgImage="",bgColor="#003366",w="650",h="650",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="white",label="Book",style="p",y="71",url="",size="16",name="visual_5",x="110")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="80",x="111",w="50",entity="APP_IBAG_UBT010_BOOK_VIEW_PROD",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_4")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="80",x="26",w="50",entity="APP_IBAG_UBT010_IN_VIEW_PROD",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_3")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="white",label="IN",style="p",y="72",url="",size="16",name="visual_2",x="25")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="white",label="UBT010 / GGL",style="p",y="37",url="",size="22",name="visual_1",x="22")

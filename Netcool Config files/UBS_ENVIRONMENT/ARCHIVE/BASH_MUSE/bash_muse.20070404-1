@@ -1,0 +1,45 @@
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias pss='ps'
+
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+PS1="[\u@\h \W]\\$ "
+
+# Source the Micromuse environment
+
+MUSE_BASE=/sbclocal/netcool
+OMNIHOME=${MUSE_BASE}/omnibus
+
+export PS1 MUSE_BASE OMNIHOME
+if [ -f /sbclocal/netcool/UBS_ENVIRONMENT/omniprof ]; then
+	. /sbclocal/netcool/UBS_ENVIRONMENT/omniprof
+	#echo "1"
+elif [ -f /sbclocal/netcool/omnibus/etc/omniprof ]; then
+	. /sbclocal/netcool/omnibus/etc/omniprof
+	#echo "2"
+else
+	echo "omniprof file not found...."
+fi
+if [ -f /sbclocal/netcool/UBS_ENVIRONMENT/omnialiases ]; then
+	. /sbclocal/netcool/UBS_ENVIRONMENT/omnialiases
+	#echo "4"
+elif [ -f /sbclocal/netcool/omnibus/etc/omnialiases ]; then
+	. /sbclocal/netcool/omnibus/etc/omnialiases
+	#echo "5"
+else
+	echo "omnialiases file not found...."
+fi
+
+
+
+# Put here so that group permissions are retained 
+umask -p 2

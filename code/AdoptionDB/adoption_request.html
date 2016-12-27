@@ -1,0 +1,173 @@
+<HEAD>
+<LINK REL="stylesheet" HREF="/css/mm.css" TYPE="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor=#FFFFFF>
+<script language="javascript" type="text/javascript">
+function check()
+{
+        var textstring = '';
+	box = document.form.REQUESTOR;
+        if(!box.value)
+        {
+                alert('Your Name is required');
+                box.focus();
+                return;
+        }
+        textstring += box.name + ': ' + box.value + '\n';
+
+	box = document.form.REQUESTOR_EMAIL;
+       	if(!box.value)
+	{
+               	alert('Your E-mail Address is required');
+                box.focus();
+                return;
+        }
+        else
+	{
+              	if(box.value.search('@ubs.com')==-1)
+		{
+                       	alert('"@ubs.com" is missing in Your E-mail Address');
+                        box.focus();
+	                return;
+               	}
+	}
+        textstring += box.name + ': ' + box.value + '\n';
+
+	document.form.output.value = '';
+}
+
+function ajax_getUserDetails(){
+        var xmlHttp=GetXmlHttpObject();
+        if (xmlHttp==null)  {
+                alert ("Your browser does not support AJAX!");
+                return;
+        }
+        xmlHttp.onreadystatechange=function() {
+                if(xmlHttp.readyState==0) {//The request in inot initialized
+                }
+                if(xmlHttp.readyState==1) {//the Request has been set up
+                }
+                if(xmlHttp.readyState==2) {//the request has been sent
+                }
+                if(xmlHttp.readyState==3) {//the request is in process
+                }
+                if(xmlHttp.readyState==4) {//The request is complete
+                //      alert(xmlHttp.getAllResponseHeaders());
+                        document.form.REQUESTOR.value=xmlHttp.getResponseHeader('SSO_GIVENNAME')+' ' + xmlHttp.getResponseHeader('SSO_SURNAME');
+                        document.form.REQUESTOR_EMAIL.value=xmlHttp.getResponseHeader('SSO_EMAIL');
+                }
+        }
+        var url="/admintools/ldapPopulate/findLineMgrEmail.jsp";
+
+        xmlHttp.open("GET",url,true);
+        xmlHttp.send(null);
+
+}
+function ajax_getUserDetailsByUser(user, num){
+        var xmlHttp=GetXmlHttpObject();
+        if (xmlHttp==null)  {
+                alert ("Your browser does not support AJAX!");
+                return;
+        }
+        xmlHttp.onreadystatechange=function() {
+                if(xmlHttp.readyState==0) {//The request in inot initialized
+                }
+                if(xmlHttp.readyState==1) {//the Request has been set up
+                }
+                if(xmlHttp.readyState==2) {//the request has been sent
+                }
+                if(xmlHttp.readyState==3) {//the request is in process
+                }
+                if(xmlHttp.readyState==4) {//The request is complete
+                     // alert(xmlHttp.getAllResponseHeaders());
+                        if(num == 1){
+                                document.form.FullName1.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr1.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 2){
+                                document.form.FullName2.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr2.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 3){
+                                document.form.FullName3.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr3.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 4){
+                                document.form.FullName4.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr4.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 5){
+                                document.form.FullName5.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr5.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 6){
+                                document.form.FullName6.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr6.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        }
+
+
+                }
+        }
+        var url="/admintools/ldapPopulate/findLineMgrEmail.jsp";
+        url=url+"?user="+user;
+
+        xmlHttp.open("GET",url,true);
+        xmlHttp.send(null);
+
+}
+function GetXmlHttpObject(){
+        var xmlHttp=null;
+        try  {
+                // Firefox, Opera 8.0+, Safari
+                xmlHttp=new XMLHttpRequest();
+        }
+        catch (e)  {
+                // Internet Explorer
+                  try    {
+                        xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+                  }
+                  catch (e)    {
+                        xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+                  }
+        }
+        return xmlHttp;
+}
+
+</SCRIPT>
+
+<table border="0" cellSpacing="1" cellPadding="1" width="100%" bgcolor=>
+	<TR class="headline">
+		<TD class="headlinetext" align="center">Netcool New Application Monitoring Request</TD>
+	</TR>
+	<TR>
+		<TD class=reportTitle>
+<P>
+This form is designed for requesting setup for the monitoring of a new application.
+<br>
+<br>
+<table border="0" width = 800 bgcolor="#99CCFF">
+        <tr>
+                <td WIDTH="280"></td>
+                <td align="center" valign="top"><font color="#FF0000"></font></td>
+                <td><strong>Enter Details Here</strong></td>
+        </tr>
+</table>
+
+<TABLE width="800" bgColor=#99ccff border=0>
+<FORM name=form action=http://monitoring.swissbank.com/cgi-bin/adoption/Adoption_Request.cgi method=post>
+	<TR>
+		<TD align=left width=300 bgColor=#ddddff><STRONG>Requestor Name :</STRONG></TD>
+		<TD align=left><INPUT type="text" name=REQUESTOR size=25></TD>
+	<TR>
+		<TD align=left width=300 bgColor=#ddddff><STRONG>Requestor Email Address :</STRONG></TD>
+		<TD align=left><INPUT type="text" name=REQUESTOR_EMAIL size=25></TD>
+	</TR>
+	<TR>
+		<TD align=left width=300 bgColor=#ddddff><STRONG>Application ID from CMDB / iSAC</STRONG></TD>
+		<TD align=left><INPUT type="text" name=APP_REF size=25><INPUT type="radio" name="APP_REF_SOURCE" value="1" Checked>CMDB<INPUT type="radio" name="APP_REF_SOURCE" value="2">iSAC<INPUT type="radio" name="APP_REF_SOURCE" value="0">Other</TD>
+	</TR>
+</TABLE>
+
+<P align=center><INPUT type=submit value="Submit Request">  </P></FORM></TD></TR></TBODY></TABLE>
+</TABLE>
+<script>
+//call after page loaded
+window.onload=ajax_getUserDetails() ; 
+</script>
+

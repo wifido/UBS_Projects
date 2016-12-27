@@ -1,0 +1,5 @@
+Mapping.File :  "/sbclocal/ism/etc/ism/ismbridge.map"
+Name    :   "database_module"
+
+Tibrv.Daemon : "tcp:9504"
+Tibrv.Service : "9504"

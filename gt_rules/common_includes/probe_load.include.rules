@@ -1,0 +1,145 @@
+# probe_load.include.rules
+# Version 2.0
+# 14th Dec 2006
+# Full re-write of this include file.... GT
+
+# This file now has 4 distinct sections.
+# 1. Probe load and count definitions. We use the default %load array, and store event counter in %EventCount array.
+# 2. Object Server load and count definitions. We use the %ServerLoads array and store event counter per destination Object Server in %EventCount array.
+# 3. Source Node load and count definitions. We use the %NodeLoads array here and the sampling functionality to detect rate and count.
+# 4. Compile Log message for stats gathering. Here we put all the stats into 1 log message per event rather than the previous 3 (or more) messages.
+
+
+# SECTION 1. Probe Load and count section
+
+# This first section provides a value for the insertion rate to the Object Server.
+# The array needs no definition as it is an 'out of the box' array.
+if (match(%load,""))
+{
+        # The line '%load = "3.20"' Specifies a time window of 3 Seconds and 20 samples.
+        %load = "3.20"
+        log(ERROR, %Manager + "Load matched as NULL")
+}
+%load = updateload(%load)
+$ubs_probe_rate= getload(%load)
+
+
+# Now we deal with the total event count since probe start time.
+# Initialise the "probe event count" array
+if (match(EventCount['Probe'],""))
+{
+	$ubs_probe_count = 1
+}
+else 
+{
+	$probe_previous_count = EventCount['Probe']
+	$ubs_probe_count = int($probe_previous_count) + 1
+}
+# Now update the array with the new count.
+EventCount['Probe'] = $ubs_probe_count
+
+
+# SECTION 2. Object Server Load and Count section.
+
+# Initialise the "server event rate" array
+if (match(ServerLoads[$tempServer], ""))
+{
+        # The line 'ServerLoads[$tempServer] = "3.20"' specifies a time window of 3 seconds and 20 samples.
+        ServerLoads[$tempServer] = "3.20"
+}
+ServerLoads[$tempServer] = updateload(ServerLoads[$tempServer])
+
+$ubs_OS_rate=(getload(ServerLoads[$tempServer]))
+
+# Now we deal with the total event count since probe start time.
+# Initialise the "Object Server event count" array
+if (match(EventCount[$tempServer],""))
+{
+	$ubs_OS_count = 1
+}
+else 
+{
+	$OS_previous_count = EventCount[$tempServer]
+	$ubs_OS_count = int($OS_previous_count) + 1
+}
+# Now update the array with the new count.
+EventCount[$tempServer] = $ubs_OS_count
+
+# SECTION 3. Source Node load and count section.
+# This section shows the event rate from each individual event source enabling us to throttle back when an individual
+# Node starts streaming events.
+# This array MUST be defined at the first line in the master rules file i.e. mttrapd.rules or socket.rules.
+
+#
+$ubs_node = @NodeAlias
+if (match(NodeLoads[$ubs_node], ""))
+{
+        # The line 'NodeLoads[$ubs_node] = "3.20"' specifies a time window of 3 seconds and 30 samples.
+        NodeLoads[$ubs_node] = "3.30"
+	# Expect this to be the value when we go to using count function.
+        #NodeLoads[$ubs_node] = "1.30"
+}
+NodeLoads[$ubs_node] = updateload(NodeLoads[$ubs_node])
+# We evaluate the count of events from the source within the given time period. If it is greater
+# than 25 per second, then we start to discard events from this source.
+$ubs_src_rate = getload(NodeLoads[$ubs_node])
+#$ubs_src_count = geteventcount(NodeLoads[$ubs_node])
+
+# Here we start to filter if the current event rate from this source is high.
+if (int($ubs_src_rate) >= 25)
+{
+#	20080905	Changes by Chris Janes of Abilitec
+	if (int($tempMarkForDiscard) == 0 )
+	{
+        	# Here we check the event is not Critical or a Problem resolution
+        	if ((int(@Severity) == 5 ) || (int(@Type) == 2))
+        	{
+			$tempMarkForDiscard = 0
+        	}
+        	else
+        	{
+        	        $tempMarkForDiscard = 1
+	
+        	}
+	}
+#       20080905        End of Changes
+}
+
+# Now we deal with the total event count since probe start time.
+# Initialise the "Source Node event count" array
+if (match(EventCount[$ubs_node],""))
+{
+	$ubs_src_count = 1
+}
+else 
+{
+	$SN_previous_count = EventCount[$ubs_node]
+	$ubs_src_count = int($SN_previous_count) + 1
+}
+# Now update the array with the new count.
+EventCount[$ubs_node] = $ubs_src_count
+
+# SECTION 4. Create the log message with all relevant information, and discard any events that are coming in too high.
+switch($tempMarkForDiscard)
+{
+#               20080820        Changes by Chris Janes of Abilitec for Sharif Johnson TD 5020
+
+	case "3": # Here we capture the events we want to discard due to high rate/count.
+		log (ERROR,"PROBESTAT Event from " + $ubs_node + " Class= " + @Class + " Sev= " + @Severity + " Type= " + @Type + " to Server " + $tempServer + " PR= " + $ubs_probe_rate + " PC= " + $ubs_probe_count + " SR= " + $ubs_OS_rate + " SC= " + $ubs_OS_count + " NR= " + $ubs_src_rate + " NC= " + $ubs_src_count + " DISCARDED Socket Heartbeat RATE" )
+		discard
+
+#               20080820        End of Changes
+
+	case "2": # Here we capture the events we want to discard due to high rate/count.
+		log (ERROR,"PROBESTAT Event from " + $ubs_node + " Class= " + @Class + " Sev= " + @Severity + " Type= " + @Type + " to Server " + $tempServer + " PR= " + $ubs_probe_rate + " PC= " + $ubs_probe_count + " SR= " + $ubs_OS_rate + " SC= " + $ubs_OS_count + " NR= " + $ubs_src_rate + " NC= " + $ubs_src_count + " DISCARDED-Rule " + $ruleset)
+		discard
+
+
+	case "1": # Here we capture the events we want to discard due to high rate/count.
+		log (ERROR,"PROBESTAT Event from " + $ubs_node + " Class= " + @Class + " Sev= " + @Severity + " Type= " + @Type + " to Server " + $tempServer + " PR= " + $ubs_probe_rate + " PC= " + $ubs_probe_count + " SR= " + $ubs_OS_rate + " SC= " + $ubs_OS_count + " NR= " + $ubs_src_rate + " NC= " + $ubs_src_count + " DISCARDED RATE")
+		discard
+	
+	default: # Here we pass the events up to the destination Object Server target.
+		log (ERROR,"PROBESTAT Event from " + $ubs_node + " Class= " + @Class + " Sev= " + @Severity + " Type= " + @Type + " to Server " + $tempServer + " PR= " + $ubs_probe_rate + " PC= " + $ubs_probe_count + " SR= " + $ubs_OS_rate + " SC= " + $ubs_OS_count + " NR= " + $ubs_src_rate + " NC= " + $ubs_src_count)
+}
+

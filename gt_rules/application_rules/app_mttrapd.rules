@@ -1,0 +1,873 @@
+case "Application":
+	# UBSW Monitoring Script for MTTRAPD probes
+	# Karey Weston
+	############################################
+	# Uncomment this if you want to turn on 
+	# details for all events in this ruleset
+	############################################
+	############################################
+	# This section sets up the initial basic field
+	# values.  
+	############################################
+        	$ruleset = $ruleset + " app_mttrapd"
+	if( exists ( $4 ) )
+		{
+        	$ruleset = $ruleset + " if exists $4"
+        	$location_cpfwdr = substr($4,3,3)
+        	$tempIdentifier = @Manager + $Node + $4
+        	@Class = "6999"
+        	@Summary = $4
+        	@Node = $IPaddress
+		@NodeAlias = $Node
+		$Operating_System = substr($Node,1,1)
+		@Impact = "1"
+        	update(@Node)
+		update(@Impact)
+        	}
+	###########################################
+	# This section grabs the value from the 
+	# $Operating_System field and matches the
+	# OS identifier with a specific @Agent
+	# entry.
+	###########################################
+	switch($Operating_System)
+		{
+		case "x":
+			@Agent = "PATROL LINUX"
+			$ruleset = $ruleset + " - x"
+		case "s":
+			@Agent = "PATROL SOLARIS"
+			$ruleset = $ruleset + " - s"
+		default:
+			@Agent = "PATROL"
+			$ruleset = $ruleset + " -def OS"
+		update(@Agent)
+		}
+	#########################################
+	# Doing some basic clean up of bogus alerts
+	#########################################
+	switch($4)
+        	{
+        	case "'couldnt'":
+                        $ruleset = $ruleset + " - couldnt"
+#                       20070627        Changes by Chris Janes of Abilitec
+#                       discard
+                        $tempMarkForDiscard = 2
+#                       20060810        Chris Janes     Temp Change for Logging discrds
+#                       log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#                       20060810        End of Change
+#                       20070627        End of Changes
+
+        	default:
+               	@Node=$IPaddress
+        	}
+	
+	###################################################
+	# The following REGEX lines are to compensate for 
+	# when the "wrapper script" is removed and we are
+	# taking native feeds from either the BMC agent or
+	# Command Post directly.  All this does is take the 
+	# initial regmatch statement and stop looking for the 
+	# single ' (tick) at the start of the line.  Added 
+	# by wes on 12/2/03.  These lines can replace the line
+	# regex lines above.  In reality if the BMC alerts were
+	# clean, then this whole thing could be down to one 
+	# if statement and 4 key assignments ;).
+	####################################################
+	if ( regmatch($4, "^[A-Za-z0-9'_\.\-]+:"))
+	#if ( regmatch($4, "^[A-Za-z0-9'_\.\-]+:") || regmatch($4, "^\"[A-Za-z0-9'_\.\-]+:") )
+        	{
+		$ruleset = $ruleset + "-ext1"
+		# New regexps that check for "lack of a colon" rather than for colon, also incorporates multiple spaces
+		$tmpLocation   = extract($4, "^([^:]+):[^:]+:[^:]+:[^:]+:.*$")	
+		$tmpAlertGroup = extract($4, "^[^:]+:([^:]+):[^:]+:[^:]+:.*$")
+		$tmpAlertKey   = extract($4, "^[^:]+:[^:]+:([^:]+):[^:]+:.*$")
+		$tmpSeverity   = extract($4, "^[^:]+:[^:]+:[^:]+:([^:]+):.*$")
+		$tmpSummary    = extract($4, "^[^:]+:[^:]+:[^:]+:[^:]+: ?(.*)$")
+		}
+	else if ( regmatch($4, "^[A-Za-z0-9']+ "))
+        	{
+		$ruleset = $ruleset + "-ext2"
+		# New regexps that check for "lack of a space" rather than for spaces, also incorporates multiple spaces
+        	$tmpLocation = extract($4, "^([^ ]+) .*$")
+        	$tmpAlertGroup = extract($4, "^[^ ]+ +([^ ]+) .*$")
+        	$tmpAlertKey = extract($4, "^[^ ]+ +[^ ]+ +([^ ]+) .*$")
+        	$tmpSeverity = extract($4, "^[^ ]+ +[^ ]+ +[^ ]+ +([^ ]+) .*$")
+        	$tmpSummary = extract($4, "^[^ ]+ +[^ ]+ +[^ ]+ +[^ ]+ +(.*)$")
+        	}
+	else if ( regmatch($4, "^[A-Za-z_':\.]+\-"))
+        	{
+		$ruleset = $ruleset + "-ext3"
+        	$tmpAlertGroup = extract($4, "[A-Za-z0-9:\-]+\-([A-Za-z0-9\(\)_\.]+):.*")
+        	$tmpAlertKey = extract($4, "[A-Za-z0-9]+\-[A-Za-z0-9 \(\)_\+\.\-]+:([A-Za-z|0-9|\ \(\)\_\+\.\-]+):.*")
+        	$tmpSeverity = extract($4, "[A-Za-z0-9]+\-[A-Za-z0-9 \(\)_\+\.\-]+:[A-Za-z|0-9|\ \(\)\_\+\.\-]+:([A-Za-z0-9]+):.*")
+        	$tmpSummary = extract($4, "[A-Za-z0-9]+\-[A-Za-z0-9 \(\)_\.\-]+:[A-Za-z|0-9|\ \(\)\_\+\.\-]+:[A-Za-z|0-9|\(\)\_\+\.\-]+:(.*)")
+        	}
+	else if ( regmatch($4, "^[A-Za-z']+\."))
+        	{
+		$ruleset = $ruleset + "-ext4"
+        	$tmpAlertGroup = extract($4, "[A-Za-z0-9_\.?]+.([A-Za-z|0-9|\;\/\\(\)\_\+\.\-]+):.*")
+        	$tmpAlertKey = extract($4, "[A-Za-z|0-9|\_]+.[A-Za-z|0-9|\;\/\\\(\)\_\+\.\-]+:([A-Za-z|0-9|\'\@\/\\\(\)\_\+\.\-]+):.*")
+        	$tmpSeverity = extract($4, "[A-Za-z|0-9|\_]+.[A-Za-z|0-9|\;\/\\ \(\)\_\+\.\-]+:[A-Za-z|0-9|\@\/\\ \(\)\_\+\.\-]+:([A-Za-z0-9]+):.*")
+        	$tmpSummary = extract($4, "[A-Za-z|0-9|\_]+.[A-Za-z|0-9|\;\/\\ \(\)\_\+\.\-]+:[A-Za-z|0-9|\@\/\\ \(\)\_\+\.\-]+:[A-Za-z|0-9|\/\\(\)\_\+\.\-]+:(.*)")
+        	}
+	else if ( regmatch($4, "^\["))
+        	{
+		$ruleset = $ruleset + "-ext5"
+        	$tmpAlertGroup = extract($4, "\[[A-Za-z0-9 \.\:\_\-]+\][A-Za-z0-9]+ ([A-Za-z0-9\'\@\/\\\(\)\_\+\.\-]+) .*")
+        	$tmpAlertKey = extract($4, "\[[A-Za-z0-9 \.\:\_\-]+\][A-Za-z0-9]+ [A-Za-z0-9\@\/\\(\)\_\+\.\-]+ ([A-Za-z0-9\_\.\-]+) .*")
+        	$tmpSeverity = extract($4, "\[[A-Za-z0-9 \.\:\_\-]+\][A-Za-z0-9]+ [A-Za-z0-9\@\/\\(\)\_\+\.\-]+ [A-Za-z0-9\_\.\-]+ ([A-Z]+) .*")
+        	$tmpSummary = extract($4, "\[[A-Za-z0-9 \.\:\_\-]+\][A-Za-z0-9]+ [A-Za-z0-9\@\/\\(\)\_\+\.\-]+ [A-Za-z0-9\_\.\-]+ [A-Z]+ (.*)")
+        	}
+	else if ( regmatch($4, "^[A-Za-z0-9]"))
+        	{
+		$ruleset = $ruleset + "-ext6"
+        	$tmpAlertGroup = extract($4, "([A-Za-z0-9 \.\_\-]+):.*")
+        	$tmpAlertKey = extract($4, "[A-Za-z0-9 \.\_\-]+:([A-Za-z0-9 \.\_\-]+):.*")
+        	$tmpSeverity = extract($4, "[A-Za-z0-9 \.\_\-]+:[A-Za-z0-9 \.\_\-]+:([A-Z]+):.*")
+        	$tmpSummary = extract($4, "[A-Za-z0-9 \.\_\-]+:[A-Za-z0-9 \.\_\-]+:[A-Z]+:(.*)")
+        	}
+	else {
+		$ruleset = $ruleset + "-ext7"
+		}
+	
+	
+	if ( regmatch($tmpSummary, "[']+"))
+		{
+		$ruleset = $ruleset + "-ticks"
+	
+		$tmpSummary1 = extract($tmpSummary,"^([^']+).*$")
+		$tmplength = length($tmpSummary)
+		$tmplength1 = length($tmpSummary1)
+		$TickPresent = (int($tmplength) - int($tmplength1))
+		switch ($TickPresent)
+			{
+			case "0":
+				# As these 2 tokens are exactly the same length, there cannot be any ticks present, no change to anything here.
+				$ruleset = $ruleset + " 0"
+			case "1":
+				# The last character is a tick, therefore we can assume that $tmpSummary1 has removed the trailing tick.
+				$ruleset = $ruleset + " 1"
+				$tmpSummaryOld = $tmpSummary
+				$tmpSummary = $tmpSummary1
+	
+			default:
+				# Oh dear, we have more than one tick or quote in here, lets try and extract the summary properly.
+				$ruleset = $ruleset + " def"
+					$tmpSummary2 = extract($tmpSummary,"^[^']+ [']+([^']+)[']*.*")
+					#$tmpSummary2 = extract($tmpSummary,"^[^'\"]+ [']+([^']+)[']*.*")
+					$tmpSummary3 = extract($tmpSummary,"^[^']+[']+[^']+[']* ([^']+)'?$")
+				$tmpSummaryOld = $tmpSummary
+				$tmpSummary = $tmpSummary1 + $tmpSummary2 + " " + $tmpSummary3
+			}
+		}
+	#################################################
+	# End of new REGEX lines....wes
+	#################################################
+	
+	@AlertGroup=$tmpAlertGroup
+	@AlertKey=$tmpAlertKey
+	@Summary=$tmpSummary
+	$tmplowSeverity=lower($tmpSeverity)
+	[@Severity, @Type, @Flash]=lookup($tmplowSeverity,app_MttrapdSeverity)
+	
+	@Node=$IPaddress
+	if ( regmatch($4, "^'[A-Za-z0-9\'\_\.\-]+:") )
+       	{
+        	$location_token = extract($4, "([A-Za-z0-9\'\_\.\-]+):.*")
+                	{
+                	if (nmatch ( $location_token, "heartbeat" ))
+                        	{
+                        	$ruleset = $ruleset + "-heartbeat"
+                        	$tmpAlertGroup = "heartbeat"
+                        	}
+			if ( regmatch ( $location_token, "dmz$" ))
+				{
+				@Location = @Location + " DMZ" 
+				$ruleset = $ruleset + "-DMZ"
+				}
+                	}
+       	}
+	update(@Location)
+	
+	$ruleset = $ruleset + "- tmpAG " + $tmpAlertGroup 
+	switch($tmpAlertGroup)
+		{
+		case "heartbeat":
+                	@AlertGroup="HEARTBEAT"
+			@AlertKey="UNIX"
+               		@Summary = "Heartbeat from " + @NodeAlias
+			@Severity = 2
+			@Impact = 0
+			@Display_Hide = 1
+			#setobjectserver("GT36TEST2")
+		case "process":
+			@Summary=$4
+			@AlertGroup = "UNIX"
+		case "USRouterNYFix":
+			@AlertGroup="USROUTER"
+		case "Sybase" | "SYBASE" | "Oracle" | "ORACLE":
+			## Match for AlertKey of KM to ensure that KM events do not go to DBServices, but go to Patrol group.
+			if (match($tmpAlertKey,"KM"))
+				{
+				@AlertGroup = "PATROL"
+				$ruleset = $ruleset + " -AK KM"
+				}
+			else
+				{
+				include "$OMNIHOME/all_rules/ubsw/application_rules/DBServices_include.rules"
+				$ruleset = $ruleset + " -AK not KM"
+				}
+		case "USRouterBrass":
+			@AlertGroup="USROUTER"
+		case "Tetris":
+			@AlertGroup="TETRIS"
+		case "tetris.cfg":
+			@AlertGroup="TETRIS"
+		case "TesReportingAdapter":
+			@AlertGroup="DETOX"
+		case "cosmos.cfg":
+			@AlertGroup="COSMOS"
+		case "DetoxColtAdapter":
+			@AlertGroup="DETOX-SUBSCRIBER"
+		case "DetoxCosmosOTCAdapter":
+			@AlertGroup="DETOX-SUBSCRIBER"
+		case "detox.cfg":
+			@AlertGroup="DETOX"
+		case "DIGISLE":
+			@AlertGroup="Digital Island"
+		case "Oasis-kruncher":
+			@AlertGroup="OASIS"
+		case "OASIS-sgw_ftp":
+			@AlertGroup="OASIS"
+		case "oasis.cfg":
+			@AlertGroup="OASIS"
+		case "OASIS-check_printers":
+			@AlertGroup="OASIS"
+        	case "OASISDEVL":
+                	@AlertGroup="OASIS"
+		case "EME_DELAY_OASISP1":
+			@AlertGroup="OASIS"
+		case "OHPOpera":
+			@AlertGroup="OHPOPERA"
+		case "OHPFix":
+			@AlertGroup="OHPFIX"
+		case "Global_One":
+			@AlertGroup="GLOBAL_ONE"
+		case "Global1":
+			@AlertGroup="GLOBAL_ONE"
+		case "global1.cfg":
+			@AlertGroup="GLOBAL_ONE"
+		case "HOG_Notifier":
+			@AlertGroup="HOG-NOTIFIER"
+		case "HOG_Cluster":
+			@AlertGroup="HOG-CLUSTER"
+		case "HOG_Cluster4":
+			@AlertGroup="HOG-CLUSTER"
+		case "hog.cfg":
+			@AlertGroup="HOG"
+		case "FIXSESAME":
+			@AlertGroup="FIX-SESAME"
+		case "REJECT":
+			@AlertGroup="FIX-ENGINE"
+		case "SENDFAIL":
+			@AlertGroup="FIX-ENGINE"
+		case "FixStats":
+			@AlertGroup="FIX-ENGINE"
+		case "FIX-COMMS":
+			@AlertGroup="FIXCOMMS"
+		case "GSD_RV":
+			@AlertGroup="RENDEZVOUS"
+			@AlertKey="TIBCO"
+		case "Sweep":
+			@AlertGroup="FIXWEB"
+			@Summary = @AlertKey + "-" + @Summary
+		case "STAR":
+			@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+        	case "STARR":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "SAFE":
+                	@AlertGroup="FIXWEB"
+       	        	@Summary = @AlertKey + "-" + @Summary
+		case "FIXWEB":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "SHOE":
+                	@AlertGroup="FIXWEB"
+              		@Summary = @AlertKey + "-" + @Summary
+		case "SWEEP":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "RFQ":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+                	$ruleset = $ruleset + "-case : RFQ"
+		case "FixWebServer":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "DEALENGIN":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "FixWeb":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "USERMANAGER":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "Safe":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "UserManager":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "Intserver":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+        	case "InstServer":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "UpdateController":
+                	@AlertGroup="FIXWEB"
+                	@Summary = @AlertKey + "-" + @Summary
+		case "3KN_NMS":
+			@Severity=3
+		case "UNIX":
+			# A quick fix for kerberos and Power broker events.
+			# The details are turned on to see if a better way can be found 
+			# for next prod push. We will not run these through the ClassGroup Lookup 
+			# as we synthesis the AlertGroup value, and we need to prvide granularity
+			# in the Class value.
+			$ruleset = $ruleset + " -tmpSummary"
+			if (regmatch($tmpSummary,"Kerberos"))
+				{
+				$ruleset = $ruleset + " Kerberos"
+				@AlertGroup = "SECURITY"
+				$TempDoLookup = 2
+				@Class = 8002
+				@OwnerGID = 575
+				@OwnerUID = 65534
+				}
+			else if (regmatch($tmpSummary," pbmaster"))
+				{
+				$ruleset = $ruleset + "-pbmaster"
+				@AlertGroup = "SECURITY"
+				$TempDoLookup = 2
+				@Class = 8003
+				@OwnerGID = 575
+				@OwnerUID = 65534
+				}
+			else
+				{
+				# Do nowt here. Leave the event to be processed normally.
+				}
+			
+		case "ITSEC":
+			# Again set Class and Group Id here as a temprary measure, until more knowledge of
+			# real requirements.
+			@AlertGroup = "SECURITY"
+			$TempDoLookup = 2
+			@OwnerGID = 575
+			@OwnerUID = 65534
+			$ruleset = $ruleset + " -tmpSummary"
+			if (regmatch($tmpSummary,"permission"))
+				{
+				$ruleset = $ruleset + " Permission"
+				@AlertKey = "PERMISSIONS"
+				@Class = 8004
+				
+				}
+			else if (regmatch($tmpSummary,"missing"))
+				{
+				$ruleset = $ruleset + " missing"
+				@AlertKey = "FILE MISSING"
+				@Class = 8005
+				}
+			else
+				{
+				$ruleset = $ruleset + " 8006"
+				@Class = 8006
+				}
+		case "GDS":
+			$TempDoLookup = 3
+		case "GERONIMO":
+			$TempDoLookup = 3
+		case "EVT":
+			$TempDoLookup = 3
+		case "TERMINATOR":
+			$TempDoLookup = 3
+		default:
+			$ruleset = $ruleset + " default"
+		}
+	##################################################
+	# This starts a basic rescrub of the purple alerts
+	# and reprocesses them using a secondary include 
+	# file
+	##################################################
+	$ruleset = $ruleset + " -Type" 
+	switch(@Type)
+		{
+		case "0":
+			$ruleset = $ruleset + " 0" 
+			$ruleset = $ruleset + " -Severity" 
+			switch(@Severity)
+				{
+				case "1":
+					$ruleset = $ruleset + " 1"
+					include "$OMNIHOME/all_rules/ubsw/application_rules/app_mttrapd_include.rules"
+					# Final sanity check. If this fails here then it is malformed.
+					$ruleset = $ruleset + " -Type2" 
+					switch(@Type)
+						{
+						case "0":
+							$ruleset = $ruleset + " 0"
+							$ruleset = $ruleset + " -Severity2" 
+							switch(@Severity)
+								{
+								case "1":
+									$ruleset = $ruleset + " 1"
+									@Summary = $4 + "This is a malformed alert"
+		
+									$BadAlert = extract(@Summary, "([.*]+)")
+									if (match ($BadAlert, "CRITICAL") || match ($BadAlert, "critical"))
+										{
+										@Severity=5
+										}
+									if (match ($BadAlert, "MAJOR") || match ($BadAlert, "major"))
+										{
+										@Severity=4
+										}
+									if (match ($BadAlert, "WARNING") || match ($BadAlert, "warning"))
+										{
+										@Severity=3
+										}
+									# We will turn on details here so that we can see all the tokens
+									# presented to the probe. May give us a better idea of why event is malformed.
+								default:
+								}
+						default:
+						}
+				default:
+				}
+		default:
+		}
+	######################################
+	# This suppresses some user specified
+	# AlertKeys from views
+	######################################
+	$ruleset = $ruleset + "-AK " + $tmpAlertKey 
+	switch($tmpAlertKey)
+		{
+		case "OHPFix-OHPOutgoingQueueSizePolling":
+			@AlertKey="CLEANUP"
+		case "OHPFix-OHPThroughputMeasurement":
+		 	@AlertKey="CLEANUP"
+		case "OHPOasis-OHPOutgoingQueueSizePolling":
+		 	@AlertKey="CLEANUP"
+		case "OHPOasis-OHPThroughputMeasurement":
+		 	@AlertKey="CLEANUP"
+		case "OHPOpera-OHPOutgoingQueueSizePolling":
+		 	@AlertKey="CLEANUP"
+		case "OHPOpera-OHPThroughputMeasurement":
+		 	@AlertKey="CLEANUP"
+		case "OSP-OSPIncomingQueueSizePolling":
+		 	@AlertKey="CLEANUP"
+		case "OSP-OSPOutgoingQueueSizePolling":
+		 	@AlertKey="CLEANUP"
+		case "OSP-OSPThroughputMeasurement":
+		 	@AlertKey="CLEANUP"
+		case "OTP-OTPThroughputMeasurement":
+		 	@AlertKey="CLEANUP"
+		case "OTP-OTPQueueSizePolling":
+		 	@AlertKey="CLEANUP"
+		case "OPERAI100":
+		 	@AlertKey="CLEANUP"
+		case "OPERAI101":
+		 	@AlertKey="CLEANUP"
+		case "OPERAI107":
+		 	@AlertKey="CLEANUP"
+		case "Cosmos-orderSetQtyForAllDone()":
+			@AlertKey="CLEANUP"
+		# The next option is part of the same switch, but is not related to view suppression
+		# but as we are switching on this field, we may as well do everything while we are here.
+	
+		case "file-missing":
+			@Severity = 3
+		
+	
+		# This mod changes events with AlertGroup of Unix and AlertKey of KM to have an AlertGroup value of PATROL As per Gino's request
+		case "KM":
+			@AlertGroup = "PATROL"
+		# End Of UNIX  --> Patrol Group mod  
+
+
+		#
+		# Here we start the DiskSpace events processing, while we are evaluating the AlertKey token.
+		#
+		case "/-CapacityAlert" | "/var-CapacityAlert":
+			$tempIdentifier = @Node + " DiskSpace" + @AlertGroup + " " + @AlertKey + " " + @Type
+
+			# Switch on type here to eliminate extract errors in the probe log.
+			$ruleset = $ruleset + "- Type"
+			switch(@Type)
+				{
+				case "2":
+					$ruleset = $ruleset + " 2"
+					# This is a clear event all tokens should have been set already.
+
+				case "1":
+					$ruleset = $ruleset + " 1"
+					# The Summary format for these is usually:
+					#
+					# /filesystem space usage exceeds xx%
+					# i.e.
+					# / space usage exceeds 90%
+					# /var space usage exceeds 95%
+					#
+					$PercentFull = extract($tmpSummary, ".* ([0-9]+)%")
+					
+					if (int($PercentFull) >=90)
+						{
+						$ruleset = $ruleset + "-if $PercentFull >=90"
+						@Severity=5
+						@Flash=1
+						}
+					else if (int($PercentFull) >=70 && int($PercentFull) <=89)
+						{
+						$ruleset = $ruleset + "- >=70 <=89 Percent Full"
+						@Severity=4
+						}
+					else if (int($PercentFull) >=60 && int($PercentFull) <=69)
+						{
+						$ruleset = $ruleset + "- >=69 Percent Full"
+						@Severity=3
+						}
+					else
+						{
+						# We should never get here
+						$ruleset = $ruleset + "- >=69 Percent Full"
+						@Severity = 2
+						}
+				
+				default:
+					# We should never get here
+					$ruleset = $ruleset + " def"
+					@Severity = 1
+					@Summary = @Summary + " Malformed alert"
+				}
+	
+		case "SWAPfs" | "/sbclocal-CapacityAlert":
+			$tempIdentifier = @Node + " DiskSpace" + @AlertGroup + " " + @AlertKey + " " + @Type
+
+			# Switch on type here to eliminate extract errors in the probe log.
+			$ruleset = $ruleset + "- Type"
+			switch(@Type)
+				{
+				case "2":
+					# This is a clear event all tokens should have been set already.
+					$ruleset = $ruleset + " 2"
+
+				case "1":
+					# The Summary format for these is usually:
+					#
+					# /filesystem space usage exceeds xx%
+					# i.e. 
+					# /sbclocal space usage exceeds 90%
+					# swap space usage exceeds 95%
+					#
+					$PercentFull = extract($tmpSummary, ".* exceeds ([0-9]+)% .*")
+					$ruleset = $ruleset + " 1"
+					if (int($PercentFull) >=95)
+						{
+						$ruleset = $ruleset + "$PercentFull >= 95"
+						$ruleset = $ruleset + "-case : 1"
+						@Severity=5
+						@Flash=1
+						}
+					else if (int($PercentFull) >=90 && int($PercentFull) <=94)
+						{
+						$ruleset = $ruleset + "-$PercentFull) <=94)"
+						@Severity=4
+						}
+					else if (int($PercentFull) >=85 && int($PercentFull) <=89)
+						{
+						$ruleset = $ruleset + "-$PercentFull) <=89)"
+						@Severity=3
+						}
+					else if (int($PercentFull) >=50 && int($PercentFull) <=84)
+						{
+						$ruleset = $ruleset + "-$PercentFull) <=84)"
+						@Severity=2
+						}
+					else
+						{
+						# We should never get here
+						$ruleset = $ruleset + "-should never get here!"
+						@Severity = 2
+						}
+				
+				default:
+					# We should never get here
+					$ruleset = $ruleset + " def"
+					@Severity = 1
+					@Summary = @Summary +  " Malformed alert"
+				}
+				
+	
+		case "FS-full" | "NFS-full":
+			$ruleset = $ruleset + "- Type"
+			switch(@Type)
+				{
+				case "2":
+					# This is a clear event all tokens should have been set already.
+					$ruleset = $ruleset + " 2"
+
+				case "1":
+					$ruleset = $ruleset + " 1"
+					if (nmatch($tmpSummary, "Free disk space"))
+						{
+						#  The Summary format for these is usually:
+						#
+						# Free disk space for /filesystem is at xxx MBytes
+						# i.e.
+						# Free disk space for /home02 is at 2000 MBytes
+						#
+						$ruleset = $ruleset + " FDS"
+						$FreeSpace  = extract($tmpSummary, "^.* is at ([0-9]+) MBytes.*")
+						$tmpFilesystem = extract($tmpSummary, "^[A-Za-z ]+ for (.*) is.*")
+						@AlertKey = $tmpFilesystem
+						if (int($FreeSpace) <=2000)
+							{
+							@Severity = 5
+							@Flash = 1
+							}
+						else if (int($FreeSpace) <=10000 && int($FreeSpace) >2000)
+							{
+							@Severity = 4
+							}
+						else if (int($FreeSpace) <=15000 && int($FreeSpace) >10000)
+							{
+							@Severity = 3
+							}
+						else
+							{
+							@Severity = 2
+							# Not too sure if Type needs resetting to 2 here, will see with time.
+							}
+						}
+					else if (nmatch($tmpSummary,"Filesystem"))
+						{
+						# The Summary format for these is usually:
+						#
+						# Filesystem /filesystem is xx% full
+						# i.e. 
+						# Filesystem /sbclocal is 95% full
+						#
+						$PercentFull = extract(@Summary, ".* ([0-9]+)% full")
+						$ruleset = $ruleset + "-Filesystem"
+						$tmpFilesystem = extract($tmpSummary, "^Filesystem (.*) is.*")
+						@AlertKey = $tmpFilesystem
+						$tmpFileSystemCheck = 1
+						}
+					else if (nmatch($tmpSummary,"Disk usage"))
+						{
+						$PercentFull = extract(@Summary, ".* ([0-9]+)%")
+						$ruleset = $ruleset + "-Disk usage"
+						# the match below looks for exce rather than exceeds or (in US excedes).
+						$tmpFilesystem = extract($tmpSummary, "^[A-Za-z ]+ for (.*) exce.*")
+						@AlertKey = $tmpFilesystem
+						$tmpFileSystemCheck = 1
+						}
+					else if (nmatch($tmpSummary,"Disk space for"))
+						{
+						$ruleset = $ruleset + "-Diskspace"
+						$PercentFull = extract(@Summary, ".* ([0-9]+)% full")
+						$tmpFilesystem = extract($tmpSummary, "^[A-Za-z ]+ for (.*) is .*")
+						@AlertKey = $tmpFilesystem
+						$tmpFileSystemCheck = 1
+						}
+					else 
+						{
+						# Hopefully this should match the following event Summaries
+						#
+						# /filesystem is xx% full
+						$ruleset = $ruleset + "-Fs=full"
+						$PercentFull = extract(@Summary, ".* ([0-9]+)% full")
+						$tmpFilesystem = extract($tmpSummary, "^([^ ]+) is.*")
+						@AlertKey = $tmpFilesystem
+						$tmpFileSystemCheck = 1
+						}
+
+				default:
+					# We should never get here..
+					$ruleset = $ruleset + " def"
+					@Severity = 1
+					@Summary = @Summary +  " Malformed alert"
+				}
+			# We set the tempIdentifier field here as the AlertKey value has not been defined until here.
+			$tempIdentifier = @Node + " DiskSpace" + @AlertGroup + " " + @AlertKey + " " + @Type
+	
+		default:
+			# This just sweeps to catch any filesystem events that were not caught in the lines above.
+			# Typically this catches more capacity alerts on non-standard or non-system partitions.
+			if (regmatch($tmpAlertKey,"CapacityAlert"))
+				{
+				$ruleset = $ruleset + " def"
+				$PercentFull = extract(@Summary, ".* ([0-9]+)%")
+				$tmpFileSystemCheck = 1
+				$tempIdentifier = @Node + " DiskSpace" + @AlertGroup + " " + @AlertKey + " " + @Type
+				}
+			# End of re-sweep for filesystem alerts.
+		}	
+	
+	# We set analyse Filesystem full/usage events here.
+	$ruleset = $ruleset + "$tmpFileSysChk" 
+	switch($tmpFileSystemCheck)
+		{
+		case "1":
+			$ruleset = $ruleset +  " 1"
+			switch($tmpAlertGroup)
+			{
+				case "UNIX":
+					$ruleset = $ruleset + " UNIX"
+					if (int($PercentFull) >=95)
+						{
+						@Severity=5
+						@Flash=1
+						}
+					else if (int($PercentFull) >=90 && int($PercentFull) <=94)
+						{
+						@Severity=4
+						}
+					else if (int($PercentFull) >=85 && int($PercentFull) <=89)
+						{
+						@Severity=3
+						}
+					else if (int($PercentFull) >=50 && int($PercentFull) <=84)
+						{
+						@Severity=2
+						}
+					else
+						{
+						@Severity = 2
+						@Type = 2
+						}
+				default:
+					$ruleset = $ruleset + " def"
+		
+					if (int($PercentFull) >=95)
+						{
+						@Severity=5
+						@Flash=1
+						}
+					else if (int($PercentFull) >=80 && int($PercentFull) <95)
+						{
+						@Severity=4
+						}
+					else if (int($PercentFull) >=75 && int($PercentFull) <80)
+						{
+						@Severity=3
+						}
+					else
+						{
+						@Severity = 2
+						@Type = 2
+						}
+				}
+		default:
+		}
+		
+	
+	
+	##################################
+	# This area was added for Equities
+	# initially to populate the field
+	# 'Stream' which was added to the
+	# Object Server Database.
+	#################################
+	
+	#Updating the 'Stream' Field based on all of this data
+	if( match( @Agent, "Patrol" ) )
+	$ruleset = $ruleset + "- Agent=patrol AG " + @AlertGroup
+		{
+        	switch(@AlertGroup)
+                	{
+                        	case "HOG":
+                                	@Stream= @Location + " Equities"
+                                case "HOG-NOTIFIER":
+                                	@Stream= @Location + " Equities"
+				case "HOG-CLUSTER":
+					@Stream= @Location + " Equities"
+                        	case "OASIS":
+                                	@Stream= @Location + " Equities"
+                        	case "ENSIGN":
+                                	@Stream= @Location + " XPROD-GEMM"
+                        	case "FIX":
+                                	@Stream= @Location + " Equities"
+                        	case "FIX-ENGINE":
+                                	@Stream= @Location + " Equities"
+				case "FIXWEB":
+					@Stream= @Location + " Equities"
+				case "COSMOS":
+					@Stream= @Location + " Equities"	
+				case "OPERA":
+					@Stream= @Location + " Equities"
+				case "TES_CLIFFT":
+					@Stream= @Location + " Equities"
+				case "OASIS-SGW-FTP":
+					@Stream= @Location + " Equities"
+				case "TETRIS":
+					@Stream= @Location + " Equities"
+				case "Tetris":
+					@Stream= @Location + " Equities"
+				case "USRouterBrass":
+					@Stream= @Location + " Equities"
+				case "USRouterNYFix":
+					@Stream= @Location + " Equities"
+				case "USROUTER":
+					@Stream= @Location + " Equities"
+				case "DETOX":
+					@Stream= @Location + " Equities"
+				case "DETOX-COLT-ADAPTER":
+					@Stream= @Location + " Equities"
+				case "DetoxCosmosOTCAdapter":
+					@Stream= @Location + " Equities"
+				case "STAR":
+					@Stream= @Location + " Equities"		
+				case "SWEEP":
+					@Stream= @Location + " Equities"
+				case "CALMViewManager":
+					@Stream= @Location + " Equities"
+				case "DETOX":
+					@Stream= @Location + " Equities"
+				case "OASIS_TPOS_WATCHER":
+					@Stream= @Location + " Equities"
+                        	default:
+                        		$ruleset = $ruleset + " def"
+                                	@Stream= @Location
+                	}
+		}
+	if (match (@AlertKey, "DB-STORAGE"))
+		{
+		@AlertKey= "DB-STORAGE"
+		$ruleset = $ruleset + "-AK DB-Storage"
+		}
+	if (match (@AlertKey, "5.6") || match (@AlertKey, "5.8") || nmatch (@AlertKey, "sun") )
+		{	
+		@AlertKey="SOLARIS"
+		$ruleset = $ruleset + "-AK Solaris"
+		}
+	if (match (@AlertKey, "file-missing") || match (@AlertKey, "BadEntry") )
+		{
+		@AlertKey="PATROL"
+		$ruleset = $ruleset + "-AlertKey-Patrol"
+		}
+	# Check for the presence of a $tempidentifier token (probably set as a result of a DISK, CPU or MEM fault.
+	# If the token already exists, then do not set it here, use the current value.
+	if (not (exists ($tempIdentifier)))
+		{
+		$tempIdentifier = substr($Node + " " + @Location + " " + @AlertGroup + " " + @AlertKey + " "  + @Summary,1,255)
+		$ruleset = $ruleset + "-$tempIdentifier"
+		}
+	#Das end of this thing.  Press go to go back ;)

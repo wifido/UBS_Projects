@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+#
+#
+# UBS /etc/init.d/nco generic script
+#
+#---------------------------------------------------------------------------------------
+#
+# Version:	1.0
+# Date:		15th October 2008
+# Author:	Gary Thomas (Abilitec Ltd)
+# Usage:	nco start | start flex | start nco | stop | stop flex | stop nco
+#---------------------------------------------------------------------------------------
+
+# Variable definitions:
+NCHOME=/sbclocal/netcool
+OMNIENV=${NCHOME}/UBS_ENVIRONMENT
+NCSTARTUP=${OMNIENV}/nco-startup
+OMNIHOME=${NCHOME}/omnibus
+OMNILOG=${OMNIHOME}/log
+LOGFILE=${OMNILOG}/STARTUP_SCRIPT.log
+
+
+# Sanity checks and script arguments.
+if [ ! -x ${NCSTARTUP} ]; then
+	echo "Netcool startup script ${NCSTARTUP} not found or not executable... Exit quickly"
+	exit 1
+fi
+
+case "$#" in
+	'1' | '2')
+		case "$1" in
+			'start')
+				STATE=$1
+				RUNSTATE=Startup
+				;;
+			'stop')
+				STATE=$1
+				RUNSTATE=Shutdown
+				;;
+			*)
+				echo "Usage $0 start | start nco | start flex | stop | stop nco | stop flex:"
+				exit 1
+				;;
+		esac
+		if [ ! -z "${2}" ]; then
+			case "${2}" in
+				'flex' | 'nco')
+					COMPONENT=$2
+					echo "Netcool ${RUNSTATE} : Performing ${RUNSTATE} on ${COMPONENT} processes"
+					;;
+				*)
+					echo "Usage $0 start | start nco | start flex | stop | stop nco | stop flex:"
+					;;
+			esac
+		else 
+			echo "Netcool ${RUNSTATE} : Performing ${RUNSTATE} on all Netcool and flex processes"
+		fi
+		;;
+esac
+
+# This bit just ensure that a valid powerbroker token is in place before we try and start Netcool processes
+USERID=`id | cut -f2 -d'=' | cut -f1 -d'('`
+if [ "${USERID}" -gt 0 ]; then
+	FILECMD=/usr/bin/file
+	pbrun ${FILECMD} ${0}
+fi
+USERNAME=`id | cut -f2 -d'(' | cut -f1 -d')'`
+# OK we are good to go now. Launch 
+echo "`date -u` /etc/init.d/nco called by ${USERNAME} with ${@} arguments" >> ${LOGFILE}
+${NCSTARTUP} ${STATE} ${COMPONENT} >> ${LOGFILE} 2>&1 &
+
+
+exit 0
+
+# END

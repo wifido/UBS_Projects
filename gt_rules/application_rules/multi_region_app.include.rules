@@ -1,0 +1,69 @@
+case "1056901" | "1000211" | "1000217" | "1056306":
+# Set as many Object Server fields as possible based on
+# the tokens provided in the event source.
+$ruleset = $ruleset + "-multi_region_app"
+@Agent = $Transport
+@Class = $ClassID
+@Summary = $MessageText
+@Stream = $Stream
+@Environment = $Environment
+@Subclass = $Subclass
+@UserData = $Userdata
+@UserInt = $Userint
+@SAPNumber = $SAPnumber
+
+# Create the AlertGroup field here. Value will change
+# dependant on presence of $Component token.
+
+if (exists($Component))
+{
+	@AlertGroup = $Component
+	$ruleset = $ruleset + " Component"
+}
+else
+{
+	@AlertGroup = $SAPname
+}
+
+#
+# This sets the "compound key" based on Location and Class
+# If you find that the Location token is not as it should be (i.e. it's not "London" or "Zurich" etc.)
+# then the OwnerGID will be incorrect.
+#
+
+$temp_length_location = length($Location)
+if (exists($Location) && int($temp_length_location) > 0)
+{
+	@Location = $Location
+	$ruleset = $ruleset + " Location"
+}
+
+$tempClass = @Location + ":" + $ClassID
+
+# Create the AlertKey field here. Value will change
+# dependant on the presence of $ProcessID token
+@AlertKey = $EventIdentifier
+if (exists($ProcessID) && int($ProcessID) > 0)
+{
+	@AlertKey = $EventIdentifier + "-" + $ProcessID
+	$ruleset = $ruleset + " ProcessID"
+}
+#	20070112	Temp by Chris Janes
+$ruleset = $ruleset + " EventType = " + $EventType
+
+#	20070112	End of Temp
+
+@Display_Hide = 0
+@Type = $EventType
+switch ($EventType)
+{
+#	20070110	Change by Chris Janes of Abilitec
+case "1":
+	@Type = 1
+#	20070110	End of changes
+case "2":
+	@Severity = 1
+default:
+}
+
+

@@ -1,0 +1,88 @@
+case "baseboardGroup" | "aryMgrEvts":
+    $ruleset = $ruleset + "-dell"
+    @Agent="Dell"
+    @Summary=$3
+    @AlertKey=$2
+    @AlertGroup='UNIX'
+    $TempDoLookup = 2
+    @Class = 123000
+    @OwnerGID = 468 
+    @OwnerUID = 65534
+    switch($4)  {
+        case "3":
+        @Severity=2
+        case "4":
+        @Severity=3
+        default:
+        @Severity=1
+    }
+
+	$ruleset = $ruleset + " ST " + $specific-trap
+    ## GT. 12/8/4  The following traps decoded as per Nathan Dibleys requirements
+    switch($specific-trap)
+    {
+    	case "1354":	### Power supply failure
+		@Severity = 5
+		@Type = 1
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Power supply"
+		@Summary = $tmpmessage
+			
+	case "1352":	### Power Supply recovery
+		@Severity = 1
+		@Type = 2
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Power supply"
+		@Summary = $tmpmessage
+		
+	case "1254":	### Chassis Intrusion detected
+		@Severity = 3
+		@Type = 1
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Chassis intrusion"
+		@Summary = $tmpmessage
+		
+	case "1252":	### Chassis Intrusion cleared
+		@Severity = 1
+		@Type = 2
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Chassis intrusion"
+		@Summary = $tmpmessage
+		
+	case "1104":	### Fan failure
+		@Severity = 5
+		@Type = 1
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Fan fail"
+		@Summary = $tmpmessage
+			
+	case "1102":	### Fan recovery
+		@Severity = 1
+		@Type = 2
+		$tmpmessage = printable($3)
+		$tmpsensor = extract($tmpmessage,".* Sensor location: ([A-Za-z 0-9]+) Chassis location.*")
+		$tmpchassis = extract($tmpmessage,".*Chassis location: ([A-Za-z 0-9]+) Previous .*")
+		@AlertKey = $tmpsensor + " - " + $tmpchassis
+		@AlertGroup = "Fan fail"
+		@Summary = $tmpmessage
+		    	
+	default:   ### Leave the event as it is.
+		$ruleset = $ruleset + "-case : default"
+		@Stream = printable($3)
+    }
+$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey

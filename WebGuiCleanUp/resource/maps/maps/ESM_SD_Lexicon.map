@@ -1,0 +1,4 @@
+map(name="ESM_SD_Lexicon",bgImage="LEXICON.jpg",bgColor="white",w="950",h="700",acl="*")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="219",x="313",w="82",entity="ESM_sldn1681pap",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_sldn1681pap")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="363",x="312",w="82",entity="ESM_sldn0633psy",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_sldn0633psy")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="363",x="570",w="82",entity="ESM_sm0p8261syb",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_sm0p8261syb")

@@ -1,0 +1,6 @@
+map(name="GESS_Premium",bgImage="",bgColor="#003366",w="176",h="250",acl="*")
+button(legend="Count",arc diameter="20",type="rounded",url="",datasource="NCOMS",label="GESS_Premium",font color="black",y="87",x="100",w="50",entity="gess_all",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="main",name="visual_2")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_blank",entity="",justify="center",font="Helvetica",color="#ffffcc",label="GESS (Global)",style="b",y="23",url="$(SERVER)/diskstorage/index.html",size="14",name="GESS",x="30")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ffffcc",label="GESS (Original)",style="b",y="106",url="",size="11",name="GESS_Original",x="6")
+button(legend="Count",arc diameter="20",type="rounded",url="",datasource="NCOMS",label="GESS_Infra",font color="black",y="50",x="100",w="50",entity="APP_GESS_Infra",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="main",name="visual_1")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ffffcc",label="GESS (Premium)",style="b",y="69",url="",size="11",name="GESS_Premium_UnAck",x="6")

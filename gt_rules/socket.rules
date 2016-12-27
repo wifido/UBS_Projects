@@ -1,0 +1,699 @@
+# Date:   September 24th 2003
+# Author: Gary Thomas (Abilitec Ltd)
+#
+# Socket probe rules file for UBS
+#
+
+#	20060517	Additions for FastTrack by Chris Janes of Abilitec
+# Register all potential target ObjectServers
+include "$OMNIHOME/etc/register_target.include.rules"
+
+#	20060517	End of Additions
+
+
+#
+# First define any arrays
+
+array NodeLoads;
+array ServerLoads;
+#	20060908	Added by Chris janes of Abilitec for use with split throughout the rules files
+array	SplitArray;
+#	20060908	End of Addition 
+#  20061214		New arrays defined GT 
+array EventCount;
+array SpamList;
+#  20061214		End of New array definitions.
+
+# Now the lookup tables:
+#
+include "$OMNIHOME/all_rules/ubsw/lookuptables/socket.include.lookup"
+table regloc = "$OMNIHOME/all_rules/ubsw/lookuptables/regloc.lookup"
+default = {"Undefined","Undefined","Undefined"}
+table hbtdnsexceptions = "$OMNIHOME/all_rules/ubsw/lookuptables/hbtdnsexceptions.lookup"
+default = {"","","","0"}
+# John Owens - Lookup table to set the SLA of the Event
+table SLA_lookup = "$OMNIHOME/all_rules/ubsw/lookuptables/support-level.lookup"
+default = "2"
+# Alan Charlton - Abilitec - Lookup table for lookups "common" to all probes
+include "$OMNIHOME/all_rules/ubsw/lookuptables/common.lookup"
+
+include "$OMNIHOME/all_rules/ubsw/lookuptables/routing.lookup"
+
+#include "$OMNIHOME/all_rules/ubsw/lookuptables/mom_user.lookup"
+table mom_user = "$OMNIHOME/all_rules/ubsw/lookuptables/mom_user.lookup"
+default = "2521"
+# Autosys Job - Class - GID map table
+include "$OMNIHOME/all_rules/ubsw/lookuptables/Autosys_ClassGroup.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/risk.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassRisk.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/imp.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/monitoring_hosts.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassStream.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/fast_track.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/version.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/app_hbt.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/zerot.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/isc_levelzero.lookup"
+
+#       20080512        Changes by Chris Janes of Abilitec TD 4832
+table DB_SLA_lookup = "$OMNIHOME/all_rules/ubsw/lookuptables/PS_Database_Hosts.lookup"
+default = "2"
+
+#       20080512        End of Changes
+#       20091112        GT BR 670
+include "$OMNIHOME/all_rules/ubsw/lookuptables/netapp_isc.lookup"
+#       20091112        End of change
+
+
+#	20080722	Change By GT. Temporary lookup table defined to catch all Log4j-Appender hosts in order to set timestamp. This is ongoing investigation 
+#			into delayed events through log4j appender.
+include "$OMNIHOME/all_rules/templog4j.lookup"
+#
+#	20080722	End of change.
+
+
+# End of lookup table assignments.
+# Now the usual ProbeWatch switch.....
+if( match( @Manager, "ProbeWatch" ) )
+{
+        $hostname = hostname()
+        $ruleset = $hostname + " " + $RulesVersion + " Socket ProbeWatch"
+	switch(@Summary)
+	{
+		case "Running ...":
+			@Severity = 1
+			@AlertGroup = "Probe"
+			@Type = 2
+		case "Going Down ...":
+			@Severity = 5
+			@AlertGroup = "Probe"
+			@Type = 1
+		default:
+			@Severity = @Severity
+	}
+	@AlertKey = @Agent
+	@Summary = @Agent + " probe on " + @Node + ": " + @Summary
+	update( @Summary )
+}
+else if (match($ClassID,"OPEX")) {
+
+	# These rules are a special case and need to bypass all other rules definitions.
+	include "$OMNIHOME/all_rules/ubsw/application_rules/opex.rules"
+
+}
+else
+{
+
+	# Token $tmpISHeartbeat added by G.Thomas 18/08/06. This token should not be used by this probe, it is only added
+	# as this rules file calls the location.include.rules file, where it is used to determine Location and Region values
+	# for SSM Heartbeat messages. we ensure that any events from this probe do NOT traverse that logic by defining
+	# a default value here.
+	$tmpISHeartbeat = 0
+
+	# First we identify where the probe is running in order to route events correctly. GT 30/10/6
+        @ProbeHostName = hostname()
+	# Now we set up some field defaults here. Manager is constructed from value
+	# defined in the props file. These fields are applicable regardless of the
+	# event source or are over-written in the applicable include file.
+
+	@Manager = %Name
+
+
+#	Set the default ObjectServer
+#	20090220	GT	Changed lookup statement to include app_hbt_status.
+	[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $UBS_CAHOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+	#[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+#	20090220	GT End of change.
+	switch ($UBS_OS)
+	{
+
+		include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+	}
+	$tempServer = $UBS_OS
+
+	include "$OMNIHOME/all_rules/ubsw/common_includes/version.include.rules"
+#	20080804	Change by Chris Janes of Abilitec
+	$LookupVersion=lookup("lookup_version", LookupVersion)
+#       20081001        Change by Chris Janes of Abilitec       TD5071
+#       $ruleset = $RulesVersion + " " + $LookupVersion + " Socket"
+        $ruleset = " Socket"
+        $TD_Num = "5071"
+#       20081001        End of Change
+
+	$na_length = length($Nodealias)
+	$nA_length = length($NodeAlias)
+	$no_length = length($Node)
+
+	if (exists($Nodealias) && int($na_length) > 0)
+	{
+		@NodeAlias = $Nodealias
+		@Origin = $FQDN                         
+	}
+	else if (exists($NodeAlias) && int($nA_length) > 0)
+	{
+		@NodeAlias = $NodeAlias
+		@Origin = $FQDN                     
+	}
+	else
+	{
+		@NodeAlias = $FQDN
+	}
+
+	if (exists($Node) && int($no_length) > 0)
+	{
+		@Node = $Node
+		@Origin = $FQDN
+	}
+	else
+	{
+		@Node = $Hostname
+	}
+	$test_severity = upper($Severity)
+	if (match($test_severity, "DEBUG"))
+	{
+		log(ERROR, "PROBESTAT LEVEL - Event came in with error level of DEBUG...Event discarded from " + @NodeAlias + " with Class " + $ClassID)
+		discard
+	}
+	[@Severity,@ExpireTime] = lookup($Severity,SevLookUp)        
+	update(@Severity)
+
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/supt_level.include.rules"
+
+
+
+	#
+
+	# All UBS applications should provide a $ClassID token, so we will use this to
+	# provide the basis for generic event handling, or for calling sub-rules
+	# sets to handle events that cannot conform to the published generic behaviour.
+
+	# Here we make sure that we have been provided with a proper
+	# timestamp. If no timestamp for the event we will supply one.
+	# A rough and ready test is that the epoch timestring should
+	# be 10 characters long (until about 2038).
+	$tempEventTime = length($EventTime)
+	$tempNowTime = getdate
+	switch($tempEventTime)
+	{
+		case "10":
+			@FirstOccurrence = $EventTime
+			@LastOccurrence = $EventTime
+			update(@LastOccurrence)
+
+#	20080227	Change by Chris Janes of Abilitec removeal of 20080219
+##	20080219	TEMP Change by Chris Janes for JO - expected to be removed 20080221
+#			@RemData2 = $EventTime
+#			@RemData3 = $tempNowTime
+#
+##	20080219	End of TEMP CHANGE
+#	20080227	End of CHANGE
+
+
+			$timeDiffSecs = int($tempNowTime) - int($EventTime)
+			$timeDiff = real($timeDiffSecs) / 3600
+			if (int($timeDiff) >= 60)  {
+				$logMsg = "DELAYEDEVENT from " + @NodeAlias + ": EventTime: " + $EventTime + ": current time: " + $tempNowTime + ": timediff: " + $timeDiff + " hours"
+				log(ERROR, $logMsg)
+			}
+
+		default:
+			# Looks like we either had no date token supplied, or
+			# it was formatted incorrectly. We
+			# will synthetically introduce one here. And modify 
+			# Summary field to highlight this.
+			$TOKENERROR = (int($TOKENERROR) + 1 )
+			@Summary = "EventTime token invalid. Please see Details for original Summary"
+			# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+			include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+			@FirstOccurrence = $tempNowTime
+			@LastOccurrence = $tempNowTime
+			update(@LastOccurrence)
+	}
+
+#	20080820	Changes by Chris Janes of Abilitec for Sharif Johnson TD 5020
+#			automatically discard the event if this is an appender heartbeat
+	if( exists($SystolicHeartbeat) || exists($DiastolicHeartbeat))
+	{
+		$tempMarkForDiscard = 3
+	}
+#	20080820	End of Change
+
+	if (exists($ClassID))
+	{
+		# As the $ClassID token exists, It must have come from a UBS Application.
+		$tempClass = $ClassID
+		switch($ClassID)
+		{
+			# This is where we can call sub-rules sets by include statements
+			# in the format:
+
+			## include "$OMNIHOME/all_rules/ubsw/application_rules/<NEW_INCLUDE_RULES>"
+			 include "$OMNIHOME/all_rules/ubsw/autosys_rules/autosys.socket.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/tradewatch.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/firc_energy.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/mom.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/multi_region_app.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/nokeyswap.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/SocketLatency.rules"
+			include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/halo.rules"
+			include "$OMNIHOME/all_rules/ubsw/common_includes/pdh_include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/Procmon.include.rules"
+			include "$OMNIHOME/all_rules/ubsw/common_includes/StartStop_include.rules"
+			include "$OMNIHOME/all_rules/ubsw/common_includes/probe_loglevel_include.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/telnetcool.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/opex_test.rules"
+			include "$OMNIHOME/all_rules/ubsw/application_rules/bmc_pem.include.rules"
+
+#	20080129	Changes by Chris Janes of Abilitec HDLDN0001699406 
+                        include "$OMNIHOME/all_rules/ubsw/application_rules/bims.rules"
+#       20091014        MK Added the RCAS include file
+                        include "$OMNIHOME/all_rules/ubsw/application_rules/rcas.rules"
+
+#	20080129	End of Changes
+                        include "$OMNIHOME/all_rules/ubsw/storage_rules/diskusage.rules"
+
+#	20090309	GT Added this include file.
+			include "$OMNIHOME/all_rules/ubsw/application_rules/UBS_OS_Trigger.rules"
+#	20090309	End of Change.
+
+#	20080129	Changes by Chris Janes of Abilitec HDLDN0001699406 
+#                        include "$OMNIHOME/all_rules/ubsw/application_rules/ice.rules"
+#	20080129	End of Changes
+			## The include file should take the format:
+			##      # Comments
+			##      Case "XXXXX":
+			##              @Field = Value
+			##              @Field2 = values
+			##              $tempIdentifier = "What ever you want - what ever you need - what ever you say - you pay your money - you take your choice"
+			##
+			##      # End of include file
+
+			# When defining the include rulesfile, remember to define the
+			# $tempIdentifier token or the default @Identifier value will 
+			# be set below.
+
+			case "0":
+				# If the $ClassID token exists, but has no value treat it as set incorrectly,
+				# as this will insert the event as a default Class (generic) to Netcool.
+				# This include file contains some defaults just to get the event into the Object Server.
+				# If event streams are going to fall into this section, then a switch or if statement will 
+				# need to be defined, to ensure event integrity.
+
+				include "$OMNIHOME/all_rules/ubsw/application_rules/No_Class_exceptions.rules"
+				# Just to make clear why this event was malformed, modify the Summary field to provide a meaningful error.
+				@Summary = "ClassID token incorrectly defined"
+				$TOKENERROR = (int($TOKENERROR) + 1 )
+
+			default:
+				# Set as many Object Server fields as possible based on
+				# the tokens provided in the event source.
+				$ruleset = $ruleset + " Default"
+				@Agent = $Transport
+				@Class = $ClassID
+				@Summary = $MessageText
+				@Stream = $Stream
+				$temp_length_location = length($Location)
+				if (exists($Location) && int($temp_length_location) > 0)
+				{
+					@Location = $Location
+				}
+				# Added extra name value pairs to be passed by the applications generating events.
+				# Giles Blake, Abilitec. 040406
+				@Environment = $Environment
+				@Subclass = $Subclass
+				@UserData = $Userdata
+				@UserInt = $Userint
+				@SAPNumber = $SAPnumber
+#       20061127        Chris Janes
+                                @SourceKey=$SourceKey
+                                @RemData1=$RemData1
+
+#	20080227		Change by Chris Janes of Abilitec to remove 20080220
+##	20080220		TEMP Change by Chris Janes to debug Appender Problem
+##                               @RemData2=$RemData2
+#
+#				$lenRemData2 = length($RemData2)
+#				if (exists($RemData2)&& int($lenRemData2) > 0 )
+#				{
+ #                               	@RemData2=$RemData2
+#				}
+#
+##	20080220		End of Change
+				@RemData2=$RemData2
+#	20080227		End of Change
+#       20061127
+
+				#  17th November 2004 AlertGroup and AlertKey values swapped at David Maxwells request
+				# Values changed to reflect this.
+				# Create the AlertKey field here. Value will change
+				# dependant on presence of $Component token.
+
+				if (exists($Component))
+				{
+					@AlertKey = $Component
+				}
+				else
+				{
+					@AlertKey = $SAPname
+				}
+
+				# Create the AlertGroup field here. Value will change
+				# dependant on the presence of $ProcessID token
+				@AlertGroup = $EventIdentifier
+				if (exists($ProcessID) && int($ProcessID) > 0)
+				{
+					@AlertGroup = $EventIdentifier + "-" + $ProcessID
+				}
+				#
+				# Temporary fix applied here for SwissGroup due to AlertGroup issues in Log4cplus
+				# Read to EndOfFix
+				if (int($ClassID) == 49999)
+				{
+						@AlertGroup = $MessageText
+				}
+				# EndOfFix
+
+
+
+				# Here we define the Type and Display_Hide fields based on
+				# the values of the $EventType and $ArchiveOnly tokens. 
+				# The Log4xxx appenders will either supply true or no value for $ArchiveOnly.
+				# To counter this we assign $ArchiveOnly to a temporary token $tempArchiveOnly.
+				# We then look for the value of this temporary to be either "true", in which case,
+				# The event is declared as a hidden event which will be archived to Oracle and aged out of
+				# the Object server within 3 minutes (enough time to traverse all gateways to Oracle.
+				# ANY other value for this tempArchiveOnly token should mean we evaluate the $EventType token to
+				# discern if the event is a 'correlatable' failure or resolution, or an event that should expire
+				# after the value of $EventType in seconds (minimum allowed value is 180 seconds). If 
+				# these tokens are not set the default value for $EventType and $ArchiveOnly
+				# will be zero. The result of this is that the evnt will neither 'age out' or
+				# correlate with a known clear. The event MUST be manually deleted from the
+				# Object Server by the GSD team. If the GSD team or apps developers do not like
+				# this then get them to supply the tokens correctly. The other alternative is
+				# to raise the event as malformed....
+
+				$tempArchiveOnly = $ArchiveOnly
+
+				switch($tempArchiveOnly)
+				{
+                        
+					case "true":
+					# When this token has a value of 1, the event is not required in
+					# the 'real-time' event list. The event is passed to the Object
+					# Server purely for onward transmission to the Oracle Reporter
+					# database. The view is suppressed from event lists with @Display_Hide
+					# field, and set to expire after 180 seconds, which should be long
+					# enough to see the event propogate through the Reporter gateway.
+
+						@Type = 180
+						@Display_Hide = 1
+				               
+				default:
+					# Here we assume that the event MUST be displayed in an event list,
+					# so we evaluate the $EventType and $TimeToClear token values to  
+					# determine values for @Type. so @Display_Hide initialised (just in case).
+					# Again we create a temp token here for $EventType in order that we always
+					# trip through this switch correctly.
+                        
+					$tempEventType = $EventType
+					@Display_Hide = 0
+					switch ($tempEventType)
+					{
+						case "1":
+						# This indicates that the event is a 'Failure' event
+						# that has an associated event that indicates the failure
+						# is resolved. For this reason we ignore the $TimeToClear
+						# token, just setting the  @Type field in order for the
+						#  Generic Clear automation to function correctly.
+                        
+							@Type = $EventType
+                        
+						case "2":
+						# This indicates that the event is telling us that the
+						# problem has been resolved (A clear event).
+						# Here we set the @Type field correctly for the Generic
+						# Clear Automation. Additionally we modify
+						# the @Severity field value to insert the 'Clear' event
+						# as Severity = 1. This leads to greater 
+						# efficiency in the Generic Clear Automation.
+                        
+							@Type = 2
+							@Severity = 1
+				                       
+						default:
+                        
+						# If TimeToClear token is set to 0 event will never
+						# expire from Object Server. If TimeToClear token
+						# value set to 1-180 seconds, it is unlikely that the
+						# event will have enough time to propogate
+						# through all gateways, before expiring. So we set a default
+						# value of 180.
+                        
+							if (int($TimeToClear) > 0 && int($TimeToClear) < 180 )
+							{
+								@Type = 180
+							}
+							#
+							# This elseif statement added short term to resolve
+							# an issue with the log4perl never sending $EventType or $TimeToClear
+							# Read to EndOfFix1.
+							else if (int($TimeToClear) == 0)
+							{
+								@Type = 1
+							}
+							# EndOfFix1
+							else
+							{
+								@Type = $TimeToClear
+							}
+
+					}
+				}
+		}       
+		
+	}
+                
+	else
+	{
+		# No $ClassID token was supplied in the event stream. This should not happen from a UBS application.
+		# If some special ruleset is required, put the include call here in the following format:
+		# When defining the include rulesfile, remember to define the $tempIdentifier token or the 
+		# default @Identifier value will be set below.
+
+		## include "$OMNIHOME/all_rules/ubsw/application_rules/<NEW_INCLUDE_RULES>
+
+		# This include file contains some defaults just to get the event into the Object Server.
+		# If event streams are going to fall into this section, then a switch or if statement will 
+		# need to be defined, to ensure event integrity.
+
+		include "$OMNIHOME/all_rules/ubsw/application_rules/No_Class_exceptions.rules"
+
+
+	}
+	# Last sanity check here. Just to check if more than 1 token was malformed. As each malformed
+	# token updated the @Summary field, we may not be advising of all the tokens in error at first
+	# parse.  Remember Details were already turned on when we see a token in error, but to be on
+	# the safe side.Therefore:
+	if (int($TOKENERROR) > 1 )
+	{
+		@Summary = "More than 1 token was malformed. Please see Details table...."
+		# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+		include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+	}
+	
+	# We set the Location and Region field from the Fully Qualified Domain Name here.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/location.include.rules"
+
+	# Here we will auto-assign the Netcool OwnerGID field based on the value of the @Class assignment. This is defined in the lookup
+	# table SocketClassGID from the socket.include.lookup file. OwnerUID set to a default 'nobody'
+
+
+        switch($TempDoLookup)  
+	{
+                case "2":
+                        # Do nothing here as the Class and OwnerGID must already have been set in the
+                        # subrules.
+
+		case "1":
+			# Do the OwnerGID lookup but NOT the OwnerUID lookup
+			@OwnerGID = lookup($tempClass,SocketClassGID)
+                default:
+			@OwnerGID = lookup($tempClass,SocketClassGID)
+			@OwnerUID = 65534
+        }
+
+#       20081030        Change by Chris Janes of Abilitec TD 5111
+        include "$OMNIHOME/all_rules/ubsw/common_includes/isc.rules"
+	# MK 20090701 Per TD#5261
+	include "$OMNIHOME/all_rules/ubsw/common_includes/specific.autoTT.include.rules"
+
+#       20081030        End of Change
+
+
+	# Check to see if this event should be notified to a chat channel
+#	Change made by Sharif Johnson for Class based notification	
+	if (match(@Alarm_Dest, ""))
+        {
+                [@Notification, @Alarm_Dest] = lookup(@Class, NotifyTable_by_class)
+        }
+	if (match(@Alarm_Dest, ""))
+        {
+                [@Notification, @Alarm_Dest] = lookup(@OwnerGID, NotifyTable)
+        }
+	
+	
+	# This If statement checks to dee if any processing is specific to dev environment, and allows promotion of the 
+	# Rules file to production without any compromise.
+	if (int($DEV) == 1)
+	{
+		include "$OMNIHOME/all_rules/ubsw/application_rules/keep_in_dev.include.rules"
+	}
+	# End of dev specific rules set
+
+	# Update statement for Summary added here to ensure it is the default behaviour.
+	update (@Summary)
+
+	# Define the Identifier here after all possible fields have been set. If sub rules have been called, a value for the Identifier
+	# field may have been defined in the $tempIdentifier token, so we will check first.
+
+	if (exists($tempIdentifier))
+	{
+		@Identifier = $tempIdentifier
+	}
+	else
+	{
+		@Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass + " " + @Environment
+	}
+                
+
+	# Set expire times here.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/expiretime.rules"
+	update(@ExpireTime)
+        update(@ProbeHostName)
+
+
+	include "$OMNIHOME/all_rules/ubsw/common_includes/risk.include.rules"
+
+        # Mahesh Kumar TD #5222
+        # PEM zOS alerts.Set appropriate values for bypassGradeLookup and tempGrade
+        # to avoid lookup on MonHosts table.
+        if (match(@Class, "2222229")) {
+            $bypassGradeLookup = 1
+	    $tempGrade = @Grade
+        }
+
+	# 20071228  GT, added a switch to bypass this lookup.
+	#@Grade = lookup(@NodeAlias, MonHosts)
+	switch($bypassGradeLookup)
+	{
+		case "1":
+			@Grade = $tempGrade
+		default:
+			@Grade = lookup(@NodeAlias, MonHosts)
+	}
+
+	# 20071228 GT end of change
+
+	if (match(@Grade,"999") && Not match(@Class,"2222229"))
+	{
+		# Change to only allow alerts from PROD servers marked for AEN. TD 5272
+		if (regmatch(@NodeAlias, "^[a-z][a-z][a-z][a-z][0-9][0-9][0-9][0-9][p][a-z][a-z].*$"))
+		{
+		    switch(@Severity)
+		    {
+			case "5":
+				$AENFlag = 1
+				$AENChannel = "Monitoring"
+			default:
+		    }
+		}
+	}
+	if (match(@Class,"1640"))
+	{
+		$AENFlag = 1
+		$AENChannel = "DUFF"
+	}
+
+	include "$OMNIHOME/all_rules/ubsw/common_includes/aen.include.rules"
+
+	@BusinessStream = lookup(@Class, ClassStream)
+
+	include "$OMNIHOME/all_rules/ubsw/common_includes/app_hbt.rules"
+
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/supt_level.include.rules"
+#	20090922 GT this netxt section rearranged to include specific opex rules and TT_raise.
+#	Add new lookup table here. Temporary measure to debug appender timing issues.
+	if (nmatch(@Agent,"log4j-appender"))
+	{
+		$tempsetSLATime = lookup(@Class,templog4j)
+		switch($tempsetSLATime)
+		{
+			case "1":
+				# Set SLA_Time, as this is one of the classes we want.
+				@SLA_Time = $tempNowTime
+			default:
+				# DO nothing, as this Class is not in the temp table.
+		}
+	}
+	switch($ClassID) {
+		case "OPEXTEST":
+			# Reset SLATime and Bypass the next bit.
+			@SLA_Time = getdate + int($SLAtime)
+			@AENFlag  = 0
+		default:
+			include "$OMNIHOME/all_rules/ubsw/common_includes/specific.opex.include.rules"
+	}
+
+        switch($TT_raise)
+	{
+		case "1":
+			if (int(@ActionCode) > 0 && int(@ActionStatus) == 0) {
+				# This will act ONLY on Opex events where the original event would default to raising a ticket.
+				@TTicket_Status = 6
+				$ruleset = $ruleset + "TTOT"
+			}
+			else if (match(@Severity, "5")){
+				# Critical alerts "on insert"
+				@TTicket_Status = 8
+				$ruleset = $ruleset + "TTCR"
+			}
+			else {
+				# New status code for non-critical alerts "on insert" which are
+				# tentatively marked for autoTT and will get a autoTT raised only 
+				# when they turn critical(on update)
+				@TTicket_Status = 7
+				$ruleset = $ruleset + "TTNCR"
+			}
+                default:
+				# Do nothing
+				$ruleset = $ruleset + "DEF"
+        }
+	# Prevention of field updates here.
+	update(@SLA_Time,false)
+	update(@ActionCode,false)
+	update(@ActionStatus,false)
+#	20090922 GT end of change.
+	#
+	# Include various debugging utilities
+	#
+	include "$OMNIHOME/all_rules/ubsw/common_includes/debug.include.rules"
+	# Try and set everything in place to gather Probe - Object Server Load statistics.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/probe_load.include.rules"
+
+	@Summary = substr(@Summary,1,250)
+
+
+	# Set @Probe_Rule
+	#
+	###  Please ensure this is the final rule in this rules file!!!
+	#
+#       20081001        Change by Chris Janes of Abilitec       TD 5071
+#	@Probe_Rule = $ruleset
+        @Probe_Rule = $RulesVersion + " " + $LookupVersion + ":" + $TD_Num + ": " + $IscRule + ": " + $ruleset
+#       20081001        End of Change
+
+
+}

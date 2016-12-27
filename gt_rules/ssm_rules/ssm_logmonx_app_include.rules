@@ -1,0 +1,30 @@
+case "MailLogs":
+    $ssmAlertGroup = $ssmShortDesc
+    $ssmAlertKey = extract($logMonXHistoryLine, '^([^:]+):[^:]+:.*$')
+    $logMonXHistoryLevelName = extract($logMonXHistoryLine, '^[^:]+:([^:]+):.*$')
+    $ssmSummary = extract($logMonXHistoryLine, '^[^:]+:[^:]+:(.*)$')
+    $severityOverRide = 1
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $1 + $4 + $ssmSummary
+
+
+case "rvdp.screen.log"|"rvdp.app.log"|"rvds.screen.log"|"rvds.app.log"|"rds1.screen.log"|"rds2.app.log"|"clean.log"|"rsfile.screen.log"|"rsfile.app.log"|"clean.log"|"rsfile.screen.log"|"rsfile.app.log"|"clean.log"|"rsdb.screen.log"|"rsdb.app.log"|"ps.screen.log"|"ps.app.log"|"clean.log"|"om.screen.log"|"om.app.log"|"clean.log"|"ss.screen.log"|"consolidatedinstance.log"|"ss.app.log"|"QA-RAP-SYD-DSA-GW1.20060301.log"| "ls.screen.log"|"clean.log"|"ttc.screen.log":
+
+ 
+ 
+# Chop the logMonXHistoryLine into pieces
+	$ruleset = $ruleset + '-Raptor'
+	$swSeverity = extract($logMonXHistoryLine, "^\[[^]]+\]\[([^]]+)\]\[[^]]+\]\[[^]]+\].*$")
+	$ssmAlertGroup = extract($logMonXHistoryLine, "^\[[^]]+\]\[[^]]+\]\[([^]]+)\]\[[^]]+\].*$")
+	$ssmAlertKey = extract($logMonXHistoryLine, "^\[[^]]+\]\[[^]]+\]\[[^]]+\]\[([^]]+)\].*$")
+	$ssmSummary = extract($logMonXHistoryLine, "^\[[^]]+\]\[[^]]+\]\[[^]]+\]\[[^]]+\](.*)$")
+	
+# These all need trimming then organising into tokens
+	$swSeverity = rtrim($swSeverity)
+ 	$ssmAlertGroup = rtrim($ssmAlertGroup)
+	$ssmAlertKey = rtrim($ssmAlertkey)
+        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $ssmType + $1 + $4 + $ssmSummary
+#    $ssmAlertGroup = $ssmShortDesc
+
+case "PRODospreyEU0.log"|"PRODospreyEU1.log"|"PRODospreyEU2.log"|"PRODospreyEU3.log"|"PRODospreyEU4.log"|"PRODospreyEU5.log"|"PRODospreyEU6.log"|"PRODospreyEU7.log":
+                       
+			$ssmSummary = extract($ssmSummary,'^.*:CRITICAL:(.*)$')

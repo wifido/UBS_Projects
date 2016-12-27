@@ -1,0 +1,59 @@
+##################################################################################
+#	
+#	NET-SNMP-AGENT-MIB
+#	200202090000Z
+#
+#	20080409	Original	Chris Janes
+#			
+#
+##################################################################################
+
+
+case "OscarAgent" | "netSnmpNotificationPrefix":
+
+	$ruleset = $ruleset + " netSnmpNotificationPrefix "
+	@Agent = $enterprise-name
+	@Class = 2500004 
+	@OwnerGID = 95001 
+
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+#		nsNotifyStart
+		
+                @Summary = "The Agent has Started"
+		@Severity = 2
+		@Type = 1
+		@AlertGroup = "Agent"
+		@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+        case "2":
+#		nsNotifyShutdown
+
+                @Summary = "The Agent has Shutdown"
+                @Severity = 2
+                @Type = 1
+		@AlertGroup = "Agent"
+		@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+        case "3":
+#               nsNotifyRestart
+
+                @Summary = "The Agent has Re-started"
+                @Severity = 2
+                @Type = 1
+		@AlertGroup = "Agent"
+		@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+
+	default:
+	
+		$ruleset = $ruleset + "-case:default"
+            	@Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            	@Severity = 1
+		@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+	}
+
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+

@@ -1,0 +1,2835 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2004 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    netcool-ssm.include.snmp.rules 1.3 2004/01/16 Robert Cowart
+#
+###############################################################################
+#
+# 1.3.1 - Updated SSM standards for UBS compliancy ( Giles Blake  040406 )
+#
+# 1.3 - Updated for SSM 3.0
+#
+# 1.2 - Updated for SSM 2.1
+#
+# 1.1 - Added handling for new traps defined in SSM build 349:
+#       desktopHelpRequest(15), desktopLogon(16), desktopLogoff(17),
+#       desktopDetails(42)
+#
+#     - Modified handling of traps 1 and 38 for different variable bindings
+#       defined in various versions of the SSM agent.
+#
+# 1.0 - Initial Release.  Complies with the Micromuse Rules File Standards
+#       (MUSE-STD-RF-01, May 2002)
+#
+###############################################################################
+
+case "ssmAgent":
+    $ruleset = $ruleset + "ssm_rules"
+
+    ##########
+    # Netcool/System Service Monitors
+    # 
+    # Notifications from AGENTCONFIG-MIB, APPFLOW-MIB, AVAILABILITY-MIB,
+    #   DNSAVAILABILITY, DTHELP-MIB, GEN-ALARM-MIB, PROCESS-MIB,
+    #   PROGRAMMABLE-MIB, SVRSECURITY-MIB, SYSRES-MIB, SLA-MIB, TIMER-MIB,
+    #   TRACEROUTE-MIB, URLAVAILABILITY-MIB
+    ##########
+
+#	20051201	Changes by Chris Janes of Abilitec
+#			Changes to normalise SSZ/DMZ/RED zone event, requested by Bill Muller
+
+	if (nmatch($community, "RED_"))
+	{
+		$community = substr($community,5,200)
+#		@Stream = $community
+		@Agent = "SSM RED"	
+	} 
+
+	else if (nmatch($community, "DMZ_"))
+	{
+		$community = substr($community,5,200)
+#		@Stream = $community
+		@Agent = "SSM DMZ"	
+	} 
+
+	else if (nmatch($community, "SSZ_"))
+	{
+		$community = substr($community,5,200)
+#		@Stream = $community
+		@Agent = "SSM SSZ"	
+	}
+
+	else if (nmatch($community, "OSX"))
+	{
+#		@Stream = $community
+		@Agent = "OSX"	
+	}
+
+	else if (nmatch($community, "SSMAGENT_HB_WMUS"))
+	{
+#		@Stream = $community
+		@Agent = "WMUS"	
+	}
+
+        else if (nmatch($community, "ESX"))
+        {
+#               @Stream = $community
+                @Agent = lookup(@NodeAlias, ESX_Swiss_Table) 
+        }
+
+	else
+	{
+		@Agent = "SSM"
+#		@Stream = $community
+	} 
+
+#	Change by Chris Janes of Abilitec TD 4851
+#	$ssm_community = lookup($community,Community_ssmClassGidKey)
+
+	if(match($community, "REMAX"))
+	{
+		$ssm_community = "REMAX"
+	}
+	else if(nmatch($community, "ESX"))
+	{
+		$ssm_community = lookup(@NodeAlias, ESX_Swiss_Table)
+	}
+	else
+	{
+		$ssm_community = "UNIX"
+	}
+
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+	switch($ssm_community)
+        {
+		 case "ESX":
+			$CommunityClass = 123000
+		case "ESX_SWISS":
+			$CommunityClass = 5917181
+		default:
+			$CommunityClass = 123000
+	}
+
+#       20080523         End of Change
+
+
+    switch ($specific-trap)
+    {
+        ##########
+        # Notifications defined in AGENTCONFIG-MIB
+        ##########
+                
+        case "12": ### eventPulsed
+
+            ##########
+            # The SNMP trap that is generated whenever the
+            # agentControlPulseEvent object is successfully set to a non-zero
+            # value (provided the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = agentControlPulseEvent - The event index of the last event
+            #        pulsed. Setting this object to a non-zero value will cause
+            #        an event to be triggered. Any actions associated with that
+            #        event will be executed (for example, turn on an RMON1
+            #        channel row). If the event does not exist, then the set
+            #        will fail (inconsistentValue). Setting this object to zero
+            #        (0) will succeed, but no event will be triggered.
+            ##########
+#		20050906	Change by Chris Janes of Abilitec
+		$ruleset = $ruleset + ' - Trap 12'
+#		20050906	End of Change
+            
+            $agentControlPulseEvent = $1
+
+            @AlertKey = "eventEntry." + $1
+            @Summary = "Security - Logix Integrity Violated  ( " + @AlertKey + " )"
+            @Severity = 5
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+		$ruleset = $ruleset + ' - Case ' + $community
+        switch($community)
+
+		{
+
+                case "EXIT10":
+
+                @Summary = "Logix failed integrity check Exit Code 10"
+		@Severity = 5
+
+                case "EXIT20":
+
+                @Summary = "Logix fingerprint missing.  Exit Code 20"
+		@Severity = 5
+
+                case "EXIT30":
+
+		@Summary = "Logix failed integrity check.  Restored old logix.  Exit Code 30"
+		@Severity = 5
+
+                case "FAILED_INTEGRITY":
+
+		@Summary = "Config file failed integrity check.  Please checklog file for Details."
+		@Severity = 4
+
+		case "MISSING_FINGERPRINT":
+
+		@Summary = "Config file fingerprint missing.  Please check log file for Details"
+		@Severity = 4
+
+		case "RESTORE_ORIGINAL":
+
+		@Summary = "File transfer failed.  Restoring original file.  Please check log file for Details"
+		@Severity = 3
+
+		case "NO_ORIGINAL":
+		@Summary = "File transfer failed.  No original file to restore.  Please check logfile for Details."
+		@Severity = 3
+      
+#		Changes made by Neil Wood of Abilitec for Kris Newport 20060714
+		case "SSM_CONFIG":
+		switch($agentControlPulseEvent)
+		{
+			case "9994":
+
+			@Summary = "The SSM has partial configs loaded"
+			@Severity = 5
+			@AlertKey = "Configs"
+			# 20091203 GT. BR_755 Hashed ssmAppClass and replaced with ssmClassGidKey.
+			#$ssmAppClass = 0
+            		$ssmClassGidKey = "MICROMUSE"
+			# 20091203 End of change.
+
+			case "9995":
+
+			@Summary = "The SSM has no configs loaded"
+			@Severity = 5
+			@AlertKey = "Configs"
+			# 20091203 GT. BR_755 Hashed ssmAppClass and replaced with ssmClassGidKey.
+			#$ssmAppClass = 0
+            		$ssmClassGidKey = "MICROMUSE"
+			# 20091203 End of change.
+		
+			default:
+			@Summary = "SSM Resolution Event for a Cold Start event"
+			@Severity = 1
+			@Type = 2
+
+			@Manager = "Generic"
+			# 20091203 GT. BR_755 Hashed ssmAppClass and replaced with ssmClassGidKey.
+			#$ssmAppClass = 6999
+            		$ssmClassGidKey = "MICROMUSE"
+			# 20091203 End of change.
+
+			@AlertGroup = "Generic"
+			@AlertKey = "0"
+		}
+		
+		
+      
+                default:
+			$ruleset = $ruleset + ' default '
+            }
+
+
+
+        case "22": ### agentHeartBeat
+
+            ##########
+            # The SNMP trap that is generated. The community of the trap will
+            # correspond the the contents of the
+            # agentConfigNotificationCommunity variable.
+            #
+            # $1 = agentIdUniqueId - A string which uniquely identifies this
+            #        agent within its "Management Community".
+            # $2 = agentIdAddress - The primary IP address of the node on which
+            #        the agent is running.
+            # $3 = agentIdName - The primary hostname of the node on which the
+            #        agent is running.
+            # $4 = ifPhysAddress - The interface's address at the protocol
+            #        layer immediately `below' the network layer in the
+            #        protocol stack.  For interfaces which do not have such an
+            #        address (e.g., a serial line), this object should contain
+            #        an octet string of zero length.
+            ##########
+		$ruleset = $ruleset + ' - Trap 22'
+            
+            $agentIdUniqueId = $1
+            $agentIdAddress = $2
+            $agentIdName = $3
+            $ifPhysAddress = $4
+
+	    # Here we set $tmpISHeartbeat token to identify trap as a Heartbeat Message. G.Thomas 18/8/06
+	    $tmpISHeartbeat = 1
+	    @NodeAlias = $agentIdName
+
+		 switch($community)
+		{
+			case "SSMAGENT_HB_DMZ":
+				@AlertGroup = "SSMAGENT_HB_DMZ"
+				@Class = 1602
+				@OwnerGID=999
+
+			case "SSMAGENT_HB_SSZ":
+				@AlertGroup = "SSMAGENT_HB_SSZ"
+				@Class = 1603
+				@OwnerGID=999
+
+			case "SSMAGENT_HB_RED":
+				@AlertGroup = "SSMAGENT_HB_RED"
+				@Class = 1604
+				@OwnerGID=999
+
+			case "OSXAGENT_HB":
+				@AlertGroup = "OSXAGENT_HB"
+				@Class = 1605
+				@OwnerGID=999
+
+			case "SSMAGENT_HB_WMUS":
+				@AlertGroup = "SSMAGENT_HB_WMUS"
+				@Class = 1606
+				@OwnerGID=999
+
+			default:
+				@AlertGroup = "SSMAGENT_HB"
+				@Class = 1601
+				@OwnerGID=999
+
+		}
+ 
+            @AlertKey = ""
+            @Display_Hide = 1
+            @Summary = "Agent Heartbeat"
+            @Severity = 2
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "31": ### agentLicenseCorrupt
+
+            ##########
+            # The SNMP trap that is generated if the agent's license file
+            # becomes corrupt, and the agent is about to terminate. The
+            # community of the trap will correspond the the contents of the
+            # agentConfigNotificationCommunity variable.
+            #
+            # $1 = agentIdUniqueId - A string which uniquely identifies this
+            #        agent within its "Management Community""
+            # $2 = agentIdAddress - The primary IP address of the node on which
+            #        the agent is running.
+            # $3 = agentIdName - The primary hostname of the node on which the
+            #        agent is running.
+            # $4 = ifPhysAddress - The interface's address at the protocol
+            #        layer immediately `below' the network layer in the
+            #        protocol stack.  For interfaces which do not have such an
+            #        address (e.g., a serial line), this object should contain
+            #        an octet string of zero length.
+            ##########
+		$ruleset = $ruleset + ' - Trap 31'
+
+            $agentIdUniqueId = $1
+            $agentIdAddress = $2
+            $agentIdName = $3
+            $ifPhysAddress = $4
+
+            @AlertGroup = "Agent License"
+            @AlertKey = ""
+            @Summary = "License File Corrupt"
+            @Severity = 4
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "32": ### agentLicenseInvalid
+
+            ##########
+            # The SNMP trap that is generated if an attempt to activate an
+            # invalid license key is made. The full string that was set in the
+            # agentLicenseControlKey field is returned. The community of the
+            # trap will correspond the the contents of the
+            # agentConfigNotificationCommunity variable.
+            #
+            # $1 = agentIdUniqueId - A string which uniquely identifies this
+            #        agent within its "Management Community".
+            # $2 = agentIdAddress - The primary IP address of the node on which
+            #        the agent is running.
+            # $3 = agentIdName - The primary hostname of the node on which the
+            #        agent is running.
+            # $4 = ifPhysAddress - The interface's address at the protocol
+            #        layer immediately `below' the network layer in the
+            #        protocol stack.  For interfaces which do not have such an
+            #        address (e.g., a serial line), this object should contain
+            #        an octet string of zero length.
+            # $5 = agentLicenseControlKey - A license string that is displayed
+            #        without the encrypted checksum (eg.
+            #        NH2095-02FFFF-12345678). When instantiating a new license
+            #        key via a control row, all sets to this variable must
+            #        include the excrypted checksum as distributed with the
+            #        product.
+            ##########
+		$ruleset = $ruleset + ' - Trap 32'
+
+            $agentIdUniqueId = $1
+            $agentIdAddress = $2
+            $agentIdName = $3
+            $ifPhysAddress = $4
+            $agentLicenseControlKey = $5
+            @AlertKey = "Key: " + $5
+            @Summary = "Invalid License Key  ( " + @AlertKey + " )"
+            @Severity = 2
+            @Type = 300
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "33": ### agentLicenseExpiry
+
+            ##########
+            # The SNMP trap that is generated when a trial license expires The
+            # full string that was set in the agentLicenseControlKey field is
+            # returned. The community of the trap will correspond the the
+            # contents of the agentConfigNotificationCommunity variable.
+            #
+            # $1 = agentIdUniqueId - A string which uniquely identifies this
+            #        agent within its "Management Community".
+            # $2 = agentIdAddress - The primary IP address of the node on which
+            #        the agent is running.
+            # $3 = agentIdName - The primary hostname of the node on which the
+            #        agent is running.
+            # $4 = ifPhysAddress - The interface's address at the protocol
+            #        layer immediately `below' the network layer in the
+            #        protocol stack.  For interfaces which do not have such an
+            #        address (e.g., a serial line), this object should contain
+            #        an octet string of zero length.
+            # $5 = agentLicenseControlKey - A license string that is displayed
+            #        without the encrypted checksum (eg.
+            #        NH2095-02FFFF-12345678). When instantiating a new license
+            #        key via a control row, all sets to this variable must
+            #        include the excrypted checksum as distributed with the
+            #        product.
+            ##########
+		$ruleset = $ruleset + ' - Trap 33'
+
+#		In preparation for GenAlarm class Ids for system and application teams
+            $genAlarmControlVariable = $1
+            $genAlarmControlVariableDescription = $2
+
+            $lowerGenDesc = lower($genAlarmControlVariableDescription)
+            if (nmatch($lowerGenDesc, "ssm_gen_system:"))  {
+                $ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                @Subclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                @SystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                $ssmAppName = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                $ssmAlertGroup = "System"
+                $ssmAlertKey = $ssmAppName
+                $processNameSwitch = 2
+#		20050914	Change by Chris Janes of Abilitec
+		$ruleset = $ruleset + ' - ssm_gen_system'
+#		20050914	End of Change
+            }
+
+            $agentIdUniqueId = $1
+            $agentIdAddress = $2
+            $agentIdName = $3
+            $ifPhysAddress = $4
+            $agentLicenseControlKey = $5
+            @AlertKey = "Key: " + $5
+            @Summary = "Trial License Expired  ( " + @AlertKey + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "55": ### agentAuthenticationFailure
+        
+            ##########
+            # The SNMP trap that is generated whenever an unknown community
+            # string is used to attempt access with the agent. The IP address
+            # of the unauthorized request is returned. The community of the
+            # trap will correspond the the contents of the
+            # agentConfigNotificationCommunity variable.
+            #
+            # $1 = agentAuthLastBadIPAddress - The IP address of the last
+            #        unauthorized client.
+            ##########
+		$ruleset = $ruleset + ' - Trap 55'
+            
+            $agentAuthLastBadIPAddress = $1
+            @AlertKey = "From: " + $5
+            @Summary = "Authentication Failure  ( " + @AlertKey + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+            
+            $OS_X733EventType = 9
+            $OS_X733ProbableCause = 100168
+            $OS_X733SpecificProb = "agentAuthenticationFailure"
+                    
+            if(regmatch(@NodeAlias, "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$"))
+            {
+                $OS_LocalNodeAlias = @NodeAlias
+            }
+            $OS_RemoteNodeAlias = $5
+            $NsSrcIP = $5
+            $NsProtocol = "udp"
+            $NsDstIP = $OS_LocalNodeAlias
+            $NsDstPort = 161
+            $NsEventType = 1
+            $NsClass = 5
+            $NsType = "alert.auth_failure"
+            $NsScore = 1
+        
+        case "38": ### agentTermination
+
+            ##########
+            # The SNMP trap that is generated when the agent process is about
+            # to terminate.
+            ##########
+		$ruleset = $ruleset + ' - Trap 38'
+            
+            if(exists($5))
+            {            
+                ##########
+                # $1 = agentIdUniqueId - A string which uniquely identifies
+                #        this agent within its "Management Community".
+                # $2 = agentIdAddress - The primary IP address of the node on
+                #        which the agent is running.
+                # $3 = agentIdName - The primary hostname of the node on which
+                #        the agent is running.
+                # $4 = ifPhysAddress - The interface's address at the protocol
+                #        layer immediately `below' the network layer in the
+                #        protocol stack.  For interfaces which do not have such
+                #        an address (e.g., a serial line), this object should
+                #        contain an octet string of zero length.
+                # $5 = agentLicenseControlKey - A license string that is
+                #        displayed without the encrypted checksum (eg.
+                #        NH2095-02FFFF-12345678). When instantiating a new
+                #        license key via a control row, all sets to this
+                #        variable must include the excrypted checksum as
+                #        distributed with the product.
+                ##########
+
+                $agentIdUniqueId = $1
+                $agentIdAddress = $2
+                $agentIdName = $3
+                $ifPhysAddress = $4
+                $agentLicenseControlKey = $5
+#		20050914	Change by Chris Janes of Abilitec
+		$ruleset = $ruleset + ' - With $5'
+#		200509.6	End of Change
+            }
+            else
+            {
+                ##########
+                # $1 = agentIdUniqueId - A string which uniquely identifies
+                #        this agent within its "Management Community".
+                # $2 = agentIdAddress - The primary IP address of the node on
+                #        which the agent is running.
+                # $3 = agentIdName - The primary hostname of the node on which
+                #        the agent is running.
+                # $4 = ifPhysAddress - The interface's address at the protocol
+                #        layer immediately `below' the network layer in the
+                #        protocol stack.  For interfaces which do not have such
+                #        an address (e.g., a serial line), this object should
+                #        contain an octet string of zero length.
+                ##########
+
+                $agentIdUniqueId = $1
+                $agentIdAddress = $2
+                $agentIdName = $3
+                $ifPhysAddress = $4
+#		20050914	Change by Chris Janes of Abilitec
+		$ruleset = $ruleset + ' - Without $5'
+#		200509.6	End of Change
+            }
+            
+            @AlertGroup = "Agent"
+            @AlertKey = "StartStop"
+
+	    @Manager = "StartStop"
+            @Summary = "SSM Agent terminating on " + $3
+            @Severity = 4
+            @Type = 1
+            $ssmClassGidKey = "MICROMUSE"
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in APPFLOW-MIB
+        ##########
+
+        case "6": ### appflowSummaryRisingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an appflowAlarmEntry (that
+            # is monitoring a variable in the appflowSummaryTable) crosses its
+            # rising threshold and generates an event that is configured for
+            # sending SNMP traps. This trap will only be sent if the
+            # slaControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            #
+            # $1 = appflowAlarmVariable - Variable of the control row to
+            #        monitor.
+            # $2 = appflowAlarmControlIndex - Index of the control row to
+            #        monitor appflowControlIndex.
+            # $3 = appflowSummarySetupPercentage - Percentage successful
+            #        connection establishment.
+            # $4 = appflowSummaryReleasePercentage - Percentage successful
+            #        connection termination.
+            ##########
+		$ruleset = $ruleset + ' - Trap 6'
+
+            $appflowAlarmVariable = lookup($1, appflowAlarmVariable)
+            $appflowAlarmControlIndex = $2
+            $appflowSummarySetupPercentage = $3
+            $appflowSummaryReleasePercentage = $4
+            
+            @AlertGroup = "Summary Status"
+            @AlertKey = "appflowAlarmEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = $appflowAlarmVariable + " Summary Alarm ( Connection Established: " + $3 + "%, Terminated: " + $4 + "% )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+            $appflowAlarmVariable = $appflowAlarmVariable + " ( " + $1 + " )"
+
+        case "7": ### appflowSummaryFallingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an appflowAlarmEntry (that
+            # is monitoring a variable in the appflowSummaryTable) crosses its
+            # falling threshold and generates an event that is configured for
+            # sending SNMP traps. This trap will only be sent if the
+            # slaControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            #
+            # $1 = appflowAlarmVariable - Variable of the control row to
+            #        monitor.
+            # $2 = appflowAlarmControlIndex - Index of the control row to
+            #        monitor appflowControlIndex.
+            # $3 = appflowSummarySetupPercentage - Percentage successful
+            #        connection establishment.
+            # $4 = appflowSummaryReleasePercentage - Percentage successful
+            #        connection termination.
+            ##########
+		$ruleset = $ruleset + ' - Trap 7'
+
+            $appflowAlarmVariable = lookup($1, appflowAlarmVariable)
+            $appflowAlarmControlIndex = $2
+            $appflowSummarySetupPercentage = $3
+            $appflowSummaryReleasePercentage = $4
+            
+            @AlertGroup = "Summary Status"
+            @AlertKey = "appflowAlarmEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = $appflowAlarmVariable + " Summary Alarm Cleared ( Connection Established: " + $3 + "%, Terminated: " + $4 + "% )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+            
+            $appflowAlarmVariable = $appflowAlarmVariable + " ( " + $1 + " )"
+
+        case "8": ### appflowConnectionRisingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an appflowAlarmEntry (that
+            # is monitoring a variable in the appflowConnectionTable) crosses
+            # its rising threshold and generates an event that is configured
+            # for sending SNMP traps. This trap will only be sent if the
+            # slaControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            #
+            # $1 = appflowAlarmVariable - Variable of the control row to
+            #        monitor.
+            # $2 = appflowAlarmControlIndex - Index of the control row to
+            #        monitor appflowControlIndex.
+            # $3 = appflowConnClientAddr - Client IP address (initiated the
+            #        connection request).
+            # $4 = appflowConnClientPort - Client port address.
+            # $5 = appflowConnServerAddr - Server IP address (received the
+            #        connection request).
+            # $6 = appflowConnServerPort - Server port address
+            # $7 = appflowConnStatus - Current connection status.
+            ##########
+		$ruleset = $ruleset + ' - Trap 8'
+
+            $appflowAlarmVariable = lookup($1, appflowAlarmVariable)
+            $appflowAlarmControlIndex = $2
+            $appflowConnClientAddr = $3
+            $appflowConnClientPort = $4
+            $appflowConnServerAddr = $5
+            $appflowConnServerPort = $6
+            $appflowConnStatus = $7
+            
+            @AlertGroup = "Connection Status"
+            @AlertKey = "appflowConnEntry." + extract($OID7, "\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$")
+            @Summary = "Connection " + $ConnStatus + "  ( " + $3 + ":" + $4 + " to " + $5 + ":" + $6 + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $7
+            
+            $appflowAlarmVariable = $appflowAlarmVariable + " ( " + $1 + " )"
+
+        case "9": ### appflowConnectionFallingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an appflowAlarmEntry (that
+            # is monitoring a variable in the appflowConnectionTable) crosses
+            # its falling threshold and generates an event that is configured
+            # for sending SNMP traps. This trap will only be sent if the
+            # slaControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            #
+            # $1 = appflowAlarmVariable - Variable of the control row to
+            #        monitor.
+            # $2 = appflowAlarmControlIndex - Index of the control row to
+            #        monitor appflowControlIndex.
+            # $3 = appflowConnClientAddr - Client IP address (initiated the
+            #        connection request).
+            # $4 = appflowConnClientPort - Client port address.
+            # $5 = appflowConnServerAddr - Server IP address (received the
+            #        connection request).
+            # $6 = appflowConnServerPort - Server port address
+            # $7 = appflowConnStatus - Current connection status.
+            ##########
+		$ruleset = $ruleset + ' - Trap 9'
+
+            $appflowAlarmVariable = lookup($1, appflowAlarmVariable)
+            $appflowAlarmControlIndex = $2
+            $appflowConnClientAddr = $3
+            $appflowConnClientPort = $4
+            $appflowConnServerAddr = $5
+            $appflowConnServerPort = $6
+            $appflowConnStatus = $7
+            
+            @AlertGroup = "Connection Status"
+            @AlertKey = "appflowConnEntry." + extract($OID7, "\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)$")
+            @Summary = "Connection " + $ConnStatus + "  ( " + $3 + ":" + $4 + " to " + $5 + ":" + $6 + " )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $7
+            $appflowAlarmVariable = $appflowAlarmVariable + " ( " + $1 + " )"
+
+        ##########
+        # Notifications defined in AVAILABILITY-MIB
+        ##########
+
+        case "2": ### availabilityFailure
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # control row fails. This trap will only be sent if the
+            # availabilityControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = availabilityControlDestAddress - Destination IP address of
+            #        the availability.
+            # $2 = availabilityControlPort - Availability port number for the
+            #        application method. Default value of 7 for the echo port.
+            # $3 = availabilityControlMethod - Application mode determines
+            #        whether the application is listening on the port
+            #        specified. Network mode determines whether the destAddress
+            #        is reachable via ICMP.
+            # $4 = availabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent availability test was started.
+            # $5 = availabilityDataPercentage - The current average percentage
+            #        of connections successful since the last history interval
+            #        expiration.
+            ##########
+		$ruleset = $ruleset + ' - Trap 2'
+
+            $availabilityControlDestAddress = $1
+            $availabilityControlPort = $2
+            $availabilityControlMethod = lookup($3, availabilityControlMethod)
+            $availabilityDataTime = $4
+            $availabilityDataPercentage = $5
+            
+            @AlertGroup = $availabilityControlMethod + " Availability"
+            @AlertKey = "availabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = $availabilityControlMethod + " Availability Test Failed"
+            switch($3)
+            {
+                case "1": ### Application
+                    @Summary = @Summary + "  ( " + $1 + ":" + $2 + " )"
+                case "2": ### Network
+                    @Summary = @Summary + "  ( " + $1 + " )"
+                default:
+            }
+            @Severity = 4
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $3
+
+            $availabilityControlMethod = $availabilityControlMethod + " ( " + $3 + " )"
+
+        case "25": ### availabilitySuccessChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # changes from being unavailable to being available. This trap will
+            # only be sent if the availabilityControlSuccessEventIndex object
+            # is non-zero, and the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = availabilityControlDestAddress - Destination IP address of
+            #        the availability.
+            # $2 = availabilityControlPort - Availability port number for the
+            #        application method. Default value of 7 for the echo port.
+            # $3 = availabilityControlMethod - Application mode determines
+            #        whether the application is listening on the port
+            #        specified. Network mode determines whether the destAddress
+            #        is reachable via ICMP.
+            # $4 = availabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent availability test was started.
+            # $5 = availabilityDataPercentage - The current average percentage
+            #        of connections successful since the last history interval
+            #        expiration.
+            # $6 = availabilityDataAvailable - Success / failure result of the
+            #        query.
+            ##########
+		$ruleset = $ruleset + ' - Trap 23'
+
+            $availabilityControlDestAddress = $1
+            $availabilityControlPort = $2
+            $availabilityControlMethod = lookup($3, availabilityControlMethod)
+            $availabilityDataTime = $4
+            $availabilityDataPercentage = $5
+            $availabilityDataAvailable = lookup($6, TruthValue) + " ( " + $6 + " )"
+            
+            @AlertGroup = $availabilityControlMethod + " Availability"
+            @AlertKey = "availabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = $availabilityControlMethod + " Availability Test Successful"
+            switch($3)
+            {
+                case "1": ### Application
+                    @Summary = @Summary + "  ( " + $1 + ":" + $2 + " )"
+                case "2": ### Network
+                    @Summary = @Summary + "  ( " + $1 + " )"
+                default:
+            }
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $3
+
+            $availabilityControlMethod = $availabilityControlMethod + " ( " + $3 + " )"
+
+        case "26": ### availabilityFailureChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # changes from being available to being unavailable. This trap will
+            # only be sent if the availabilityControlEventIndex object is
+            # non-zero, and the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = availabilityControlDestAddress - Destination IP address of
+            #        the availability.
+            # $2 = availabilityControlPort - Availability port number for the
+            #        application method. Default value of 7 for the echo port.
+            # $3 = availabilityControlMethod - Application mode determines
+            #        whether the application is listening on the port
+            #        specified. Network mode determines whether the destAddress
+            #        is reachable via ICMP.
+            # $4 = availabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent availability test was started.
+            # $5 = availabilityDataPercentage - The current average percentage
+            #        of connections successful since the last history interval
+            #        expiration.
+            # $6 = availabilityDataAvailable - Success / failure result of the
+            #        query.
+            ##########
+		$ruleset = $ruleset + ' - Trap 26'
+
+            $availabilityControlDestAddress = $1
+            $availabilityControlPort = $2
+            $availabilityControlMethod = lookup($3, availabilityControlMethod)
+            $availabilityDataTime = $4
+            $availabilityDataPercentage = $5
+            $availabilityDataAvailable = lookup($6, TruthValue) + " ( " + $6 + " )"
+            
+            @AlertGroup = $availabilityControlMethod + " Availability"
+            @AlertKey = "availabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = $availabilityControlMethod + " Availability Test Failed"
+            switch($3)
+            {
+                case "1": ### Application
+                    @Summary = @Summary + "  ( " + $1 + ":" + $2 + " )"
+                case "2": ### Network
+                    @Summary = @Summary + "  ( " + $1 + " )"
+                default:
+            }
+            @Severity = 4
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $3
+
+            $availabilityControlMethod = $availabilityControlMethod + " ( " + $3 + " )"
+
+        ##########
+        # Notifications defined in CRONTAB-MIB
+        ##########
+
+        case "48": ### crontabExpiry
+
+            ##########
+            # The SNMP trap that is generated when a crontab control entry
+            # expired. This trap will only be sent if the
+            # crontabControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = crontabCurrentDateTime - Local time.
+            # $2 = crontabControlCronType - Setting this value to crontime(1)
+            #        will mean that the control row will use the
+            #        crontabControlCronEventTime object to determine when
+            #        events will be fired, and the StartTime and Period objects
+            #        will be ignored. Setting it to periodicwithstart(2) will
+            #        mean the control row will use crontabControlStartTime and
+            #        crontabControlPeriod to determine when events etc are
+            #        fired, and CronEventTime will be ignored.
+            # $3 = crontabControlCronEventTime - Crontab style time/date
+            #        definition. Refer to crontab (5) man pages for Details on
+            #        the syntax of this variable. Basically, it has 5 fields,
+            #        each of which is space separated and defines a time to
+            #        generate events. The five fields are minute, hour, day of
+            #        month, month, day of week. Examples: - five minutes after
+            #        midnight, every day 5 0 * * * - 2:15pm on the first of
+            #        every month 15 14 1 * * - 10 pm on weekdays, 0 22 * * 1-5
+            #        - 23 minutes after midnight, 2am, 4am ...., everyday 23
+            #        0-23/2 * * * - 5 minutes after 4 every sunday 5 4 * * sun 
+            # $4 = crontabControlStartTime - This determines the date and time
+            #        of starting a periodic type control row. This field is
+            #        used when CronType is set to periodicwithstart(2).
+            # $5 = crontabControlExecutionCmd - The command line to execute
+            #        when/if the event described in this control row is fired.
+            # $6 = crontabControlPeriod - If this field is set to a non-zero
+            #        integer, then after time defined in
+            #        crontabControlStartTime has passed, an event will be
+            #        generated every crontabControlPeriod minutes thereafter.
+            # $7 = crontabControlEventCount - The number of times an event has
+            #        been generated by this control row.
+            # $8 = crontabControlDescription - A description given to this
+            #        control row by the owner.
+            # $9 = crontabControlOwner - Defines the owner/creator of the
+            #        control row.
+            ##########
+		$ruleset = $ruleset + ' - Trap 48'
+
+            $crontabCurrentDateTime = $1
+            $crontabControlCronType = lookup($2, crontabControlCronType) + " ( " + $2 + " )"
+            $crontabControlCronEventTime = $3
+            $crontabControlStartTime = $4
+            $crontabControlExecutionCmd = $5
+            $crontabControlPeriod = $6
+            $crontabControlEventCount = $7
+            $crontabControlDescription = $8
+            $crontabControlOwner = $9
+
+            @AlertGroup = "crontab Control Entry Status"
+            @AlertKey = "crontabControlEntry." + extract($OID2, "\.([0-9+])$")
+            @Summary = "crontab Control Entry Expired  ( " + @AlertKey + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in DESKTOP-MIB
+        ##########
+
+        case "15": ### desktopHelpRequest
+
+            ##########
+            # A request for support to the helpdesk.
+            #
+            # $1 = desktopHelpQuery - The last help query sent from the desktop
+            #        help tool. You can also write to this object to send a new
+            #        query (trap).
+            ##########
+		$ruleset = $ruleset + ' - Trap 15'
+
+            $desktopHelpQuery = $1
+
+            @AlertGroup = "Help Request"
+            @AlertKey = ""
+            @Summary = "Helpdesk Support Requested"
+            @Severity = 2
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "16": ### desktopLogon
+
+            ##########
+            # Notification that a user has just logged onto the machine.
+            #
+            # $1 = desktopProfileUserName - The user name (including domain)
+            #        used to log onto the machine.
+            # $2 = desktopProfileFirstName - The user's first name.
+            # $3 = desktopProfileLastName - The user's last name (surname).
+            # $4 = desktopProfileEmail - The user's email address.
+            ##########
+		$ruleset = $ruleset + ' - Trap 16'
+
+            $desktopProfileUserName = $1
+            $desktopProfileFirstName = $2
+            $desktopProfileLastName = $3
+            $desktopProfileEmail = $4
+
+            @AlertGroup = "User Logon"
+            @AlertKey = "User: " + $1
+            @Summary = "User Logged On  ( " + @AlertKey + " )"
+            @Severity = 2
+            @Type = 900
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "17": ### desktopLogoff
+
+            ##########
+            # Notification that a user has just logged off the machine.
+            #
+            # $1 = desktopProfileUserName - The user name (including domain)
+            #        used to log onto the machine.
+            # $2 = desktopProfileFirstName - The user's first name.
+            # $3 = desktopProfileLastName - The user's last name (surname).
+            # $4 = desktopProfileEmail - The user's email address.
+            ##########
+#		20050906	Change by Chris Janes of Abilitec
+		$ruleset = $ruleset + ' - Trap 17'
+#		20050906	End of Change
+
+            $desktopProfileUserName = $1
+            $desktopProfileFirstName = $2
+            $desktopProfileLastName = $3
+            $desktopProfileEmail = $4
+
+            @AlertGroup = "User Logon"
+            @AlertKey = "User: " + $1
+            @Summary = "User Logged Off  ( User: " + $1 + " )"
+            @Severity = 2
+            @Type = 900
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "42": ### desktopDetails
+
+            ##########
+            # Notification that the user has changed their personal Details
+            # (most of which must be read from the MIB).
+            #
+            # $1 = desktopProfileUserName - The user name (including domain)
+            #        used to log onto the machine.
+            # $2 = desktopProfileFirstName - The user's first name.
+            # $3 = desktopProfileLastName - The user's last name (surname).
+            # $4 = desktopProfileEmail - The user's email address.
+            ##########
+		$ruleset = $ruleset + ' - Trap 42'
+
+            $desktopProfileUserName = $1
+            $desktopProfileFirstName = $2
+            $desktopProfileLastName = $3
+            $desktopProfileEmail = $4
+
+            @AlertGroup = "Details Changed"
+            @AlertKey = "User: " + $1
+            @Summary = "User Changed Their Personal Details  ( " + @AlertKey + " )"
+            @Severity = 2
+            @Type = 900
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in DNSAVAILABILITY-MIB
+        ##########
+
+        case "10": ### dnsAvailabilityFailure
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # control row fails. This trap will only be sent if the
+            # dnsAvailabilityControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = dnsAvailabilityControlServer - Destination IP address of the
+            #        DNS server to probe. By default this will be set to the
+            #        probe's primary DNS server.
+            # $2 = dnsAvailabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent dnsAvailability test was started.
+            ##########
+		$ruleset = $ruleset + ' - Trap 10'
+
+            $dnsAvailabilityControlServer = $1
+            $dnsAvailabilityDataTime = $2
+
+            @AlertGroup = "DNS Availability"
+            @AlertKey = $1
+            @Summary = "Failed to Reach DNS server  ( " + $1 + " )"
+            @Severity = 4
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "27": ### dnsAvailabilitySuccessChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # changes from being unavailable to being available. This trap will
+            # only be sent if the dnsAvailabilityControlSuccessEventIndex
+            # object is non-zero, and the corresponding eventType in the
+            # eventTable is set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = dnsAvailabilityControlServer - Destination IP address of the
+            #        DNS server to probe. By default this will be set to the
+            #        probe's primary DNS server.
+            # $2 = dnsAvailabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent dnsAvailability test was started.
+            ##########
+		$ruleset = $ruleset + ' - Trap 27'
+
+            $dnsAvailabilityControlServer = $1
+            $dnsAvailabilityDataTime = $2
+
+            @AlertGroup = "DNS Availability"
+            @AlertKey = $1
+            @Summary = "Successfully Reached DNS server  ( " + $1 + " )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "28": ### dnsAvailabilityFailureChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # changes from being available to being unavailable. This trap will
+            # only be sent if the dnsAvailabilityControlFailureEventIndex
+            # object is non-zero, and the corresponding eventType in the
+            # eventTable is set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = dnsAvailabilityControlServer - Destination IP address of the
+            #        DNS server to probe. By default this will be set to the
+            #        probe's primary DNS server.
+            # $2 = dnsAvailabilityDataTime - Value of sysUpTime.0 at which the
+            #        most recent dnsAvailability test was started.
+            ##########
+		$ruleset = $ruleset + ' - Trap 28'
+
+            $dnsAvailabilityControlServer = $1
+            $dnsAvailabilityDataTime = $2
+
+            @AlertGroup = "DNS Availability"
+            @AlertKey = $1
+            @Summary = "Failed to Reach DNS server  ( " + $1 + " )"
+            @Severity = 4
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in DTHELP-MIB
+        ##########
+
+        case "20": ### dtHelpQuery
+
+            ##########
+            # The SNMP trap that is generated whenever the dtHelpControlStatus
+            # object is successfully set to active(1). This trap will not be
+            # sent if the previous value of dtHelpControlStatus was already
+            # equal to active(1).
+            #
+            # $1 = dtHelpControlSummary
+            ##########
+		$ruleset = $ruleset + ' - Trap 20'
+
+            $dtHelpControlSummary = $1
+            
+            @AlertGroup = "DTHELP Query"
+            @AlertKey = ""
+            @Summary = "dtHelpControlStatus set to Active: " + $1
+            @Severity = 2
+            @Type = 900
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $1
+
+        case "21": ### dtHelpAnswer
+
+            ##########
+            # The SNMP trap that is generated whenever the
+            # dtHelpControlAnswerFlag object is successfully set to true(1).
+            #
+            # $1 = dtHelpAnswerTime
+            ##########
+		$ruleset = $ruleset + ' - Trap 21'
+
+            $dtHelpAnswerTime = $1
+            
+            @AlertGroup = "DTHELP Answer"
+            @AlertKey = ""
+            @Summary = "dtHelpControlAnswerFlag set to True: Answer Time = " + $1
+            @Severity = 2
+            @Type = 900
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in GEN-ALARM-MIB
+        ##########
+
+# 	This case statement now relocated to the following include statement.
+	include "$OMNIHOME/all_rules/ubsw/ssm_rules/t34-ssm.include.rules"
+
+
+
+
+        case "36": ### genAlarmMatchAlarm
+
+            ##########
+            # The SNMP trap that is generated when a genAlarmControlEntry
+            # matches the match value and generates an event that is configured
+            # for sending SNMP traps. This trap will only be sent if the
+            # genAlarmControlMatchEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = genAlarmControlVariable - The object identifier of the
+            #        particular variable to be sampled. Only variables that
+            #        resolve to an ASN.1 primitive type of INTEGER (INTEGER,
+            #        Counter, Gauge, or TimeTicks) may be sampled. This may be
+            #        wildcarded, and the wildcards can only be specified for
+            #        INDEX fields. The wildcards is denoted by the character
+            #        
+            #          '?' or '*'. '?' - Represents a single sub-object
+            #                            identifier.
+            #          '*' - Represents object identifier of variable length.
+            #                The '*' can only be used for the last OID of the
+            #                control variable.
+            #        
+            #        For example:
+            #          1) Trailing Wildcards - To monitor ifInOctets for all
+            #               interfaces, set the variable to the ifInOctets OID
+            #               as follows: .1.3.6.1.2.1.2.2.1.10.?
+            #          2) Multiple Wildcards (Contiguous) - To monitor the SLA
+            #               last response time for any slaControlIndex any
+            #               slaClientAddr, set the variable to the
+            #               slaDataLastResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.2.1.3.?.?.?.?.?.206.104.226.3
+            #          3) Multiple Wildcards (Segmented) - To monitor the
+            #               appflowConnOutLastPacketArrivalDelay for any
+            #               appflowControlIndex any server port of server
+            #               address 203.166.18.222, and any client port of
+            #               client address 203.63.54.132, set the variable to
+            #               the appflowConnOutLastPacketArrivalDelay OID as
+            #               follows: .1.3.6.1.4.1.1977.4.1.36.?.?.203.166.18.
+            #                 222.?.203.63.54.132
+            #          4) Multiple Wildcards (Variable length) - To monitor the
+            #               SLA last response time for any slaControlIndex any
+            #               slaHistorySampleIndex, any slaHistoryClientAddr and
+            #               any slaHistoryServerAddr, set the variable to the
+            #               slaHistoryWorstResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.3.1.8.* OR
+            #               .1.3.6.1.4.1.1977.4.3.1.8.?.?.?.?.?.?.*
+            #
+            #        If the variable syntax of those objects is not usable, a
+            #        'badValue' error must be returned. This object may not be
+            #        modified if the associated alarmStatus object is equal to
+            #        valid(1).
+            # $2 = genAlarmControlVariableDescription - A textual description
+            #        of the variable being monitored.
+            # $3 = genAlarmDataInstance - The object identifier of the MIB
+            #        object to sample to see if the event should be generated.
+            #        If at any time the instance is no longer avalable in the
+            #        selected MIB view, the entire row entry will be removed.
+            # $4 = genAlarmControlSampleType - The method of sampling the
+            #        selected variable and calculating the value to be compared
+            #        against the thresholds. If the value of this object is
+            #        absoluteValue(1), the value of the selected variable will
+            #        be compared directly with the thresholds at the end of the
+            #        sampling interval. If the value of this object is
+            #        deltaValue(2), the value of the selected variable at the
+            #        last sample will be subtracted from the current value, and
+            #        the difference compared with the thresholds. This object
+            #        may not be modified if the associated alarmStatus object
+            #        is equal to active(1).
+            # $5 = genAlarmControlAlarmMode - Alarm generation Mode. If the
+            #        value of this object is set to hysteresis(1), the alarm
+            #        generation is as per RMON Alarm and Event groups. If the
+            #        value of this object is set to risingContinuous(2), a
+            #        rising alarm will be generated on every sample interval,
+            #        when the selected variable sample value greater or equal
+            #        to the rising threshold. If the value of this object is
+            #        set to singleEdge(3), an alarm will be generated once when
+            #        the selected variable exceeds the threshold. If the value
+            #        of this object is set to fallingContinuous(4), a falling
+            #        alarm will be generated on every sample interval, when the
+            #        selected variable sample value less than the falling
+            #        threshold. If the value of this object is set to
+            #        matchMode(5), an alarm will be generated when the
+            #        monitored object value is equal to the match value. If the
+            #        value of this object is set to pushMode(6), an alarm will
+            #        be generated at every sample interval. This object may not
+            #        be modified if the associated alarmStatus object is equal
+            #        to active(1).
+            # $6 = genAlarmDataValue - The value of the statistic during the
+            #        last sampling period. For example, if the sample type is
+            #        deltaValue, this value will be the difference between the
+            #        samples at the beginning and end of the period. If the
+            #        sample type is absoluteValue, this value will be the
+            #        sampled value at the end of the period. This is the value
+            #        that is compared with the rising and falling thresholds.
+            #        The value during the current sampling period is not made
+            #        available until the period is completed and will remain
+            #        available until the next period completes.
+            # $7 = genAlarmControlMatchValue - A match value for the sampled
+            #        statistic. When the current sampled value is equal to this
+            #        match value, a single event will be generated. This object
+            #        may not be modified if the associated alarmStatus object
+            #        is equal to active(1).
+            # $8 = genAlarmControlMatchDuration - The duration in seconds that
+            #        the sample value maintains the match value condition for
+            #        event generation. A match duration value of 0 indicates
+            #        that an event will be generated as when the current sample
+            #        value is equal to match value. This object may not be
+            #        modified if the associated alarmStatus object is equal to
+            #        active(1).
+            # $9 = genAlarmControlMatchSeverity - Match Alarm Severity. This
+            #        object may not be modified if the associated alarmStatus
+            #        object is equal to active(1).
+            # $10 = genAlarmControlMatchDescription - A description that will
+            #         be sent in the trap when the match event is triggered.
+            #         This string can contain elements of the form '$i', where
+            #         i is an index into the variable binding list sent when a
+            #         trap triggered by this alarm row is sent. These elements
+            #         are expanded to the textual representation of the value
+            #         of the specified variable binding. i must be in the range
+            #         [1,N], where N is the number of bindings in the list.
+            #         Given that there are 10 bindings in the
+            #         genAlarmRisingAlarm notification, N = 10 +
+            #         genAlarmControlVarBindSize NB. a literal '$' character is
+            #         specified as '$$'.
+            ##########
+		$ruleset = $ruleset + ' - Trap 36'
+
+            $genAlarmControlVariable = $1
+            $genAlarmControlVariableDescription = $2
+            if(nmatch($3,"OID: .iso."))
+            {
+                $genAlarmDataInstance = ".1" + extract($3, "^OID: \.iso(.*)$")
+            }
+            else
+            {
+                $genAlarmDataInstance = $3
+            }
+            $genAlarmControlSampleType = lookup($4, genAlarmControlSampleType) + " ( " + $4 + " )"
+            $genAlarmControlAlarmMode = lookup($5, genAlarmControlAlarmMode) + " ( " + $5 + " )"
+            $genAlarmDataValue = $6
+            $genAlarmControlMatchValue = $7
+            $genAlarmControlMatchDuration = $8 + " seconds"
+            $genAlarmControlMatchSeverity = lookup($9, genAlarmSeverity) + " ( " + $9 + " )"
+            $genAlarmControlMatchDescription = $10
+
+            @AlertGroup = $2
+            @AlertKey = $genAlarmDataInstance
+            @Summary = $10
+            switch($9)
+            {
+                case "1":
+                    @Severity = 1
+                    @Type = 2
+                case "2":
+                    @Severity = 2
+                    @Type = 1
+                case "3":
+                    @Severity = 3
+                    @Type = 1
+                case "4":
+                    @Severity = 4
+                    @Type = 1
+                default:
+                    @Severity = 2
+                    @Type = 1
+            }
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $genAlarmDataInstance
+
+        case "37": ### genAlarmPushAlarm
+
+            ##########
+            # The SNMP trap that is generated at every sample interval and
+            # generates an event that is configured for sending SNMP traps.
+            # This trap will only be sent if the genAlarmControlMatchEventIndex
+            # object is non-zero, and the corresponding eventType in the
+            # eventTable is set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = genAlarmControlVariable - The object identifier of the
+            #        particular variable to be sampled. Only variables that
+            #        resolve to an ASN.1 primitive type of INTEGER (INTEGER,
+            #        Counter, Gauge, or TimeTicks) may be sampled. This may be
+            #        wildcarded, and the wildcards can only be specified for
+            #        INDEX fields. The wildcards is denoted by the character
+            #        
+            #          '?' or '*'. '?' - Represents a single sub-object
+            #                            identifier.
+            #          '*' - Represents object identifier of variable length.
+            #                The '*' can only be used for the last OID of the
+            #                control variable.
+            #        
+            #        For example:
+            #          1) Trailing Wildcards - To monitor ifInOctets for all
+            #               interfaces, set the variable to the ifInOctets OID
+            #               as follows: .1.3.6.1.2.1.2.2.1.10.?
+            #          2) Multiple Wildcards (Contiguous) - To monitor the SLA
+            #               last response time for any slaControlIndex any
+            #               slaClientAddr, set the variable to the
+            #               slaDataLastResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.2.1.3.?.?.?.?.?.206.104.226.3
+            #          3) Multiple Wildcards (Segmented) - To monitor the
+            #               appflowConnOutLastPacketArrivalDelay for any
+            #               appflowControlIndex any server port of server
+            #               address 203.166.18.222, and any client port of
+            #               client address 203.63.54.132, set the variable to
+            #               the appflowConnOutLastPacketArrivalDelay OID as
+            #               follows: .1.3.6.1.4.1.1977.4.1.36.?.?.203.166.18.
+            #                 222.?.203.63.54.132
+            #          4) Multiple Wildcards (Variable length) - To monitor the
+            #               SLA last response time for any slaControlIndex any
+            #               slaHistorySampleIndex, any slaHistoryClientAddr and
+            #               any slaHistoryServerAddr, set the variable to the
+            #               slaHistoryWorstResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.3.1.8.* OR
+            #               .1.3.6.1.4.1.1977.4.3.1.8.?.?.?.?.?.?.*
+            #
+            #        If the variable syntax of those objects is not usable, a
+            #        'badValue' error must be returned. This object may not be
+            #        modified if the associated alarmStatus object is equal to
+            #        valid(1).
+            # $2 = genAlarmControlVariableDescription - A textual description
+            #        of the variable being monitored.
+            # $3 = genAlarmDataInstance - The object identifier of the MIB
+            #        object to sample to see if the event should be generated.
+            #        If at any time the instance is no longer avalable in the
+            #        selected MIB view, the entire row entry will be removed.
+            # $4 = genAlarmControlSampleType - The method of sampling the
+            #        selected variable and calculating the value to be compared
+            #        against the thresholds. If the value of this object is
+            #        absoluteValue(1), the value of the selected variable will
+            #        be compared directly with the thresholds at the end of the
+            #        sampling interval. If the value of this object is
+            #        deltaValue(2), the value of the selected variable at the
+            #        last sample will be subtracted from the current value, and
+            #        the difference compared with the thresholds. This object
+            #        may not be modified if the associated alarmStatus object
+            #        is equal to active(1).
+            # $5 = genAlarmControlAlarmMode - Alarm generation Mode. If the
+            #        value of this object is set to hysteresis(1), the alarm
+            #        generation is as per RMON Alarm and Event groups. If the
+            #        value of this object is set to risingContinuous(2), a
+            #        rising alarm will be generated on every sample interval,
+            #        when the selected variable sample value greater or equal
+            #        to the rising threshold. If the value of this object is
+            #        set to singleEdge(3), an alarm will be generated once when
+            #        the selected variable exceeds the threshold. If the value
+            #        of this object is set to fallingContinuous(4), a falling
+            #        alarm will be generated on every sample interval, when the
+            #        selected variable sample value less than the falling
+            #        threshold. If the value of this object is set to
+            #        matchMode(5), an alarm will be generated when the
+            #        monitored object value is equal to the match value. If the
+            #        value of this object is set to pushMode(6), an alarm will
+            #        be generated at every sample interval. This object may not
+            #        be modified if the associated alarmStatus object is equal
+            #        to active(1).
+            # $6 = genAlarmDataValue - The value of the statistic during the
+            #        last sampling period. For example, if the sample type is
+            #        deltaValue, this value will be the difference between the
+            #        samples at the beginning and end of the period. If the
+            #        sample type is absoluteValue, this value will be the
+            #        sampled value at the end of the period. This is the value
+            #        that is compared with the rising and falling thresholds.
+            #        The value during the current sampling period is not made
+            #        available until the period is completed and will remain
+            #        available until the next period completes.
+            # $7 = genAlarmControlMatchValue - A match value for the sampled statistic. When the current sampled value is equal 
+	    # to this match value, a single event will be generated. This object may not be modified if the associated alarmStatus 
+	    #object is equal to active(1).
+            # $8 = genAlarmControlMatchDuration - The duration in seconds that the sample value maintains the match value
+	    # condition for event generation. A match duration value of 0 indicates that an event will be generated as when 
+	    # the current sample value is equal to match value. This object may not be modified if the associated 
+	    #alarmStatus object is equal to active(1).
+            # $9 = genAlarmControlMatchSeverity - Match Alarm Severity. This object may not be modified if the associated 
+	    # alarmStatus object is equal to active(1).
+            # $10 = genAlarmControlMatchDescription - A description that will be sent in the trap when the match event is
+	    # triggered. This string can contain elements of the form '$i', where i is an index into the variable binding
+	    # list sent when a trap triggered by this alarm row is sent. These elements are expanded to the textual
+	    # representation of the value of the specified variable binding. i must be in the range [1,N], where N is the 
+	    # number of bindings in the list. Given that there are 10 bindings in the genAlarmRisingAlarm notification,
+	    #  N = 10 + genAlarmControlVarBindSize NB. a literal '$' character is specified as '$$'.
+            ##########
+		$ruleset = $ruleset + ' - Trap 37'
+
+            $genAlarmControlVariable = $1
+            $genAlarmControlVariableDescription = $2
+            if(nmatch($3,"OID: .iso."))
+            {
+                $genAlarmDataInstance = ".1" + extract($3, "^OID: \.iso(.*)$")
+            }
+            else
+            {
+                $genAlarmDataInstance = $3
+            }
+            $genAlarmControlSampleType = lookup($4, genAlarmControlSampleType) + " ( " + $4 + " )"
+            $genAlarmControlAlarmMode = lookup($5, genAlarmControlAlarmMode) + " ( " + $5 + " )"
+            $genAlarmDataValue = $6
+            $genAlarmControlMatchValue = $7
+            $genAlarmControlMatchDuration = $8 + " seconds"
+            $genAlarmControlMatchSeverity = lookup($9, genAlarmSeverity) + " ( " + $9 + " )"
+            $genAlarmControlMatchDescription = $10
+
+            @AlertGroup = $2
+            @AlertKey = $genAlarmDataInstance
+            @Summary = $10
+            switch($9)
+            {
+                case "1":
+                    @Severity = 1
+                    @Type = 2
+                case "2":
+                    @Severity = 2
+                    @Type = 1
+                case "3":
+                    @Severity = 3
+                    @Type = 1
+                case "4":
+                    @Severity = 4
+                    @Type = 1
+                default:
+                    @Severity = 2
+                    @Type = 1
+            }
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $genAlarmDataInstance
+
+        ##########
+        # Notifications defined in IPCONFIG-MIB
+        ##########
+
+        case "43": ### srIpConfigIpChanged
+
+            ##########
+            # The trap generated when the IP address for an interface changes.
+            # This trap is also generated during agent initialization.
+            #
+            # $1 = agentIdUniqueId - A string which uniquely identifies this
+            #        agent within its "Management Community".
+            ##########
+		$ruleset = $ruleset + ' - Trap 43'
+
+            $agentIdUniqueId = $1
+
+            @AlertGroup = "IP Address Status"
+            @AlertKey = ""
+            @Summary = "An Interface's IP Address Changed, or Agent Started"
+            @Severity = 2
+            @Type = 900
+
+            $ssmClassGidKey = $ssm_community
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in LOGMONX-MIB
+        ##########
+
+
+        ## This case statement now relocated to the following include statement.
+#        case "44": ### logMonXFileRemoved
+#        case "45": ### logMonXFileCreated
+        include "$OMNIHOME/all_rules/ubsw/ssm_rules/t44-45-ssm.include.rules"
+
+
+	## This case statement now relocated to the following include statement.
+	include "$OMNIHOME/all_rules/ubsw/ssm_rules/t46-ssm.include.rules"
+        ## case "46": ### logMonXFileMatch
+
+        case "47": ### logMonXFileError
+
+            ##########
+            # The SNMP trap that is generated when a file error occurs whilst
+            # reading a log file.
+            #
+            # $1 = logMonXStatsLastError - The last error message reported by
+            #        the agent whilst accessing the specified file.
+            # $2 = logMonXControlDescription - A description of the control
+            #        row.
+            ##########
+		$ruleset = $ruleset + ' - Trap 47'
+
+            $logMonXStatsLastError = $1
+            $logMonXControlDescription = $2
+
+            @AlertGroup = $2
+            @AlertKey = $1
+            @Summary = $1
+            @Severity = 3
+            @Type = 1
+
+		$NoElements = split($logMonXControlDescription, SplitArray, ":")
+		switch ($NoElements)  
+		{
+       		case "1":
+			$ssmAppClass = $CommunityClass
+			
+
+		default:
+			$ssmAppClass = SplitArray[2]
+			@Subclass = SplitArray[3]
+			@SystemDesig = SplitArray[4]
+			$tempOwnerGID = lookup($ssmAppClass, SocketClassGID)
+			if (match($tempOwnerGID,"999"))
+			{
+				$ssmAppClass = 1670
+			}
+		}
+
+
+
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in PROCESS-MIB
+        ##########
+
+        case "23": ### psException
+
+            ##########
+            # A psException trap represents a single exception; what was being
+            # monitored, and what exceptional situation occured.
+            #
+            # $1 = psControlStatus - SNMPv2 Row Status. Controls creation,
+            #        activation and deletion of the control row.
+            # $2 = psControlOwner - Defines the owner/creator of the control
+            #        row.
+            # $3 = psControlDescription - User's description of this control
+            #        row.
+            # $4 = psControlFilterType - Specifies how to identify the subset
+            #        of processes to monitor. Name means to match a process's
+            #        short name (psRunningName). Command means to match a
+            #        process's full command and arguments string. Pid means to
+            #        match a specific process ID. groupLeaderName means to
+            #        match a process's short name and only match process group
+            #        leaders (those for which process ID = process group ID).
+            #        noName means to check that NO process names match the
+            #        filter, and if so, skip attribute checking and start an
+            #        action. Any objects in ExceptionTable including those sent
+            #        in traps, as a result of a noName match will have
+            #        undefined contents.
+            # $5 = psControlFilterPattern - If FilterType is name(1) or
+            #        command(2) this string is a regular expression to match
+            #        against the entire name or command string of each process.
+            #        If FilterType is pid then this string is a textual
+            #        representation of the specific process ID to monitor.
+            # $6 = psControlSampleInterval - The sample interval in seconds.
+            #        This specifies how frequently to check the list of running
+            #        processes, perform filter matching and test the given
+            #        process attribute.
+            # $7 = psControlSampleType - Specifies whether samples are to be of
+            #        exact attribute values, or their deltas (differences
+            #        between samples).
+            # $8 = psControlTestAttribute - The process attribute to be tested
+            #        each sample:
+            #          alive - The value 1 or 0 for true or false. Zero is only
+            #            possible when the process existed in the previous
+            #            sample but has since died.
+            #          size - As defined in psRunningTable.
+            #          rss - As defined in psRunningTable.
+            #          priority - As defined in psRunningTable.
+            #          pageFaults - As defined in psRunningTable.
+            #          hardPageFaults - As defined in psRunningTable.
+            #          contextSwitches - As defined in psRunningTable.
+            #          threads - As defined in psRunningTable.
+            #          handles - As defined in psRunningTable.
+            #          totalTime - kernelTime + userTime kernelTime As defined
+            #            in psRunningTable.
+            #          userTime - As defined in psRunningTable.
+            #          age - How long the process has been running, in seconds.
+            # $9 = psControlTestOperator - The logical operator to apply to
+            #        TestAttribute and TestThreshold: eq Equal, ne Not equal,
+            #        gt Greater than, lt Less than, ge Greater than or equal,
+            #        le Less than or equal. For example, to check for when a
+            #        process uses more than 50MB of memory:
+            #          TestAttribute: size(2)
+            #          TestOperator: gt
+            #          TestThreshold: 50000 
+            # $10 = psControlTestThreshold - The numeric value of TestAttribute
+            #         to test each sample against.
+            # $11 = psExceptionMatch - The process name/command that matched
+            #         ControlFilterPattern. If ControlFilterType is pid then
+            #         this string will be empty.
+            # $12 = psExceptionValue - The sampled value that passed the
+            #         logical test specified in the control row, causing this
+            #         exception.
+            ##########
+		$ruleset = $ruleset + ' - Trap 23'
+
+            $psControlStatus = lookup($1, RowStatus) + " ( " + $1 + " )"
+            $psControlOwner = $2
+            $psControlDescription = $3
+            $psControlFilterType = lookup($4, psControlFilterType) + " ( " + $4 + " )"
+            $psControlFilterPattern = $5
+            $psControlSampleInterval = $6 + " sec."
+            $psControlSampleType = lookup($7, psControlSampleType)
+            $psControlTestAttribute = lookup($8, psControlTestAttribute)
+            $psControlTestOperator = lookup($9, psControlTestOperator)
+            $psControlTestThreshold = $10
+            $psExceptionMatch = $11
+            $psExceptionValue = $12
+
+	    $processNameSwitch = 0
+
+		$ssmSeveritySet = "0"
+	    #
+	    # Here we look at pre-defined process entries from the SSM config
+	    #
+            $lowerProcDesc = lower($psControlDescription)
+		if (nmatch($lowerProcDesc, "ssm_procmon_app_5"))  
+		{
+			$ruleset = $ruleset + ' - ssm_procmon_app_5'
+			$ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                	$ssmAlertGroup = "Process"
+                	$ssmAlertKey = $ssmAppName
+			@Severity = 5
+			$ssmSeveritySet = "1"
+			$processNameSwitch = 2
+
+##########################################################################################################
+#
+#	20080226	Chris Janes	remove vmkstatus events until they are removed from the SSM
+#	this is a temp rule
+
+			if(match($ssmAlertKey, "vmkstatus"))
+			{
+				$tempMarkForDiscard = 2
+			}
+#
+#
+##########################################################################################################
+		}
+		else if (nmatch($lowerProcDesc, "ssm_procmon_app_4"))  
+		{
+			$ruleset = $ruleset + ' - ssm_procmon_app_4'
+			$ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                	$ssmAlertGroup = "Process"
+                	$ssmAlertKey = $ssmAppName
+			@Severity = 4
+#			20050905 Changes By Chris Janes of Abilitec
+			$ssmSeveritySet = "1"
+#			20050905 End of Change
+			$processNameSwitch = 2
+		}
+		else if (nmatch($lowerProcDesc, "ssm_procmon_app_3"))  
+		{
+			$ruleset = $ruleset + ' - ssm_procmon_app_3'
+			$ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                	$ssmAlertGroup = "Process"
+                	$ssmAlertKey = $ssmAppName
+			@Severity = 3
+#			20050905 Changes By Chris Janes of Abilitec
+			$ssmSeveritySet = "1"
+#			20050905 End of Change
+			$processNameSwitch = 2
+		}
+		else if (nmatch($lowerProcDesc, "ssm_procmon_app_2"))  
+		{
+			$ruleset = $ruleset + ' - ssm_procmon_app_2'
+			$ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+			@Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+			@SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+			$ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                	$ssmAlertGroup = "Process"
+                	$ssmAlertKey = $ssmAppName
+			@Severity = 2
+			$ssmSeveritySet = "1"
+			$processNameSwitch = 2
+		}
+
+
+		else if (nmatch($lowerProcDesc, "ssm_procmon_app_0"))
+                {
+                        $ruleset = $ruleset + ' - ssm_procmon_app_0'
+                        $ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                        @Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                        @SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                        $ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                        $ssmAlertGroup = "Process"
+                        $ssmAlertKey = $ssmAppName
+                        @Severity = 0
+                        $ssmSeveritySet = "1"
+                        $processNameSwitch = 2
+##########################################################################################################
+#
+#	20080226	Chris Janes	remove vmkstatus events until they are removed from the SSM
+#	this is a temp rule
+
+			if(match($ssmAlertKey, "vmkstatus"))
+			{
+				$tempMarkForDiscard = 2
+			}
+#
+#
+##########################################################################################################
+                }
+
+#           if (nmatch($lowerProcDesc, "ssm_procmon_app:"))  {
+            else if (nmatch($lowerProcDesc, "ssm_procmon_app:"))  {
+			$ruleset = $ruleset + ' - ssm_procmon_app:' 
+		$ssmAppClass = extract($psControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+		@Subclass = extract($psControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+		@SystemDesig = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+		$ssmAppName = extract($psControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                $ssmAlertGroup = "Process"
+                $ssmAlertKey = $ssmAppName
+                $ssmSeveritySet = "0"
+		$processNameSwitch = 2
+##########################################################################################################
+#
+#       20080226        Chris Janes     remove vmkstatus events until they are removed from the SSM
+#       this is a temp rule
+
+                if(match($ssmAlertKey, "vmkstatus"))
+                {
+                        $tempMarkForDiscard = 2
+                }
+#
+#
+##########################################################################################################
+
+            }
+#		20080319	Change by Chris Janes of Abilitec TD 4726
+		else if (nmatch($psControlDescription, "ssm_procunix_app_5"))
+		{
+			$ruleset = $ruleset + ' - ssm_procunix_app_5:'
+			$NoElements = split($lowerProcDesc, SplitArray, ":")
+			$ssmAppClass = SplitArray[2]
+			@Subclass = SplitArray[3]
+			@SystemDesig = SplitArray[4]
+			$ssmAppName = $psExceptionMatch
+			$ssmAlertGroup = "Process"
+			$ssmAlertKey = $psExceptionMatch
+                        @Severity = 5
+                        $ssmSeveritySet = "1"
+			$processNameSwitch = 2 
+		}
+                else if (nmatch($psControlDescription, "ssm_procunix_app"))
+                {
+                        $ruleset = $ruleset + ' - ssm_procunix_app:'
+                        $NoElements = split($lowerProcDesc, SplitArray, ":")
+                        $ssmAppClass = SplitArray[2]
+                        @Subclass = SplitArray[3]
+                        @SystemDesig = SplitArray[4]
+                        $ssmAppName = $psExceptionMatch
+                        $ssmAlertGroup = "Process"
+                        $ssmAlertKey = $psExceptionMatch
+                        @Severity = 1
+                        $ssmSeveritySet = "1"
+                        $processNameSwitch = 2
+                }
+
+
+#		20080319	End of change
+	    #
+	    # If the above doesn't match, we switch on the various generic process config entries
+	    #
+	    else  {
+                switch($psControlDescription)  {
+                    include "$OMNIHOME/all_rules/ubsw/ssm_rules/ssm_process_include.rules"
+                    default:
+			$ruleset = $ruleset + ' - default'
+                        $ssmAlertGroup = "Process"
+                        $ssmAlertKey = $psControlDescription
+
+                        $ssmClassGidKey = $ssm_community
+                }
+	    }
+
+	   $ruleset = $ruleset + ' - ssmSeveritySet = ' + $ssmSeveritySet + ' processNameSwitch = ' + $processNameSwitch
+
+
+
+#
+# This allows the process description to be set based on the process that matched
+# or the configuration "description" field - set the value of $processNameSwitch
+# accordingly in the preceding include file
+#
+	    switch ($processNameSwitch)  {
+		case "0":
+		    $psSummary = $psExceptionMatch
+		case "1":
+		    $psSummary = $psControlDescription
+		case "2":
+		    $psSummary = $ssmAppName
+		default:
+		    $psSummary = $psExceptionMatch
+	    }
+	   $ruleset = $ruleset + ' - $8 = ' + $8
+            switch($8)
+            {
+                case "1": ### Alive
+                    if(match($ReverseLogicAlive, "1"))
+                    {
+			$ruleset = $ruleset + ' - process case 1'
+	   		$ruleset = $ruleset + ' - $12 = ' + $12
+                        switch($12)
+                        {
+                            case "-1": ### false
+                                $ssmSummary = "Process " + $psSummary + " is dead"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 4
+				}
+                                @Type = 1
+                            case "0": ### false
+                                $ssmSummary = "Process " + $psSummary + " is dead"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 4
+				}
+                                @Type = 1
+                            case "1": ### true
+                                $ssmSummary = "Process " + $psSummary + " is alive"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 2
+				}
+                                @Type = 2
+                            default:
+                                $ssmSummary = "Process " + $psSummary + " status unknown"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 1
+				}
+                                @Type = 1
+                        }
+                    }
+                    else
+                    {
+			$ruleset = $ruleset + ' - process case 2'
+	   		$ruleset = $ruleset + ' - $12 = ' + $12
+                        switch($12)
+                        {
+                            case "-1": ### false
+                                $ssmSummary = "Process " + $psSummary + " is dead"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 4
+				}
+                                @Type = 1
+
+
+                            case "0": ### false
+                                $ssmSummary = "Process " + $psSummary + " is dead"
+
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 4
+				}
+
+                                @Type = 1
+
+
+                            case "1": ### true
+                                $ssmSummary = "Process " + $psSummary + " is alive"
+
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 1
+				}
+
+                                @Type = 2
+
+                            default:
+                                $ssmSummary = "Process " + $psSummary + " status unknown"
+				if (match( $ssmSeveritySet,"0"))
+				{
+                                	@Severity = 2
+				}
+                                @Type = 1
+                        }
+                    }
+                case "2": ### Memory Size
+			$ssmAlertGroup = "Process Memory"
+		    $limit = int($10) / 1024
+		    $size = int($12) / 1024
+                    $ssmSummary = "Memory usage of process " + $psSummary + " exceeds " + $limit + " Mb (actual size " + $size + " Mb)"
+		if (match( $ssmSeveritySet,"0"))
+		{
+                    	@Severity = 4	## changed from 3 to 4 - change requested by Zameel 11/5/2005
+		}
+                    @Type = 1
+                case "3": ### RAM Resident Size
+			$ssmAlertGroup = "Process RSS"
+		    $limit = int($10) / 1024
+		    $size = int($12) / 1024
+                    $ssmSummary = "Resident memory usage of process " + $psSummary + " exceeds " + $limit + " Mb (actual size " + $size + " Mb)"
+		    if (match( $ssmSeveritySet,"0"))
+		    {
+                        @Severity = 3
+	  	    }
+                    @Type = 1
+                case "4": ### Priority
+			$ssmAlertGroup = "Process Priority"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "5": ### Page Faults
+			$ssmAlertGroup = "Process Page Faults"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "6": ### Hard Page Faults
+			$ssmAlertGroup = "Process Hard Page Faults"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                	    @Severity = 2
+			}
+                    @Type = 1
+                case "7": ### Context Switches
+			$ssmAlertGroup = "Process Context Switches"
+                    $ContextSwitchRate = int($12)/int($6)
+                    $ssmSummary = "Context Switch Rate for last " + $psControlSampleInterval + " was " + $ContextSwitchRate + "/sec. for process " + $ssmAlertKey
+		    if (int($ContextSwitchRate) <= 200)  {
+			if (match( $ssmSeveritySet,"0"))
+			{
+				@Severity = 1
+			}
+			@Type = 2
+		    }
+		    else if (int($ContextSwitchRate) > 200 && int($ContextSwitchRate) <= 300)  {
+			if (match( $ssmSeveritySet,"0"))
+			{
+				@Severity = 2
+			}
+			@Type = 1
+		    }
+		    else if (int($ContextSwitchRate) > 300 && int($ContextSwitchRate) <= 400)  {
+			if (match( $ssmSeveritySet,"0"))
+			{
+				@Severity = 3
+			}
+			@Type = 1
+		    }
+		    else if (int($ContextSwitchRate) > 400 && int($ContextSwitchRate) <= 500)  {
+			if (match( $ssmSeveritySet,"0"))
+			{
+				@Severity = 4
+			}
+			@Type = 1
+		    }
+		    else  {
+			if (match( $ssmSeveritySet,"0"))
+			{
+				@Severity = 5
+			}
+			@Type = 1
+		    }
+                case "8": ### Threads
+			$ssmAlertGroup = "Process Threads"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "9": ### Handles
+			$ssmAlertGroup = "Process Handles"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "10": ### Total CPU Time
+			$ssmAlertGroup = "Process Total CPU Time"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "11": ### Kernel CPU Time
+			$ssmAlertGroup = "Process Kernel CPU Time"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "12": ### User CPU Time
+			$ssmAlertGroup = "Process User CPU Time"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "13": ### Age
+			$ssmAlertGroup = "Process Age"
+                    $ssmSummary = $ssmAlertKey + ": " + $psControlTestAttribute + ": " + $12 + " (" + $psControlTestOperator + " " + $10 + ")"
+			if (match( $ssmSeveritySet,"0"))
+			{
+                    		@Severity = 2
+			}
+                    @Type = 1
+                case "14": ### Average CPU
+##########################################################################################
+#
+#	20070123	Rules re-writen by Chris Janes as the old rules have become a mess
+#
+##########################################################################################
+
+			$ruleset = $ruleset + " Average CPU"
+			if (match($3, "nco_m_ssmagent"))  
+			{
+				$ssmClassGidKey = "MICROMUSE"
+			}
+
+			$ssmSummary = "Average CPU utilisation for last " + $psControlSampleInterval + " was " + $12 + "% , for process " + $psExceptionMatch
+			$ssmAlertGroup = "Process Average CPU"
+			$ssmAlertKey = "Average CPU"
+			@Type = 1
+
+
+
+
+
+                default:
+			$ruleset = $ruleset + ' - Case default'
+                    $ssmSummary = $psControlDescription + " " + $psControlTestAttribute + " " + $psControlSampleType + ", " + $12 + ", " + $psControlTestOperator + " " + $10 + "  ( " + $ssmAlertKey + " )"
+                    @Severity = 2
+                    @Type = 1
+            }
+
+        if(match($ssmAppClass, "123000"))
+        {
+                $ssmAppClass =$CommunityClass
+        }
+
+	    @Summary = $ssmSummary
+	    @AlertGroup = $ssmAlertGroup
+	    @AlertKey = $ssmAlertKey
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $psSummary
+            
+
+        ##########
+        # Notifications defined in PROGRAMMABLE-MIB
+        ##########
+
+        case "5": ### programComplete
+
+            ##########
+            # The SNMP trap that is generated when a program has finished
+            # executing. This trap will only be sent if the
+            # programmableControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = programmableControlProgramStatus - Defines the program
+            #        status: idle, running, completed, failed, aborted.
+            #          idle - (settable) the default program state can be set
+            #            from failed, completed, aborted.
+            #          running - (settable) the program may be set to running
+            #            from idle, completed.
+            #          completed - is the result of the application finishing
+            #            irrespective of return code.
+            #          failed - if the application failed to run.
+            #          aborted - (settable) may be set from running to
+            #           terminate the application.
+            # $2 = programmableControlReturnCode - The returncode value upon
+            #        program completion.
+            ##########
+		$ruleset = $ruleset + ' - Trap 5 '
+
+            $programmableControlProgramStatus = lookup($1, programmableControlProgramStatus)
+            $programmableControlReturnCode = $2
+
+            @AlertGroup = "Program Status"
+            @AlertKey = "programmableControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "Program " + $programmableControlProgramStatus + ": Return Code " + $2 + "  ( " + @AlertKey + " )"
+            switch ($1)
+            {
+                case "1": ### Idle
+                    @Severity = 2
+                    @Type = 1
+                case "2": ### Running
+                    @Severity = 1
+                    @Type = 2
+                case "3": ### Completed
+                    @Severity = 1
+                    @Type = 2
+                case "4": ### Failed
+                    @Severity = 3
+                    @Type = 1
+                case "5": ### Aborted
+                    @Severity = 2
+                    @Type = 1
+                default:
+            }
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $1
+            
+            $programmableControlProgramStatus = $programmableControlProgramStatus + " ( " + $1 + " )"
+
+        ##########
+        # Notifications defined in SLA-MIB
+        ##########
+
+        case "1": ### slaViolation
+
+            ##########
+            # The SNMP trap that is generated when the SLA described by an
+            # slaControlEntry is violated. This trap will only be sent if the
+            # slaControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            ##########
+		$ruleset = $ruleset + ' - Trap 1 '
+            
+            if(exists($7))
+            {
+                ##########
+                # $1 = slaControlProtocolDesc - Description of the SLA protocol
+                #        associated with the port number (or port range).
+                # $2 = slaControlSLAType - Defines the monitored response time:
+                #        network layer or application layer. Note certain
+                #        protocols/application do not support network layer
+                #        response time.
+                # $3 = slaControlSLAValue - SLA violation value (milliseconds).
+                # $4 = slaControlDescription - User-based description of the
+                #        SLA requests and responses or transactions monitored.
+                # $5 = slaDataServerAddr - Server IP address.
+                # $6 = slaDataLastResponseTime - Response time (milliseconds)
+                #        of last observed request/response pair. The response
+                #        time value is -1 if the corresponding request/response
+                #        pair response has not been observed or has expired.
+                # $7 = slaDataSLAVPercentage - Percentage of response times
+                #        that is greater than the defined SLA value.
+                ##########
+
+                $slaControlProtocolDesc = $1
+                $slaControlSLAType = lookup($2, slaControlSLAType)
+                $slaControlSLAValue = $3
+                $slaControlDescription = $4
+                $slaDataServerAddr = $5
+                $slaDataLastResponseTime = $6
+                $slaDataSLAVPercentage = $7 + "%"
+
+                @AlertGroup = $slaControlSLAType + " SLA Status"
+                @AlertKey = "slaDataEntry." + extract($OID7, "\.1\.3\.6\.1\.4\.1\.1977\.4\.2\.1\.7\.(.*)$")
+                @Summary = $slaControlSLAType + "SLA Violated: " + $4 + "  ( " + $5 + " )"
+                @Severity = 3
+                @Type = 1
+                $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+                
+                $slaControlSLAType = $slaControlSLAType + " ( " + $2 + " )"
+            }
+            else
+            {
+                ##########
+                # $1 = slaDataSLAVPercentage - Percentage of response times
+                #        that is greater than the defined SLA value.
+                # $2 = slaDataServerAddr - Server IP address.
+                # $3 = slaControlDescription - User-based description of the
+                #        SLA transaction monitored.
+                # $4 = slaControlProtocolDesc - Description of the SLA protocol
+                #        associated with the port number (or port range).
+                # $5 = slaControlSLAType - Defines the monitored response time:
+                #        network layer or application layer. Note certain
+                #        protocols/application do not support network layer
+                #        response time.
+                ##########
+
+                $slaDataSLAVPercentage = $1 + "%"
+                $slaDataServerAddr = $2
+                $slaControlDescription = $3
+                $slaControlProtocolDesc = $4
+                $slaControlSLAType = lookup($5, slaControlSLAType)
+
+                @AlertGroup = $slaControlSLAType + " SLA Status"
+                @AlertKey = "slaDataEntry." + extract($OID1, "\.1\.3\.6\.1\.4\.1\.1977\.4\.2\.1\.7\.(.*)$")
+                @Summary = $slaControlSLAType + "SLA Violated: " + $3 + "  ( " + $2 + " )"
+                @Severity = 3
+                @Type = 1
+                $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $3 + $4
+
+                $slaControlSLAType = $slaControlSLAType + " ( " + $5 + " )"
+            }
+
+        ##########
+        # Notifications defined in SVRSECURITY-MIB
+        ##########
+        
+        case "24": ### svrSecurityAlert
+
+            ##########
+            # The SNMP trap that is generated when an attack is detected. This
+            # trap will only be sent if the svrSecurityControlEventIndex object
+            # is non-zero, and the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = svrSecurityDetectorDescription - A textual description of
+            #        the attack this entry can detect.
+            # $2 = svrSecurityLogTimeStamp - The wall-clock time that the
+            #        attack was detected.
+            # $3 = svrSecurityLogLogMessage - The message generated by the
+            #        detector. This may contain useful information, ie the
+            #        origin of the attack etc.
+            ##########
+		$ruleset = $ruleset + ' - Trap 24'
+
+            $svrSecurityDetectorDescription = $1
+            $svrSecurityLogTimeStamp = $2
+            $svrSecurityLogLogMessage = $3
+
+            @AlertGroup = "Security Alert"
+            switch($1)
+            {
+                case "SYN flood":
+                
+                    $NsDstPort = extract($3, "flood; on (.*)$")
+                    
+                    @AlertGroup = @AlertGroup + " ( SYN Flood )"
+                    @AlertKey = "Port: " + $NsDstPort
+                    @Summary = "SYN Flood  ( " + @AlertKey + " )"
+                    @Severity = 3
+                    @Type = 1
+                    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+                    
+                    $OS_X733EventType = 9
+                    $OS_X733ProbableCause = 100080
+                    $OS_X733SpecificProb = "svrSecurityAlert-SynFlood"
+                    
+                    if(regmatch(@NodeAlias, "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$"))
+                    {
+                        $OS_LocalNodeAlias = @NodeAlias
+                    }
+                    $OS_RemoteNodeAlias = ""
+                    $NsDstIP = $OS_LocalNodeAlias
+                    $NsEventType = 1
+                    $NsProtocol = "tcp"
+                    $NsClass = 0
+                    $NsType = "alert"
+                    $NsScore = 3
+                    
+                case "Ping flood":
+                
+                    @AlertGroup = @AlertGroup + " ( Ping Flood )"
+                    @AlertKey = "From: " + extract($3, "from host\(s\):(.*):")
+                    @Summary = "Ping Flood  ( " + @AlertKey + " )"
+                    @Severity = 3
+                    @Type = 1
+                    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+                    
+                    $OS_X733EventType = 9
+                    $OS_X733ProbableCause = 100080
+                    $OS_X733SpecificProb = "svrSecurityAlert-PingFlood"
+                    
+                    if(regmatch(@NodeAlias, "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$"))
+                    {
+                        $OS_LocalNodeAlias = @NodeAlias
+                    }
+                    $OS_RemoteNodeAlias = extract($3, "from host\(s\):([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+):")
+                    $NsSrcIP = $OS_RemoteNodeAlias
+                    $NsDstIP = $OS_LocalNodeAlias
+                    $NsEventType = 1
+                    $NsProtocol = "icmp"
+                    $NsClass = 0
+                    $NsType = "alert"
+                    $NsScore = 3
+                    
+                case "Login monitor":
+                
+                    @AlertGroup = @AlertGroup + " ( Login Monitor )"
+                    @AlertKey = "User: " + extract($3, " user \((.*)\)")
+                    @Summary = "Excessive Login Failures  ( " + @AlertKey + " )"
+                    @Severity = 2
+                    @Type = 1
+                    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+                    
+                    $OS_X733EventType = 9
+                    $OS_X733ProbableCause = 100168
+                    $OS_X733SpecificProb = "svrSecurityAlert-LoginMonitor"
+                    
+                    if(regmatch(@NodeAlias, "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$"))
+                    {
+                        $OS_LocalNodeAlias = @NodeAlias
+                    }
+                    $OS_RemoteNodeAlias = ""
+                    $NsDstIP = $OS_LocalNodeAlias
+                    $NsEventType = 1
+                    $NsClass = 5
+                    $NsType = "alert.auth_failure"
+                    $NsScore = 1
+                    
+                case "Port Scan":
+                
+                    $PortScanType = extract($3, "; Type: (.*); from ")
+                    $OS_RemoteNodeAlias = extract($3, "; from (.*)$")
+                    
+                    @AlertGroup = @AlertGroup + " ( Port Scan )"
+                    @AlertKey = "From: " + $OS_RemoteNodeAlias
+                    @Summary = $PortScanType + " Port Scan  ( " + @AlertKey + " )"
+                    @Severity = 3
+                    @Type = 1
+                    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $PortScanType
+                    
+                    $OS_X733EventType = 9
+                    $OS_X733ProbableCause = 100085
+                    $OS_X733SpecificProb = "svrSecurityAlert-PortScan"
+                    
+                    if(regmatch(@NodeAlias, "^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$"))
+                    {
+                        $OS_LocalNodeAlias = @NodeAlias
+                    }
+                    $NsSrcIP = $OS_RemoteNodeAlias
+                    $NsDstIP = $OS_LocalNodeAlias
+                    $NsEventType = 1
+                    $NsProtocol = ""
+                    $NsClass = 0
+                    $NsType = "alert.port_scan"
+                    $NsScore = 2
+                                        
+                default:
+                
+                    @AlertKey = $3 + " ( Unknown )"
+                    @Summary = $3
+                    @Severity = 2
+                    @Type = 1
+                    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+            }
+
+        ##########
+        # Notifications defined in SYSRES-MIB
+        ##########
+
+        case "13": ### logFileMatch
+
+            ##########
+            # The SNMP trap that is generated when a line in the log file
+            # matches the regular expression.
+            #
+            # $1 = srLogMonControlLogFile - Absolute path to the log file being
+            #        monitored.
+            # $2 = srLogMonLine - A line from the log file that matched the
+            #        filter in this entry's associated control row.
+            # $3 = srLogMonLevel - Log entry level, if known.
+            ##########
+
+		$ruleset = $ruleset + ' - Trap 13'
+            $srLogMonControlLogFile = $1
+            $srLogMonLine = $2
+            $srLogMonLevel = lookup($3, SrLogMonLevel) + " ( " + $3 + " )"
+
+            @AlertGroup = "Log Monitor: " + $1
+            @AlertKey = "srLogMonEntry." + extract($OID2, "\.([0-9]+\.[0-9]+)$")
+            @Summary = $2
+            switch($3)
+            {
+                case "1": ### Unknown
+                    @Severity = 2
+                    @Type = 1
+                case "2": ### Information
+                    @Severity = 1
+                    @Type = 300
+                case "3": ### Warning
+                    @Severity = 2
+                    @Type = 1
+                case "4": ### Error
+                    @Severity = 4
+                    @Type = 1
+                default:
+                    @Severity = 2
+                    @Type = 1
+            }
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "14": ### logFileError
+
+            ##########
+            # The SNMP trap that is generated when a file error occurs whilst
+            # reading a log file.
+            #
+            # $1 = srLogMonStatsLastError - Last Error message.
+            ##########
+		$ruleset = $ruleset + ' - Trap 14'
+
+            $srLogMonStatsLastError = $1
+
+            @AlertGroup = "Log Monitor Status"
+            @AlertKey = "srLogMonStatsEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "Log File Read Error: " + $1
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + $1
+
+        case "18": ### logFileCreated
+
+            ##########
+            # The trap generated when a log file being monitored comes into
+            # existence.
+            #
+            # $1 = srLogMonControlLogFile - Absolute path to the log file being
+            #        monitored.
+            ##########
+		$ruleset = $ruleset + ' - Trap 18'
+
+            $srLogMonControlLogFile = $1
+
+            @AlertGroup = "Log File Status"
+            @AlertKey = "srLogMonControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "Log File Created  ( " + $1 + " )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "19": ### logFileRemoved
+
+            ##########
+            # The trap generated when a log file can no longer be opened.
+            #
+            # $1 = srLogMonControlLogFile - Absolute path to the log file being
+            #        monitored.
+            ##########
+		$ruleset = $ruleset + ' - Trap 19'
+
+            $srLogMonControlLogFile = $1
+
+            @AlertGroup = "Log File Status"
+            @AlertKey = "srLogMonControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "Log File Removed  ( " + $1 + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in TIMER_MIB
+        ##########
+
+        case "4": ### timerExpiry
+
+            ##########
+            # The SNMP trap that is generated when a timer control entry
+            # expires. This trap will only be sent if the
+            # timerControlEventIndex object is non-zero, and the corresponding
+            # eventType in the eventTable is set to either snmp-trap(3) or
+            # log-and-trap(4).
+            #
+            # $1 = timerInfoSecond - Second of local time.
+            # $2 = timerInfoMinute - Minute of local time.
+            # $3 = timerInfoHour - Hour of local time.
+            # $4 = timerInfoDay - Day of local time.
+            # $5 = timerInfoDayOfWeek - Day of week of local time.
+            # $6 = timerInfoMonth - Month of local itme.
+            # $7 = timerInfoYear - Year of local time.
+            ##########
+		$ruleset = $ruleset + ' - Trap 4 '
+
+            $timerInfoSecond = $1
+            $timerInfoMinute = $2
+            $timerInfoHour = $3
+            $timerInfoDay = $4
+            $timerInfoDayOfWeek = lookup($5, timerInfoDayOfWeek) + " ( " + $5 + " )"
+            $timerInfoMonth = lookup($6, timerInfoMonth) + " ( " + $6 + " )"
+            $timerInfoYear = $7
+
+            @AlertGroup = "Timer Status"
+            @AlertKey = ""
+            @Summary = "Timer Expired"
+            @Severity = 2
+            @Type = 300
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in TRACEROUTE-MIB
+        ##########
+
+        case "3": ### traceComplete
+
+            ##########
+            # The SNMP trap that is generated when a trace is completed. This
+            # trap will only be sent if the tracerouteControlEventIndex object
+            # is non-zero, and the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = tracerouteDestAddr - Destination IP Address of the
+            #        traceroute.
+            ##########
+		$ruleset = $ruleset + ' - Trap 3 '
+
+            $tracerouteDestName = $1
+
+            @AlertGroup = "Traceroute Status"
+            @AlertKey = "tracerouteDestEntry." + extract($OID1, "\.([0-9]+\.[0-9]+)$")
+            @Summary = "Traceroute Complete  ( to " + $1 + " )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "40": ### tracerouteRisingAlarm
+		$ruleset = $ruleset + ' - Trap 40'
+
+            ##########
+            # The SNMP trap that is generated when an tracerouteAlarmEntry
+            # crosses its rising threshold and generates an event that is
+            # configured for sending SNMP traps. This trap will only be sent if
+            # the tracerouteControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = tracerouteAlarmVariable - Variable to monitor in the
+            #        tracerouteAlarmTable.
+            # $2 = tracerouteAlarmControlIndex - Index of the control row to
+            #        monitor tracerouteControlIndex.
+            # $3 = tracerouteDestAddr - Destination IP Address of the
+            #        traceroute.
+            # $4 = tracerouteDataDelay - The delay interval between the agent
+            #        (source) and the hop address.
+            # $5 = tracerouteDataAddress - Hop (intermediate/final) address of
+            #        the traceroute.
+            ##########
+
+            $tracerouteAlarmVariable = $1
+            $tracerouteAlarmControlIndex = $2
+            $tracerouteDestAddr = $3
+            $tracerouteDataDelay = $4
+            $tracerouteDataAddress = $5
+
+            @AlertGroup = "Traceroute Status"
+            @AlertKey = "tracerouteDestEntry." + extract($OID3, "\.([0-9]+\.[0-9]+)$")
+            @Summary = "Traceroute Failed: Hop Delay = " + $4 + "  ( to " + $3 + " )"
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "41": ### tracerouteFallingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an tracerouteAlarmEntry
+            # crosses its falling threshold and generates an event that is
+            # configured for sending SNMP traps. This trap will only be sent if
+            # the tracerouteControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = tracerouteAlarmVariable - Variable to monitor in the
+            #        tracerouteAlarmTable.
+            # $2 = tracerouteAlarmControlIndex - Index of the control row to
+            #        monitor tracerouteControlIndex.
+            # $3 = tracerouteDestAddr - Destination IP Address of the
+            #        traceroute.
+            # $4 = tracerouteDataDelay - The delay interval between the agent
+            #        (source) and the hop address.
+            # $5 = tracerouteDataAddress - Hop (intermediate/final) address of
+            #        the traceroute.
+            ##########
+		$ruleset = $ruleset + ' - Trap 41'
+
+            $tracerouteAlarmVariable = $1
+            $tracerouteAlarmControlIndex = $2
+            $tracerouteDestAddr = $3
+            $tracerouteDataDelay = $4
+            $tracerouteDataAddress = $5
+
+            @AlertGroup = "Traceroute Status"
+            @AlertKey = "tracerouteDestEntry." + extract($OID3, "\.([0-9]+\.[0-9]+)$")
+            @Summary = "Traceroute Complete: Hop Delay = " + $4 + "  ( to " + $3 + " )"
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        ##########
+        # Notifications defined in URLAVAILABILITY-MIB
+        ##########
+
+        case "11": ### urlAvailabilityFailure
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # control row fails. This trap will only be sent if the
+            # urlAvailabilityControlEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = urlAvailabilityControlServerAddress - Destination IP address
+            #        of the URL server to probe, if this variable is set, then
+            #        the ServerName variable will be blanked out, as it is not
+            #        necessary.
+            # $2 = urlAvailabilityDataTime - Time when the availability query
+            #        was performed.
+            # $3 = urlAvailabilityControlURL - Specifies the URL to be
+            #        requested from the server.
+            ##########
+		$ruleset = $ruleset + ' - Trap 11'
+
+            $urlAvailabilityControlServerAddress = $1
+            $urlAvailabilityDataTime = $2
+            $urlAvailabilityControlURL = $3
+
+            @AlertGroup = "URL Availability"
+            @AlertKey = "urlAvailabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "URL Unavailable  ( Server: " + $1 + ", URL: " + $3 + " )" 
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "29": ### urlAvailabilitySuccessChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an
+            # availability changes from being unavailable to available. This
+            # trap will only be sent if the
+            # urlAvailabilityControlSuccessEventIndex object is non-zero, and
+            # the corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = urlAvailabilityControlServerAddress - Destination IP address
+            #        of the URL server to probe, if this variable is set, then
+            #        the ServerName variable will be blanked out, as it is not
+            #        necessary.
+            # $2 = urlAvailabilityDataTime - Time when the availability query
+            #        was performed.
+            # $3 = urlAvailabilityControlURL - Specifies the URL to be
+            #        requested from the server.
+            ##########
+		$ruleset = $ruleset + ' - Trap 29'
+
+            $urlAvailabilityControlServerAddress = $1
+            $urlAvailabilityDataTime = $2
+            $urlAvailabilityControlURL = $3
+
+            @AlertGroup = "URL Availability"
+            @AlertKey = "urlAvailabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "URL Available  ( Server: " + $1 + ", URL: " + $3 + " )" 
+            @Severity = 1
+            @Type = 2
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+        case "30": ### urlAvailabilityFailureChange
+
+            ##########
+            # The SNMP trap that is generated when the test for an availability
+            # changes from being available to unavailable. This trap will only
+            # be sent if the urlAvailabilityControlFailureEventIndex object is
+            # non-zero, and the corresponding eventType in the eventTable is
+            # set to either snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = urlAvailabilityControlServerAddress - Destination IP address
+            #        of the URL server to probe, if this variable is set, then
+            #        the ServerName variable will be blanked out, as it is not
+            #        necessary.
+            # $2 = urlAvailabilityDataTime - Time when the availability query
+            #        was performed.
+            # $3 = urlAvailabilityControlURL - Specifies the URL to be
+            #        requested from the server.
+            ##########
+		$ruleset = $ruleset + ' - Trap 30'
+
+            $urlAvailabilityControlServerAddress = $1
+            $urlAvailabilityDataTime = $2
+            $urlAvailabilityControlURL = $3
+
+            @AlertGroup = "URL Availability"
+            @AlertKey = "urlAvailabilityControlEntry." + extract($OID1, "\.([0-9]+)$")
+            @Summary = "URL Unavailable  ( Server: " + $1 + ", URL: " + $3 + " )" 
+            @Severity = 3
+            @Type = 1
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+#######################################################################################################################
+#
+#	20070726 Trap 57 rules added by Chris Janes of Abilitec this assistance from Richard Harper of the Agent Platform Team
+
+	include "$OMNIHOME/all_rules/ubsw/ssm_rules/t57-ssm.include.rules"
+
+#
+#
+#######################################################################################################################
+
+        default:
+
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $ssmClassGidKeyLen = length($ssmClassGidKey)
+    
+    #
+    # Use the existing MttrapdClassGID lookup table to derive the correct Class and OwnerGID
+    # from the $ssmClassGidKey token which is set in the sub-rules for each trap.
+    #
+    # Else, use the SocketClassGID table (used in socket.rules) where a Class is supplied with the event
+    # via the SSM config description
+    #
+    # If that fails, use the SNMP community string to derive the values.
+    #
+    # If that also fails, set the defaults.
+    #
+    if (exists($ssmClassGidKey)  && int($ssmClassGidKeyLen) > 0)  {
+        [@Class, @OwnerGID] = lookup($ssmClassGidKey, MttrapdClassGID)
+        $cglookup = 1
+    }
+    else if (exists($ssmAppClass))  {
+
+	if (match($ssmAppClass, "0") && match($ssmAlertGroup, "Configuration") && match($ssmAlertKey, "AgentHealth"))
+	{
+		@Class = 1650
+		@OwnerGID = 702
+		$cglookup = 2
+	}
+	else
+	{
+		@Class = $ssmAppClass
+		@OwnerGID = lookup($ssmAppClass, SocketClassGID)
+		$cglookup = 2
+	}
+    }
+    else if (match($specific-trap, "22"))
+    {
+#	@Stream = @Stream + " no ssmAppClass lookup"
+	# Class and OwnerGID set in rule so do nothing here
+    }
+#	20051115	End of Change
+    else if (exists($community))  {
+        [@Class, @OwnerGID] = lookup($community, MttrapdClassGID)
+        $cglookup = 3
+    }
+
+    else  {
+        @Class = 5201
+        @OwnerGID = 999
+        $cglookup = 4
+    }
+	$ruleset = $ruleset + ' cglookup=' + $cglookup
+    $TempDoLookup = 2
+    @OwnerUID = 65534
+
+    update(@SysInt)
+
+#
+# Set the SSM Identifier, finally - this may have been altered by various includes above
+#
+$tempIdLen = length($tempIdentifier)
+if (exists($tempIdentifier) || int($tempIdLen) == 0)  {
+
+}
+

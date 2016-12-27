@@ -1,0 +1,172 @@
+#	risk.lookup created by Chris Janes of Abilitec
+#	1st September 2006
+
+
+#This Lookup associates NodeAlias to the Grade for ESM hosts
+#	Grade	App			Class
+#	998	Monitoring Dev		0
+#	999	Monitoring Prod		0
+#	1000	ITSM			
+#	1010	ATAM
+#	1020	CMDB
+#	1030	LEXICON
+#	1040	ITSP
+#	1050	GCMS/GRS
+#	
+#
+#
+
+#	NodeAlias	Grade
+
+table MonHosts =
+{
+#Monitoring Hosts
+#{"sldn0150por.ldn.swissbank.com","999"}	removed by Chris Janes 20090709
+{"sstm8958por.stm.swissbank.com","999"}
+#	Added by Chris Janes	20081003
+{"sldn2504por.ldn.swissbank.com","999"}
+#	Added by Chris Janes	20081003
+{"sstm5314por.stm.swissbank.com","999"}
+{"xldn0028pap.ldn.swissbank.com","999"}
+#{"xldn0055pap.ldn.swissbank.com","999"}	removed by Chris Janes 20070531
+#{"xldn0064pap.ldn.swissbank.com","999"}	removed by Chris Janes 20081008
+{"xldn1014pap.ldn.swissbank.com","999"}
+#{"xldn1015pap.ldn.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xldn1016pap.ldn.swissbank.com","999"}       removed by Chris Janes 20081003
+{"xldn1017pap.ldn.swissbank.com","999"}
+{"xldn1018pap.ldn.swissbank.com","999"}
+#{"xldn1019pap.ldn.swissbank.com","999"}        removed by Chris Janes 20070531
+#	Added by Chris Janes 20070531
+{"xldn2376pap.ldn.swissbank.com","999"}
+{"xldn2795pap.ldn.swissbank.com","999"}
+#	Added by Chris Janes 20070531
+{"xldn2892pap.ldn.swissbank.com","999"}
+#	Added by Chris Janes 20070531
+{"xldn2893pap.ldn.swissbank.com","999"}
+#{"xldn1052dap.ldn.swissbank.com","998"}	removed by Chris Janes 20081003
+#	Added by GT 20080902
+{"xldn2929dap.ldn.swissbank.com","998"}
+#{"xldn1053dap.ldn.swissbank.com","998"}        removed by Chris Janes 20081003
+#{"xldn1054dap.ldn.swissbank.com","998"}        removed by Chris Janes 20081003
+#{"xldn1055dap.ldn.swissbank.com","998"}        removed by Gary Thomas 20090918
+{"xldn0234dap.ldn.swissbank.com","998"}
+#{"xopf0100pap.opf.swissbank.com","999"}	removed by Gary Thomas 20090918
+#{"xopf0101pap.opf.swissbank.com","999"}        removed by Chris Janes 20081003
+#{"xsng1001pap.sng.swissbank.com","999"}        removed by Chris Janes 20081003
+{"xsng1209pap.sng.swissbank.com","999"}
+{"xsng1215pap.sng.swissbank.com","999"}
+{"xsng1281dap.sng.swissbank.com","998"}
+#	Added by Chris Janes 20070531
+{"xsng1282pap.sng.swissbank.com","999"}
+{"xsng1283pap.sng.swissbank.com","999"}
+{"xsng1284pap.sng.swissbank.com","999"}
+{"xsng1285pap.sng.swissbank.com","999"}
+{"xsng1299pap.sng.swissbank.com","999"}
+{"xstm1315pap.stm.swissbank.com","999"}
+#{"xstm1317pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm1318pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm1333pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm1335pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm1338pap.stm.swissbank.com","999"}        removed by Chris Janes 20070531
+#{"xstm1343pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+{"xstm1394pap.stm.swissbank.com","999"}
+#{"xstm1935dap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm1953dap.stm.swissbank.com","998"}	removed by Gary Thomas 20090918
+#{"xstm1979dap.stm.swissbank.com","998"}	removed by Gary Thomas 20090918
+#	Added by Chris Janes 20071101
+{"xstm5257dap.stm.swissbank.com","999"}
+#	Added by Chris Janes 20070816
+{"xstm5987pap.stm.swissbank.com","999"}
+#	Added by GT 20090430
+{"xstm7743dap.stm.swissbank.com","998"}	
+#{"xstm8027pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm9838dap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm8950pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#{"xstm9174dap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+{"xzur0565pap.zur.swissbank.com","999"}
+{"xzur0567pap.zur.swissbank.com","999"}
+#	Added by Chris Janes 20071217
+{"xstm1770pap.stm.swissbank.com","999"}
+{"xstm1771pap.stm.swissbank.com","999"}
+{"xstm1521pap.stm.swissbank.com","999"}
+#{"xstm1522pap.stm.swissbank.com","999"}       removed by Chris Janes 20081003
+#	Added by Chris Janes	20081003
+{"xstm1522dap.stm.swissbank.com","998"}
+{"xldn0628pap.ldn.swissbank.com","999"}
+#{"xldn2929pap.ldn.swissbank.com","999"}	removed by Gary Thomas 20090918
+{"xstm6143pap.stm.swissbank.com","999"}
+#       Added by Chris Janes    20081003
+{"xldn1644vdap.ldn.swissbank.com","998"}
+# ITSM Hosts	1000
+{"xldn0973pww.ldn.swissbank.com","1000"}
+{"xldn1832pap.ldn.swissbank.com","1000"}
+{"xldn1805por.ldn.swissbank.com","1000"}
+{"xldn3233por.ldn.swissbank.com","1000"}
+{"xldn1322por.ldn.swissbank.com","1000"}
+{"xldn0972pww.ldn.swissbank.com","1000"}
+{"xstm1342pap.stm.swissbank.com","1000"}
+{"xstm7250por.stm.swissbank.com","1000"}
+{"xstm2310por.stm.swissbank.com","1000"}
+{"xstm1328por.stm.swissbank.com","1000"}
+{"xstm8967pap.stm.swissbank.com","1000"}
+{"xstm7210pap.stm.swissbank.com","1000"}
+{"xsyd0065pap.stm.swissbank.com","1000"}
+{"xsyd0064pap.stm.swissbank.com","1000"}
+{"xsyd0079por.stm.swissbank.com","1000"}
+{"xsng1055pap.sng.swissbank.com","1000"}
+{"xsng1310pap.sng.swissbank.com","1000"}
+{"xsng1323por.sng.swissbank.com","1000"}
+{"xsng1324pap.sng.swissbank.com","1000"}
+
+
+# ITAM Hosts	1010
+{"xldn2931pap.ldn.swissbank.com","1010"}
+{"xldn1797pap.ldn.swissbank.com","1010"}
+{"xldn1656por.ldn.swissbank.com","1010"}
+
+# CMDB Hosts	1020
+
+{"xldn2377pap.ldn.swissbank.com","1020"}
+{"xldn2401pap.ldn.swissbank.com","1020"}
+{"xldn2276pap.ldn.swissbank.com","1020"}
+{"xldn2485por.ldn.swissbank.com","1020"}
+{"xldn2485por.ldn.swissbank.com","1020"}
+
+# LEXICON Hosts	1030	 
+{"sldn1681pap.ldn.swissbank.com","1030"}
+{"sldn0633psy.ldn.swissbank.com","1030"}
+{"sm0p8261syb.ldn.swissbank.com","1030"}
+
+# ITSP Hosts 1040
+
+{"itsxsydwebmt.swissbank.com","1040"}
+{"kmxsyd.swissbank.com","1040"}
+{"itsxsyd.swissbank.com","1040"}
+{"itsxsyddb.swissbank.com","1040"}
+{"ssyd2202pww.syd.swissbank.com","1040"}
+{"ssyd2203pww.syd.swissbank.com","1040"}
+{"ssyd0870pww.syd.swissbank.com","1040"}
+{"ssyd0871pww.syd.swissbank.com","1040"}
+{"ssyd2209pap.syd.swissbank.com","1040"}
+{"ssyd2208pap.syd.swissbank.com","1040"}
+{"ssyd2207por.syd.swissbank.com","1040"}
+{"ssyd2206por.syd.swissbank.com","1040"}
+
+
+# GCMS/GRS	1050
+{"nldn9630pww.ldn.swissbank.com","1050"}
+{"sldn2378psy.ldn.swissbank.com","1050"}
+{"sldn1612psy.ldn.swissbank.com","1050"}
+{"nldn9530pww.ldn.swissbank.com","1050"}
+{"nstm8922pww.stm.swissbank.com","1050"}
+{"sstm8540psy.stm.swissbank.com","1050"}
+{"sstm7245psy.stm.swissbank.com","1050"}
+{"nsng8032pww.sng.swissbank.com","1050"}
+{"ssng1328psy.sng.swissbank.com","1050"}
+{"ssng1137psy.sng.swissbank.com","1050"}
+{"nldn9590pww.ldn.swissbank.com","1050"}
+{"nstm0805pww.stm.swissbank.com","1050"}
+}
+
+default = {"0"}
+

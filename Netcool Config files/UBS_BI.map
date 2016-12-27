@@ -1,0 +1,489 @@
+##############################################################################
+# Netcool/OMNIbus Bi-directional ObjectServer Gateway 7.2
+#
+# UBS Specific BI gateway map definition file.
+#
+# Revision History:
+#	2.0 	28 May 2008	Initial cut By G.Thomas
+#
+# Notes:
+#
+# Fields that are marked as 'ON INSERT ONLY' will only be passed when an event
+# is inserted for the first time. (ie. they will not be updated). The ordering
+# of the fields is not important as the gateway will use named value insertion.
+#
+##############################################################################
+CREATE MAPPING StatusMap
+(
+	'Identifier'		=	'@Identifier'		ON INSERT ONLY,
+	'Node'			=	'@Node'			ON INSERT ONLY,
+	'NodeAlias'		=	'@NodeAlias'		ON INSERT ONLY,
+	'Manager'		=	'@Manager'		ON INSERT ONLY,
+	'Agent'			=	'@Agent'		ON INSERT ONLY,
+	'AlertGroup'		=	'@AlertGroup'		ON INSERT ONLY,
+	'AlertKey'		=	'@AlertKey'		ON INSERT ONLY,
+	'Severity'		=	'@Severity',
+	'Summary'		=	'@Summary',
+	'StateChange'		=	'@StateChange',
+	'FirstOccurrence'	=	'@FirstOccurrence'	ON INSERT ONLY,
+	'LastOccurrence'	=	'@LastOccurrence',
+	'InternalLast'		=	'@InternalLast',
+	'Poll'			=	'@Poll',
+	'Type'			=	'@Type'			ON INSERT ONLY,
+	'Tally'			=	'@Tally',
+	'Class'			=	'@Class'		ON INSERT ONLY,
+	'Grade'			=	'@Grade',
+	'Location'		=	'@Location'		ON INSERT ONLY,
+	'OwnerUID'		=	'@OwnerUID',
+	'OwnerGID'		=	'@OwnerGID',
+	'Acknowledged'		=	'@Acknowledged',
+	'Flash'			=	'@Flash',
+	'ServerName'		=	'@ServerName'		ON INSERT ONLY,
+	'ServerSerial'		=	'@ServerSerial'		ON INSERT ONLY,
+	'Stream'		=	'@Stream'		ON INSERT ONLY,
+	'Impact'		=	'@Impact',
+	'Display_Hide'		=	'@Display_Hide',
+	'Region'		=	'@Region'		ON INSERT ONLY,
+	'Supt_Lvl'		=	'@Supt_Lvl',
+	'SystemDesig'		=	'@SystemDesig',
+	'Reporter'		=	'@Reporter',
+	'Origin'		=	'@Origin',
+	'TTicket'		=	'@TTicket',
+	'TTicket_Status'	=	'@TTicket_Status',
+	'Notification'		=	'@Notification',
+	'Alarm_Dest'		=	'@Alarm_Dest'		ON INSERT ONLY,
+	'Probe_Rule'		=	'@Probe_Rule'		ON INSERT ONLY,
+	'SAPNumber'		=	'@SAPNumber'		ON INSERT ONLY,
+	'Subclass'		=	'@Subclass',
+	'Environment'		=	'@Environment'		ON INSERT ONLY,
+	'UserData'		=	'@UserData',
+	'UserInt'		=	'@UserInt',
+	'ExpireID'		=	'@ExpireID',
+	'ExpireTime'		=	'@ExpireTime',
+	'SysInt'		=	'@SysInt',
+	'TT_UpdateTime'		=	'@TT_UpdateTime',
+	'IntTT_Num'		=	'@IntTT_Num',
+	'ProbeHostName'		=	'@ProbeHostName',
+	'OriginalSeverity'	=	'@OriginalSeverity'	ON INSERT ONLY,
+	'TT_Region'		=	'@TT_Region',
+	'Description'		=	'@Description'		ON INSERT ONLY,
+	'SLA_Time'		=	'@SLA_Time'		ON INSERT ONLY,
+	'UserData1'		=	'@UserData1',
+	'UserData2'		=	'@UserData2',
+	'UserInt1'		=	'@UserInt1',
+	'UserInt2'		=	'@UserInt2',
+	'AckTime'		=	'@AckTime',
+	'SourceKey'		=	'@SourceKey',
+	'XtraTime'		=	'@XtraTime',
+	'RemData1'		=	'@RemData1',
+	'RemData2'		=	'@RemData2',
+	'BusinessStream'	=	'@BusinessStream',
+	'AENFlag'		=	'@AENFlag',
+	'AENChannel'		=	'@AENChannel',
+	'RemData3'		=	'@RemData3',
+	'Domain'		=	'@Domain'
+);
+
+CREATE MAPPING JournalMap
+(
+	'KeyField'		=	TO_STRING(STATUS.SERIAL) + ":" + TO_STRING('@UID') + ":" + TO_STRING('@Chrono')	ON INSERT ONLY,
+	'Serial'		=	STATUS.SERIAL,
+	'Chrono'		=	'@Chrono',
+	'UID'			=	TO_INTEGER('@UID'),
+	'Text1'			=	'@Text1',
+	'Text2'			=	'@Text2',
+	'Text3'			=	'@Text3',
+	'Text4'			=	'@Text4',
+	'Text5'			=	'@Text5',
+	'Text6'			=	'@Text6',
+	'Text7'			=	'@Text7',
+	'Text8'			=	'@Text8',
+	'Text9'			=	'@Text9',
+	'Text10'		=	'@Text10',
+	'Text11'		=	'@Text11',
+	'Text12'		=	'@Text12',
+	'Text13'		=	'@Text13',
+	'Text14'		=	'@Text14',
+	'Text15'		=	'@Text15',
+	'Text16'		=	'@Text16'
+);
+
+CREATE MAPPING DetailsMap
+(
+	'KeyField'		=	'@Identifier' + '####' + TO_STRING('@Sequence')	ON INSERT ONLY,
+	'Identifier'		=	'@Identifier',
+	'AttrVal'		=	'@AttrVal',
+	'Sequence'		=	'@Sequence',
+	'Name'			=	'@Name',
+	'Detail'		=	'@Detail'
+);
+
+##############################################################################
+# NOTE: If replication of the user related system tables is required, uncomment
+# the table mapping definitions below. The associated table replication 
+# definitions will also need to be uncommented.
+##############################################################################
+
+CREATE MAPPING SecurityUsersMap
+(
+	'UserID'		=	'@UserID'		ON INSERT ONLY,
+	'UserName'		=	'@UserName',
+	'SystemUser'		=	'@SystemUser',
+	'FullName'		=	'@FullName',
+	'Passwd'		=	'@Passwd',
+	'UsePAM'		=	'@UsePAM',
+	'Enabled'		=	'@Enabled'
+);
+
+CREATE MAPPING SecurityGroupsMap
+(
+	'GroupID'		=	'@GroupID'		ON INSERT ONLY,
+	'GroupName'		=	'@GroupName',
+	'SystemGroup'		=	'@SystemGroup',
+	'Description'		=	'@Description'
+);
+
+CREATE MAPPING SecurityRolesMap
+(
+	'RoleID'		=	'@RoleID'		ON INSERT ONLY,
+	'RoleName'		=	'@RoleName',
+	'SystemRole'		=	'@SystemRole',
+	'Description'		=	'@Description',
+	'RoleScope'		=	'@RoleScope'
+);
+
+CREATE MAPPING SecurityRoleGrantsMap
+(
+	'GranteeType'		=	'@GranteeType'		ON INSERT ONLY,
+	'GranteeID'		=	'@GranteeID'		ON INSERT ONLY,
+	'RoleID'		=	'@RoleID'		ON INSERT ONLY
+);
+
+CREATE MAPPING SecurityGroupMembersMap
+(
+	'UserID'		=	'@UserID'		ON INSERT ONLY,
+	'GroupID'		=	'@GroupID'		ON INSERT ONLY,
+	'Compat'		=	'@Compat'
+);
+
+CREATE MAPPING CatalogRestrictionFiltersMap
+(
+	'RestrictionName'	=	'@RestrictionName'	ON INSERT ONLY,
+	'TableName'		=	'@TableName',
+	'DatabaseName'		=	'@DatabaseName',
+	'ConditionText'		=	'@ConditionText',
+	'CreationText'		=	'@CreationText'
+);
+
+CREATE MAPPING SecurityRestrictionFiltersMap
+(
+	'GranteeType'		=	'@GranteeType'		ON INSERT ONLY,
+	'GranteeID'		=	'@GranteeID'		ON INSERT ONLY,
+	'RestrictionName'	=	'@RestrictionName',
+	'DatabaseName'		=	'@DatabaseName',
+	'TableName'		=	'@TableName'
+);
+
+CREATE MAPPING SecurityPermissionsMap
+(
+	'ApplicationID'		=	'@ApplicationID'	ON INSERT ONLY,
+	'ObjectType'		=	'@ObjectType'		ON INSERT ONLY,
+	'Object'		=	'@Object'		ON INSERT ONLY,
+	'GranteeType'		=	'@GranteeType'		ON INSERT ONLY,
+	'GranteeID'		=	'@GranteeID'		ON INSERT ONLY,
+	'Allows'		=	'@Allows',
+	'Denies'		=	'@Denies',
+	'GrantOptions'		=	'@GrantOptions'
+);
+
+##############################################################################
+# NOTE: If replication of desktop  related system tables is required, uncomment
+# the replication definitions below. The associated maps will also need to be
+# uncommented.
+##############################################################################
+
+CREATE MAPPING ToolsMenusMap
+(
+	'MenuID'		=	'@MenuID'		ON INSERT ONLY,
+	'Name'			=	'@Name',
+	'Owner'			=	'@Owner',
+	'Enabled'		=	'@Enabled'
+);
+
+CREATE MAPPING ToolsMenuItemsMap
+(
+	'KeyField'		=	TO_STRING('@MenuID') + ":" + TO_STRING('@MenuItemID') ON INSERT ONLY,
+	'MenuID'		=	'@MenuID'		ON INSERT ONLY,
+	'MenuItemID'		=	'@MenuItemID'		ON INSERT ONLY,
+	'Title'			=	'@Title',
+	'Description'		=	'@Description',
+	'Enabled'		=	'@Enabled',
+	'InvokeType'		=	'@InvokeType',
+	'InvokeID'		=	'@InvokeID',
+	'Position'		=	'@Position',
+	'Accelerator'		=	'@Accelerator'
+);
+
+CREATE MAPPING ToolsActionsMap
+(
+	'ActionID'		=	'@ActionID'		ON INSERT ONLY,
+	'Name'			=	'@Name',
+	'Owner'			=	'@Owner',
+	'Enabled'		=	'@Enabled',
+	'Description1'		=	'@Description1',
+	'Description2'		=	'@Description2',
+	'Description3'		=	'@Description3',
+	'Description4'		=	'@Description4',
+	'HasInternal'		=	'@HasInternal',
+	'InternalEffect1'	=	'@InternalEffect1',
+	'InternalEffect2'	=	'@InternalEffect2',
+	'InternalEffect3'	=	'@InternalEffect3',
+	'InternalEffect4'	=	'@InternalEffect4',
+	'InternalForEach'	=	'@InternalForEach',
+	'HasExternal'		=	'@HasExternal',
+	'ExternalEffect1'	=	'@ExternalEffect1',
+	'ExternalEffect2'	=	'@ExternalEffect2',
+	'ExternalEffect3'	=	'@ExternalEffect3',
+	'ExternalEffect4'	=	'@ExternalEffect4',
+	'ExternalForEach'	=	'@ExternalForEach',
+	'RedirectOut'		=	'@RedirectOut',
+	'RedirectErr'		=	'@RedirectErr',
+	'Platform'		=	'@Platform',
+	'JournalText1'		=	'@JournalText1',
+	'JournalText2'		=	'@JournalText2',
+	'JournalText3'		=	'@JournalText3',
+	'JournalText4'		=	'@JournalText4',
+	'JournalForEach'	=	'@JournalForEach',
+	'HasForcedJournal'	=	'@HasForcedJournal'
+);
+
+CREATE MAPPING ToolsActionAccessMap
+(
+	'ActionAccessID'	=	'@ActionAccessID'	ON INSERT ONLY,
+	'ActionID'		=	'@ActionID',
+	'GID'			=	'@GID',
+	'ClassID'		=	'@ClassID'
+);
+
+CREATE MAPPING ToolsMenuDefsMap
+(
+	'Name'			=	'@Name'			ON INSERT ONLY,
+	'DatabaseName'		=	'@DatabaseName',
+	'TableName'		=	'@TableName',
+	'ShowField'		=	'@ShowField',
+	'AssignField'		=	'@AssignField',
+	'OrderbyField'		=	'@OrderbyField',
+	'WhereClause'		=	'@WhereClause'
+);
+
+CREATE MAPPING ToolsPromptDefsMap
+(
+	'Name'			=	'@Name'			ON INSERT ONLY,
+	'Prompt'		=	'@Prompt',
+	'Default'		=	'@Default',
+	'Value'			=	'@Value',
+	'Type'			=	'@Type'
+);
+
+CREATE MAPPING AlertsConversionsMap
+(
+	'KeyField'		=	'@KeyField'		ON INSERT ONLY,
+	'Colname'		=	'@Colname'		ON INSERT ONLY,
+	'Value'			=	'@Value'		ON INSERT ONLY,
+	'Conversion'		=	'@Conversion'
+);
+
+CREATE MAPPING AlertsColVisualsMap
+(
+	'Colname'		=	'@Colname'		ON INSERT ONLY,
+	'Title'			=	'@Title',
+	'DefWidth'		=	'@DefWidth',
+	'MaxWidth'		=	'@MaxWidth',
+	'TitleJustify'		=	'@TitleJustify',
+	'DataJustify'		=	'@DataJustify'
+);
+
+CREATE MAPPING AlertsColorsMap
+(
+	'Severity'		=	'@Severity'		ON INSERT ONLY,
+	'AckedRed'		=	'@AckedRed',
+	'AckedGreen'		=	'@AckedGreen',
+	'AckedBlue'		=	'@AckedBlue',
+	'UnackedRed'		=	'@UnackedRed',
+	'UnackedGreen'		=	'@UnackedGreen',
+	'UnackedBlue'		=	'@UnackedBlue'
+);
+
+##############################################################################
+# Additional Maps Added By John Owens (03.11.05)
+############################################################################## 
+
+CREATE MAPPING AlertsObjClassMap
+(
+	'Tag'			=	'@Tag'			ON INSERT ONLY,
+	'Name'			=	'@Name',
+	'Icon'			=	'@Icon',
+	'Menu'			=	'@Menu'
+);
+
+CREATE MAPPING AlertsObjMenusMap
+(
+	'Menu'			=	'@Menu'			ON INSERT ONLY,
+	'Columns'		=	'@Columns'
+);
+
+CREATE MAPPING AlertsObjMenuItemsMap
+(
+	'KeyField'		=	'@KeyField'		ON INSERT ONLY,
+	'Menu'			=	'@Menu',
+	'Sequence'		=	'@Sequence',
+	'Title'			=	'@Title',
+	'Command1'		=	'@Command1',
+	'Command2'		=	'@Command2',
+	'Command3'		=	'@Command3',
+	'Command4'		=	'@Command4',
+	'RedirectStdin'		=	'@RedirectStdin',
+	'RedirectStdout'	=	'@RedirectStdout',
+	'RedirectStderr'	=	'@RedirectStderr'
+);
+
+CREATE MAPPING CustomSuppressMap
+(
+	'KeyField'		=	'@KeyField'		ON INSERT ONLY,
+	'NodeAlias'		=	'@NodeAlias',
+	'Class'			=	'@Class',
+	'Owner'			=	'@Owner',
+	'OwnerGID'		=	'@OwnerGID',
+	'StartTime'		=	'@StartTime',
+	'EndTime'		=	'@EndTime',
+	'Method'		=	'@Method',
+	'Comments'		=	'@Comments'
+);
+
+CREATE MAPPING CustomInfraStatusMap
+(
+	'Name'			=	'@Name'			ON INSERT ONLY,
+	'Process_Type'		=	'@Process_Type',
+	'Process_Host'		=	'@Process_Host',
+	'Maintenance'		=	'@Maintenance',
+	'Operational'		=	'@Operational',
+	'Cold_Gate'		=	'@Cold_Gate',
+	'Last_Operational'	=	'@Last_Operational',
+	'Last_Down'		=	'@Last_Down',
+	'Last_Checked'		=	'@Last_Checked',
+	'A_End_Server'		=	'@A_End_Server',
+	'B_End_Server'		=	'@B_End_Server',
+	'Alternate_Gate'	=	'@Alternate_Gate',
+	'Alternate_Gate_Host'	=	'@Alternate_Gate_Host'
+);
+
+CREATE MAPPING IDUCSystemChannel
+(
+	'Name'			=	'@Name'			ON INSERT ONLY,
+	'ChannelID'		=	'@ChannelID'		ON INSERT ONLY,
+	'Description'		=	'@Description'
+);
+
+CREATE MAPPING IDUCSystemChannelInterest
+(
+	'InterestID'		=	'@InterestID'		ON INSERT ONLY,
+	'ElementName'		=	'@ElementName',
+	'IsGroup'		=	'@IsGroup',
+	'Hostname'		=	'@Hostname',
+	'AppName'		=	'@AppName',
+	'AppDescription'	=	'@AppDescription',
+	'ChannelID'		=	'@ChannelID'
+);
+
+CREATE MAPPING IDUCSystemChannelSummary
+(
+	'DatabaseName'		=	'@DatabaseName'		ON INSERT ONLY,
+	'TableName'		=	'@TableName'		ON INSERT ONLY,
+	'ChannelID'		=	'@ChannelID'		ON INSERT ONLY,
+	'SummaryID'		=	'@SummaryID'
+);
+
+CREATE MAPPING IDUCSystemChannelSummaryCols
+(
+	'ColumnName'		=	'@ColumnName'		ON INSERT ONLY,
+	'SummaryID'		=	'@SummaryID'		ON INSERT ONLY,
+	'Position'		=	'@Position',
+	'ChannelID'		=	'@ChannelID'
+);
+
+CREATE MAPPING IDUCMessages
+(
+	'MsgID'			=	'@MsgID'		ON INSERT ONLY,
+	'MsgText'		=	'@MsgText',
+	'MsgTime'		=	'@MsgTime'
+);
+CREATE MAPPING CustomAppHbtStatusMap
+(
+	'Identifier'		=	'@Identifier'		ON INSERT ONLY,
+	'Node'			=	'@Node'			ON INSERT ONLY,
+	'NodeAlias'		=	'@NodeAlias'		ON INSERT ONLY,
+	'Manager'		=	'@Manager'		ON INSERT ONLY,
+	'Agent'			=	'@Agent'		ON INSERT ONLY,
+	'AlertGroup'		=	'@AlertGroup'		ON INSERT ONLY,
+	'AlertKey'		=	'@AlertKey'		ON INSERT ONLY,
+	'Severity'		=	'@Severity',
+	'Summary'		=	'@Summary',
+	'StateChange'		=	'@StateChange',
+	'FirstOccurrence'	=	'@FirstOccurrence'	ON INSERT ONLY,
+	'LastOccurrence'	=	'@LastOccurrence',
+	'InternalLast'		=	'@InternalLast',
+	'Poll'			=	'@Poll',
+	'Type'			=	'@Type'			ON INSERT ONLY,
+	'Tally'			=	'@Tally',
+	'Class'			=	'@Class'		ON INSERT ONLY,
+	'Grade'			=	'@Grade',
+	'Location'		=	'@Location'		ON INSERT ONLY,
+	'OwnerUID'		=	'@OwnerUID',
+	'OwnerGID'		=	'@OwnerGID',
+	'Acknowledged'		=	'@Acknowledged',
+	'Flash'			=	'@Flash'		ON INSERT ONLY,
+	'ServerName'		=	'@ServerName'		ON INSERT ONLY,
+	'ServerSerial'		=	'@ServerSerial'		ON INSERT ONLY,
+	'Stream'		=	'@Stream'		ON INSERT ONLY,
+	'Impact'		=	'@Impact'		ON INSERT ONLY,
+	'Display_Hide'		=	'@Display_Hide'		ON INSERT ONLY,
+	'Region'		=	'@Region'		ON INSERT ONLY,
+	'Supt_Lvl'		=	'@Supt_Lvl',
+	'SystemDesig'		=	'@SystemDesig'		ON INSERT ONLY,
+	'Reporter'		=	'@Reporter'		ON INSERT ONLY,
+	'Origin'		=	'@Origin',
+	'TTicket'		=	'@TTicket'		ON INSERT ONLY,
+	'TTicket_Status'	=	'@TTicket_Status'	ON INSERT ONLY,
+	'Notification'		=	'@Notification'		ON INSERT ONLY,
+	'Alarm_Dest'		=	'@Alarm_Dest'		ON INSERT ONLY,
+	'Probe_Rule'		=	'@Probe_Rule'		ON INSERT ONLY,
+	'SAPNumber'		=	'@SAPNumber'		ON INSERT ONLY,
+	'Subclass'		=	'@Subclass',
+	'Environment'		=	'@Environment'		ON INSERT ONLY,
+	'UserData'		=	'@UserData',
+	'UserInt'		=	'@UserInt',
+	'ExpireID'		=	'@ExpireID',
+	'ExpireTime'		=	'@ExpireTime',
+	'SysInt'		=	'@SysInt',
+	'TT_UpdateTime'		=	'@TT_UpdateTime'	ON INSERT ONLY,
+	'IntTT_Num'		=	'@IntTT_Num'		ON INSERT ONLY,
+	'ProbeHostName'		=	'@ProbeHostName',
+	'OriginalSeverity'	=	'@OriginalSeverity'	ON INSERT ONLY,
+	'TT_Region'		=	'@TT_Region'		ON INSERT ONLY,
+	'Description'		=	'@Description'		ON INSERT ONLY,
+	'SLA_Time'		=	'@SLA_Time'		ON INSERT ONLY,
+	'UserData1'		=	'@UserData1'		ON INSERT ONLY,
+	'UserData2'		=	'@UserData2'		ON INSERT ONLY,
+	'UserInt1'		=	'@UserInt1'		ON INSERT ONLY,
+	'UserInt2'		=	'@UserInt2'		ON INSERT ONLY,
+	'AckTime'		=	'@AckTime'		ON INSERT ONLY,
+	'SourceKey'		=	'@SourceKey',
+	'XtraTime'		=	'@XtraTime'		ON INSERT ONLY,
+	'RemData1'		=	'@RemData1'		ON INSERT ONLY,
+	'RemData2'		=	'@RemData2'		ON INSERT ONLY,
+	'BusinessStream'	=	'@BusinessStream',
+	'AENFlag'		=	'@AENFlag'		ON INSERT ONLY,
+	'AENChannel'		=	'@AENChannel'		ON INSERT ONLY,
+	'RemData3'		=	'@RemData3'		ON INSERT ONLY,
+	'Domain'		=	'@Domain'
+);

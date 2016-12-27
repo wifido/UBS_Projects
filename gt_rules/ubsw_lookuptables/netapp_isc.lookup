@@ -1,0 +1,32 @@
+table netappISC =
+{
+#	{"Specific Trap number","Event Severity","ToIsc"}
+#	Where ToIsc can be
+#	0 - Do not send to ISC
+#	1 - Send To ISC
+#	2 - Check a different token before routing to ISC
+	{"13","5","1"}
+	{"22","4","1"}
+	{"103","5","1"}
+	{"111","5","1"}
+	{"113","5","1"}
+	{"115","5","1"}
+	{"192","4","1"}
+	{"237","5","1"}
+	{"238","5","1"}
+	{"272","5","1"}
+	{"275","5","1"}
+	{"482","5","1"}
+	{"485","5","1"}
+	{"574","5","1"}
+	{"10072","4","1"}
+	{"10092","5","1"}
+	{"10132","4","1"}
+	{"10165","5","2"}
+	{"10213","5","1"}
+	{"10433","4","1"}
+	{"10582","5","1"}
+}
+default = {"6","0"}
+# Note the default Severity comporator set to 6, so we bypass any further routing processing if we do not match the specific-trap number.
+

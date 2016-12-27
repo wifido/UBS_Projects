@@ -1,0 +1,156 @@
+#####################################################################################
+#
+#	aen.include.rules - rules associated with Accelerated Event Notification
+#
+#	20070312	Chris Janes	Origional
+#
+#	It should work like this
+#	if $AENFlag and $AENChannel are set before it reaches this rules file then 
+#	the event should be notifiled
+#	Else lookup against Class:Subclass for Class AenChannel, AenMinSeverity, AenEnable
+#	AenChannel	This is the channel that should ne notified
+#	AenMinSeverity  The event must have a severity equal or greater than this for
+#			a notification to take place
+#	AenEnable	If this is set to 1 then the event is notified, if it is set to 0 
+#			then the event is only notified if AENException is set to 1 by
+#			an earlier rule 
+#
+#
+#####################################################################################
+
+$ruleset = $ruleset + ' - AEN'
+
+if (exists($ExpireTime))
+{
+	@ExpireTime = $ExpireTime
+}
+if ((int($AENFlag) == 1) && NOT match($AENChannel ,""))
+{
+	@AENChannel = $AENChannel
+	@AENFlag = $AENFlag
+#	$ruleset = $ruleset + ' Notify(1) to ' + @AENChannel
+}
+else
+{ 
+	$class_subclass_key = @Class + ":" + @Subclass
+	[$AenChannel, $AenMinSeverity, $AenEnable] = lookup($class_subclass_key, AenClassSubclass)
+	if(match ($AenChannel, "NoMatch"))
+	{
+#		$ruleset = $ruleset + 'No Match on Class:Subclass'
+		[$AenChannel, $AenMinSeverity, $AenEnable] = lookup(@Class, AenClass)
+		if(match ($AenChannel, "NoMatch"))
+		{
+#			$ruleset = $ruleset + 'No Match on Class'
+		}
+	}
+
+	if(match ($AenChannel, "NoMatch"))
+	{
+		
+	}
+	else
+	{
+		if(int(@Severity) >= int($AenMinSeverity))
+		{
+			@AENChannel = $AenChannel
+			if ((int($AENException) == 1) || (int($AenEnable) == 1))
+			{
+				@AENFlag = 1
+			}
+#			$ruleset = $ruleset + ' Notify(2) to ' + @AENChannel
+		}
+	}
+}
+
+#	20080718	GT. Changed the lines below prefixed with #### in order to migrate AEN functionality into engineering environment.
+#			The replacement contains a switch on hostname in order for these rules to be pushed into production during the migration period.
+#			As you can the hashed out rules now live within the default clause for the switch statement. There will be various phases as this 
+# 			piece of work unfolds.
+####if(int(@AENFlag) == 1)
+####{
+####
+#####	20080701	Change by Chris Janes of Abilitec TD 4937
+####	#if(int(@Severity) >= 4)
+####	if((int(@Severity) >= 4) ||  (int(@Class) == 1640))
+#####	20080701	End of Change
+####
+####	{
+####		$ruleset = $ruleset + 'CH = ' + @AENChannel + 'Flag = ' + @AENFlag
+####		[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+####		switch ($UBS_FTOS)
+####		{
+####			include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+####		}
+####		$tempServer = $UBS_FTOS
+####		$ruleset = $ruleset + ' tempServer = ' + $tempServer
+####	}
+####	else
+####	{
+####		@AENFlag = 0
+####		$ruleset = $ruleset + 'AEN STOPPED'
+####	}
+####} 
+switch (@AENFlag)
+{
+	case "1":
+		## 20080929 GT hashed out ready for AEN migration.
+		### details  When we push AEN into the collection layer we can delete to EOD
+		##$gt_temptoken = hostname()
+		##switch($gt_temptoken)
+		##{
+			##case "xldn1052dap" | "xstm1953dap" | "xstm5257dap" | "xsng1281dap" :
+			### Adding proposed new rule set here for engineering environment.
+		### details EOD
+		### GT end of hashes 20080929
+				switch (@Class)
+				{
+					case "1640":
+						# These are the PDH insert events and still need to be routed to HBT servers.
+#						$ruleset = $ruleset + 'PDH INSERT'
+#	20090220	GT Change made to lookup statement to include value for app_hbt_status.
+						[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $UBS_CAHOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+						#[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+#	20090220	GT End of change.
+						switch ($UBS_FTOS)
+						{
+							include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+						}
+						$tempServer = $UBS_FTOS
+#						$ruleset = $ruleset + ' tempServer = ' + $tempServer
+					default:
+						# pass through here
+#						$ruleset = $ruleset + 'ch = ' + @AENChannel + 'fl = ' + @AENFlag
+
+				# End of @Class Switch.
+				}
+		## 20080929 GT hashed out ready for AEN migration.
+		#### details  When we push AEN into the collection layer we can delete to EOD
+			###default:
+				###if ((int(@Severity) >= 4) || (int(@Class) == 1640))
+				###{
+					#### This is where we handle things normally as per current prod practise.
+					###$ruleset = $ruleset + 'CH = ' + @AENChannel + 'Flag = ' + @AENFlag
+					###[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+					###switch ($UBS_FTOS)
+					###{
+						###include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+					###}
+					###$tempServer = $UBS_FTOS
+					###$ruleset = $ruleset + ' tempServer = ' + $tempServer
+				###}
+				###else
+				###{
+					###@AENFlag = 0
+					###$ruleset = $ruleset + 'AEN STOPPED'
+				###}
+
+		#### End of $gt_temptoken switch
+		###}
+		#### details EOD
+		### GT end of hashes 20080929
+
+	default:
+		# Pass through here unchanged as AENFlag was zero.
+
+# End of @AENFlag switch.
+}

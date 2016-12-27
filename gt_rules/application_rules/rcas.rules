@@ -1,0 +1,118 @@
+##################################################################################
+#
+#	rcas.rules	created by Mahesh Kumar 14Oct2009
+#
+#################################################################################
+
+
+case "2222262":
+
+	$ruleset = $ruleset + " rcas"
+	$TD_Num = "742"
+	
+        @Agent = upper($Environment) + "-" + $Transport
+
+	# Extract @NodeAlias value here and set orgin field. These are set from the scripthost.
+	@Node      = $Hostname
+	@NodeAlias = $FQDN
+	@Origin    = $FQDN
+	# Set Poll so any clears will age out after an hour if they are not updated.
+	@Poll      = 3600
+	# Now find the correct Location / Region values from the $Node token supplied by the appender script.
+	if (exists($Node)) {
+		$tmpNode = lower($Node)
+		[@Location, @Region, $tmpDomain] = lookup($Node,regloc)
+		switch (@Location) {
+			case "Undefined" | "undefined" | "[undefined]":
+				# Here we are looking for a failure in the lookup table or any possible override from probe/appender.
+				# Set Region and Location to blank, and get values from script host when we pass thru location.include.rules file later on.
+				@Location = ""
+				@Region   = ""
+			
+			default:
+				# This means we found a valid Location/Region value in lookup table.
+				# So do nothing.
+		}
+	}
+	
+        # Target ClassID is populated in Subclass field.
+	# Otherwise, Use ClassID
+	if( exists($Subclass) ) {
+            @Class = int($Subclass)
+	    @Subclass = $Subclass
+	}
+        else {
+            @Class = $ClassID
+	    @Subclass = $Subclass
+	}
+	$tempClass = @Class
+	# Set AlertGroup populated from EventIdentifier
+        @AlertGroup = $EventIdentifier
+        if (exists($ProcessID) && int($ProcessID) > 0)
+        {
+            @AlertGroup = $EventIdentifier + "-" + $ProcessID
+        }
+
+	# Set AlertKey - populated from Component(logger name by default)
+        if (exists($Component))
+        {
+            @AlertKey = $Component
+        }
+        else
+        {
+            @AlertKey = $SAPname
+        }
+
+        @Summary = $MessageText
+
+	 
+	# Set Business Stream
+        @Stream = $Stream
+        @Environment = upper($Environment)
+        @UserData = $Userdata
+        @UserInt = $Userint
+        @SAPNumber = $SAPnumber
+        @SourceKey=$SourceKey
+
+        if( exists( $Severity))
+        {
+                switch($Severity)
+                {
+                        case "FATAL":
+                                @Severity = 5
+                                @Type = 1
+                        case "MAJOR":
+                                @Severity = 4
+                                @Type = 1
+                        case "MINOR":
+                                @Severity = 3
+                                @Type = 1
+                        case "INFO":
+                                @Severity = 2
+                                @Type = 1
+                        default:
+                                @Severity = 1
+                                @Type = 1
+                }
+        }
+        else
+        {
+                @Severity = 1
+                @Type = 1
+        }
+        # Set Event Type
+        $tempEventType = $EventType
+        @Display_Hide = 0
+        switch ($tempEventType)
+        {
+            case "2":
+                @Type = 2
+                @Severity = 1
+		@SystemDesig = 1001
+            default:
+                @Type = $EventType
+		@SystemDesig = 1006
+        }
+
+        $tempIdentifier = lower($Nodealias) + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass + " " + @Environment
+

@@ -1,0 +1,42 @@
+                case "LDNENG":
+                        settarget(LDNENG)
+                case "LDNENG_AH":
+                        settarget(LDNENG_AH)
+                case "LDNENG_FT":
+                        settarget(LDNENG_FT)
+                case "STMENG":
+                        settarget(STMENG)
+                case "STMENG_AH":
+                        settarget(STMENG_AH)
+                case "STMENG_FT":
+                        settarget(STMENG_FT)
+                case "STMTEST":
+                        settarget(STMTEST)
+                case "STMTEST_AH":
+                        settarget(STMTEST_AH)
+                case "STMTEST_FT":
+                        settarget(STMTEST_FT)
+                case "EMEA":
+                        settarget(EMEA)
+                case "EMEA_AH":
+                        settarget(EMEA_AH)
+                case "EMEA_FT":
+                        settarget(EMEA_FT)
+                case "PACIFIC":
+                        settarget(PACIFIC)
+                case "PACIFIC_AH":
+                        settarget(PACIFIC_AH)
+                case "PACIFIC_FT":
+                        settarget(PACIFIC_FT)
+                case "USAPAC":
+                        settarget(USAPAC)
+                case "USAPAC_AH":
+                        settarget(USAPAC_AH)
+                case "USAPAC_FT":
+                        settarget(USAPAC_FT)
+                case "UBS_HBT_OS":
+                        settarget(UBS_HBT_OS)
+                case "DEV_HBT_OS":
+                        settarget(DEV_HBT_OS)
+                default:
+

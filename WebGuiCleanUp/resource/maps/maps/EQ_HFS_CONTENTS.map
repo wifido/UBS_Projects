@@ -1,0 +1,3 @@
+map(name="EQ_HFS_CONTENTS",bgImage="",bgColor="#006666",w="200",h="250",acl="*")
+text(color="#ccffcc",action="Open URL",label="GSD Process Monitor",target="_self",style="b",y="31",entity="",url="",size="17",name="Header",x="15",justify="center",font="TimesRoman")
+monitor(show highest="false",type="lavalamp",url="",show lowest="false",show highest severity as border="true",label="untitled",show total="false",y="64",x="18",w="154",entity="HFS_AUTOSYS",font="Helvetica",size="10",action="Active Event List (AEL)",show label="false",h="43",foreground color="black",style="p",background color="lightGray",show metric="false",target="_self",name="Alert_Status")

@@ -1,0 +1,61 @@
+
+so we need somethingthat identifies the event as autosys
+then alarmCode OR alarmName
+then	OwnerGID
+then alarmJobName
+
+
+trapMessage, trapDate, alarmName, alarmJobName, alarmText, alarmCode }
+
+trapMessage OBJECT-TYPE   
+-- 1.3.6.1.4.1.858.1.1.0
+-- iso(1). org(3). dod(6). internet(1). private(4). enterprises(1). platinum(858). general(1). trapMessage(1). 0 
+  SYNTAX  DisplayString   
+  ACCESS  not-accessible    
+  DESCRIPTION        
+  "A field containing a general description of a platinum trap "
+  ::= { general 1  }
+
+trapDate OBJECT-TYPE   
+-- 1.3.6.1.4.1.858.1.2.0
+-- iso(1). org(3). dod(6). internet(1). private(4). enterprises(1). platinum(858). general(1). trapDate(2). 0 
+  SYNTAX  DisplayString   
+  ACCESS  not-accessible    
+  DESCRIPTION        
+  "The date and time a platinum trap was generated" 
+::= { general 2  } 
+
+
+alarmName OBJECT-TYPE   
+-- 1.3.6.1.4.1.858.3.2.1.2.1.1.0
+-- iso(1). org(3). dod(6). internet(1). private(4). enterprises(1). platinum(858). products(3). jobManagement(2). autosys(1). trapInfo(2). alarms(1). alarmName(1). 0 
+  SYNTAX  DisplayString   
+  ACCESS  read-only    
+  DESCRIPTION        
+  "The name of the alarm generated" 
+::= { alarms 1  } 
+
+
+alarmText OBJECT-TYPE   
+-- 1.3.6.1.4.1.858.3.2.1.2.1.3.0
+-- iso(1). org(3). dod(6). internet(1). private(4). enterprises(1). platinum(858). products(3). jobManagement(2). autosys(1). trapInfo(2). alarms(1). alarmText(3). 0 
+  SYNTAX  DisplayString   
+  ACCESS  read-only    
+  DESCRIPTION        
+  "The diagnostic message detailing the cause of the alarm" 
+::= { alarms 3  } 
+
+
+alarmCode OBJECT-TYPE   
+-- 1.3.6.1.4.1.858.3.2.1.2.1.4.0
+-- iso(1). org(3). dod(6). internet(1). private(4). enterprises(1). platinum(858). products(3). jobManagement(2). autosys(1). trapInfo(2). alarms(1). alarmCode(4). 0 
+  SYNTAX  INTEGER    
+  ACCESS  read-only    
+  DESCRIPTION        
+  "The integer code corresponding to the alarm" 
+::= { alarms 4  } 
+
+
+
+
+

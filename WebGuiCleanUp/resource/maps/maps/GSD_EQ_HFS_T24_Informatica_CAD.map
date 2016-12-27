@@ -1,0 +1,5 @@
+map(name="GSD_EQ_HFS_T24_Informatica_CAD",bgImage="",bgColor="#003366",w="250",h="250",acl="GSD_EQ_HFS_GLOBAL")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ff0033",label="CAD Open Fails",style="b",y="24",url="",size="12",name="visual_4",x="12")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ff0033",label="CAD Volumes",style="b",y="55",url="",size="12",name="visual_3",x="15")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="37",x="111",w="50",entity="1_HFS_T24_Infor_Cad2",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_2")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="6",x="113",w="50",entity="1_HFS_T24_Infor_Cad1",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_1")

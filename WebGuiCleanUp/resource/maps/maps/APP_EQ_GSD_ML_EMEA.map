@@ -1,0 +1,6 @@
+map(name="APP_EQ_GSD_ML_EMEA",bgImage="",bgColor="white",w="165",h="400",acl="*")
+button(name="app2_2",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="APP_DMATOMSOM_infra",h="54",font color="black",target="main",type="rounded",y="125",x="16",label="untitled",legend="Count",w="133",arc diameter="20",size="10")
+text(color="blue",action="Open URL",label="All Events",target="_self",style="b",y="193",entity="",url="",size="12",name="visual_1",x="51",justify="center",font="Helvetica")
+text(color="blue",action="Open URL",label="All Unacknowledged",target="_self",style="b",y="101",entity="",url="",size="14",name="visual_2",x="14",justify="center",font="Helvetica")
+button(name="app2_1",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="APP_DMA_TOMSOM_unacked",h="54",font color="black",target="main",type="rounded",y="30",x="16",label="untitled",legend="Count",w="133",arc diameter="20",size="10")
+text(color="blue",action="Open URL",label="DMA SOMTOM",target="_self",style="b",y="19",entity="",url="",size="18",name="app_name",x="21",justify="center",font="Helvetica")

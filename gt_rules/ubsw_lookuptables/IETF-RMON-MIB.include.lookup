@@ -1,0 +1,45 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2002 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    IETF-RMON-MIB.include.lookup 1.0 2002/05/02 Robert Cowart
+#
+###############################################################################
+#
+# 1.1 - Improved readability of values.
+#
+# 1.0 - Initial Release
+#
+###############################################################################
+
+table alarmSampleType =
+{
+    ##########
+    # The method of sampling the selected variable and calculating the value to be
+    # compared against the thresholds. If the value of this object is
+    # absoluteValue(1), the value of the selected variable will be compared directly
+    # with the thresholds at the end of the sampling interval. If the value of this
+    # object is deltaValue(2), the value of the selected variable at the last sample
+    # will be subtracted from the current value, and the difference compared with the
+    # thresholds.
+    #
+    # This object may not be modified if the associated  alarmStatus object is equal
+    # to valid(1).
+    ##########
+
+    {"1", "Absolute Value"},
+    {"2", "Delta Value"}
+}
+default = "Unknown"
+
+
+

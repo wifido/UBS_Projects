@@ -1,0 +1,19 @@
+##############################################################################
+#
+#	Rules for Traps where MiBs are either unavailible or not reliable 
+#
+#
+#
+#
+##############################################################################
+
+case "activeworks" | "ciscoExperiment.ciscoHcAlarmMIB":
+	@Summary="No Rules for SNMP V1 enterprise ID: " + $enterprise + " $specific-trap = " + $specific-trap + " as no MIB is availible"
+	@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4 + "$5 = " + $5 + "$6 = " + $6 + "$7 = " + $7 + "$8 = " + $8 
+	@AlertGroup = $enterprise
+	@AlertKey = $enterprise-name
+	@Stream = $community
+	@UserInt = $specific-trap
+	@Severity = 1
+	@Type = 99
+

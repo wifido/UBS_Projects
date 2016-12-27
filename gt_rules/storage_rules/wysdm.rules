@@ -1,0 +1,118 @@
+#
+# WysDM MIB traps
+#
+# Alan Charlton, Abilitec, April 2005 subsequently improved by David Butler
+# 20091124 GT Complete re-write as we have never recieved one of these events in production.
+#
+case "wysdmAlert":
+
+    @OwnerGID = 257
+    @OwnerUID = 65534
+    @Class = 128120
+    @Agent = "WysDM"
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "-" + $enterprise-name
+
+    # Assign nice names to probe tokens.
+
+    $wysdmAlertID              = $1
+    $wysdmAlertEventID         = $2
+    $wysdmAlertGroup           = $3
+    $wysdmAlertSeverity        = $4
+    $wysdmAlertText            = $5
+    $wysdmAlertFirstOccurrence = $6
+    $wysdmAlertLastOccurrence  = $7
+    $wysdmAlertCount           = $8
+    $wysdmAlertNode            = $9
+    $wysdmAlertSourceView      = $10
+    $wysdmAlertSourceNode      = $11
+    $wysdmAlertCategory        = $12
+    switch ($specific-trap)  {
+        case "1":
+            @AlertGroup = $wysdmAlertGroup + "-" + $wysdmAlertSourceView + "-" + $wysdmAlertCategory
+            @AlertKey   = $wysdmAlertEventID
+            @Summary    = $wysdmAlertText
+            @Severity   = $wysdmAlertSeverity
+            @Type       = 1
+            @Origin     = @NodeAlias
+            # Cater for 'strike Failures' alerts here.
+            if (regmatch($wysdmAlertGroup, "strike Failures")) 
+            {
+                 @Subclass = "DPA_Strike3"
+                 # Set Location and Region here. we will bypass the location.include.rules file..
+                 @Location = $wysdmAlertNode
+                 switch($wysdmAlertNode)
+                 {
+                      case "North America":
+                          @Region = "Americas"
+                      
+                      case "ASIA":
+                          @Region = "APAC"
+
+                      case "EMEA" | "Switzerland":
+                          @Region = $wysdmAlertNode
+
+                      default:
+                          @Region = "Undefined"
+                 }
+            } 
+            else 
+            {
+                  # Set Location and Region properly here as well as Node/NodeAlias
+                  @NodeAlias  = $wysdmAlertNode
+                  @Node       = $wysdmAlertNode
+                  # Just cater for locations where they do not follow the recognised 3 char code for location.
+                  switch($wysdmAlertSourceNode)
+                  { 
+                        case "aucknbrmaster":
+                             @Location = "Auckland"
+                             @Region   = "APAC"
+                        case "ssznbrmaster":
+                             @Location = "Zurich"
+                             @Region   = "Switzerland"
+                        default:
+                             $tempwysnod = substr($wysdmAlertSourceNode,1,3)
+                             [@Location, @Region, $temptothrow] = lookup($tempwysnod,regloc)
+                  }
+                  # Now Location and Node etc is set, a bit more logic on the events.
+                  if (nmatch($wysdmAlertGroup, "Collector Heartbeat")) {
+                        @AlertGroup = "Collector Heartbeat-" + $wysdmAlertSourceView + "-" + $wysdmAlertCategory
+                        @AlertKey   = "Collector heartbeat failed " + $wysdmAlertSourceNode
+                        @Subclass   = "DPA_Collector"
+                        if (regmatch($wysdmAlertGroup, "is beating")) {
+                             @Severity  = 1
+                             @Type      = 2
+                             # Node and NodeAlias munged here, as the recovery is only reported at sub-elemnt level.
+                             @NodeAlias = $wysdmAlertSourceNode
+                             @Node      = $wysdmAlertSourceNode
+                        }
+                  }
+                  else if (nmatch($wysdmAlertGroup, "Success Rate")) {
+                        @AlertGroup = "Success Rate-" + $wysdmAlertSourceView + "-" + $wysdmAlertCategory
+                        @AlertKey   = "Success Rate Threshold " + $wysdmAlertSourceNode
+                        @Subclass   = "DPA_SuccessRate"
+                        if (regmatch($wysdmAlertGroup, "Above Threshold")) {
+                             @Severity = 1
+                             @Type     = 2
+                        }
+                  }
+            }
+                  
+            # Final check to make sure this event is visible somewhere.
+            if (match(@Region, "Undefined"))
+            {
+                 @Location = $wysdmAlertNode
+                 @Region   = "EMEA"
+            }
+                 
+                 
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            
+    }
+
+    $tempIdentifier = @NodeAlias + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+    @Description = $1 + "-" + $2 + "-" + $3 + "-" + $4 + "-" + $5 + "-" + $6 + "-" + $7 + "-" + $8 + "-" + $9 + "-" + $10 + "-" + $11 + "-" + $12
+
+

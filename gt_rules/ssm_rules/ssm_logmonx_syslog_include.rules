@@ -1,0 +1,707 @@
+$ruleset = $ruleset + ' - logmon_syslog'
+@Description = ">" + $ssmSummary + "< ssmAlertKey = >" + $ssmAlertKey + "<"
+if (regmatch($logMonXHistoryLine, "^[aA-zZ]+ [aA-zZ]+ +[^ ]+ +[^ ]+ [0-9]+ .*$"))  
+{
+        $patrol = 1
+	$ruleset = $ruleset + ' - p1'
+        $logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 26, 1000)
+        $logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 24)
+        $logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^([^ ]+) .*$")
+}
+else  
+{
+        $patrol = 0
+	$ruleset = $ruleset + ' - p0'
+        $logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 17, 1000)
+        $logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 16)
+        $logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^[^ ]+ ([^:]+):.*$")
+}
+
+
+if (regmatch($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [^]]+\].*$"))  
+{
+	$ruleset = $ruleset + ' - s1'
+        $logMonXHistoryLineEVENTID = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID ([0-9]+) [^]]+\] .*$")
+        $logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [^]]+\] (.*)$")
+        $syslog = 1 ### debug stuff
+}
+# Matches Cisco syslog events which should already be handled by Dominic's syslog probes
+else if (regmatch($logMonXHistoryLineNODATE, "^[^%]+%[^:]+: .*$"))  
+{
+	$ruleset = $ruleset + ' - s2'
+        $logMonXHistoryLineSUBSYSTEM = "cisco"
+        $syslog = 2
+}
+else if (int($patrol) == 0) 
+{
+	$ruleset = $ruleset + ' - s3'
+	$logMonXHistoryLineNODATE = ltrim($logMonXHistoryLineNODATE)
+	if (match($1,"/var/VRTSvcs/log/engine_A.log"))
+	{
+		$ruleset = $ruleset + ' - m1'
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+:(.*)$")
+		@Subclass = "VCS"
+	}
+	else if (match($logMonXHistoryLineNODATE,"^[^ ]+ [^:]+: .*$"))
+	{
+        	$logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: (.*)$")
+		$ruleset = $ruleset + ' - m2'
+	}
+	else
+	{
+		$logMonXHistoryLineSUMMARY = $logMonXHistoryLineNODATE
+		$ruleset = $ruleset + ' - m3'
+	}
+        $syslog = 3
+}
+else  
+{
+	$ruleset = $ruleset + ' - s4'
+        $logMonXHistoryLineSUMMARY = $logMonXHistoryLineNODATE
+        $syslog = 4
+}
+
+
+if (not exists($ssmAlertGroup))  
+{
+        $ssmAlertGroup = $1
+}
+$ssmSummary = $logMonXHistoryLineSUMMARY
+#
+# Does this event have a unique PID associated with it?  If so, zap it to decrease uniqueness
+#
+
+
+if (regmatch($logMonXHistoryLineSUBSYSTEM, "^[^[]+\[[0-9]+\]$"))  
+{
+        $ssmAlertKey = extract($logMonXHistoryLineSUBSYSTEM, "^([^[]+)\[[0-9]+\]$")
+	$ruleset = $ruleset + ' - m4'
+}
+else  
+{
+        $ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+	$ruleset = $ruleset + ' - m5'
+}
+
+# 20090520 MK TD5258 - start
+# trim ssmAlertKey to remove leading and trailing spaces.
+$ssmAlertKey=rtrim(ltrim($ssmAlertKey))
+# 20090520 MK TD5258 - end
+
+### This little switch on the ssmSummary token will catch sbus/pci/ssm posted errors from syslog. Added by GT 27/3/6.
+## Unix team only want 1 event per host rather than the multitude that usually arrive. We just set the tempIDOverride to 1 here and 
+## this will use AlertGroup/AlertKey values in the Identifier rather than the Summary. All the relevant token values should already be set. We are just  changing the Identifier value here.
+if (match($ssmAlertKey,"scsi") && nmatch($ssmSummary,"WARNING:")) 
+{
+	$tempIDOverRide = 1
+	## Nathan has requested we change the summary for these events to the following:
+	$orig-ssmSummary = $ssmSummary
+	$ssmSummary = "WARNING disk or controller type errors in syslog - could be bad hardware or bad config on system"
+}
+
+#	20090409 GT TD5240
+
+### This switch on the ssmSummary token will catch ssm posted errors from syslog. Added by MK TD5271
+#20090929 GT  BR_696
+if (regmatch($ssmSummary,"^.*.offlining lun.*.$*"))
+{
+        $TD_Num = "696"
+        $ssmAlertKey = "MPxIO"
+        $orig-ssmSummary = $ssmSummary
+	clear(SplitArray)
+        $NoElements = split($ssmSummary, SplitArray, " ")
+	$tmptoken2 =(ltrim(rtrim(SplitArray[2])))
+	$tmptoken3 =(ltrim(rtrim(SplitArray[3])))
+	if (match($tmptoken2,"offlining")) {
+		# matches the following.
+		# [MPxIO] offlining lun. (trace=0), target=900010 (trace=2800004)
+		$tmpshortsummary = SplitArray[1] + " " + $tmptoken2 + " lun."
+		$ruleset = $ruleset + "-MPxIO2"
+	}
+	else if (match($tmptoken3,"offlining")) {
+		# matches the following.
+		# [MPxIO] sldn2213bor.ldn.swissbank.com    offlining lun. (trace=0), target=900007 (trace=2800004)'
+		$tmpshortsummary = SplitArray[1] + " " + $tmptoken2 + " " + $tmptoken3 + " lun."
+		$ruleset = $ruleset + "-MPxIO3"
+	}
+	else { 
+		# leave it untouched.
+		$tmpshortsummary = $ssmSummary
+		$ruleset = $ruleset + "MPxIO-" + SplitArray[2] + "-" + SplitArray[3]
+	}
+	$tempIDOverRide = 1
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + "SAN" + $ssmAlertKey + $tmpshortsummary
+}
+# 20090929 GT end of change.
+
+#Set AlertGroup based on value of $ssmAlertKey value. the default returned if no match will be /var/adm/messages.
+
+$ssmAlertGroup = lookup($ssmAlertKey,unixAGorg)
+#	20090409	GT TD5240 Following section rewritten as a switch on AlertKey, this will reset AlertGroup values where neccessary from the previous lookup.
+
+switch ($ssmAlertKey)
+{
+	case "FJSVmadm":
+		if(regmatch($ssmSummary,"Device Error(Not Ready)"))
+		{
+			$ruleset = $ruleset + "FJSV"
+			$ssmAlertGroup = "SAN"
+			##$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + "FJSV" + $ssmAlertGroup + $ssmAlertKey + $ssmType
+		}
+		else if (regmatch($ssmSummary,"SCSI transport failed"))
+		{
+			$ssmAlertGroup = "SAN"
+		}
+		else if (regmatch($ssmSummary,"DIMM"))
+		{
+			$ssmAlertGroup = "Memory"
+		}
+		else if (regmatch($ssmSummary,"CPU"))
+		{
+			$ssmAlertGroup = "CPU"
+		}
+                else if (regmatch($ssmSummary, "([a-z]+)([0-9]+)([a-z]+):FJSVmadm:[A-Z]:[a-zA-Z0-9\#\-]+:kern:.*$"))
+                {
+                        $TD_Num = "637"
+                        $ssmAlertGroup = "Memory"
+                }
+                else if (regmatch($ssmSummary, "([a-z]+)([0-9]+)([a-z]+):FJSVmadm:[A-Z]:[a-zA-Z0-9\#\-]+:st:.*$"))
+                {
+                        $TD_Num = "5270"
+                        $tempMarkForDiscard = 2
+                }
+                else if ( (regmatch($ssmSummary, "^([a-z]+)([0-9]+)([a-z]+):FJSVmadm:$")) || (regmatch($ssmSummary, "^:FJSVmadm:$")))
+                {
+                        $TD_Num = "5270"
+                        $tempMarkForDiscard = 2
+                }
+
+	case "genunix":
+		if (regmatch($ssmSummary,"[Ss]wap"))
+		{
+			$ssmAlertGroup = "Swap"
+		}
+
+	case "kernel":
+		clear(SplitArray)
+		$NoElements = split($ssmSummary, SplitArray, ":")
+		$tmpsummary = ltrim(SplitArray[2])
+		if (match($tmpsummary,"bonding"))
+		{
+			$ssmAlertGroup = "Network"
+		}
+		#else if (match($tmpsummary,"VFS"))
+		#{
+			#$ssmAlertGroup = "Self-destruct"
+		#}
+		else if (match($tmpsummary,"tg3"))
+		{
+			$ssmAlertGroup = "Network"
+		}
+		else if (nmatch($tmpsummary,"lpfc"))
+		{
+			$ssmAlertGroup = "SAN"
+		}
+		else if (nmatch($tmpsummary,"scsi"))
+		{
+			$ssmAlertGroup = "SAN"
+		}	
+		# No need to match fo nfs, as it is the default value for kernel.
+	# 20090929 GT BR_700
+		else if (regmatch($ssmSummary,"Failing path"))
+		{
+        		$TD_Num = "700"
+			$ssmAlertGroup = "SAN"
+			$tmptoken = extract($ssmSummary,"^(.*) Failing path .*$")
+			$tmpshortsummary = $tmptoken + " Failing path"
+			$ruleset = $ruleset + "-mp_fp"
+			$tempIDOverRide = 1
+			$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $tmpshortsummary
+		}
+
+	case "multipathd":
+		# Alertgroup is already populated via the AK lookup.
+		$TD_Num = "700"
+		clear(SplitArray)
+		$NoElements = split($ssmSummary, SplitArray, " ")
+		$tmpsummary = ltrim(rtrim(SplitArray[4]))
+		switch($tmpsummary)
+		{
+			case "reinstated":
+				$ruleset = $ruleset + "-mpd_rei"
+				$tmpshortsummary = SplitArray[1] + " " + SplitArray[2] + " " + SplitArray[4]
+
+			case "checker":
+				$ruleset = $ruleset + "-mpd_ch"
+				$tmpshortsum1 = SplitArray[1] + " " + SplitArray[2]
+				$tmpshortsum2 = SplitArray[7] + " " + SplitArray[8] + " " + SplitArray[9] + " " + SplitArray[10] + " " + SplitArray[11] + " " + SplitArray[12]
+				$tmpshortsummary = $tmpshortsum1 + " " + $tmpshortsum2
+			
+			case "readsector0":
+				$ruleset = $ruleset + "-mpd_rea"
+				$tmpshortsum1 = SplitArray[1] + " " + SplitArray[2]
+				$tmpshortsum2 = SplitArray[4] + " " + SplitArray[5] + " " + SplitArray[6] + " " + SplitArray[7] + " " + SplitArray[8] + " " + SplitArray[9]
+				$tmpshortsummary = $tmpshortsum1 + " " + $tmpshortsum2
+				
+			case "multipathd:":
+				# Here is where we get the double hostname thing. Lets check SplitArray[6]
+				$tmptoken = ltrim(rtrim(SplitArray[6]))
+				switch ($tmptoken)
+				{
+					case "reinstated":
+						$ruleset = $ruleset + "-mpd_mpdrei"
+						$tmpshortsummary = SplitArray[1] + " " + SplitArray[2] + " " + SplitArray[3] + " " + SplitArray[4]
+					
+					case "readsector0":
+						$ruleset = $ruleset + "-mpd_mpdrea"
+						$tmpshortsum1 = SplitArray[1] + " " + SplitArray[2] + " " + SplitArray[3] + " " + SplitArray[4]
+						$tmpshortsum2 = SplitArray[6] + " " + SplitArray[7] + " " + SplitArray[8] + " " + SplitArray[9]
+						$tmpshortsum3 = SplitArray[10] + " " + SplitArray[11]				
+						$tmpshortsummary = $tmpshortsum1 + " " + $tmpshortsum2 + " " + $tmpshortsum3
+					
+					default:
+						# Do nothing
+						$ruleset = $ruleset + "-mpd_mpd"
+						$tmpshortsummary = $ssmSummary
+				}
+				$ruleset = $ruleset + "-" + $tmptoken	
+	
+			default:
+				# Do nothing
+				$ruleset = $ruleset + "-mpd_def-" + $tmpsummary
+				$tmpshortsummary = $ssmSummary
+		}
+		$tempIDOverRide = 1
+		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmAlertGroup + $ssmAlertKey + $tmpshortsummary
+
+	# 20090929 BR_700 end.
+
+	case "REC-ACTION":
+		if (regmatch($ssmSummary,"Memory"))
+		{
+			$ssmAlertGroup = "Memory"
+		}
+
+        case "r5d":
+                if (regmatch($ssmSummary,"r5d"))
+                {
+                        $ssmAlertGroup = "Baydel"
+                }
+
+	case "rmclomv":
+		if (regmatch($ssmSummary,"[Pp]ower"))
+		{
+			$ssmAlertGroup = "Power"
+		}
+                else if (regmatch($ssmSummary,"PSU"))
+                {
+			$ssmAlertGroup = "Power"
+                }
+		else if (regmatch($ssmSummary,"DISK"))
+		{
+			$ssmAlertGroup = "Disk"
+		}
+
+	case "unix":
+		if (regmatch($ssmSummary,"power"))
+		{
+			$ssmAlertGroup = "Power"
+		}
+		else if (regmatch($ssmSummary,"named"))
+		{
+			$ssmAlertGroup = "DNS"
+		}
+		else if (regmatch($ssmSummary,"[Bb]us"))
+		{
+			$ssmAlertGroup = "SAN"
+		}
+		else if (regmatch($ssmSummary,"scsi"))
+		{
+			$ssmAlertGroup = "SAN"
+		}
+		else if (regmatch($ssmSummary,"VxVM"))
+		{
+			$ssmAlertGroup = "Veritas"
+		}
+# MK BR_637
+	case "UNIX":
+		if (regmatch($ssmSummary,"Primary disk"))
+		{
+		    $TD_Num = "637"
+		    $ssmAlertGroup = "Disk"
+		}
+
+# 	GT 20090828 BR_655
+	case "hpasmxld" | "hpasmd":
+		# I am only really expecting one trap through here, but we will pattern match on ssmSummary anyway. Unix req 127
+		if (regmatch($ssmSummary, "Corrected Memory Error"))
+		{
+			$ssmAlertGroup = "Memory"
+			$ssmAlertKey   = "Memory Linux"
+		}
+#	GT 20090828 End.
+	default:
+}
+#	20090409 End of change.
+
+
+
+####This section added here as this file originally did not have $ruleset definitions. Once some test events have been seen
+#### the placement within this file will be reviewed.
+# Next bit added by GT to handle Sun ECC memory faults in a more appropriate way. 
+if (regmatch($ssmSummary,"\[AFT[0-9]\]")) 
+{
+	$ruleset = $ruleset + ' - AFT'
+	$ssmAlertGroup = 'ECC Memory Faults - ' + $ssmAlertKey
+	# First of all match for Uncorrectable as this is a Hardware fault.
+	if (regmatch($ssmSummary,"Uncorrectable")) 
+	{
+		$ruleset = $ruleset + "-Uncorrectable"
+		$severityOverRide = 3
+		$ssmSeverity = 5
+		$ssmAlertKey = "Uncorrectable"
+		$tempIDOverRide = 1
+	}
+	# Now match for Sticky. This IS a HARD fault.
+	else if (regmatch($ssmSummary,"Sticky")) 
+	{
+		$ruleset = $ruleset + "-Sticky"
+		$severityOverRide = 3
+		$ssmSeverity = 5
+		$ssmAlertGroup = $ssmAlertGroup + "-Sticky"
+		if (regmatch($ssmSummary,"Softerror")) 
+		{
+			$ruleset = $ruleset + '-softerror'
+			$ssmAlertKey = extract($ssmSummary,"^.* Memory Module (.*)$")
+			$tempIDOverRide = 1
+		}		
+		else if (regmatch($ssmSummary,"Corrected Memory Error on")) 
+		{
+			$ruleset = $ruleset + '-CME'
+			$ssmAlertKey = extract($ssmSummary,"^.* Corrected Memory Error on (.*) is .*$")
+			# The $tempIDOverRide flag will negate the need to mess with the $ssmSummary token in order to dedup correctly
+			$tempIDOverRide = 1
+		}
+		else 
+		{
+			# This is one we have not seen before. Pass it through raw, and set $ruleset to 'unknown'
+			$ruleset = $ruleset + 'Unknown'
+		}
+			
+	}
+	else if (regmatch($ssmSummary,"Persistent")) 
+	{
+		$ruleset = $ruleset + "-Persist"
+		$ssmAlertGroup = $ssmAlertGroup + "-Persistent"
+		if (regmatch($ssmSummary,"Corrected Memory Error on")) 
+		{
+			$ruleset = $ruleset + '-CME'
+			$ssmAlertKey = extract($ssmSummary,"^.* Corrected Memory Error on (.*) is .*$")
+			# The $tempIDOverRide flag will negate the need to mess with the $ssmSummary token in order to dedup correctly
+			$tempIDOverRide = 1
+			# Here we have to apply some logic to count frequency of these events as per Sun recommendations.
+			# Sun state that if more that 3 of these errors occur in any 24 hour (86400 seconds), then the memory module should be replaced.
+			#
+			$ECCmemMOD = $Node + $ssmAlertKey
+			$ECCThisOccurTime = getdate
+			$ECC_StartThreshTime = int($ECCThisOccurTime)-87600
+			# Here we check the eccMemFreq array to see if we have seen a mem error from here before.
+			if (match("",eccMemFreq[$ECCmemMOD]))
+			{
+				eccMemFreq[$ECCmemMOD] = $ECCThisOccurTime + ":" + $ECCThisOccurTime + ":" + $ECCThisOccurTime
+			}			
+			else
+			{
+
+				$ECCMemErrHistory = eccMemFreq[$ECCmemMOD]
+				$ecc_no_of_instances = split($ECCMemErrHistory,eccMemTime,":")
+				$ECC_First = eccMemTime[1]
+				$ECC_Second = eccMemTime[2]
+				$ECC_Third = eccMemTime[3]
+
+				# See how long ago the first time we saw this was.
+				if (int($ECC_Third) < int($ECC_StartThreshTime))
+				{
+					$ecc_no_of_valid_instances =  1
+					$ECCMemCurrFreq = $ECCThisOccurTime + ":" + $ECCThisOccurTime + ":" + $ECCThisOccurTime
+				}
+				else if (int($ECC_Second) < int($ECC_StartThreshTime))
+				{
+					$ecc_no_of_valid_instances =  2
+					$ECCMemCurrFreq = $ECC_Third + ":" + $ECCThisOccurTime + ":" + $ECCThisOccurTime
+				}
+				else if (int($ECC_First) < int($ECC_StartThreshTime))
+				{
+					$ecc_no_of_valid_instances =  3
+					$ECCMemCurrFreq = $ECC_Second + ":" + $ECC_Third + ":" + $ECCThisOccurTime
+				}
+				else
+				{
+					# We got here because all previous occurrences are within the desired timescale. Now we need to
+					# check exactly how many occurences.
+					if (int($ECC_Third) > int($ECC_Second))
+					{
+						$ecc_no_of_valid_instances = 4
+						$ECCMemCurrFreq = $ECC_Second + ":" + $ECC_Third + ":" + $ECCThisOccurTime
+					}
+					else if (int($ECC_Second) > int($ECC_First))
+					{
+						$ecc_no_of_valid_instances = 3
+						$ECCMemCurrFreq = $ECC_Second + ":" + $ECC_Third + ":" + $ECCThisOccurTime
+					}
+					else
+					{
+						$ecc_no_of_valid_instances = 2
+						$ECCMemCurrFreq = $ECC_Third + ":" + $ECCThisOccurTime + ":" + $ECCThisOccurTime
+					}
+						
+				}
+				switch($ecc_no_of_valid_instances){
+
+					# We should NEVER see a value of 0 if we get here.
+					case "1":
+						# Do nothing to the event, pass it straight through.
+					case "2":
+						# Make sure we raise a Major
+						$severityOverRide = 3
+						$ssmSeverity = 4
+						$ssmSummary = "2nd Occurrence -" + $ssmSummary
+					case "3":
+						# Raise the severity to Critical
+						$severityOverRide = 3
+						$ssmSeverity = 5
+						$ssmSummary = "3rd Occurrence -" + $ssmSummary
+					default:
+						# Raise the severity to Critical
+						$severityOverRide = 3
+						$ssmSeverity = 5
+						$ssmSummary = "More than 3 Occurrences -" + $ssmSummary
+				}
+				# Finally update the array so that the history is accurate
+				eccMemFreq[$ECCmemMOD] = $ECCMemCurrFreq
+
+			}	
+			
+		}
+		else 
+		{
+			# This is one we have not seen before. Pass it through raw, and set $ruleset to 'unknown'
+			$ruleset = $ruleset + 'Unknown'
+		}
+	}
+	else if (regmatch($ssmSummary,"Intermittent")) 
+	{
+		$ruleset = $ruleset + "-Intermit"
+		$ssmAlertGroup = $ssmAlertGroup + "-Intermittent"
+		if (regmatch($ssmSummary,"Corrected Memory Error on")) 
+		{
+			$ruleset = $ruleset + '-CME'
+			$ssmAlertKey = extract($ssmSummary,"^.* Corrected Memory Error on (.*) is .*$")
+			# The $tempIDOverRide flag will negate the need to mess with the $ssmSummary token in order to dedup correctly
+			$tempIDOverRide = 1
+			$severityOverRide = 3
+			$ssmSeverity = 3
+		}
+		else 
+		{
+			# This is one we have not seen before. Pass it through raw, and set $ruleset to 'unknown'
+			$ruleset = $ruleset + 'Unknown'
+		}
+	}
+	else if (regmatch($ssmSummary,"soft errors in less than 24:00")) 
+	{
+		$ruleset = $ruleset + '-softcount'
+		# The $tempIDOverRide flag will negate the need to mess with the $ssmSummary token in order to dedup correctly
+		$tempIDOverRide = 1	
+		$ssmAlertKey = extract($ssmSummary,"^.* Memory Module Board (.*)$") + "-soft count"
+		$severityOverRide = 3
+		$ssmSeverity = 3
+	}
+	else if (regmatch($ssmSummary,"Corrected Memory Error detected")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if (regmatch($ssmSummary,"Corrected system bus")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if (regmatch($ssmSummary,"Event detected by CPU")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if (regmatch($ssmSummary,"ECC Data Bit")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if (nmatch($ssmSummary,"AFSR")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if (nmatch($ssmSummary,"UDBL")) 
+	{
+		$tempMarkForDiscard = 2
+	}
+	else if(regmatch($ssmSummary,"DISK @ HDD3 has been"))
+	{
+	    switch($ssmAlertKey){
+	        case "rmclomv":
+		    $tempMarkForDiscard = 2
+		default:
+            }
+        }
+	else 
+	{
+		# This is one we have not seen before. Pass it through raw, and set $ruleset to 'unknown'
+		$ruleset = $ruleset + 'Unknown'
+	}
+}
+else if (nmatch($ssmSummary,"Fault_PC")) 
+{
+}
+### MK BR_684 - Discard alert
+else if(regmatch($ssmSummary,"DB-Library error.* Unable to connect.* SQL Server.*$")) {
+    $tempMarkForDiscard = 2
+}
+else if (nmatch($ssmSummary,"WARNING: lpfc"))
+{
+	$tempIDOverRide = 2
+	$tempIdAddOn = substr($ssmSummary,1,40)
+}
+#	20061227	End of addition
+# End of ECC memory handling section.
+
+else if (nmatch($ssmSummary,"WARNING: Sorry, no swap space to grow"))
+{
+#	20090409 GT TD 5244 . fine tuned this statement to aid better deduplication.
+	#$NoElements = split($ssmSummary, SplitArray, "\(")
+	#$tmpProcessName = SplitArray[2]
+	#$ssmSummary = "WARNING: Sorry, no swap space to grow stack for (" + $tmpProcessName
+	$ssmSummary = "WARNING: Sorry, no swap space to grow stack"
+#	20090409 End of change.
+}
+
+else if (regmatch($ssmSummary,"^.*RPC: Timed out.*"))
+{
+	$ruleset = $ruleset + "- RPC: Timed out"
+	$BypassExpire = 600
+}
+
+else if (regmatch($ssmSummary,"^.*VFS.*"))
+{
+        $ruleset = $ruleset + "- VFS"
+
+	$NoElements = split($logMonXHistoryLineSUMMARY, SplitArray, "VFS")
+
+	@Origin = @NodeAlias
+
+	@NodeAlias = SplitArray[1]
+
+#	20080226	Change by Chris Janes of Abilitec HDLDN0001769005
+	$machine = lower(@NodeAlias)
+	$machArea = substr($machine, 2, 3)
+	[@Location, @Region, $tmpDomain] = lookup($machArea, regloc)
+
+#	20080226	End of Change
+
+}
+## Changes made by Mahesh Kumar TD 5196
+## Section to handle Link down/up alerts
+#	20090409 GT TD 5240 AG reorg.. This clause is too widespread.
+#else if (regmatch($ssmSummary,"^.*Link.*"))
+else if (match($ssmAlertGroup,"SAN") && (regmatch($ssmSummary,"^.*Link.*")))
+{
+	$ruleset = $ruleset + "- Link" + ">" + $ssmSummary + "<"
+	### Discard Link alerts generated by ssm from RHN logs
+	### MK BR_684	
+	## Need to confirm with Neale/Bharat
+	#if (regmatch($ssmSummary,"^x([a-z]+)([0-9]+)([a-z]+).* lpfc.* Link.* Event.*$")) {
+	#if (regmatch($ssmSummary,"^x([a-z]+)([0-9]+)([a-z]+) lpfc.* Link.* Event.*$")) {
+	#    $tempMarkForDiscard = 2
+	#}
+	$NoElements = split($ssmSummary, SplitArray, ":")
+	$temptoken1 = SplitArray[1]
+	switch($temptoken1){
+		# NOTICE alert
+		case "NOTICE":
+			## Expect to see five tokens
+			$temptoken1 = SplitArray[1]
+			$temptoken2 = SplitArray[2]
+			$temptoken3 = SplitArray[3]
+			$temptoken4 = SplitArray[4]
+			$NoElements = split($temptoken4, SplitArray, " ")
+			# Concatenate and build ssmSummary from split up tokens
+			$ssmSummary = $temptoken1 + ": " + $temptoken2 + ":" + $temptoken3 + ":" + SplitArray[1] + " " + SplitArray[2]
+			# TD5240 GT 20090409 not needed anymore
+			#$ssmAlertGroup = "SAN"
+		# WARNING alert
+		case "WARNING":
+			## Expect to see six tokens
+			$temptoken1 = SplitArray[1]
+			$temptoken2 = SplitArray[2]
+			$temptoken3 = SplitArray[3]
+			$temptoken4 = SplitArray[4]
+			$temptoken5 = SplitArray[5]
+			$NoElements = split($temptoken5, SplitArray, " ")
+			# Concatenate and build ssmSummary from split up tokens
+			$ssmSummary = $temptoken1 + ": " + $temptoken2 + ":" + $temptoken3 + ":" + $temptoken4 + ":" + SplitArray[1] + " " + SplitArray[2]
+			# TD5240 GT 20090409 not needed anymore
+			#$ssmAlertGroup = "SAN"
+		default:
+			# do nothing
+	}
+}  # TD 5196 complete
+# MK 05Aug2009 - Start
+else if (regmatch($ssmSummary,"^WARNING:.*.[fp]\([0-9]\)::.*$"))
+{
+    $ruleset = $ruleset + "- Found" + ">"
+    $ssmSummary = "Port disappeared from fabric"
+
+}
+#MK BR_638
+if (regmatch($ssmSummary,"chassisPowerSupply.degraded:notice"))
+{
+     $tempMarkForDiscard = 2   
+}
+# MK 05Aug2009 - End
+# MK BR_637
+#else if ( (regmatch($ssmSummary,"ODS Error")) and (regmatch($ssmAlertkey, "ODS Error")) )
+#{
+#    $ssmAlertGroup = "Disk"
+#}
+else
+{
+	$ruleset = $ruleset + "- DEfault" + ">" + $ssmSummary + "<"
+	@Description = ">" + $ssmSummary + "< ssmAlertKey = >" + $ssmAlertKey + "< ssmAlertGroup = >" + $ssmAlertGroup + "<"
+}
+#       20071024        End of Changes
+		
+
+#	20090409 TD5240 THis section moved higher up the chain. GT.
+#	20081125	Changes by Chris Janes of Abilitec TD 5163
+#	if(match($ssmAlertKey,"FJSVmadm"))
+#	{
+#		$NoElements = split($logMonXHistoryLineSUMMARY, SplitArray, ":")
+#		if(nmatch(SplitArray[2],"sd:Device Error(Not Ready)"))
+#		{
+#			$ruleset = $ruleset + "FJSV"
+#			$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + "FJSV" + $ssmAlertGroup + $ssmAlertKey + $ssmType
+#		}
+#		else
+#		{
+#			$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $ssmAlertGroup + $ssmAlertKey + $ssmType
+#		}
+#	}
+#	else
+#	{
+#		$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $ssmAlertGroup + $ssmAlertKey + $ssmType
+#	}
+		
+# 20090924 GT BR_700 Added this switch, if we have set tempIdentifier higher up in this rules file, then we preserve the value.
+$tmplenID = length($tempIdentifier)
+if (int($tmplenID) == 0 )
+{
+# 20090924 End.
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $ssmAlertGroup + $ssmAlertKey + $ssmType
+}
+
+ 

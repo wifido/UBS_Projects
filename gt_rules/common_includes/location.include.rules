@@ -1,0 +1,266 @@
+# We extract the Location and Region field from the Fully Qualified Domain Name (FQDN) here.
+# If there is a $location token is supplied with the event stream, it will be reset later
+# in the rules file processing, subject to relevant sanity checks being passed.
+# The regloc lookup table is defined at the top of the master rules file i.e.
+# socket.rules or mttrapd.rules.
+
+# Change added 18/8/06 by G.Thomas. Added switch to detect if trap is a heartbeat message as HB probes will no longer do dns
+# lookups to obtain an FQDN for heartbeat messages. End of change is marked GT-End-18/08/06
+$gtdebug = "loc-"
+switch ($tmpISHeartbeat) {
+     case "1":
+          # We got here because trap has been identified as a heartbeat message
+          # Check if NodeAlias is in exception list
+          [$UBS_Location, $UBS_Region, $tmpDomain, $tmpIsMatch] = lookup(@NodeAlias, hbtdnsexceptions)
+          $gtdebug = $gtdebug + "hbt"
+          switch ($tmpIsMatch) {
+               case "1":
+                     # Just set the $DoHBTLocLookup token to 2 here as this host is an identified exception
+                     $DoHBTLocLookup = 2
+
+               default:
+                    if (regmatch(@NodeAlias,"^[denmsx][a-z][a-z][a-z][0-9fec][0-9].*"))
+                    {
+                         # This regmatch should hit hosts of the following format 
+                         # xstm1315pap.stm.swissbank.com
+                         # sstme005.ubswenergy.net
+                         # sldn0150por.ldn.swissbank.com
+                         # estmf001005p.stm.swissbank.com
+                         $location_node = substr(@NodeAlias,2,3)
+                         $DoHBTLocLookup = 0
+                    }
+                    else if (regmatch(@NodeAlias,"^[a-z][a-z][0-9][0-9dpt].*"))
+                    {
+                         # This regmatch should hit hosts of the following format 
+                         # hk1p295cmp.hkg.swissbank.com
+                         # ln16p36cmp.ldn.swissbank.com
+                         # zr14p350cmp.opf.swissbank.com
+                         $location_node = substr(@NodeAlias,1,2)
+                         $DoHBTLocLookup = 0
+                    }
+                    else if (regmatch(@NodeAlias,"^.*\.ubs\.ch$"))
+                    {
+                         $UBS_Location = "WMBB"
+                         $UBS_Region = "Switzerland"
+                         $DoHBTLocLookup = 1
+		    }
+		    else
+                    {
+                         # We obviously cant set an FQDN here as the Hostname is an unknown format.
+                         $UBS_Location = "No FQDN"
+                         $UBS_Region = "undefined"
+                         $DoHBTLocLookup = 1
+                    }
+
+          }
+      
+          if (regmatch(@NodeAlias,"swissbank.com$"))
+          {
+               $DoHBTLocLookup = 1
+          }
+          switch ($DoHBTLocLookup) {
+               case "1":
+                    # We want to go through this if we dont have a FQDN but we leave everything untouched.
+                    
+               case "2":
+                    # This is for exception hosts, where we synthetically generate domain info as it is wrong in DNS. Same as default, but we do not do the lookup. 
+                    # Hash the next 2 lines out if we dont want FQDN hostnames in custom heartbeat table.
+                    $tmpMyHost = @NodeAlias
+                    @NodeAlias = $tmpMyHost + "." + $tmpDomain
+          
+               default:
+                    # Here we get the Location, Region and doain info from regloc.lookup
+                    [$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+
+                    # Hash the next 2 lines out if we dont want FQDN hostnames in custom heartbeat table.
+                    $tmpMyHost = @NodeAlias
+                    @NodeAlias = $tmpMyHost + "." + $tmpDomain
+          }
+     default:
+          $gtdebug = $gtdebug + "def-"
+          # does @Node contain a FQDN
+          if (regmatch(@Node, "[A-Za-z]\..+"))
+          {
+               $NodeToTest = lower(@Node)
+               $gtdebug = $gtdebug + "m1"
+          }
+          # does @NodeAlias contain a FQDN
+          else if(regmatch(@NodeAlias, "[A-Za-z]\..+"))
+          {
+               $NodeToTest = lower(@NodeAlias)
+               $gtdebug = $gtdebug + "m2"
+          }
+          else
+          # well it doesn't appear we have a FQDN that is recognised so leave as $Node
+          {
+               # GT 20090910 next 2 lines commented out. moved into FQDN switch below.
+               #$UBS_Location = "No FQDN"
+               #$UBS_Region = "undefined"
+               # GT 20090910 end.
+               $NoFQDN=1
+               $gtdebug = $gtdebug + "m3"
+          }
+          # End of section added 20050603 for rest of file $Node replaced with $NodeToTest
+          
+          switch ($NoFQDN) {
+               case "1":
+                    $gtdebug = $gtdebug + "s1"
+                    # GT 20090910 Added this bit to try and sort out Region Location field when no FQDN is recieved.
+                    # We didnt get a FQDN match, try the following:
+		    if (regmatch(@NodeAlias,"^[aA-zZ][aA-zZ][aA-zZ][aA-zZ][aA-zZ0-9][0-9]+.*$"))
+                    {
+                          # This matches any hostname with 4 alpha chars at the beginning.  eg xldn1025
+                          $NodeToTest = lower(@NodeAlias)
+                          $location_node = substr($NodeToTest,2,3)
+			  [$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m1"
+                    }
+                    else if (regmatch(@Node,"^[aA-zZ][aA-zZ][aA-zZ][aA-zZ][aA-zZ0-9][0-9]+.*$"))
+                    {
+                          # This matches any hostname with 4 alpha chars at the beginning.  eg xldn1025
+                          $NodeToTest = lower(@Node)
+                          $location_node = substr($NodeToTest,2,3)
+			  [$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m2"
+                    }
+                    else if (regmatch(@NodeAlias,"^[aA-zZ][aA-zZ][0-9]+.*$"))
+                    {
+                          $NodeToTest = lower(@NodeAlias)
+                          $location_node = substr($NodeToTest,1,2)
+			  [$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m3"
+                    }
+                    else if (regmatch(@Node,"^[aA-zZ][aA-zZ][0-9]+.*$"))
+                    {
+                          $NodeToTest = lower(@Node)
+                          $location_node = substr($NodeToTest,1,2)
+			  [$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m4"
+                    }
+                    else 
+                    {
+                          # Well at least we tried...
+                          $UBS_Location = "No FQDN"
+                          $UBS_Region = "undefined"
+                          $gtdebug = $gtdebug + "-m5"
+                    } 
+                    
+                    # GT 20090910 End.         
+                    
+
+               default:
+          
+                    $gtdebug = $gtdebug + "sdef"
+                    # The first regmatch looks for values similar to xldn1052dap.ldn.swissbank.com
+                    if (regmatch($NodeToTest, "^[^.]+\.[^.]+\.swissbank\.com$"))
+                    {
+                         $location_node = extract($NodeToTest, "^[^.]+\.([aA-zZ]+)\.swissbank\.com$")
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m1"
+                    }
+                    # This regmatch looks for values similar to ln4p13cmp.swissbank.com
+                    # This is an old format hostname. DNS may get set to set hostname to a proper value, so the
+                    # previous regmatch will probably pick up most of the locations.
+                    else if (regmatch($NodeToTest, "^[a-z][a-z][^.]+\.swissbank\.com$"))
+                    {
+                         $location_node = substr($NodeToTest, 1, 2)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m2"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.ubswenergy\.net$"))
+                    {
+                         $location_node = substr($NodeToTest, 1, 3)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m3"
+                    }
+       # GT 20090910 Added next few clauses as new hostname/fqdn values now being recieved.
+                    else if (regmatch($NodeToTest, "^[^.]+\.develop\.ubsw\.net$"))
+                    {
+                         $location_node = substr($NodeToTest, 2, 3)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m4a"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.ubsw\.net$"))
+                    {
+                         $location_node = substr($NodeToTest, 2, 3)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m4"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.ubs[a-z]*\.net$"))
+                    {
+                         $location_node = substr($NodeToTest, 2, 3)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m5a"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.[^.]+\.ubs[a-z]*\.net$"))
+                    {
+                         $location_node = extract($NodeToTest, "^[^.]+\.([a-z]+)\.ubs[a-z]*\.net$")
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m5"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.pwj\.com$"))
+                    {
+                         $location_node = substr($NodeToTest, 2, 3)
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m6a"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.[^.]+\.[^.]+\.pwj\.com$"))
+                    {
+                         $location_node = extract($NodeToTest, "^[^.]+\.[^.]+\.([a-z]+)\.pwj\.com$")
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m6b"
+                    }
+       # GT 20090910 end.
+                    else if (regmatch($NodeToTest, "^[^.]+\.[^.]+\.pwj\.com$"))
+                    {
+                         $location_node = extract($NodeToTest, "^[^.]+\.([a-z]+)\.pwj\.com$")
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m6"
+                    }
+                    else if (regmatch($NodeToTest, "^[^.]+\.mash\.schwab\.com$"))
+                    {
+                         # Schwab hosts are currently only based in New York. rather than hard code these values, 
+                         # we will continue to use the lookup mechanism.
+                         $location_node = 'nyc'
+			[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+                          $gtdebug = $gtdebug + "-m7"
+                    }     
+                    else if (nmatch($NodeToTest, "localhost"))
+                    {
+                         @UserData = "PA=" + $PeerAddress + "  PI=" + $PeerIPaddress + "  IP=" + $IPaddress + "  N=" + $Node
+                          $gtdebug = $gtdebug + "-m8"
+                    }
+                    else if (regmatch(@NodeAlias,"^.*\.ubs\.ch$"))
+                    {
+                         $UBS_Location = "WMBB"
+                         $UBS_Region = "Switzerland"
+                          $gtdebug = $gtdebug + "-m9"
+		    }
+                    else
+                    {
+                         # If the event has a $UBS_Location value of 'Undefined' as opposed to 'undefined' then
+                         # the location value in the socket probe appender file is incorrectly set. The appender
+                         # sends 'Undefined' the probe rules send 'undefined'.
+                         $UBS_Location = "undefined"
+                         $UBS_Region = "undefined"
+                          $gtdebug = $gtdebug + "-m10"
+                    }
+          }
+}
+# GT-End-18/08/06
+
+#@RemData3 = "gtdebug=" + $gtdebug + "Node=" + @Node + " NodeAlias=" + @NodeAlias + " NodeToTest=" + $NodeToTest + " locationNode=" + $location_node
+# This next little bit just tests to see if a previous rule has already set the @Location field. If already set we do NOT overwrite it.
+
+$temp_location_length=length(@Location)
+if (int($temp_location_length) < 1 )
+{
+     @Location = $UBS_Location
+}
+
+# This next little bit just tests to see if a previous rule has already set the @Region field. If already set we do NOT overwrite it.
+$temp_region_length=length(@Region)
+if (int($temp_region_length) < 1 )
+{
+     @Region = $UBS_Region
+}

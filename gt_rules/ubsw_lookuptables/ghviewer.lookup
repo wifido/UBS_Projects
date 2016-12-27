@@ -1,0 +1,15 @@
+#	ghviewer.lookup created by Chris Janes of Abilitec
+#	13th September 2006
+
+
+#This Lookup associates instance Class
+#	Instance Class
+
+table GHInstanceClass =
+{
+{"janesch","999999"}
+}
+default = {"666"}
+
+
+

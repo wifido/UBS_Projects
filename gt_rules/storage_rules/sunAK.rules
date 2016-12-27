@@ -1,0 +1,101 @@
+######################################################################################
+#
+#	sunAK.rules
+#	Rulesfile based on SUN-AK-MIB
+#	sunAkMIB MODULE-IDENTITY
+#		LAST-UPDATED	"200908110000Z"
+#		ORGANIZATION	"Sun Microsystems, Inc."
+#		CONTACT-INFO	"Sun Microsystems, Inc.
+#				4150 Network Circle
+#				Santa Clara, CA 95054
+#
+#				http://www.sun.com
+#		DESCRIPTION
+#				MIB providing access to Sun Storage information"
+#		REVISION	"200908110000Z"
+#		DESCRIPTION	"Version: 1.1"
+#
+#		Author: 	Gary Thomas
+#		Creation Date:	4th November 2009
+#
+######################################################################################
+case "SunAKstorage":
+	@Agent               = "Sun-AK-MIB"
+	$ruleset             = $ruleset + " " + @Agent
+	@Class               = 128005
+	@OwnerUID            = 65534
+	@OwnerGID            = 542
+	$TempDoLookup        = 2
+	@Description         = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6 + " $7 = " + $7 + " $8 = " + $8
+
+	# Sort out tokenisation here. Giving meaninful names to tokens.
+	$sunAkAlertUUID      = $1
+	$sunAkAlertClass     = $2
+	$sunAkAlertDesc      = $3
+	$sunAkAlertCode      = $4
+	$sunAkAlertType      = $5
+	$sunAkAlertSeverity  = $6
+	$sunAkAlertResponse  = $7
+
+
+	@AlertKey            = $sunAkAlertUUID
+	@SourceKey           = $sunAkAlertUUID
+	@AlertGroup          = $sunAkAlertType + " " + $sunAkAlertClass
+	@Summary             = $sunAkAlertCode + " " + $sunAkAlertDesc + " Required response is " + $sunAkAlertResponse
+
+	# next 2 bits may be related, for first cut will switch independantly until we have more information.
+
+	# Set Type field.
+	#switch($sunAkAlertType) {
+		## The only one see so far is alert. Will need to see if we get something like clear or resolution before I can set Type2
+		#case "alert":
+			## Well this must be a problem.
+			#@Type = 1
+		#default:
+			#@Type = 1	
+	#}
+	# Only way I can see of doing this at the moment.
+	if (regmatch($sunAkAlertDesc,"restored")) {
+		@Type = 2
+		$lowersunAkAlertSeverity = "clear"
+	}
+	else if (regmatch($sunAkAlertDesc,"resumed")) {
+		@Type = 2
+		$lowersunAkAlertSeverity = "clear"
+	}
+	else if (regmatch($sunAkAlertDesc,"rejoined")) {
+		@Type = 2
+		$lowersunAkAlertSeverity = "clear"
+	}
+	else if (regmatch($sunAkAlertDesc,"fallen below")) {
+		@Type = 2
+		$lowersunAkAlertSeverity = "clear"
+	}
+	else if (regmatch($sunAkAlertDesc,"up")) {
+		@Type = 2
+		$lowersunAkAlertSeverity = "clear"
+	}
+	else {
+		@Type = 1
+		$lowersunAkAlertSeverity = lower($sunAkAlertSeverity)
+	}
+	
+
+	# Now set Severity.
+	switch($lowersunAkAlertSeverity) {
+		# Only event so far shows Minor.. Lets hope it follows the CCITT recomendations.
+		case "clear":
+			@Severity = 1
+		case "warning" | "minor":
+			@Severity = 3
+		case "major" | "error":
+			@Severity = 4
+		case "critical" | "fatal":
+			@Severity = 5
+		default:
+			# Hedge my bets here
+			@Severity = 2
+	}
+
+	$tempIdentifier = @NodeAlias + "-" + @Manager + "-" + @AlertGroup + "-" + @AlertKey + "-" + @Type
+# End

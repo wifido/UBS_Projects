@@ -1,0 +1,342 @@
+================ Start of PA Server LDN0064_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+PROBES               MTTRAPD_SSM          xldn0064paproot      RUNNING   20592
+                     PROCMON              xldn0064paproot      RUNNING   20593
+-------------------------------------------------------------------------------
+================ End of PA Server LDN0064_PA========================================
+ 
+================ Start of PA Server LDN0150_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 Oracle_Gate          sldn0150porroot      RUNNING    7905
+-------------------------------------------------------------------------------
+================ End of PA Server LDN0150_PA========================================
+ 
+================ Start of PA Server LDN0628_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+IMPACTSERVER         Impact_Server        xldn0628papnetcool   RUNNING   25731
+                     jrexec               xldn0628papnetcool   RUNNING   25732
+                     security             xldn0628papnetcool   RUNNING   25735
+                     cluster_sync         xldn0628papnetcool   RUNNING    3641
+Musebot              Decoupler            xldn0628paproot      RUNNING   25743
+                     musebot_persist      xldn0628paproot      RUNNING    9180
+-------------------------------------------------------------------------------
+================ End of PA Server LDN0628_PA========================================
+ 
+================ Start of PA Server LDN1014_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD              xldn1014paproot      RUNNING   24460
+                     MTTRAPD_SSM          xldn1014paproot      RUNNING   29937
+                     SOCKET               xldn1014paproot      RUNNING   12286
+                     PROCMON              xldn1014paproot      RUNNING    4472
+PEMZoS               PEMZoS               xldn1014paproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server LDN1014_PA========================================
+ 
+================ Start of PA Server LDN1017_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Monitors             Data_Bridge          xldn1017paproot      RUNNING   14113
+                     HTTP_Monitor         xldn1017paproot      RUNNING   14147
+                     HTTPS_Monitor        xldn1017paproot      RUNNING   14148
+                     TCPPORT_Monitor      xldn1017paproot      RUNNING   14153
+                     ISM_Server           xldn1017paproot      RUNNING   14158
+                     Transx_Monitor       xldn1017paproot      RUNNING   26514
+Probes               MTTRAPD              xldn1017paproot      RUNNING   13920
+                     MTTRAPD_SSM          xldn1017paproot      RUNNING   13932
+                     PROCMON              xldn1017paproot      RUNNING   13940
+-------------------------------------------------------------------------------
+================ End of PA Server LDN1017_PA========================================
+ 
+================ Start of PA Server LDN1018_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 LDNOBJPHBT1          xldn1018paproot      RUNNING    4395
+                     PROCMON              xldn1018paproot      RUNNING    1643
+Gates                HG_LDN-STM           xldn1018paproot      RUNNING    5714
+                     NG_LDN-LDN           xldn1018paproot      RUNNING   14021
+Probes               MTTRAPD              xldn1018paproot      RUNNING    1651
+                     MTTRAPD_SSM          xldn1018paproot      RUNNING    1654
+                     MTTRAPD_HBT          xldn1018paproot      RUNNING    2077
+                     MTTRAPD_HBT2         xldn1018paproot      RUNNING    2078
+-------------------------------------------------------------------------------
+================ End of PA Server LDN1018_PA========================================
+ 
+================ Start of PA Server LDN2376_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 LDNOBJPDSP3          xldn2376paproot      RUNNING    4477
+                     PROCMON              xldn2376paproot      RUNNING   28085
+                     UG_LDNP3             xldn2376paproot      RUNNING   15238
+                     LDNWEBTOP3           xldn2376paproot      RUNNING   17744
+-------------------------------------------------------------------------------
+================ End of PA Server LDN2376_PA========================================
+ 
+================ Start of PA Server LDN2795_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 LDNOBJPROD1          xldn2795paproot      RUNNING   19810
+                     PROCMON              xldn2795paproot      RUNNING   18400
+Probes               MTTRAPD              xldn2795paproot      RUNNING   18562
+                     MTTRAPD_SSM          xldn2795paproot      RUNNING   12149
+Cold_Gates           BG_EM1-US1           xldn2795paproot      DEAD          0
+Musebot              Decoupler2           xldn2795paproot      RUNNING    3375
+                     musebot_persist      xldn2795paproot      RUNNING    4918
+Remedy               G_REM_PLDN           xldn2795paproot      RUNNING   22106
+-------------------------------------------------------------------------------
+================ End of PA Server LDN2795_PA========================================
+ 
+================ Start of PA Server LDN2892_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 LDNOBJPDSP1          xldn2892paproot      RUNNING    6193
+                     PROCMON              xldn2892paproot      RUNNING   17477
+                     UG_LDNP1             xldn2892paproot      RUNNING   29590
+                     LDNWEBTOP1           xldn2892paproot      RUNNING    1142
+-------------------------------------------------------------------------------
+================ End of PA Server LDN2892_PA========================================
+ 
+================ Start of PA Server LDN2893_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 LDNOBJPDSP2          xldn2893paproot      RUNNING   29415
+                     PROCMON              xldn2893paproot      RUNNING   15793
+                     UG_LDNP2             xldn2893paproot      RUNNING   15212
+                     LDNWEBTOP2           xldn2893paproot      RUNNING    6608
+-------------------------------------------------------------------------------
+================ End of PA Server LDN2893_PA========================================
+ 
+================ Start of PA Server OPF0100_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD_SSM          xopf0100paproot      RUNNING    5394
+                     PROCMON              xopf0100paproot      RUNNING    5395
+-------------------------------------------------------------------------------
+================ End of PA Server OPF0100_PA========================================
+ 
+================ Start of PA Server SNG1001_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD_SSM          xsng1001paproot      RUNNING    9433
+                     PROCMON              xsng1001paproot      RUNNING    9434
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1001_PA========================================
+ 
+================ Start of PA Server SNG1209_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 SNGOBJPROD1          xsng1209paproot      RUNNING    1813
+                     PROCMON              xsng1209paproot      RUNNING    1814
+Cold_Gates           BG_AP1-EM1           xsng1209paproot      RUNNING    1815
+Musebot              Decoupler            xsng1209paproot      DEAD          0
+                     musebot_fast_track   xsng1209paproot      DEAD          0
+Remedy               G_REM_PSNG           xsng1209paproot      RUNNING    1816
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1209_PA========================================
+ 
+================ Start of PA Server SNG1282_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+core                 SNGOBJPDSP3          xsng1282paproot      RUNNING   30752
+                     PROCMON              xsng1282paproot      RUNNING    2693
+                     UG_SNGP3             xsng1282paproot      RUNNING    5808
+                     SNGWEBTOP3           xsng1282paproot      RUNNING    9028
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1282_PA========================================
+ 
+================ Start of PA Server SNG1283_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD              xsng1283paproot      RUNNING    6679
+                     MTTRAPD_SSM          xsng1283paproot      RUNNING    6680
+                     SOCKET               xsng1283paproot      RUNNING    6682
+                     PROCMON              xsng1283paproot      RUNNING    6686
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1283_PA========================================
+ 
+================ Start of PA Server SNG1284_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 SNGOBJPDSP1          xsng1284paproot      RUNNING   17233
+                     PROCMON              xsng1284paproot      RUNNING    6540
+                     UG_SNGP1             xsng1284paproot      RUNNING   18135
+                     SNGWEBTOP1           xsng1284paproot      RUNNING   30944
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1284_PA========================================
+ 
+================ Start of PA Server SNG1285_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 SNGOBJPDSP2          xsng1285paproot      RUNNING   14250
+                     PROCMON              xsng1285paproot      RUNNING    2616
+                     UG_SNGP2             xsng1285paproot      RUNNING   25447
+                     SNGWEBTOP2           xsng1285paproot      RUNNING   14236
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1285_PA========================================
+ 
+================ Start of PA Server SNG1299_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 SNGOBJPROD2          xsng1299paproot      RUNNING   11604
+                     PROCMON              xsng1299paproot      RUNNING    1938
+                     FG_SNG-SNG           xsng1299paproot      RUNNING   12529
+Cold_Gates           BG_AP2-EM2           xsng1299paproot      DEAD          0
+Musebot              Decoupler            xsng1299paproot      DEAD          0
+                     musebot_fast_track   xsng1299paproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1299_PA========================================
+ 
+================ Start of PA Server STM1315_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJPHBT1          xstm1315paproot      RUNNING   32615
+                     PROCMON              xstm1315paproot      RUNNING   10833
+                     MTTRAPD_HBT          xstm1315paproot      RUNNING    3192
+                     MTTRAPD_HBT2         xstm1315paproot      RUNNING    3193
+ColdGate             NG_STM-STM           xstm1315paproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server STM1315_PA========================================
+ 
+================ Start of PA Server STM1318_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+IMPACTSERVER         Impact_Server        xstm1318papnetcool   RUNNING    2518
+                     jrexec               xstm1318papnetcool   RUNNING    2519
+                     security             xstm1318papnetcool   RUNNING    2520
+                     cluster_sync         xstm1318papnetcool   RUNNING    2521
+Musebot              Decoupler            xstm1318paproot      RUNNING    2522
+                     musebot_persist      xstm1318paproot      RUNNING    2608
+-------------------------------------------------------------------------------
+================ End of PA Server STM1318_PA========================================
+ 
+================ Start of PA Server STM1343_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Monitors             Data_Bridge          xstm1343paproot      RUNNING    4314
+                     HTTP_Monitor         xstm1343paproot      RUNNING    4337
+                     HTTPS_Monitor        xstm1343paproot      RUNNING    4338
+                     TCPPORT_Monitor      xstm1343paproot      RUNNING    4339
+                     TRANSX_Monitor       xstm1343paproot      RUNNING   28432
+                     ISM_Server           xstm1343paproot      RUNNING    4343
+-------------------------------------------------------------------------------
+================ End of PA Server STM1343_PA========================================
+ 
+================ Start of PA Server STM1394_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD              xstm1394paproot      RUNNING    2408
+                     MTTRAPD_SSM          xstm1394paproot      RUNNING   18518
+                     SOCKET               xstm1394paproot      RUNNING    2410
+                     PROCMON              xstm1394paproot      RUNNING    8724
+-------------------------------------------------------------------------------
+================ End of PA Server STM1394_PA========================================
+ 
+================ Start of PA Server STM1770_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJPDSP1          xstm1770paproot      RUNNING   13468
+                     PROCMON              xstm1770paproot      RUNNING    2714
+                     UG_STMP1             xstm1770paproot      RUNNING   17480
+                     STMWEBTOP1           xstm1770paproot      RUNNING    8048
+-------------------------------------------------------------------------------
+================ End of PA Server STM1770_PA========================================
+ 
+================ Start of PA Server STM1771_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJPDSP2          xstm1771paproot      RUNNING    3564
+                     PROCMON              xstm1771paproot      RUNNING    2713
+                     UG_STMP2             xstm1771paproot      RUNNING   12013
+                     STMWEBTOP2           xstm1771paproot      RUNNING   10022
+-------------------------------------------------------------------------------
+================ End of PA Server STM1771_PA========================================
+ 
+================ Start of PA Server STM5987_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJPROD1          xstm5987paproot      RUNNING   19197
+                     PROCMON              xstm5987paproot      RUNNING   27911
+                     TEST_PRI             xstm5987paproot      RUNNING   27990
+Remedy               G_REM_PSTM           xstm5987paproot      RUNNING   22704
+Musebot              Decoupler2           xstm5987paproot      RUNNING   13558
+                     musebot_persist      xstm5987paproot      RUNNING   18601
+Cold_Gates           BG_US1-EM1           xstm5987paproot      RUNNING   20479
+-------------------------------------------------------------------------------
+================ End of PA Server STM5987_PA========================================
+ 
+================ Start of PA Server STM6143_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJPROD2          xstm6143paproot      RUNNING   18451
+                     PROCMON              xstm6143paproot      RUNNING   12645
+                     FG_STM-STM           xstm6143paproot      RUNNING   19358
+Musebot              Decoupler            xstm6143paproot      RUNNING   12647
+                     musebot_fast_track   xstm6143paproot      RUNNING   12938
+Cold_Gates           BG_US2-EM2           xstm6143paproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server STM6143_PA========================================
+ 
+================ Start of PA Server STM8958_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 Oracle_Gate          sstm8958porroot      RUNNING    6752
+-------------------------------------------------------------------------------
+================ End of PA Server STM8958_PA========================================
+ 
+================ Start of PA Server ZUR0565_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Probes               MTTRAPD              xzur0565paproot      RUNNING   24405
+                     MTTRAPD_SSM          xzur0565paproot      RUNNING   24644
+                     SOCKET               xzur0565paproot      RUNNING   16065
+                     PROCMON              xzur0565paproot      RUNNING    7845
+PEMZoS               PEMZoS               xzur0565paproot      RUNNING    7848
+-------------------------------------------------------------------------------
+================ End of PA Server ZUR0565_PA========================================
+ 
+================ Start of PA Server ZUR0567_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 ZUROBJPROD1          xzur0567paproot      RUNNING   26825
+                     PROCMON              xzur0567paproot      RUNNING   26128
+                     FG_ZUR-LDN           xzur0567paproot      RUNNING   27529
+Probes               MTTRAPD              xzur0567paproot      RUNNING   26129
+                     MTTRAPD_SSM          xzur0567paproot      RUNNING    3433
+Cold_Gates           BG_EM2-US2           xzur0567paproot      DEAD          0
+Musebot              Decoupler            xzur0567paproot      RUNNING   26134
+                     musebot_fast_track   xzur0567paproot      RUNNING   26276
+-------------------------------------------------------------------------------
+================ End of PA Server ZUR0567_PA========================================
+ 

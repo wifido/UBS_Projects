@@ -1,0 +1,3055 @@
+########################################################################
+#
+#  Compaq Insight Manager includes
+#
+########################################################################
+
+case "compaq":
+
+    	$ruleset = $ruleset + "-compaq.rules" + " compaq osType " + $osType
+    
+    	@Agent = "Compaq"
+    	$osType = substr($1, 1, 1)
+    	switch (upper($osType))  
+	{
+		case "N":
+	    		$cpqClassGidKey = "WINTEL"
+
+#		20070807	Change made by Chris Janes of Abilitec HDLDN0001226519 
+#		case "X" | "S":
+		case "X" | "S" | "D":
+
+#		20070807	End of Change`
+#			20080529	Change by Chris Janes of Abilitec TD 4851
+#	    		$cpqClassGidKey = "UNIX"
+
+			if(match($community, "REMAX"))
+			{
+				$cpqClassGidKey = "REMAX"
+			}
+			else if(nmatch($community, "ESX"))
+			{
+				$cpqClassGidKey = lookup(@NodeAlias, ESX_Swiss_Table)
+			}
+			else
+			{
+				$cpqClassGidKey = "UNIX"
+			}
+#			20080529	End of Change
+		default:
+	    		$cpqClassGidKey = ""
+    	}
+
+	[@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    	@OwnerUID = 65534
+    	$TempDoLookup = 2
+	$ruleset = $ruleset + " ST " + $specific-trap    
+    	switch($specific-trap)
+    	{
+        case "1001":
+            # cpqSeCpuThresholdPassed
+            @AlertKey = $3 + $4
+            @AlertGroup = "Threshold"
+            @Summary = "Internally corrected errors have passed a set threshold for CPU in slot " + $3 + ", socket " + $4 + " ."
+            @Severity = 3
+            @Type = 1
+        case "1002":
+            # cpqSePCCardThermalDegraded
+            @AlertKey = $5
+            @AlertGroup = "PCCard"
+            @Summary = "Safe PC Card " + $5 + " Thermal operating conditions exceeded."
+            @Severity = 4
+            @Type = 1
+        case "1003":
+            # cpqSePCCardThermalFailure
+            @AlertKey = $5
+            @AlertGroup = "PCCard"
+            @Summary = "Degraded PC Card " + $5 + " Thermal operating conditions exceeded."
+            @Severity = 5
+            @Type = 1
+        case "1004":
+            # cpqSePCCardThermalSafe
+            @AlertKey = $3
+            @AlertGroup = "PCCard"
+            @Summary = "Degraded/Failed PC Card " + $3 + " Thermal conditions restored to Safe operations."
+            @Severity = 2
+            @Type = 2
+        case "2001":
+            # cpqSiHoodRemoved
+            @AlertGroup = "HoodStatus"
+            @Summary = "Hood is removed from unit."
+            @Severity = 4
+            @Type = 1
+        case "2002":
+            # cpqSiMonitorConditionOK
+            @AlertKey = $3
+            @AlertGroup = "MonitorCondition"
+            @Summary = "The monitor's condition has been set to OK."
+            @Severity = 2
+            @Type = 2
+        case "2003":
+            # cpqSiMonitorConditionDegraded
+            @AlertKey = $3
+            @AlertGroup = "MonitorCondition"
+            @Summary = "The monitor's condition has been set to degraded."
+            @Severity = 3
+            @Type = 1
+        case "2004":
+            # cpqSiMonitorConditionFailed
+            @AlertKey = $3
+            @AlertGroup = "MonitorCondition"
+            @Summary = "The monitor's condition has been set to failed."
+            @Severity = 5
+            @Type = 1
+        case "2005":
+            # cpqSiCorrMemErrStatusDegraded
+            @AlertKey = $3
+            @AlertGroup = "MemStatus"
+            @Summary = "The Memory Module " + $4 + " ECC status has been set to degraded."
+            @Severity = 3
+            @Type = 1
+        case "2006":
+            # cpqSiCorrMemErrStatusOk
+            @AlertKey = $3
+            @AlertGroup = "MemStatus"
+            @Summary = "The Memory Module " + $4 + " ECC status has been set to OK."
+            @Severity = 2
+            @Type = 2
+        case "2007":
+            # cpqSiMemConfigChange
+            @AlertKey = $3
+            @AlertGroup = "MemStatus"
+            @Summary = "The system's memory configuration (slot " + $3 + ") has changed."
+            @Severity = 2
+            @Type = 1
+        case "2008":
+            # cpqSiHotPlugSlotBoardRemoved
+            @AlertKey = $3 + $4
+            @AlertGroup = "HotPlugSlot"
+            @Summary = "Hot Plug Slot Board Removed from slot " + $4 + "."
+            @Severity = 3
+            @Type = 1
+        case "2009":
+            # cpqSiHotPlugSlotBoardInserted
+            @AlertKey = $3 + $4
+            @AlertGroup = "HotPlugSlot"
+            @Summary = "Hot Plug Slot Board Inserted into slot " + $4 + "."
+            @Severity = 2
+            @Type = 2
+        case "2010":
+            # cpqSiHotPlugSlotPowerUpFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "HotPlugSlot"
+            @Summary = "Hot Plug Slot Board Failed in slot " + $4 + ", Error " + $status + "."
+        case "2011":
+            # cpqSiSysBatteryFailure
+            @AlertKey = $3
+            @AlertGroup = "Battery"
+            @Summary = "Battery " + $3 + " has failed."
+            @Severity = 4
+            @Type = 1
+        case "2012":
+            # cpqSiSysBatteryChargingDegraded
+            @AlertKey = $3
+            @AlertGroup = "Battery"
+            @Summary = "Battery " + $3 + " has degraded charging capacity."
+            @Severity = 4
+            @Type = 1
+        case "2013":
+            # cpqSiSysBatteryCalibrationError
+            @AlertKey = $3
+            @AlertGroup = "Battery"
+            @Summary = "Battery " + $3 + " has calibration error."
+            @Severity = 4
+            @Type = 1
+        case "3001":
+            # cpqDa2LogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "StatusChange"
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive status is now " + $status + "."
+        case "3002":
+            # cpqDa2SpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $2
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive status is now " + $status + " on bus " + $2 + "."
+        case "3003":
+            # cpqDa2PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status is now " + $status + " for a physical drive on bus " + $2 + "."
+        case "3004":
+            # cpqDa2PhyDrvThreshPassedTrap
+            @AlertKey = $2
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for a physical drive on bus " + $2 + "."
+            @Severity = 4
+            @Type = 1
+        case "3005":
+            # cpqDa2AccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "StatusChange"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator board status is now " + $status + "."
+        case "3006":
+            # cpqDa2AccelBadDataTrap
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BadData"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator lost battery power.  Data Loss (" + $status + ")."
+        case "3007":
+            # cpqDa2AccelBatteryFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BatteryFailed"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator battery status is now " + $status + "."
+        case "3008":
+            # cpqDa3LogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive status is now " + $status + "."
+        case "3009":
+            # cpqDa3SpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive status is now " + $status + " on bus " + $4 + "."
+        case "3010":
+            # cpqDa3PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical drive status is now " + $status + " on bus " + $4 + "."
+        case "3011":
+            # cpqDa3PhyDrvThreshPassedTrap
+            @AlertKey = $4
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for a physical drive on bus " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "3012":
+            # cpqDa3AccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "StatusChange"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator board status is now " + $status + "."
+        case "3013":
+            # cpqDa3AccelBadDataTrap
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BadData"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator lost battery power.  Data Loss (" + $status + ")."
+        case "3014":
+            # cpqDa3AccelBatteryFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BatteryFailed"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator battery status is now " + $status + "."
+        case "3015":
+            # cpqDaCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "ArrayController"
+            @Summary = "Array controller status is now " + $status + "."
+        case "3016":
+            # cpqDaCntlrActive
+            @AlertKey = $3 + $4
+            @AlertGroup = "ArrayController"
+            @Summary = "Backup array controller in slot " + $3 + " is now active for partner in slot " + $4 + "."
+            @Severity = 2
+            @Type = 1
+        case "3017":
+            # cpqDa4SpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive status is now " + $status + " on controller " + $4 + ", bus " + $5 + ", drive bay " + $6 + "."
+        case "3018":
+            # cpqDa4PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical drive status is now " + $status + " on controller " + $4 + ", bus " + $5 + ", drive bay " + $6 + "."
+        case "3019":
+            # cpqDa4PhyDrvThreshPassedTrap
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for a physical drive on controller " + $3 + ", bus " + $4 + ", drive bay " + $5 + "."
+            @Severity = 4
+            @Type = 1
+        case "3020":
+            # cpqDaTapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status is now " + $status + " for the tape library on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "3021":
+            # cpqDaTapeLibraryDoorStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Door status is now " + $status + " for the tape library on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "3022":
+            # cpqDaTapeDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status is now " + $status + " for the tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "3023":
+            # cpqDaTapeDriveCleaningRequired
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning is needed for the tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "3024":
+            # cpqDaTapeDriveCleanTapeReplace
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning tape needs replacing in the tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "3025":
+            # cpqDa5AccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "Accelerator"
+            @Summary = "Status is now " + $status + " for the accelerator cache in slot " + $3 + " (error code: " + $8 + ")."
+        case "3026":
+            # cpqDa5AccelBadDataTrap
+            @AlertKey = "BadData"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator in slot " + $3 + " lost battery power.  Data Loss possible."
+            @Severity = 5
+            @Type = 1
+        case "3027":
+            # cpqDa5AccelBatteryFailed
+            @AlertKey = "BatteryFailed"
+            @AlertGroup = "Accelerator"
+            @Summary = "Battery status is failed on accelerator cache in slot " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "3028":
+            # cpqDa5CntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "ArrayController"
+            @Summary = "Array controller status is now " + $status + "."
+        case "3029":
+            # cpqDa5PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical drive status is now " + $status + " on controller " + $4 + ", bus " + $5 + ", drive bay " + $6 + "."
+        case "3030":
+            # cpqDa5PhyDrvThreshPassedTrap
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for a physical drive on controller " + $3 + ", bus " + $4 + ", drive bay " + $5 + "."
+            @Severity = 4
+            @Type = 1
+        case "3031":
+            # cpqDa2TapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status is now " + $status + " for the tape library on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "3032":
+            # cpqDa2TapeDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status is now " + $status + " for the tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "3033":
+            # cpqDa6CntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4
+            @AlertGroup = "ArrayController"
+            @Summary = "Array controller status is now " + $status + "."
+        case "3034":
+            # cpqDa6LogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Status is now " + $status + " for logical drive " + $5 + " on controller " + $4 + "."
+        case "3035":
+            # cpqDa6SpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $7 + $8
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive " + $5 + " status is now " + $status + " on controller " + $4 + ", bus " + $7 + ", drive bay " + $8 + "."
+        case "3036":
+            # cpqDa6PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $12
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical drive " + $5 + " status is now " + $status + " on controller " + $4 + ", bus " + $6 + ", drive bay " + $7 + "."
+        case "3037":
+            # cpqDa6PhyDrvThreshPassedTrap
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for physical drive " + $5 + " on controller " + $4 + ", bus " + $6 + ", drive bay " + $7 + "."
+            @Severity = 4
+            @Type = 1
+        case "3038":
+            # cpqDa6AccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $8
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Status is now " + $status + " for the accelerator cache in slot " + $5 + " (error code: " + $9 + ")."
+        case "3039":
+            # cpqDa6AccelBadDataTrap
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator in slot " + $5 + " lost battery power.  Data Loss possible."
+            @Severity = 5
+            @Type = 1
+        case "3040":
+            # cpqDa6AccelBatteryFailed
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Battery status is failed on accelerator cache in slot " + $5 + "."
+            @Severity = 5
+            @Type = 1
+        case "3041":
+            # cpqDa6TapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status is now " + $status + " for the tape library on controller " + $4 + ", bus " + $5 + ", ID " + $6 + ", LUN " + $7 + "."
+        case "3042":
+            # cpqDa6TapeLibraryDoorStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Door status is now " + $status + " for the tape library on controller " + $4 + ", bus " + $5 + ", ID " + $6 + ", LUN " + $7 + "."
+        case "3043":
+            # cpqDa6TapeDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status is now " + $status + " for the tape drive on controller " + $4 + ", bus " + $5 + ", ID " + $6 + ", LUN " + $7 + "."
+        case "3044":
+            # cpqDa6TapeDriveCleaningRequired
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning is needed for the tape drive on controller " + $4 + ", bus " + $5 + ", ID " + $6 + ", LUN " + $7 + "."
+            @Severity = 4
+            @Type = 1
+        case "3045":
+            # cpqDa6TapeDriveCleanTapeReplace
+            @AlertKey = $4 + $5 + $6 + $7
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning tape needs replacing in the tape drive on controller " + $4 + ", bus " + $5 + ", ID " + $6 + ", LUN " + $7 + "."
+            @Severity = 4
+            @Type = 1
+
+#	20070920	Changes by Chris Janes of Abilitec see HDSTM0000348546
+	case "3046":
+		#cpqDa7PhyDrvStatusChange
+		$sysName = $1 
+		$cpqHoTrapFlags = $2 
+		$cpqDaCntlrHwLocation = $3
+		$cpqDaPhyDrvCntlrIndex = $4 
+		$cpqDaPhyDrvIndex = $5
+		$cpqDaPhyDrvLocationString = $6 
+		$cpqDaPhyDrvType = $7
+		$cpqDaPhyDrvModel = $8 
+		$cpqDaPhyDrvFWRev = $9 
+		$cpqDaPhyDrvSerialNum = $10
+		$cpqDaPhyDrvFailureCode = $11 
+		$cpqDaPhyDrvStatus = $12
+		$cpqDaPhyDrvBusNumber = $13
+
+		@AlertKey = $cpqDaPhyDrvLocationString
+		@AlertGroup = "Drive Status"
+#		20081029	Changes by Chris Janes of Abilitec
+#		$tempSummary = lookup($cpqDaPhyDrvStatus,cpqDaPhyDrvStatus_table)
+
+		[$tempSummary,@Severity,@Type] = lookup($cpqDaPhyDrvStatus,cpqDaPhyDrvStatus_table)
+		@Summary = "Physical Drive Status is now " + $tempSummary
+#		@Severity = 5
+#		@Type = 1
+
+        case "3047":
+		#cpqDa7SpareStatusChange
+
+		$sysName = $1 
+		$cpqHoTrapFlags = $2 
+		$cpqDaCntlrHwLocation = $3
+		$cpqDaSpareCntlrIndex  = $4
+		$cpqDaSparePhyDrvIndex = $5
+		$cpqDaSpareStatus  = $6
+		$cpqDaSpareLocationString = $7
+		$cpqDaSpareBusNumber = $8
+
+                @AlertKey = $cpqDaSpareLocationString
+                @AlertGroup = "Drive Status"
+#	20081112	Change by Chris janes of Abilitec
+#                $tempSummary = lookup($cpqDaSpareStatus,cpqDaSpareStatus_table)
+#                @Severity = 5
+#                @Type = 1
+                [$tempSummary,@Severity,@Type] = lookup($cpqDaSpareStatus,cpqDaSpareStatus_table)
+                @Summary = "Spare Drive Status is now " + $tempSummary
+
+
+
+#	20070920	End of Changes
+        case "5001":
+            # cpqScsi2CntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "SCSIController"
+            @Summary = "SCSI Controller Status changed to " + $status + "."
+        case "5002":
+            # cpqScsi2LogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical Drive Status changed to " + $status + "."
+        case "5003":
+            # cpqScsi2PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical Drive Status changed to " + $status + "."
+        case "5004":
+            # cpqTapePhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "TapeDrive"
+            @Summary = "Tape Drive Status changed to " + $status + "."
+        case "5005":
+            # cpqScsi3CntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "SCSIController"
+            @Summary = "SCSI Controller Status changed to " + $status + "."
+        case "5006":
+            # cpqScsi3PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical Drive Status changed to " + $status + "."
+        case "5007":
+            # cpqTape3PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "TapeDrive"
+            @Summary = "Tape Drive Status changed to " + $status + "."
+        case "5008":
+            # cpqTape3PhyDrvCleaningRequired
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "TapeDrive"
+            @Summary = "Tape drive cleaning required. Status: " + $status + "."
+        case "5009":
+            # cpqTape3PhyDrvCleanTapeReplace
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "TapeDrive"
+            @Summary = "Tape Drive cleaning tape requires replacement. Status: " + $status + "."
+        case "5010":
+            # cpqTape3LibraryFailed
+            @AlertKey = $3
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Tape library " + $3 + " is not operational."
+            @Severity = 5
+            @Type = 1
+        case "5011":
+            # cpqTape3LibraryOkay
+            @AlertKey = $3
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Tape Library " + $3 + " has recovered"
+            @Severity = 1
+            @Type = 2
+        case "5012":
+            # cpqTape3LibraryDegraded
+            @AlertKey = $3
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Tape library " + $3 + " is in a degraded condition."
+            @Severity = 4
+            @Type = 1
+        case "5013":
+            # cpqTape3LibraryDoorOpen
+            @AlertKey = $3
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Tape library " + $3 + " door opened"
+            @Severity = 2
+            @Type = 1
+        case "5014":
+            # cpqTape3LibraryDoorClosed
+            @AlertKey = $3
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Tape library " + $3 + " door closed"
+            @Severity = 1
+            @Type = 2
+        case "5015":
+            # cpqScsiCdLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "CdLibrary"
+            @Summary = "Status of CD Library on controller " + $3 + ", bus " + $4 + ", ID " + $5 + " changed to " + $status + "."
+        case "5016":
+            # cpqTape4PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status of tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + " changed to " + $status + "."
+        case "5017":
+            # cpqScsi4PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status of physical SCSI drive on controller " + $4 + ", bus " + $5 + ", ID " + $6 + " changed to " + $status + "."
+        case "5018":
+            # cpqTapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status of CD Library on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + " changed to " + $status + "."
+        case "5019":
+            # cpqTape5PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status of tape drive on controller " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + " changed to " + $status + "."
+        case "5020":
+            # cpqScsi5PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status of physical SCSI drive on controller " + $4 + ", bus " + $5 + ", ID " + $6 + " changed to " + $status + "."
+        case "6001":
+            # cpqHe2CorrectableMemoryError
+            @AlertKey = "Correctable"
+            @AlertGroup = "MemoryError"
+            @Summary = "Total correctable errors = " + $1 + "."
+            @Severity = 3
+            @Type = 1
+        case "6002":
+            # cpqHe2CorrectableMemoryLogDisabled
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "Disabled"
+            @AlertGroup = "MemoryError"
+            @Summary = "Memory error tracking now " + $status
+        case "6003":
+            # cpqHeThermalTempFailed
+            @AlertGroup = "Thermal"
+            @Summary = "System will be shutdown due to this thermal condition."
+            @Severity = 5
+            @Type = 1
+        case "6004":
+            # cpqHeThermalTempDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature out of range.  Shutdown may occur."
+        case "6005":
+            # cpqHeThermalTempOk
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature has returned to normal range."
+            @Severity = 1
+            @Type = 2
+        case "6006":
+            # cpqHeThermalSystemFanFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "Thermal"
+            @Summary = "Required fan not operating normally.  Shutdown may occur."
+        case "6007":
+            # cpqHeThermalSystemFanDegraded
+            @AlertGroup = "Thermal"
+            @Summary = "An optional fan is not operating normally."
+            @Severity = 4
+            @Type = 1
+        case "6008":
+            # cpqHeThermalSystemFanOk
+            @AlertGroup = "Thermal"
+            @Summary = "System fan has returned to normal operation."
+            @Severity = 1
+            @Type = 2
+        case "6009":
+            # cpqHeThermalCpuFanFailed
+            @AlertGroup = "Thermal"
+            @Summary = "CPU fan has failed.  Server will be shutdown."
+            @Severity = 5
+            @Type = 1
+        case "6010":
+            # cpqHeThermalCpuFanOk
+            @AlertGroup = "Thermal"
+            @Summary = "CPU fan is now OK."
+            @Severity = 1
+            @Type = 2
+        case "6011":
+            # cpqHeAsrConfirmation
+            @AlertGroup = "ASR"
+            @Summary = "Server is operational again after ASR shutdown."
+            @Severity = 5
+            @Type = 1
+        case "6012":
+            # cpqHeThermalConfirmation
+            @AlertGroup = "Thermal"
+            @Summary = "Server is operational again after thermal shutdown."
+            @Severity = 1
+            @Type = 2
+        case "6013":
+            # cpqHePostError
+            @AlertGroup = "PostError"
+            @Summary = "Errors occurred during server restart."
+            @Severity = 3
+            @Type = 1
+        case "6014":
+            # cpqHeFltTolPwrSupplyDegraded
+            @AlertGroup = "PwrSupply"
+            @Summary = "The server power supply status has become degraded."
+            @Severity = 4
+            @Type = 1
+        case "6015":
+            # cpqHe3CorrectableMemoryError
+            @AlertKey = "Correctable"
+            @AlertGroup = "MemoryError"
+            @Summary = "Total correctable errors = " + $3 + "."
+            @Severity = 3
+            @Type = 1
+        case "6016":
+            # cpqHe3CorrectableMemoryLogDisabled
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "Disabled"
+            @AlertGroup = "MemoryError"
+            @Summary = "Memory error tracking now " + $status
+        case "6017":
+            # cpqHe3ThermalTempFailed
+            @AlertGroup = "Thermal"
+            @Summary = "System will be shutdown due to this thermal condition."
+            @Severity = 5
+            @Type = 1
+        case "6018":
+            # cpqHe3ThermalTempDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature out of range.  Shutdown may occur."
+        case "6019":
+            # cpqHe3ThermalTempOk
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature has returned to normal range."
+            @Severity = 1
+            @Type = 2
+        case "6020":
+            # cpqHe3ThermalSystemFanFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "Thermal"
+            @Summary = "Required fan not operating normally.  Shutdown may occur."
+        case "6021":
+            # cpqHe3ThermalSystemFanDegraded
+            @AlertGroup = "Thermal"
+            @Summary = "An optional fan is not operating normally."
+            @Severity = 4
+            @Type = 1
+        case "6022":
+            # cpqHe3ThermalSystemFanOk
+            @AlertGroup = "Thermal"
+            @Summary = "System fan has returned to normal operation."
+            @Severity = 1
+            @Type = 2
+        case "6023":
+            # cpqHe3ThermalCpuFanFailed
+            @AlertGroup = "Thermal"
+            @Summary = "CPU fan has failed.  Server will be shutdown."
+            @Severity = 5
+            @Type = 1
+        case "6024":
+            # cpqHe3ThermalCpuFanOk
+            @AlertGroup = "Thermal"
+            @Summary = "CPU fan is now OK."
+            @Severity = 1
+            @Type = 2
+        case "6025":
+            # cpqHe3AsrConfirmation
+            @AlertGroup = "ASR"
+            @Summary = "Server is operational again after ASR shutdown."
+            @Severity = 5
+            @Type = 1
+        case "6026":
+            # cpqHe3ThermalConfirmation
+            @AlertGroup = "Thermal"
+            @Summary = "Server is operational again after thermal shutdown."
+            @Severity = 1
+            @Type = 2
+        case "6027":
+            # cpqHe3PostError
+            @AlertGroup = "PostError"
+            @Summary = "Errors occurred during server restart."
+            @Severity = 3
+            @Type = 1
+        case "6028":
+            # cpqHe3FltTolPwrSupplyDegraded
+            @AlertGroup = "PwrSupply"
+            @Summary = "The server power supply status has become degraded."
+            @Severity = 4
+            @Type = 1
+        case "6029":
+            # cpqHe3CorrMemReplaceMemModule
+            @AlertGroup = "MemoryError"
+            @Summary = "Correctable memory errs require a replacement memory module."
+            @Severity = 5
+            @Type = 1
+        case "6030":
+            # cpqHe3FltTolPowerSupplyDegraded
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " is degraded"
+            @Severity = 4
+            @Type = 1
+        case "6031":
+            # cpqHe3FltTolPowerSupplyFailed
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " has failed"
+            @Severity = 5
+            @Type = 1
+        case "6032":
+            # cpqHe3FltTolPowerRedundancyLost
+            @AlertKey = $3
+            @AlertGroup = "PwrSupply"
+            @Summary = "The Power Supplies are no longer redundant"
+            @Severity = 4
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "6033":
+            # cpqHe3FltTolPowerSupplyInserted
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " was inserted"
+            @Severity = 1
+            @Type = 2
+        case "6034":
+            # cpqHe3FltTolPowerSupplyRemoved
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " was removed"
+            @Severity = 5
+            @Type = 1
+        case "6035":
+            # cpqHe3FltTolFanDegraded
+            @AlertKey = $3 + $4
+            @AlertGroup = "FanFail"
+            @Summary = "Fan " + $4 + " is degraded"
+            @Severity = 4
+            @Type = 1
+        case "6036":
+            # cpqHe3FltTolFanFailed
+            @AlertKey = $3 + $4
+            @AlertGroup = "FanFail"
+            @Summary = "Fan " + $4 + " has failed"
+            @Severity = 5
+            @Type = 1
+        case "6037":
+            # cpqHe3FltTolFanRedundancyLost
+            @AlertKey = $3
+            @AlertGroup = "FanFail"
+            @Summary = "The Fans are no longer redundant"
+            @Severity = 4
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "6038":
+            # cpqHe3FltTolFanInserted
+            @AlertKey = $3 + $4
+            @AlertGroup = "FanFail"
+            @Summary = "Fan " + $4 + " was inserted"
+            @Severity = 1
+            @Type = 2
+        case "6039":
+            # cpqHe3FltTolFanRemoved
+            @AlertKey = $3 + $4
+            @AlertGroup = "FanFail"
+            @Summary = "Fan " + $4 + " was removed"
+            @Severity = 3
+            @Type = 1
+        case "6040":
+            # cpqHe3TemperatureFailed
+            @AlertKey = $3 + $4
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature Exceeded in " + $4 + "."
+            @Severity = 5
+            @Type = 1
+        case "6041":
+            # cpqHe3TemperatureDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature out of range in " + $5 + ". Shutdown may occur."
+        case "6042":
+            # cpqHe3TemperatureOk
+            @AlertKey = $3 + $4
+            @AlertGroup = "Thermal"
+            @Summary = "Temperature Normal in " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "6043":
+            # cpqHe3PowerConverterDegraded
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "PwrSupply"
+            @Summary = "The Power Converter has degraded, Slot " + $4 + ", Socket " + $5 + "."
+            @Severity = 4
+            @Type = 1
+        case "6044":
+            # cpqHe3PowerConverterFailed
+            @AlertKey = $3 + $4 + $5
+            @AlertGroup = "PwrSupply"
+            @Summary = "The Power Converter has failed, Slot " + $4 + ", Socket " + $5 + "."
+            @Severity = 5
+            @Type = 1
+        case "6045":
+            # cpqHe3PowerConverterRedundancyLost
+            @AlertKey = $3
+            @AlertGroup = "PwrSupply"
+            @Summary = "The Power Converters are no longer redundant"
+            @Severity = 4
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "6046":
+            # cpqHe3CacheAccelParityError
+            @AlertGroup = "Accelerator"
+            @Summary = "Cache Accelerator errors may require a replacement module."
+            @Severity = 5
+            @Type = 1
+        case "6047":
+            # cpqHeResilientMemOnlineSpareEngaged
+            @AlertGroup = "MemoryError"
+            @Summary = "The Advanced Memory Protection subsystem has engaged the online spare memory."
+            @Severity = 4
+            @Type = 1
+        case "6048":
+            # cpqHe4FltTolPowerSupplyOk
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " is OK"
+        case "6049":
+            # cpqHe4FltTolPowerSupplyDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " has degraded"
+        case "6050":
+            # cpqHe4FltTolPowerSupplyFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4
+            @AlertGroup = "PwrSupply"
+            @Summary = "Power Supply " + $4 + " has failed"
+        case "6051":
+            # cpqHeResilientMemMirroredMemoryEngaged
+            @AlertGroup = "MemoryError"
+            @Summary = "The Advanced Memory Protection subsystem has engaged the online spare memory."
+            @Severity = 4
+            @Type = 1
+        case "6052":
+            # cpqHeResilientAdvancedECCMemoryEngaged
+            @AlertGroup = "MemoryError"
+            @Summary = "The Advanced Memory Protection subsystem has engaged the advanced ECC memory."
+            @Severity = 4
+            @Type = 1
+        case "6053":
+            # cpqHeResilientMemXorMemoryEngaged
+            @AlertGroup = "MemoryError"
+            @Summary = "The Advanced Memory Protection subsystem has engaged the XOR memory"
+            @Severity = 4
+            @Type = 1
+        case "6054":
+            # cpqHe3FltTolPowerRedundancyRestored
+            @AlertGroup = "PwrSupply"
+            @AlertKey = $3
+            @Summary = "The Power Supplies are now redundant on Chassis " + $3
+            @Severity = 1
+            @Type = 2
+        case "6055":
+            # cpqHe3FltTolFanRedundancyRestored
+            @AlertGroup = "FanFail"
+            @AlertKey = $3
+            @Summary = "The Fans are now redundant on Chassis " + $3
+            @Severity = 1
+            @Type = 2
+        case "6056":
+            # cpqHe4CorrMemReplaceMemModule
+            @AlertGroup = "MemoryError"
+            @AlertKey = $3 + $4
+            @Summary = "Correctable memory errors require a replacement of the memory module in slot " + $3 + ", socket " + $4
+            @Severity = 5
+            @Type = 1
+	    # Mahesh Kumar BR_679
+	    # Discard the alert as this is being picked up by ssm
+            $tempMarkForDiscard = 2
+        case "6057":
+            # cpqHeResMemBoardRemoved
+            @AlertGroup = "MemoryError"
+            @AlertKey = $3
+            @Summary = "Memory Board or Cartridge Removed from Slot " + $3
+            @Severity = 3
+            @Type = 1
+        case "6058":
+            # cpqHeResMemBoardInserted
+            @AlertGroup = "MemoryError"
+            @AlertKey = $3
+            @Summary = "Memory Board or Cartridge Inserted into Slot " + $3
+            @Severity = 1
+            @Type = 2
+        case "6059":
+            # cpqHeResMemBoardBusError
+            @AlertGroup = "MemoryError"
+            @AlertKey = $3
+            @Summary = "Memory Board or Cartridge Bus Error Detected in Slot " + $3
+            @Severity = 4
+            @Type = 1
+        case "8001":
+            # cpqSs2FanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System fan status has changed to " + $status + "."
+        case "8002":
+            # cpqSsTempFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System will be shutdown."
+        case "8003":
+            # cpqSsTempDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Temp is outside of normal range."
+        case "8004":
+            # cpqSsTempOk
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System temperature ok."
+        case "8005":
+            # cpqSsSidePanelInPlace
+            @AlertKey = "SidePanel"
+            @AlertGroup = "StorageSystem"
+            @Summary = "Side panel is re-installed on unit."
+            @Severity = 1
+            @Type = 2
+        case "8006":
+            # cpqSsSidePanelRemoved
+            @AlertKey = "SidePanel"
+            @AlertGroup = "StorageSystem"
+            @Summary = "Side panel is removed from unit."
+            @Severity = 4
+            @Type = 1
+        case "8007":
+            # cpqSsPwrSupplyDegraded
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "PSUStatus"
+            @Summary = "A storage system power supply unit has become degraded"
+            @Severity = 5
+            @Type = 1
+        case "8008":
+            # cpqSs3FanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System fan status has changed to " + $status + "."
+        case "8009":
+            # cpqSs3TempFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System will be shutdown."
+        case "8010":
+            # cpqSs3TempDegraded
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Temp is outside of normal range."
+        case "8011":
+            # cpqSs3TempOk
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $3
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System temperature ok."
+        case "8012":
+            # cpqSs3SidePanelInPlace
+            @AlertKey = "SidePanel"
+            @AlertGroup = "StorageSystem"
+            @Summary = "Side panel is re-installed on unit."
+            @Severity = 1
+            @Type = 2
+        case "8013":
+            # cpqSs3SidePanelRemoved
+            @AlertKey = "SidePanel"
+            @AlertGroup = "StorageSystem"
+            @Summary = "Side panel is removed from unit."
+            @Severity = 4
+            @Type = 1
+        case "8014":
+            # cpqSs3PwrSupplyDegraded
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "PSUStatus"
+            @Summary = "A storage system power supply unit has become degraded"
+            @Severity = 5
+            @Type = 1
+        case "8015":
+            # cpqSs4PwrSupplyDegraded
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "PSUStatus"
+            @Summary = "A storage system power supply unit has become degraded"
+            @Severity = 5
+            @Type = 1
+        case "8016":
+            # cpqSsExFanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = $5
+            @Summary = "Storage system fan " + $5 + " status has changed to " + $status + "."
+        case "8017":
+            # cpqSsExPowerSupplyStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = $5
+            @Summary = "Storage system power supply in bay " + $5 + ": status has changed to " + $status + "."
+        case "8018":
+            # cpqSsExPowerSupplyUpsStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = $5
+            @Summary = "Storage system power supply UPS status has changed to " + $status + "."
+        case "8019":
+            # cpqSsExTempSensorStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system temperature sensor status has changed to " + $status + ": current temp. " + $7 + "degrees Celsius."
+        case "8020":
+            # cpqSsEx2FanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system fan status has changed to " + $status + "."
+        case "8021":
+            # cpqSsEx2PowerSupplyStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system power supply in bay " + $5 + ": status has changed to " + $status + "."
+        case "8022":
+            # cpqSsExBackplaneFanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system fan status has changed to " + $status + "."
+        case "8023":
+            # cpqSsExBackplaneTempStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system temperature status has changed to " + $status + "."
+        case "8024":
+            # cpqSsExBackplanePowerSupplyStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system power supply status has changed to " + $status + "."
+        case "8025":
+            # cpqSsExRecoveryServerStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $6
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system recovery server option status has changed to " + $status + "."
+        case "8026":
+            # cpqSs5FanStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system fan status has changed to " + $status + "."
+        case "8027":
+            # cpqSs5TempStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system fan status has changed to " + $status + "."
+        case "8028":
+            # cpqSs5PwrSupplyStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $9
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5
+            @AlertGroup = "StorageSystem"
+            @Summary = "Storage system fan status has changed to " + $status + "."
+        case "9001":
+            # cpqSm2ServerReset
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Server reset detected."
+            @Severity = 5
+            @Type = 1
+        case "9002":
+            # cpqSm2ServerPowerOutage
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Server power outage detected."
+            @Severity = 5
+            @Type = 1
+        case "9003":
+            # cpqSm2UnauthorizedLoginAttempts
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "More than " + $3 + " unauthorized login attempts detected."
+            @Severity = 3
+            @Type = 1
+        case "9004":
+            # cpqSm2BatteryFailed
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight battery failed."
+            @Severity = 5
+            @Type = 1
+        case "9005":
+            # cpqSm2SelfTestError
+            @AlertKey = $3
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight self test error " + $3 + "."
+            @Severity = 5
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "9006":
+            # cpqSm2InterfaceError
+            @AlertKey = $1
+            @AlertGroup = "LOM"
+            @Summary = "Server " + $1 + ", Remote Insight interface error."
+            @Severity = 5
+            @Type = 1
+        case "9007":
+            # cpqSm2BatteryDisconnected
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight battery disconnected."
+            @Severity = 5
+            @Type = 1
+        case "9008":
+            # cpqSm2KeyboardCableDisconnected
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight keyboard cable disconnected."
+            @Severity = 5
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "9009":
+            # cpqSm2MouseCableDisconnected
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight mouse cable disconnected."
+            @Severity = 4
+            @Type = 1
+        case "9010":
+            # cpqSm2ExternalPowerCableDisconnected
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight external power cable disconnected."
+            @Severity = 4
+            @Type = 1
+        case "9011":
+            # cpqSm2LogsFull
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight/ Integrated Lights-Out Logs Full"
+            @Severity = 2
+            @Type = 1
+        case "9012":
+            # cpqSm2SecurityOverrideEngaged
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight/ Integrated Lights-Out firmware has detected the security override jumper has been engaged."
+            @Severity = 2
+            @Type = 1
+        case "9013":
+            # cpqSm2SecurityOverrideDisengaged
+            @AlertKey = ""
+            @AlertGroup = "LOM"
+            @Summary = "Remote Insight/ Integrated Lights-Out firmware has detected the security override jumper has been disengaged."
+            @Severity = 2
+        case "10001":
+            # cpqMeRisingAlarm
+            @AlertKey = $5 + $1 + $3 + $4
+            @AlertGroup = "Threshold"
+            @Summary =  $5 + ": Variable " + $1 + " has value " + $3 + " >= " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "10002":
+            # cpqMeFallingAlarm
+            @AlertKey = $5 + $1 + $3 + $4
+            @AlertGroup = "Threshold"
+            @Summary =  $5 + ": Variable " + $1 + " has value " + $3 + " <= " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "10003":
+            # cpqMe2RisingAlarm
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " >= " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "10004":
+            # cpqMe2FallingAlarm
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " <= " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "10005":
+            # cpqMeRisingAlarmExtended
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " >= " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "10006":
+            # cpqMeFallingAlarmExtended
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " <= " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "10007":
+            # cpqMeCriticalRisingAlarmExtended
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " <= " + $6 + "."
+            @Severity = 5
+            @Type = 1
+        case "10008":
+            # cpqMeCriticalFallingAlarmExtended
+            @AlertKey = $7 + $3 + $5 + $6
+            @AlertGroup = "Threshold"
+            @Summary =  $7 + ": Variable " + $3 + " has value " + $5 + " <= " + $6 + "."
+            @Severity = 5
+            @Type = 1
+        case "11001":
+            # cpqHoGenericTrap
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary =  $1
+            @Severity = 4
+            @Type = 1
+        case "11002":
+            # cpqHoAppErrorTrap
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary =  $1
+            @Severity = 4
+            @Type = 1
+        case "11003":
+            # cpqHo2GenericTrap
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary =  $3
+            @Severity = 4
+            @Type = 1
+        case "11004":
+            # cpqHo2AppErrorTrap
+            @AlertKey = ""
+            @AlertGroup = ""
+            @Summary =  $3
+            @Severity = 4
+            @Type = 1
+        case "11005":
+            # cpqHo2NicStatusOk
+            @AlertKey = $3
+            @AlertGroup = ""
+            @Summary = "NIC Status is OK for slot " + $3 + "."
+            @Severity = 1
+            @Type = 2
+        case "11006":
+            # cpqHo2NicStatusFailed
+            @AlertKey = $3
+            @AlertGroup = ""
+            @Summary = "NIC Status is Failed for slot " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "11007":
+            # cpqHo2NicSwitchoverOccurred
+            @AlertKey = $3 + $4
+            @AlertGroup = ""
+            @Summary = "NIC switchover to slot " + $3 + " from slot " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "11008":
+            # cpqHo2NicStatusOk2
+            @AlertKey = $3 + $4
+            @AlertGroup = ""
+            @Summary = "NIC Status is OK for slot " + $3 + ", port " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "11009":
+            # cpqHo2NicStatusFailed2
+            @AlertKey = $3 + $4
+            @AlertGroup = ""
+            @Summary = "NIC Status is Failed for slot " + $3 + ", port " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "11010":
+            # cpqHo2NicSwitchoverOccurred2
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = ""
+            @Summary = "NIC switchover to slot " + $3 + ", port " + $4 + " from slot " + $5 + ", port " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "11011":
+            # cpqHoProcessEventTrap
+            @AlertKey = ""
+            @AlertGroup = "Process"
+            @Summary =  $3
+            @Severity = 4
+            @Type = 1
+        case "11012":
+            # cpqHoProcessCountWarning
+            @AlertKey = $3
+            @AlertGroup = "Process"
+            @Summary = "Process " + $3 + " has count " + $4 + " which violates the thresholds " + $5 + " to " + $6
+            @Severity = 4
+            @Type = 1
+        case "11013":
+            # cpqHoProcessCountNormal
+            @AlertKey = $3
+            @AlertGroup = "Process"
+            @Summary = "Process " + $3 + " has count " + $4 + " which is within the thresholds " + $5 + " to " + $6
+            @Severity = 1
+            @Type = 2
+        case "12001":
+            # cpqUpsLineFailed
+            @AlertKey = $1
+            @AlertGroup = "UPS"
+            @Summary = "UPS has about " + $1 + " minutes of power left."
+            @Severity = 5
+            @Type = 1
+        case "12002":
+            # cpqUpsLineOk
+            @AlertGroup = "UPS"
+            @Summary = "UPS reports AC line power has returned."
+            @Severity = 2
+            @Type = 1
+        case "12003":
+            # cpqUpsShutdown
+            @AlertGroup = "UPS"
+            @Summary = "The UPS has initiated server shutdown."
+            @Severity = 5
+            @Type = 1
+        case "12004":
+            # cpqUpsConfirmation
+            @AlertGroup = "UPS"
+            @Summary = "Server now operational after UPS shutdown."
+            @Severity = 2
+            @Type = 1
+        case "12005":
+            # cpqUpsBatteryLow
+            @AlertGroup = "UPS"
+            @Summary = "Server will soon lose power."
+            @Severity = 5
+            @Type = 1
+        case "12006":
+            # cpqUps2LineFailed
+            @AlertKey = $3
+            @AlertGroup = "UPS"
+            @Summary = "UPS has about " + $3 + " minutes of power left."
+            @Severity = 5
+            @Type = 1
+        case "12007":
+            # cpqUps2LineOk
+            @AlertGroup = "UPS"
+            @Summary = "UPS reports AC line power has returned."
+            @Severity = 2
+            @Type = 1
+        case "12008":
+            # cpqUps2Shutdown
+            @AlertGroup = "UPS"
+            @Summary = "The UPS has initiated server shutdown."
+            @Severity = 5
+            @Type = 1
+        case "12009":
+            # cpqUps2Confirmation
+            @AlertGroup = "UPS"
+            @Summary = "Server now operational after UPS shutdown."
+            @Severity = 2
+            @Type = 1
+        case "12010":
+            # cpqUps2BatteryLow
+            @AlertGroup = "UPS"
+            @Summary = "Server will soon lose power."
+            @Severity = 5
+            @Type = 1
+        case "12011":
+            # cpqUpsOverload
+            @AlertGroup = "UPS"
+            @Summary = "The UPS has been overloaded."
+            @Severity = 5
+            @Type = 1
+        case "12012":
+            # cpqUpsPendingBatteryFailure
+            @AlertGroup = "UPS"
+            @Summary = "The UPS battery is about to fail."
+            @Severity = 5
+            @Type = 1
+        case "12013":
+            # cpqUpsGenericCritical
+            @AlertKey = $3
+            @AlertGroup = "UPS"
+            @Summary =  $3
+            @Severity = 5
+            @Type = 1
+        case "12014":
+            # cpqUpsGenericInfo
+            @AlertKey = $3
+            @AlertGroup = "UPS"
+            @Summary =  $3
+            @Severity = 2
+            @Type = 1
+        case "13001":
+            # cpqRsPartnerFailed
+            @AlertGroup = "RecoveryServer"
+            @Summary = "The partner server has failed and this server has taken over operations."
+            @Severity = 5
+            @Type = 1
+        case "13002":
+            # cpqRsStandbyCableFailure
+            @AlertGroup = "RecoveryServer"
+            @Summary = "Standby Recovery Server reports the local serial interconnect has failed."
+            @Severity = 5
+            @Type = 1
+        case "13003":
+            # cpqRsStandbyFailure
+            @AlertGroup = "RecoveryServer"
+            @Summary = "Recovery Server reports the standby server has failed."
+            @Severity = 5
+            @Type = 1
+        case "13004":
+            # cpqRsOnlineCableFailure
+            @AlertGroup = "RecoveryServer"
+            @Summary = "On-Line Recovery Server reports the local serial interconnect has failed."
+            @Severity = 5
+            @Type = 1
+        case "13005":
+            # cpqRsFailoverFailed
+            @AlertGroup = "RecoveryServer"
+            @Summary = "On-Line Recovery Server reports the failover attempt has failed."
+            @Severity = 5
+            @Type = 1
+        case "14001":
+            # cpqIdeDriveDegraded
+            @AlertKey = $3
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "IDE drive " + $3 + " has become degraded."
+            @Severity = 4
+            @Type = 1
+        case "14002":
+            # cpqIdeDriveOk
+            @AlertKey = $3
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "IDE drive " + $3 + " has returned to normal operating condition."
+            @Severity = 1
+            @Type = 2
+        case "14003":
+            # cpqIdeDriveUltraAtaDegraded
+            @AlertKey = $3
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "IDE drive " + $3 + " has detected Ultra ATA errors."
+            @Severity = 4
+            @Type = 1
+        case "14004":
+            # cpqIdeAtaDiskStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $8
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $9 + $10
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status is now " + $status + " for physical disk " + $10 + " on IDE controller " + $3 + " channel " + $9 + "."
+        case "14005":
+            # cpqIdeLogicalDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4 + $5 + $6
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Status is now " + $status + " for the logical drive " + $6 + " on IDE controller " + $5 + " in slot " + $4 + "."
+        case "16001":
+            # cpqFcaLogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $5 + " status changed to " + $status + "."
+        case "16002":
+            # cpqFcaSpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5 + $6
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive status changed to " + $status + " on bus " + $5 + ", drive bay " + $6 + "."
+        case "16003":
+            # cpqFcaPhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical drive status changed to " + $status + " on bus " + $5 + ", drive bay " + $6 + "."
+        case "16004":
+            # cpqFcaAccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator status changed to " + $status + " in slot " + $5 + "."
+        case "16005":
+            # cpqFcaAccelBadDataTrap
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator in slot " + $5 + " lost battery power.  Data Loss possible."
+            @Severity = 5
+            @Type = 1
+        case "16006":
+            # cpqFcaAccelBatteryFailed
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Battery status is failed for accelerator in slot " + $5 + "."
+            @Severity = 5
+            @Type = 1
+        case "16007":
+            # cpqFcaCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "FcaController"
+            @Summary = "Fibre channel controller " + $3 + " status changed to " + $status + "."
+        case "16008":
+            # cpqFcTapeCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "TapeController"
+            @Summary = "Tape controller " + $3 + " status changed to " + $status + "."
+        case "16009":
+            # cpqFcTapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status changed to " + $status + " for the tape library on bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "16010":
+            # cpqFcTapeLibraryDoorStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "The door is " + $status + " for the tape library on bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "16011":
+            # cpqFcTapeDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status changed to " + $status + " for the tape drive on bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "16012":
+            # cpqFcTapeDriveCleaningRequired
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning is needed for the tape drive on bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "16013":
+            # cpqFcTapeDriveCleanTapeReplace
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning tape needs replacing for the tape drive on bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "16014":
+            # cpqFcaCntlrActive
+            @AlertKey = $3 + $5
+            @AlertGroup = "FcaController"
+            @Summary = "Controller in i/o slot " + $5 + " is now active"
+            @Severity = 2
+            @Type = 1
+        case "16015":
+            # cpqFcaHostCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "FcaController"
+            @Summary = "Host controller in slot " + $3 + " has a new status of " + $status + "."
+        case "16016":
+            # cpqFca2PhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5 + $6
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status changed to " + $7 + " for a physical drive on bus " + $5 + ", bay " + $6 + "."
+        case "16017":
+            # cpqFca2AccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator status changed to " + $status + " in slot " + $5 + "."
+        case "16018":
+            # cpqFca2AccelBadDataTrap
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator in slot " + $5 + " lost battery power.  Data Loss possible."
+            @Severity = 5
+            @Type = 1
+        case "16019":
+            # cpqFca2AccelBatteryFailed
+            @AlertKey = $5
+            @AlertGroup = "Accelerator"
+            @Summary = "Battery status is failed for accelerator in slot " + $5 + "."
+            @Severity = 5
+            @Type = 1
+        case "16020":
+            # cpqFca2CntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $6
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5
+            @AlertGroup = "FcaController"
+            @Summary = "Fibre channel controller " + $5 + " status changed to " + $status + "."
+        case "16021":
+            # cpqFca2HostCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $4
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3
+            @AlertGroup = "FcaController"
+            @Summary = "Host controller in slot " + $3 + " has a new status of " + $status + "."
+        case "16022":
+            # cpqExtArrayLogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $7
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $5 + $6
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $5 + " status changed to " + $status + " in external array " + $5 + "."
+        case "16023":
+            # cpqExtTapeDriveStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Status changed to " + $status + " for the external tape drive on controller in slot " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "16024":
+            # cpqExtTapeDriveCleaningRequired
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning is needed for the external tape drive on controller in slot " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "16025":
+            # cpqExtTapeDriveCleanTapeReplace
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeDrive"
+            @Summary = "Cleaning tape needs replacing for the external tape drive on controller in slot " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 4
+            @Type = 1
+        case "16026":
+            # cpqExtTapeLibraryStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "Status changed to " + $status + " for the tape library on controller in slot " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+            @Severity = 5
+        case "16027":
+            # cpqExtTapeLibraryDoorStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $11
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $3 + $4 + $5 + $6
+            @AlertGroup = "TapeLibrary"
+            @Summary = "The door is " + $status + " for tape library on controller in slot " + $3 + ", bus " + $4 + ", ID " + $5 + ", LUN " + $6 + "."
+        case "16028":
+            # cpqFca3HostCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $5
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $4
+            @AlertGroup = "FcaController"
+            @Summary = "Host controller ID " + $4 + " (WWN " + $8 + ", port " + $9 + ") has a new status of " + $status + "."
+        case "18001":
+            # cpqNicConnectivityRestored
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            @Summary = "Connectivity is restored for adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "18002":
+            # cpqNicConnectivityLost
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            @Summary = "Connectivity lost for adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 5
+            @Type = 1
+        case "18003":
+            # cpqNicRedundancyIncreased
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            @Summary = "Redundancy increased by adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "18004":
+            # cpqNicRedundancyReduced
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            @Summary = "Redundancy decreased by adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 4
+            @Type = 1
+        case "18005":
+            # cpqNic2ConnectivityRestored
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            @Summary = "Connectivity is restored for adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "18006":
+            # cpqNic2ConnectivityLost
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            @Summary = "Connectivity lost for adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 5
+            @Type = 1
+        case "18007":
+            # cpqNic2RedundancyIncreased
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            @Summary = "Redundancy increased by adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 1
+            @Type = 2
+        case "18008":
+            # cpqNic2RedundancyReduced
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            @Summary = "Redundancy decreased by adapter in slot " + $3 + ", port " + $4 + "."
+            @Severity = 4
+            @Type = 1
+
+#	20080509	Change by ChrisJanes of Abilitec TD 4829
+        case "18011":
+#	20090921 GT  BR_701 varbinds incorrectly assigned.
+            #@AlertKey = $1 + $2
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            #@Summary = "Connectivity has been restored for the NIC in slot " + $1 + ", port " + $2
+            @Summary = "Connectivity has been restored for the NIC in slot " + $3 + ", port " + $4
+            @Severity = 2
+            @Type = 2
+
+        case "18012":
+            #@AlertKey = $1 + $2
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicConnectivity"
+            #@Summary = "Connectivity has been lost for the NIC in slot " + $1 + ", port " + $2
+            @Summary = "Connectivity has been lost for the NIC in slot " + $3 + ", port " + $4
+            @Severity = 4
+            @Type = 1
+
+        case "18013":
+            #@AlertKey = $1 + $2
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            #@Summary = "Redundancy has been increased by the NIC in slot " + $1 + ", port " + $2 + "Number of functional NIC's in the team " + $3
+            @Summary = "Redundancy has been increased by the NIC in slot " + $3 + ", port " + $4 + "Number of functional NIC's in the team " + $11
+            @Severity = 2
+            @Type = 2
+
+        case "18014":
+            #@AlertKey = $1 + $2
+            @AlertKey = $3 + $4
+            @AlertGroup = "NicRedundancy"
+            #@Summary = "Redundancy has been reduced by the NIC in slot " + $1 + ", port " + $2 + "Number of functional NIC's in the team " + $3
+            @Summary = "Redundancy has been reduced by the NIC in slot " + $3 + ", port " + $4 + "Number of functional NIC's in the team " + $11
+            @Severity = 3
+            @Type = 1
+#	20090921 GT  BR_701 end of changes.
+
+#	20080509	End of Change
+        case "22001":
+            # cpqRackNameChanged
+            @AlertKey = $3
+            @AlertGroup = "RackName"
+            @Summary = "The rack name has changed to " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        case "22002":
+            # cpqRackEnclosureNameChanged
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackName"
+            @Summary = "The enclosure name has changed to " + $5 + " in rack " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        case "22003":
+            # cpqRackEnclosureRemoved
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackStatus"
+            @Summary = "The enclosure " + $5 + " has been removed from rack " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        case "22004":
+            # cpqRackEnclosureInserted
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackStatus"
+            @Summary = "The enclosure " + $5 + " has been inserted into rack " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        case "22005":
+            # cpqRackEnclosureTempFailed
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackTemp"
+            @Summary = "The enclosure " + $5 + " temperature sensor in rack " + $3 + " has been set to failed."
+            @Severity = 5
+            @Type = 1
+        case "22006":
+            # cpqRackEnclosureTempDegraded
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackTemp"
+            @Summary = "The enclosure " + $5 + " temperature sensor in rack " + $3 + " has been set to degraded."
+            @Severity = 4
+            @Type = 1
+        case "22007":
+            # cpqRackEnclosureTempOk
+            @AlertKey = $3 + $5
+            @AlertGroup = "RackTemp"
+            @Summary = "The enclosure " + $5 + " temperature sensor in rack " + $3 + " has been set to ok."
+            @Severity = 2
+            @Type = 1
+        case "22008":
+            # cpqRackEnclosureFanFailed
+            @AlertKey = $3 + $5
+            @AlertGroup = "FanFail"
+            @Summary = "The enclosure " + $5 + " fan in rack " + $3 + " has been set to failed."
+            @Severity = 5
+            @Type = 1
+        case "22009":
+            # cpqRackEnclosureFanDegraded
+            @AlertKey = $3 + $5
+            @AlertGroup = "FanFail"
+            @Summary = "The enclosure " + $5 + " fan in rack " + $3 + " has been set to degraded."
+            @Severity = 4
+            @Type = 1
+        case "22010":
+            # cpqRackEnclosureFanOk
+            @AlertKey = $3 + $5
+            @AlertGroup = "FanFail"
+            @Summary = "The enclosure " + $5 + " fan in rack " + $3 + " has been set to ok."
+            @Severity = 2
+            @Type = 1
+        case "22011":
+            # cpqRackEnclosureFanRemoved
+            @AlertKey = $3 + $5
+            @AlertGroup = "FanFail"
+            @Summary = "The enclosure " + $5 + " fan in rack " + $3 + " has been removed."
+            @Severity = 3
+            @Type = 1
+        case "22012":
+            # cpqRackEnclosureFanInserted
+            @AlertKey = $3 + $5
+            @AlertGroup = "FanFail"
+            @Summary = "The enclosure " + $5 + " fan in rack " + $3 + " has been inserted."
+            @Severity = 2
+            @Type = 1
+        case "22013":
+            # cpqRackPowerSupplyFailed
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power supply " + $7 + " in enclosure " + $5 + " in rack " + $3 + " has been set to failed."
+            @Severity = 5
+            @Type = 1
+        case "22014":
+            # cpqRackPowerSupplyDegraded
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power supply " + $7 + " in enclosure " + $5 + " in rack " + $3 + " has been set to degraded."
+            @Severity = 4
+            @Type = 1
+        case "22015":
+            # cpqRackPowerSupplyOk
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power supply " + $7 + " in enclosure " + $5 + " in rack " + $3 + " has been set to ok."
+            @Severity = 2
+            @Type = 1
+        case "22016":
+            # cpqRackPowerSupplyRemoved
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power supply " + $7 + " in enclosure " + $5 + " in rack " + $3 + " has been removed."
+            @Severity = 3
+            @Type = 1
+        case "22017":
+            # cpqRackPowerSupplyInserted
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power supply " + $7 + " in enclosure " + $5 + " in rack " + $3 + " has been inserted."
+            @Severity = 2
+            @Type = 1
+        case "22018":
+            # cpqRackPowerSubsystemNotRedundant
+            @AlertKey = $3 + $5
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power subsystem in enclosure " + $5 + " in rack " + $3 + " is no longer redundant."
+            @Severity = 4
+            @Type = 1
+#		20070627	Changes by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+
+#       20060810        Chris Janes     Temp Change for Logging discrds
+#               log(warning, "### DISCARD ### Node > " + @Node + " Ruileset > " + $ruleset)
+#       20060810        End of Change
+#		20070627	End of Changes
+
+        case "22019":
+            # cpqRackPowerSubsystemLineVoltageProblem
+            @AlertKey = $3 + $5 + $7
+            @AlertGroup = "PwrSupply"
+            @Summary = "The rack power supply detected an input line voltage problem in power supply " + $7 + ", enclosure " + $5 + ", rack " + $3 + "."
+	    # MK - 06Aug2009
+            @Severity = 5
+            @Type = 1
+        case "22020":
+            # cpqRackPowerSubsystemOverloadCondition
+            @AlertKey = $3 + $5
+            @AlertGroup = "PwrSupply"
+            @Summary = "The power subsystem in enclosure " + $5 + " in rack " + $3 + " is in an overload condition."
+	    # MK BR_679
+            @Severity = 5
+            @Type = 1
+        case "22021":
+            # cpqRackPowerShedAutoShutdown
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "The server shutdown due to lack of power blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22022":
+            # cpqRackServerPowerOnFailedNotRedundant
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "Server power on prevented to preserve redundancy in blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22023":
+            # cpqRackServerPowerOnFailedNotEnoughPower
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "Inadequate power to power on blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22024":
+            # cpqRackServerPowerOnFailedEnclosureNotFound
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "Inadequate power to power on blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22025":
+            # cpqRackServerPowerOnFailedPowerChassisNotFound
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "Inadequate power to power on blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22026":
+            # cpqRackServerPowerOnManualOverride
+            @AlertKey = $3 + $5 + $6
+            @AlertGroup = "PwrSupply"
+            @Summary = "Server power on via manual override on blade " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22027":
+            # cpqRackFuseOpen
+            @AlertKey = $1 + $1 + $1
+            @AlertGroup = "PwrSupply"
+            @Summary = "Fuse open fuse " + $6 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22028":
+            # cpqRackServerBladeRemoved
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "BladeStatus"
+            @Summary = "Server blade " + $6 + " removed from position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22029":
+            # cpqRackServerBladeInserted
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "BladeStatus"
+            @Summary = "Server blade " + $6 + " inserted into position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22030":
+            # cpqRackPowerChassisNotLoadBalanced
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem not load balanced in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22031":
+            # cpqRackPowerChassisDcPowerProblem
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem DC power problem in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22032":
+            # cpqRackPowerChassisAcFacilityPowerExceeded
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem AC facility input power exceeded in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22033":
+            # cpqRackPowerUnknownPowerConsumption
+            @AlertKey = $3
+            @AlertGroup = "Chassis"
+            @Summary = "Unknown power consumption in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22034":
+            # cpqRackPowerChassisLoadBalancingWireMissing
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem load balancing wire missing for enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22035":
+            # cpqRackPowerChassisTooManyPowerChassis
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem has too may power enclosures " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22036":
+            # cpqRackPowerChassisConfigError
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Power subsystem has been improperly configured in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22037":
+	    # Traps 22037 - 22048 Added by N Wood 20070719
+            # cpqRackEnclosureManagerDegraded
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "The enclosure " + $5 + " manager in rack " + $3 + " has been set to degraded."
+            @Severity = 4
+            @Type = 1
+        case "22038":
+            # cpqRackEnclosureManagerOk
+            @AlertKey = $3 + $4
+            @AlertGroup = "Chassis"
+            @Summary = "The Onboard Administrator  " + $4 + ", in rack " + $3 + " has been set to ok."
+            @Severity = 2
+            @Type = 1
+        case "22039":
+            # cpqRackEnclosureManagerRemoved
+            @AlertKey = $3 + $4
+            @AlertGroup = "Chassis"
+            @Summary = "The Onboard Administrator  " + $4 + ", in rack " + $3 + " has been removed."
+            @Severity = 3
+            @Type = 1
+        case "22040":
+            # cpqRackEnclosureManagerInserted
+            @AlertKey = $3 + $4
+            @AlertGroup = "Chassis"
+            @Summary = "The Onboard Administrator  " + $4 + ", in rack " + $3 + " has been inserted."
+            @Severity = 3
+            @Type = 1
+        case "22041":
+            # cpqRackManagerPrimaryRole
+            @AlertKey = $3 + $5
+            @AlertGroup = "Chassis"
+            @Summary = "Onboard Administrator has taken the role of primary, in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22042":
+            # cpqRackServerBladeEKeyingFailed
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Server blade " + $6 + " e-keying failed in position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22043":
+            # cpqRackServerBladeEKeyingOK
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Server blade " + $6 + " e-keying is ok in position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        case "22044":
+            # cpqRackNetConnectorRemoved
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Interconnect " + $6 + " removed from position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22045":
+            # cpqRackNetConnectorRemoved
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Interconnect " + $6 + " inserted into position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 4
+            @Type = 1
+        case "22046":
+            # cpqRackNetConnectorFailed
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Interconnect " + $6 + " failed in position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22047":
+            # cpqRackNetConnectorDegraded
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Interconnect " + $6 + " degraded in position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 5
+            @Type = 1
+        case "22048":
+            # cpqRackNetConnectorOk
+            @AlertKey = $3 + $5 + $6 + $7
+            @AlertGroup = "Chassis"
+            @Summary = "Interconnect " + $6 + " ok in position " + $7 + ", in enclosure " + $5 + ", in rack " + $3 + "."
+            @Severity = 2
+            @Type = 1
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+        }
+            $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqDriveArray":
+    
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqDriveArray"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-case:N"
+        case "X" | "S" | "D":
+#		20080529	Change by Chris Janes of Abilitec TD 4851
+#	    	$cpqClassGidKey = "UNIX"
+			if(match($community, "REMAX"))
+		{
+			$cpqClassGidKey = "REMAX"
+		}
+		else if(nmatch($community, "ESX"))
+		{
+			$cpqClassGidKey = lookup(@NodeAlias, ESX_Swiss_Table)
+		}
+		else
+		{
+			$cpqClassGidKey = "UNIX"
+		}
+#		20080529	End of Change
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $ruleset = $ruleset + "-case:default"	
+            $cpqClassGidKey = ""
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " ST " + $specific-trap 
+    switch($specific-trap)
+    {
+        case "1":
+            # cpqDaLogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "StatusChange"
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Status is now " + $status + " for a logical drive."
+        case "2":
+            # cpqDaSpareStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $2
+            @AlertGroup = "SpareDrive"
+            @Summary = "Spare drive status is now " + $status + " on bus " + $2 + "."
+        case "3":
+            # cpqDaPhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Status is now " + $status + " for a physical drive on bus " + $2 + "."
+        case "4":
+            # cpqDaPhyDrvThreshPassedTrap
+            @AlertKey = $2
+            @AlertGroup = "Threshold"
+            @Summary = "Factory threshold passed for a physical drive on bus " + $2 + "."
+            @Severity = 4
+            @Type = 1
+        case "5":
+            # cpqDaAccelStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "StatusChange"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator board status is now " + $status + "."
+        case "6":
+            # cpqDaAccelBadDataTrap
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BadData"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator lost battery power.  Data Loss (" + $status + ")."
+        case "7":
+            # cpqDaAccelBatteryFailed
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "BatteryFailed"
+            @AlertGroup = "Accelerator"
+            @Summary = "Accelerator battery status is now " + $status + "."
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+    
+case "cpqHealth":
+    
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqHealth"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    
+            $ruleset = $ruleset + "-ST " + $specific-trap
+    switch($specific-trap)
+    {
+        case "1":
+            # cpqHeCorrectableMemoryError
+            @AlertKey = "Correctable"
+            @AlertGroup = "MemoryError"
+            @Summary = "Total correctable errors = " + $1 + "."
+            @Severity = 3
+            @Type = 1
+        case "2":
+            # cpqHeCorrectableMemoryLogDisabled
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $10
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = "Disabled"
+            @AlertGroup = "MemoryError"
+            @Summary = "Memory error tracking now " + $status
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = @Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqScsi":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqScsi"
+    @Agent = "Compaq"
+    #
+    # Hack to differentiate between Wintel and Linux hosts
+    #
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-compaq.rules" + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-compaq.rules" + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-compaq.rules" + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    $ruleset = $ruleset + "-ST " + $specific-trap
+    switch($specific-trap)
+    {
+        case "1":
+            # cpqScsiCntlrStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = ""
+            @AlertGroup = "SCSIController"
+            @Summary = "SCSI controller status changed to " + $status + "."
+        case "2":
+            # cpqScsiLogDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = ""
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive status changed to " + $status + "."
+        case "3":
+            # cpqScsiPhyDrvStatusChange
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertKey = ""
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical SCSI drive status changed to " + $status + "."
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+    
+case "cpqServerManager":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:1"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+             $ruleset = $ruleset + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "-ST " + $specific-trap
+
+    switch($specific-trap)
+    {
+        case "1":
+            # cpqSmBoardFailed
+            $ruleset = $ruleset + "-case:1"
+            @AlertGroup = ""
+            @Summary = "Server Manager/R board failure detected."
+            @Severity = 5
+            @Type = 1
+        case "2":
+            # cpqSmBoardReset
+            $ruleset = $ruleset + "-case:2"
+            @AlertGroup = ""
+            @Summary = "Server Manager/R board has been reset."
+            @Severity = 3
+            @Type = 1
+        case "3":
+            # cpqSmServerManagerAlert
+            $ruleset = $ruleset + "-case:3"
+            @AlertKey = $2 + $3 + $1
+            @AlertGroup = ""
+            @Summary = "The " + $2 + " - " + $3 + " = " + $1 + "."
+            @Severity = 5
+            @Type = 1
+        case "4":
+            # cpqSmCommFailed
+            $ruleset = $ruleset + "-case:4"
+            @AlertGroup = ""
+            @Summary = "Async comm failure on Server Manager/R Board."
+            @Severity = 5
+            @Type = 1
+        case "5":
+            # cpqSmBatteryFailed
+            $ruleset = $ruleset + "-case:5"
+            @AlertGroup = ""
+            @Summary = "Server Manager/R battery has failed."
+            @Severity = 4
+            @Type = 1
+        case "6":
+            # cpqSmBoardTimeout
+            $ruleset = $ruleset + "-case:6"
+            @AlertGroup = ""
+            @Summary = "Server Manager/R board is not responding."
+            @Severity = 5
+            @Type = 1
+        case "7":
+            # cpqSmAlertDestinationBlacklisted
+            $ruleset = $ruleset + "-case:7"
+            @AlertKey = $2 + $3
+            @AlertGroup = ""
+            @Summary = "Phone# " + $2 + ", Pager ID " + $3 + " blacklisted."
+            @Severity = 3
+            @Type = 1
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqCrCntlrTrap":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqCrCntlrTrap"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    switch ($specific-trap)  {
+        case "1":
+            # cpqCrController1FailureTrap
+            $ruleset = $ruleset + "-case:1"
+            @AlertKey = "Primary"
+            @AlertGroup = "ClusteredRaid"
+            @Summary = "The primary RAID controller in the subsytem has failed."
+            @Severity = 5
+            @Type = 1
+        case "2":
+            # cpqCrController1InformationTrap
+            $ruleset = $ruleset + "-case:2"
+            @AlertKey = "Primary"
+            @AlertGroup = "ClusteredRaid"
+            @Summary = "The primary RAID controller in the subsytem has recovered."
+            @Severity = 1
+            @Type = 2
+        case "3":
+            # cpqCrController2FailureTrap
+            $ruleset = $ruleset + "-case:3"
+            @AlertKey = "Secondary"
+            @AlertGroup = "ClusteredRaid"
+            @Summary = "The secondary RAID controller in the subsytem has failed."
+            @Severity = 5
+            @Type = 1
+        case "4":
+            # cpqCrController2InformationTrap
+            $ruleset = $ruleset + "-case:4"
+            @AlertKey = "Secondary"
+            @AlertGroup = "ClusteredRaid"
+            @Summary = "The secondary RAID controller in the subsytem has recovered."
+            @Severity = 1
+            @Type = 2
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqCrLogDrvTrap":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqCrLogDrvTrap"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    switch ($specific-trap)  {
+        case "5":
+            # cpqCrLogDriveInformationTrap
+            $ruleset = $ruleset + "-case:5"
+            @AlertKey = $2
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $2 + " has completed reconstruction"
+            @Severity = 1
+            @Type = 2
+        case "6":
+            # cpqCrLogDriveFailureTrap
+            $ruleset = $ruleset + "-case:6"
+            @AlertKey = $2
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $2 + " has failed"
+            @Severity = 5
+            @Type = 1
+        case "7":
+            # cpqCrLogDriveReconstructTrap
+            $ruleset = $ruleset + "-case:7"
+            @AlertKey = $2
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $2 + " has started reconstruction"
+            @Severity = 1
+            @Type = 2
+        case "8":
+            # cpqCrLogDriveReducedTrap
+            $ruleset = $ruleset + "-case:8"
+            @AlertKey = $2
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $2 + " has become degraded"
+            @Severity = 4
+            @Type = 1
+        case "9":
+            # cpqCrLogDriveInitializingTrap
+            $ruleset = $ruleset + "-case:9"
+            @AlertKey = $2
+            @AlertGroup = "LogicalDrive"
+            @Summary = "Logical drive " + $2 + " has started initialisation"
+            @Severity = 2
+            @Type = 1
+        default:
+       	    $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqCrPhyDrvTrap":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqCrPhyDrvTrap"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+        default:
+            $cpqClassGidKey = ""
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    switch ($specific-trap)  {
+        case "10":
+            # cpqCrDiskInformationTrap
+            $ruleset = $ruleset + "-case:10"
+            @AlertKey = $2 + $3
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk " + $3 + " on RAID controller " + $2 + " has recovered"
+            @Severity = 1
+            @Type = 2
+        case "11":
+            # cpqCrDiskFailureTrap
+            $ruleset = $ruleset + "-case:11"
+            @AlertKey = $2 + $3
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk " + $3 + " on RAID controller " + $2 + " has failed"
+            @Severity = 5
+            @Type = 1
+        case "12":
+            # cpqCrDiskReconstructTrap
+            $ruleset = $ruleset + "-case:12"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk " + $2 + " has begun reconstruction"
+            @Severity = 2
+            @Type = 1
+        case "13":
+            # cpqCrDiskAvailableTrap
+            $ruleset = $ruleset + "-case:13"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk " + $2 + " is available for use"
+            @Severity = 1
+            @Type = 2
+        case "14":
+            # cpqCrDiskSpareTrap
+            $ruleset = $ruleset + "-case:14"
+            @AlertKey = $2
+            @AlertGroup = "SpareDrive"
+            @Summary = "Physical disk " + $2 + " has been made a spare"
+            @Severity = 2
+            @Type = 1
+        case "30":
+            # cpqCrPhyDiskInformationTrap
+            $ruleset = $ruleset + "-case:30"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk (SCSI ID " + $2 + ") has recovered"
+            @Severity = 1
+            @Type = 2
+        case "31":
+            # cpqCrPhyDiskFailureTrap
+            $ruleset = $ruleset + "-case:31"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk (SCSI ID " + $2 + ") has failed"
+            @Severity = 5
+            @Type = 1
+        case "32":
+            # cpqCrPhyDiskReconstructTrap
+            $ruleset = $ruleset + "-case:32"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk (SCSI ID " + $2 + ") has begun reconstruction"
+            @Severity = 2
+            @Type = 1
+        case "33":
+            # cpqCrPhyDiskAvailableTrap
+            $ruleset = $ruleset + "-case:33"
+            @AlertKey = $2
+            @AlertGroup = "PhysicalDrive"
+            @Summary = "Physical disk (SCSI ID " + $2 + ") is available for use"
+            @Severity = 1
+            @Type = 2
+        case "34":
+            # cpqCrPhyDiskSpareTrap
+            $ruleset = $ruleset + "-case:34"
+            @AlertKey = $2
+            @AlertGroup = "SpareDrive"
+            @Summary = "Physical disk (SCSI ID " + $2 + ") has been made a spare"
+            @Severity = 2
+            @Type = 1
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqCrEMUTrap":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqCrEMUTrap"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $cpqClassGidKey = "WINTEL"
+            $ruleset = $ruleset + "-case:N"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X"
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default"
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    
+    switch ($specific-trap)  {
+        case "15":
+            # cpqCrEMUNormalTrap
+            $ruleset = $ruleset + "-case:15"
+            @AlertKey = "StatusChange"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "Primary enclosure status has returned to normal."
+            @Severity = 1
+            @Type = 2
+        case "16":
+            # cpqCrEMUFanFailureTrap
+            $ruleset = $ruleset + "-case:16"
+            @AlertKey = "FanFail"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "One of the cooling fans in the primary enclosure has failed."
+            @Severity = 4
+            @Type = 1
+        case "17":
+            # cpqCrEMUFanInformationTrap
+            $ruleset = $ruleset + "-case:17"
+            @AlertKey = "FanFail"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "The cooling fan in the primary enclosure has recovered."
+            @Severity = 1
+            @Type = 2
+        case "18":
+            # cpqCrEMUPowerSupplyFailureTrap
+            $ruleset = $ruleset + "-case:18"
+            @AlertKey = "PSUFail"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "One of the power supplies in the primary enclosure has failed."
+            @Severity = 5
+            @Type = 1
+        case "19":
+            # cpqCrEMUPowerSupplyInformationTrap
+            $ruleset = $ruleset + "-case:19"
+            @AlertKey = "PSUFail"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "The power supply in the primary enclosure has recovered."
+            @Severity = 1
+            @Type = 2
+        case "23":
+            # cpqCrEMUTemperatureWarningTrap
+            $ruleset = $ruleset + "-case:23"
+            @AlertKey = "TempChange"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "The temperature in the primary enclosure has triggered a warning condition detected by the controller."
+            @Severity = 4
+            @Type = 1
+        case "24":
+            # cpqCrEMUTemperatureCriticalTrap
+            $ruleset = $ruleset + "-case:24"
+            @AlertKey = "TempChange"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "The temperature in the primary enclosure has triggered a critical condition detected by the controller."
+            @Severity = 5
+            @Type = 1
+        case "25":
+            # cpqCrEMUTemperatureInformationTrap
+            $ruleset = $ruleset + "-case:25"
+            @AlertKey = "TempChange"
+            @AlertGroup = "PrimaryEnclosure"
+            @Summary = "The temperature in the primary enclosure has returned to normal."
+            @Severity = 1
+            @Type = 2
+        default:
+            $ruleset = $ruleset + "-case:default"  	
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+  
+case "cpqCrExpCabTrap":
+
+    $ruleset = $ruleset + "compaq.rules" + "-case:cpqCrExpCabTrap"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $ruleset = $ruleset + "-case:N"
+            $cpqClassGidKey = "WINTEL"
+        case "X" | "S":
+            $ruleset = $ruleset + "-case:X"
+            $cpqClassGidKey = "UNIX"
+        default:
+            $cpqClassGidKey = ""
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    switch ($specific-trap)  {
+        case "20":
+            # cpqCrExpCabFanFailureTrap
+            $ruleset = $ruleset + "-case:20"
+            @AlertKey = "FanFail"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "One of the cooling fans in the expansion cabinet has failed."
+            @Severity = 4
+            @Type = 1
+        case "21":
+            # cpqCrExpCabFanInformationTrap
+            $ruleset = $ruleset + "-case:21"
+            $ruleset = $ruleset + "case-21"
+            @AlertKey = "FanFail"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "A cooling fan in the expansion cabinet has returned to a normal state."
+            @Severity = 1
+            @Type = 2
+        case "22":
+            # cpqCrExpCabPowerSupplyFailureTrap
+            $ruleset = $ruleset + "-case:22"
+            @AlertKey = "PSUFail"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "One of the power supplies in the expansion cabinet has failed."
+            @Severity = 5
+            @Type = 1
+        case "26":
+            # cpqCrExpCabTemperatureWarningTrap
+            $ruleset = $ruleset + "-case:26"
+            @AlertKey = "TempChange"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "The temperature in the expansion cabinet has triggered a warning condition detected by the controller."
+            @Severity = 4
+            @Type = 1
+        case "27":
+            # cpqCrExpCabTemperatureCriticalTrap
+            $ruleset = $ruleset + "-case:27"
+            @AlertKey = "TempChange"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "The temperature in the expansion cabinet has triggered a critical condition detected by the controller."
+            @Severity = 5
+            @Type = 1
+        case "28":
+            # cpqCrExpCabTemperatureInformationTrap
+            $ruleset = $ruleset + "-case:28"
+            @AlertKey = "TempChange"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "The temperature in the expansion cabinet has returned to normal."
+            @Severity = 1
+            @Type = 2
+        case "29":
+            # cpqCrExpCabPowerSupplyInformationTrap
+            $ruleset = $ruleset + "-case:29"
+            @AlertKey = "PSUFail"
+            @AlertGroup = "ExternalEnclosure"
+            @Summary = "The power supply in the expansion cabinet has recovered."
+            @Severity = 1
+            @Type = 2
+        default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "cpqSsStorageSys":
+
+    $ruleset = $ruleset + "-compaq.rules" + "-case:cpqSsStorageSys"
+    @Agent = "Compaq"
+    $osType = substr($1, 1, 1)
+    switch (upper($osType))  {
+        case "N":
+            $ruleset = $ruleset + "-case:N" 
+            $cpqClassGidKey = "WINTEL"
+        case "X" | "S":
+            $cpqClassGidKey = "UNIX"
+            $ruleset = $ruleset + "-case:X" 
+        default:
+            $cpqClassGidKey = ""
+            $ruleset = $ruleset + "-case:default" 
+    }
+    [@Class, @OwnerGID] = lookup($cpqClassGidKey, MttrapdClassGID)
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    switch ($specific-trap)  {
+        case "1":
+            # cpqSsFanStatusChange
+            $ruleset = $ruleset + "-case:1" 
+            $trapKey = $enterprise-name + ":" + $specific-trap + ":" + $1
+            [$status, @Severity, @Type] = lookup($trapKey, cpqSevMap)
+            @AlertGroup = "StorageSystem"
+            @AlertKey = "FanStatus"
+            @Summary = "Storage System fan status changed to " + $status + "."
+         default:
+            $ruleset = $ruleset + "-case:default" 
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+

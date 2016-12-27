@@ -1,0 +1,197 @@
+<HEAD>
+<LINK REL="stylesheet" HREF="/css/mm.css" TYPE="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="/css/usertools/main.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/globaltoolbar.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/globalnavigation.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/localtoolbar.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/localnavigation.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/0,12807,,00.css" />
+<link rel="stylesheet" type="text/css" href="/css/usertools/0,12880,,00.css" />
+</head>
+<body bgcolor=#FFFFFF>
+<script language="javascript" type="text/javascript">
+function check()
+{
+        var textstring = '';
+	box = document.form.REQUESTOR;
+        if(!box.value)
+        {
+                alert('Your Name is required');
+                box.focus();
+                return;
+        }
+        textstring += box.name + ': ' + box.value + '\n';
+
+	box = document.form.REQUESTOR_EMAIL;
+       	if(!box.value)
+	{
+               	alert('Your E-mail Address is required');
+                box.focus();
+                return;
+        }
+        else
+	{
+              	if(box.value.search('@ubs.com')==-1)
+		{
+                       	alert('"@ubs.com" is missing in Your E-mail Address');
+                        box.focus();
+	                return;
+               	}
+	}
+        textstring += box.name + ': ' + box.value + '\n';
+
+	document.form.output.value = '';
+}
+
+function ajax_getUserDetails(){
+        var xmlHttp=GetXmlHttpObject();
+        if (xmlHttp==null)  {
+                alert ("Your browser does not support AJAX!");
+                return;
+        }
+        xmlHttp.onreadystatechange=function() {
+                if(xmlHttp.readyState==0) {//The request in inot initialized
+                }
+                if(xmlHttp.readyState==1) {//the Request has been set up
+                }
+                if(xmlHttp.readyState==2) {//the request has been sent
+                }
+                if(xmlHttp.readyState==3) {//the request is in process
+                }
+                if(xmlHttp.readyState==4) {//The request is complete
+                //      alert(xmlHttp.getAllResponseHeaders());
+                        document.form.REQUESTOR.value=xmlHttp.getResponseHeader('SSO_GIVENNAME')+' ' + xmlHttp.getResponseHeader('SSO_SURNAME');
+                        document.form.REQUESTOR_EMAIL.value=xmlHttp.getResponseHeader('SSO_EMAIL');
+                }
+        }
+        var url="/admintools/ldapPopulate/findLineMgrEmail.jsp";
+
+        xmlHttp.open("GET",url,true);
+        xmlHttp.send(null);
+
+}
+function ajax_getUserDetailsByUser(user, num){
+        var xmlHttp=GetXmlHttpObject();
+        if (xmlHttp==null)  {
+                alert ("Your browser does not support AJAX!");
+                return;
+        }
+        xmlHttp.onreadystatechange=function() {
+                if(xmlHttp.readyState==0) {//The request in inot initialized
+                }
+                if(xmlHttp.readyState==1) {//the Request has been set up
+                }
+                if(xmlHttp.readyState==2) {//the request has been sent
+                }
+                if(xmlHttp.readyState==3) {//the request is in process
+                }
+                if(xmlHttp.readyState==4) {//The request is complete
+                     // alert(xmlHttp.getAllResponseHeaders());
+                        if(num == 1){
+                                document.form.FullName1.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr1.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 2){
+                                document.form.FullName2.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr2.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 3){
+                                document.form.FullName3.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr3.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 4){
+                                document.form.FullName4.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr4.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 5){
+                                document.form.FullName5.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr5.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        } else if(num == 6){
+                                document.form.FullName6.value=xmlHttp.getResponseHeader('SSO_Full_Name');
+                                document.form.LineMgr6.value=xmlHttp.getResponseHeader('SSO_LINE_MANAGER_EMAIL');
+                        }
+
+
+                }
+        }
+        var url="/admintools/ldapPopulate/findLineMgrEmail.jsp";
+        url=url+"?user="+user;
+
+        xmlHttp.open("GET",url,true);
+        xmlHttp.send(null);
+
+}
+function GetXmlHttpObject(){
+        var xmlHttp=null;
+        try  {
+                // Firefox, Opera 8.0+, Safari
+                xmlHttp=new XMLHttpRequest();
+        }
+        catch (e)  {
+                // Internet Explorer
+                  try    {
+                        xmlHttp=new ActiveXObject("Msxml2.XMLHTTP");
+                  }
+                  catch (e)    {
+                        xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+                  }
+        }
+        return xmlHttp;
+}
+
+</SCRIPT>
+<table class=floating cellSpacing=1 cellPadding=2 width=800 border=0>
+<TBODY>
+<TR>
+        <TD style="FONT-SIZE: 13px" width="1%" bgColor=#003366>&nbsp;<DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+        <TD style="FONT-SIZE: 13px" width="99%" bgColor=#003366><FONT face=Arial,Helvetica,sans-serif color=#ffffff size=2>&nbsp;<SPAN class=strong><Strong>Netcool New Application Monitoring Request</Strong></SPAN> </FONT><DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+</TR>
+<TR>
+        <TD style="FONT-SIZE: 13px" bgColor=#d6e0eb>&nbsp; <DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+        <TD style="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2>This form is designed for requesting setup for the monitoring of a new application.</FONT><DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+</TR>
+</TBODY>
+</table>
+<FORM name=form action=http://monitoring.swissbank.com/cgi-bin/adoption/Adoption_Request.cgi method=post>
+<table class=floating cellSpacing=1 cellPadding=2 width=800 border=0>
+<TR>
+	<TD style="FONT-SIZE: 13px" width="1%" bgColor=#d6e0eb>&nbsp; <DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+        <TD style="FONT-SIZE: 13px" bgColor=#ebf5ff width=240><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><Strong>Enter Details</Strong></FONT><DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></td>
+	<TD style="FONT-SIZE: 13px" bgColor=#ebf5ff></TD>
+</TR>
+<TR>
+	<TD style="FONT-SIZE: 13px" width="1%" bgColor=#d6e0eb>&nbsp; <DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+	<TD style="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><STRONG>Requestor Name :</STRONG></FONT><DIV style="POSITION: relative"></TD>
+	<TD align=left bgColor=#ebf5ff border=3><INPUT type="text" name=REQUESTOR size=25></TD>
+<TR>
+	<TD style="FONT-SIZE: 13px" width="1%" bgColor=#d6e0eb>&nbsp; <DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+	<TD style="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><STRONG>Requestor Email Address :</STRONG></FONT><DIV style="POSITION: relative"></TD>
+	<TD align=left bgColor=#ebf5ff border=3><INPUT type="text" name=REQUESTOR_EMAIL size=25></TD>
+</TR>
+<TR>
+	<TD style="FONT-SIZE: 13px" width="1%" bgColor=#d6e0eb>&nbsp; <DIV style="POSITION: relative"><IMG height=1 src="/images/0.gif" width=1></DIV></TD>
+	<TD style="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><STRONG>Application ID from CMDB / iSAC</STRONG></FONT><DIV style="POSITION: relative"></TD>
+	<TD align=left bgColor=#ebf5ff border=3><INPUT type="text" name=APP_REF size=25><INPUT type="radio" name="APP_REF_SOURCE" value="1" Checked>CMDB<INPUT type="radio" name="APP_REF_SOURCE" value="2">iSAC<INPUT type="radio" name="APP_REF_SOURCE" value="0">Other</TD>
+</TR>
+</TABLE>
+<P align=center><INPUT type=submit value="Submit Request">  </P>
+</FORM>
+<table class=floating cellSpacing=1 cellPadding=2 width=800 border=0>
+<TBODY>
+<TR><TD><BR></TD></TR>
+<TR><TD><BR></TD></TR>
+<TR>
+</TR>
+<TR>
+<TDstyle="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><STRONG> 
+<A HREF="https://bw.inventories.it.ubs.com/inventory/component/quickSearch.do" TARGET=_blank >Click here to find your i-SAC Reference </A></TD>
+</TR>
+<TR>
+<TDstyle="FONT-SIZE: 13px" bgColor=#ebf5ff><FONT face=Arial,Helvetica,sans-serif color=#000000 size=2><STRONG> 
+<A HREF="http://nldn9766pap.ldn.swissbank.com/CMDB_Reports/Home.aspx" TARGET=_blank >Click here to find your CMDB Reference </A></TD>
+</TR>
+</TABLE>
+
+<script>
+//call after page loaded
+window.onload=ajax_getUserDetails() ; 
+</script>
+</body>
+</html>

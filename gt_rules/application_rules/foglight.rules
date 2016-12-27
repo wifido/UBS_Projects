@@ -1,0 +1,4156 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2002 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    quest-foglight.include.rules 1.0 2002/10/15 Robert Cowart
+#
+###############################################################################
+#
+# 1.0 - Initial Release.  Complies with the Micromuse Rules File Standards
+#       (MUSE-STD-RF-02, July 2002)
+#
+# 2.0 - Modified by David Butler, Abilitec, 05/05/2005 for UBS
+#
+###############################################################################
+case "Foglight AIX_DiskIO": ### Quest Foglight AIX Disk IO Agent - Notifications from QUEST_SOFTWARE-MIB
+    @Agent = "Quest-Foglight AIX Disk IO Agent"
+    $ruleset = $ruleset + "Foglight AIX Disk"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgAIX_DiskIOTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight AIX_System": ### Quest Foglight AIX System - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Foglight AIX Sys"
+    @Agent = "Quest-Foglight AIX System"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+    #20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+    #    @OwnerGID = 66
+        @OwnerGID=lookup(@Subclass,foglight_subclass)  
+    #20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgAIX_SystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight ApacheServer": ### Quest Foglight Apache Server Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Apache Svr"
+    @Agent = "Quest-Foglight Apache Server Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#   @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgApacheSvrTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+            case "0": ### clear
+                @Severity = 1
+                @Type = 2
+            case "1": ### informational
+                @Severity = 3
+                @Type = 1
+            @ExpireTime = 900
+            case "2": ### warning
+                @Severity = 3
+                @Type = 1
+            case "3": ### critical
+                @Severity = 4
+                @Type = 1
+            case "4": ### fatal
+                @Severity = 5
+                @Type = 1
+            default:
+                @Severity = 3
+                @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Application Monitor": ### Quest Foglight Application Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight App Mon"
+    @Agent = "Quest-Foglight Application Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    #Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgAppMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight DiskIO": ### Quest Foglight Disk IO Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Disk IO" 
+    @Agent = "Quest-Foglight Disk IO Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+        #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgDiskIOTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight File System": ### Quest Foglight File System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Foglight File Sys" 
+    @Agent = "Quest-Foglight File System Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgFileSystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight HPUX Console": ### Quest Foglight HPUX Console Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " HPUX Console" 
+    @Agent = "Quest-Foglight HPUX Console Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgHPUX_ConsoleTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight HPUX DiskIO": ### Quest Foglight HPUX Disk IO Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Foglight HPUX Disk" 
+    @Agent = "Quest-Foglight HPUX Disk IO Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgHPUX_DiskIOTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight HPUX System": ### Quest Foglight HPUX System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight  HPUX " 
+    @Agent = "Quest-Foglight HPUX System Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgHPUX_SystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Linux DiskIO": ### Quest Foglight Linux Disk IO Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Linux Dsk IO" 
+    @Agent = "Quest-Foglight Linux Disk IO Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgLinux_DiskIOTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Linux System": ### Quest Foglight Linux System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Linux Sys" 
+    @Agent = "Quest-Foglight Linux System Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgLinux_SystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Log Filter": ### Quest Foglight Log Filter Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "foglight Log Filter" 
+    @Agent = "Quest-Foglight Log Filter Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgLogFilterTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight MIB II": ### Quest Foglight MIB-II Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Fogligh MIB-II" 
+    @Agent = "Quest-Foglight MIB-II Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+    	#@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgMIBIITrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight NFS Server": ### Quest Foglight NFS Server Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight NFS Svr" 
+    @Agent = "Quest-Foglight NFS Server Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNFSServerTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Network Card": ### Quest Foglight NIC Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight NIC" 
+    @Agent = "Quest-Foglight NIC Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}
+    	#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNICTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight NT Internet Information Services": ### Quest Foglight NT IIS Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Foglight IIS" 
+    @Agent = "Quest-Foglight NT IIS Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNT_IISTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SQL Server": ### Quest Foglight NT SQL Server Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight SQL Svr" 
+    @Agent = "Quest-Foglight NT SQL Server Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+#20051114  HDLDN0000139865
+#   @Class = 1057334
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNT_SQLServerTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight NT System": ### Quest Foglight NT System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight NT System" 
+    @Agent = "Quest-Foglight NT System Agent"
+ #20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    #@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNT_SystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Network Monitor": ### Quest Foglight Network Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Network Mon" 
+    @Agent = "Quest-Foglight Network Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass) #20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNetMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Netscape Server": ### Quest Foglight Netscape Server Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Netscape" 
+    @Agent = "Quest-Foglight Netscape Server Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    #@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNetscapeSvrTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Oracle 7": ### Quest Foglight Oracle 7 Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Oracle7" 
+    @Agent = "Quest-Foglight Oracle 7 Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	@Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    #@Class = 40276
+    @Stream = $community
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgOracle7Trap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Oracle 8": ### Quest Foglight Oracle 8 Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight Oracle8" 
+    @Agent = "Quest-Foglight Oracle 8 Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgOracle8Trap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Oracle Monitor": ### Quest Foglight Oracle Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Oracle Monitor" 
+    @Agent = "Quest-Foglight Oracle Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgOracleMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Oracle Log Monitor": ### Quest Foglight Oracle Log Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Oracle Log" 
+    @Agent = "Quest-Foglight Oracle Log Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgOracle_Log_MonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Peoplesoft AS Monitor": ### Quest Foglight PSAS Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight PSAS" 
+    @Agent = "Quest-Foglight PSAS Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgPSASMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Peoplesoft Domain": ### Quest Foglight PS Domain Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight PS Domain" 
+    @Agent = "Quest-Foglight PS Domain Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865    
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgPS_DomainTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Peoplesoft Scheduler": ### Quest Foglight PS Scheduler Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight PS Sched" 
+    @Agent = "Quest-Foglight PS Scheduler Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgPS_SchedulerTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight PeopleBot": ### Quest Foglight PeopleBot Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "Foglight PeopleBot" 
+    @Agent = "Quest-Foglight PeopleBot Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgPeopleBotTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Process": ### Quest Foglight Process Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset +  "Foglight Process" 
+    @Agent = "Quest-Foglight Process Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+         	@Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+                @Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgProcessTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SNMP Listener": ### Quest Foglight SNMP Listener Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + ":SNMP Listener Agent" 
+    @Agent = "Quest-Foglight SNMP Listener Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+                @Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSNMP_ListenerTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SNMP PrintStat": ### Quest Foglight SNMP Printer Statistics Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:SNMP Printer Statistics Agent" 
+    @Agent = "Quest-Foglight SNMP Printer Statistics Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSNMP_PrintStatTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sun Console": ### Quest Foglight Sun Console Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case: Sun Console Agent" 
+    @Agent = "Quest-Foglight Sun Console Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSun_ConsoleTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sun DiskIO": ### Quest Foglight Sun Disk IO Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Sun Disk IO Agent" 
+    @Agent = "Quest-Foglight Sun Disk IO Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSun_DiskIOTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sun MP Status": ### Quest Foglight Sun MP Statistics Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + " Sun MP Statistics Agent" 
+    @Agent = "Quest-Foglight Sun MP Statistics Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSun_MPStatTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sun System": ### Quest Foglight Sun System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Sun System Agent" 
+    @Agent = "Quest-Foglight Sun System Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSun_SystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sun TCP": ### Quest Foglight Sun TCP Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Sun TCP Agent" 
+    @Agent = "Quest-Foglight Sun TCP Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    @Stream = $community
+    #@Class = 40276
+#20051114  HDLDN0000139865  
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSun_TCPTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Sybase": ### Quest Foglight Sybase Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "foglight:Sybase Agent"
+    @Agent = "Quest-Foglight Sybase Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+    	{
+        	@Class = extract($community,"(^[0-9]+):.*$")
+     	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+    	}
+    else 
+    	{
+    		@Class = 40276
+		#test purposes only
+		@Subclass = 99999
+    	}
+    @Stream = $community
+#20051114  HDLDN0000139865      
+    #20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+    #    @OwnerGID = 66
+        @OwnerGID=lookup(@Subclass,foglight_subclass)  
+    #20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSybaseTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight System": ### Quest Foglight System Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-foglight.rule" + "-case:System Agent" 
+    @Agent = "Quest-Foglight System Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+     }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSystemTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight TransBot": ### Quest Foglight Transaction Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Transaction Agent" 
+    @Agent = "Quest-Foglight Transaction Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        	@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+         	}    
+    	#@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgTransBotTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight User": ### Quest Foglight User Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:User Agent" 
+    @Agent = "Quest-Foglight User Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+       	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+       		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+        	}
+    	#@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgUserTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Web Monitor": ### Quest Foglight Web Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Web Monitor Agent" 
+    @Agent = "Quest-Foglight Web Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgWebMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+     switch ($specific-trap)
+     {
+         case "0": ### clear
+             @Severity = 1
+             @Type = 2
+         case "1": ### informational
+             @Severity = 3
+             @Type = 1
+             @ExpireTime = 900
+         case "2": ### warning
+             @Severity = 3
+             @Type = 1
+         case "3": ### critical
+             @Severity = 4
+             @Type = 1
+         case "4": ### fatal
+             @Severity = 5
+             @Type = 1
+         default:
+             @Severity = 3
+             @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight NT_RTM Agent": ### Quest Foglight NT RTM Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:NT RTM Agent" 
+    @Agent = "Quest-Foglight NT RTM Agent"
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    #20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+    #@Class = 40276
+    #20051114  HDLDN0000139865      
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNT_RTMTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Network Services": ### Quest Foglight Network Services Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Network Services Agent"
+    @Agent = "Quest-Foglight Network Services Agent"
+    #20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            	{
+                	@Class = extract($community,"(^[0-9]+):.*$")
+             	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+            	}
+            else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+    #@Class = 40276
+    #20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgNetwork_ServicesTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Oracle": ### Quest Foglight Oracle Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Oracle Agent" 
+    @Agent = "Quest-Foglight Oracle Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            	@Class = extract($community,"(^[0-9]+):.*$")
+       	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+       		@Class = 40276
+    		#test purposes only
+    		@Subclass = 99999
+    	}    
+#@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgOracleTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight RStat": ### Quest Foglight RStat Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight RStat Agent" 
+    @Agent = "Quest-Foglight RStat Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+                @Class = extract($community,"(^[0-9]+):.*$")
+             	@Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+            else 
+            {
+        	@Class = 40276
+                #test purposes only
+        	@Subclass = 99999
+    	    } 
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgRStatTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SAP": ### Quest Foglight SAP Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight SAP Agent" 
+    @Agent = "Quest-Foglight SAP Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+                @Class = extract($community,"(^[0-9]+):.*$")
+             	@Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+            else 
+            {
+            	@Class = 40276
+        	#test purposes only
+        	@Subclass = 99999
+    	    }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSAPTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SMTP": ### Quest Foglight SMTP Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight SMTP Agent" 
+    @Agent = "Quest-Foglight SMTP Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+         	@Class = extract($community,"(^[0-9]+):.*$")
+             	@Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+            else 
+            {
+            	@Class = 40276
+        	#test purposes only
+        	@Subclass = 99999
+    	    }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSMTPTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight SiebelBot Monitor": ### Quest Foglight Siebel Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Siebel Agent" 
+    @Agent = "Quest-Foglight Siebel Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+                  @Class = extract($community,"(^[0-9]+):.*$")
+                  @Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+            else 
+            {
+                  @Class = 40276
+        	  #test purposes only
+        	  @Subclass = 99999
+    	    }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSiebelBotTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Siebel Log Monitor": ### Quest Foglight Siebel Log Monitor Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Siebel Log Monitor Agent" 
+    @Agent = "Quest-Foglight Siebel Log Monitor Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+             {
+              @Class = extract($community,"(^[0-9]+):.*$")
+              @Subclass = extract($community,"^[0-9]+:(.*$)")
+             }
+        else 
+             {
+              @Class = 40276
+              #test purposes only
+              @Subclass = 99999
+    	     }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+ #20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+ #    @OwnerGID = 66
+     @OwnerGID=lookup(@Subclass,foglight_subclass)  
+ #20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSiebelLogMonitorTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Siebel SQL User Monitor": ### Quest Foglight Siebel SQL User Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Siebel SQL User Agent" 
+    @Agent = "Quest-Foglight Siebel SQL User Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+           {
+                 @Class = extract($community,"(^[0-9]+):.*$")
+             	 @Subclass = extract($community,"^[0-9]+:(.*$)")
+           }
+        else 
+           {
+                 @Class = 40276
+        	 #test purposes only
+        	 @Subclass = 99999
+    	   }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgSiebelSQLUserTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Terminal Server": ### Quest Foglight Terminal Server Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "foglight.rules" + "-case:Foglight Terminal Server Agent" 
+    @Agent = "Quest-Foglight Terminal Server Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+           {
+              	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+           }
+            else 
+           {
+        	@Class = 40276
+        	#test purposes only
+        	@Subclass = 99999
+           }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgTerminalServerTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Unix Accounting": ### Quest Foglight Unix Accounting Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Unix Accounting Agent" 
+    @Agent = "Quest-Foglight Unix Accounting Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+           	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+            else 
+            {
+          	@Class = 40276
+        	#test purposes only
+        	@Subclass = 99999
+    	    }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgUnix_AccountingTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+case "Foglight Web Logic Monitor": ### Quest Foglight WebLogic Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight WebLogic Agent" 
+    @Agent = "Quest-Foglight WebLogic Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+            {
+                 @Class = extract($community,"(^[0-9]+):.*$")
+                 @Subclass = extract($community,"^[0-9]+:(.*$)")
+            }
+        else 
+            {
+            	@Class = 40276
+        	#test purposes only
+        	@Subclass = 99999
+    	    }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgWebLogicTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+
+
+case "Foglight Custom Agent": ### Quest Foglight Custom Agent - Notifications from QUEST_SOFTWARE-MIB
+
+    $ruleset = $ruleset + "-case:Foglight Custom Agent" 
+    @Agent = "Quest-Foglight Custom Agent"
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+        if (regmatch($community,"^[0-9]+:.*$"))
+           {
+           	@Class = extract($community,"(^[0-9]+):.*$")
+                @Subclass = extract($community,"^[0-9]+:(.*$)")
+           }
+           else 
+           {
+           	@Class = 40276
+           	#test purposes only
+        	@Subclass = 99999
+    	   }
+    #@Class = 40276
+#20051114  HDLDN0000139865      
+#20051202 Simon Waller Abilitec sets the ownergid relating to subclass
+#    @OwnerGID = 66
+    @OwnerGID=lookup(@Subclass,foglight_subclass)  
+#20051202
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    ##########
+    # fgCustomTrap
+    #
+    # This trap is sent when an error occurs for this agent. The trap will
+    # always have a generic type of 6. Specific types are defined by the
+    # severity of these events. These specific types are defined as:
+    #
+    #     clear(0) - Clears any events for this object
+    #     informational(1) - Informational message
+    #     warning(2) - Warning message
+    #     critical(3) - Critical message
+    #     fatal(4) - Fatal message
+    #
+    # $1 = fgAgentMsg - A textual description of the event. It is mandatory
+    #        that this only contain printable ASCII characters.
+    # $2 = fgAgentIdString - A textual string which uniquely identifies an
+    #        entity monitored by the Foglight agent. It is mandatory that this
+    #        only contain printable ASCII characters.
+    ##########
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertGroup = $enterprise-name
+    @AlertKey = $2
+    @Summary = $1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+
+    if (nmatch($fgAgentIdString, "SQLServer")) {  ## different class if SQL Server
+#20051114 Simon Waller Abilitec HDLDN0000139865 Sets the new class and subclass from $Community
+     if (regmatch($community,"^[0-9]+:.*$"))
+        {
+          @Class = extract($community,"(^[0-9]+):.*$")
+          @Subclass = extract($community,"^[0-9]+:(.*$)")
+        }
+        else 
+            	{
+            		@Class = 40276
+        		#test purposes only
+        		@Subclass = 99999
+    	}
+    #	@Class = 1057334
+#20051114  HDLDN0000139865
+    }
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+

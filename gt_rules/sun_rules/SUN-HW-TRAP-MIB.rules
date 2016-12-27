@@ -1,0 +1,1810 @@
+###############################################################################
+#
+#	SUN-HW-TRAP-MIB.rules
+#	Rulesfile based SUN-HW-TRAP-MIB
+#
+#	20080213	Chris Janes	Original
+#
+###############################################################################
+case "sunHwTraps":
+
+
+@Agent = "SUN-HW-TRAP-MIB"
+$ruleset = $ruleset + " " + @Agent
+@Class = 999996
+
+#################################################################################
+#
+#	20080213	Following section Added for development only
+
+@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6 + " $7 = " + $7 + " $8 = " + $8 + " $9 = " + $9 + " $10 = " + $10 
+
+#
+#
+#################################################################################
+
+$ruleset = $ruleset + " " + $specific-trap
+switch($specific-trap) 
+	{
+		case "1": ### - sunHwTrapVoltageFatalThresholdExceeded
+			#######################
+			# A voltage sensor has reported that its value has gone above an upper
+			# fatal threshold setting or below a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+			$SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@AlertGroup = "Fatal Voltage"
+			@UserData = $sunHwTrapAdditionalInfo
+
+			$sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "2": ### - sunHwTrapVoltageFatalThresholdDeasserted
+			#######################
+			# A voltage sensor has reported that its value has gone below an upper
+			# fatal threshold setting or above a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Voltage"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+
+			
+
+		case "3": ### - sunHwTrapVoltageCritThresholdExceeded
+			#######################
+			# A voltage sensor has reported that its value has gone above an upper
+			# critical threshold setting or below a lower critical threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Voltage"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+
+
+			
+
+		case "4": ### - sunHwTrapVoltageCritThresholdDeasserted
+			#######################
+			# A voltage sensor has reported that its value has gone below an upper
+			# critical threshold setting or above a lower critical threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Voltage"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+
+
+			
+
+		case "5": ### - sunHwTrapVoltageNonCritThresholdExceeded
+			#######################
+			# A voltage sensor has reported that its value has gone above an upper
+			# non-critical threshold setting or below a lower non-critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the threshold
+			# was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Voltage"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " NON CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+		case "6": ### - sunHwTrapVoltageOk
+			#######################
+			# A voltage sensor has reported that its value is in the normal
+			# operating range.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Voltage"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+#                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " NON CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+			@Summary = "A Voltage sensor ( " + $sunHwTrapComponentName + " has reported that its value (" + $sunHwTrapThresholdValue + ") is in the normal operating range."
+
+		case "7": ### - sunHwTrapTempFatalThresholdExceeded
+			#######################
+			# A temperature sensor has reported that its value has gone above an upper
+			# fatal threshold setting or below a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "8": ### - sunHwTrapTempFatalThresholdDeasserted
+			#######################
+			# A temperature sensor has reported that its value has gone below an
+			# upper fatal threshold setting or above a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+
+			
+		case "9": ### - sunHwTrapTempCritThresholdExceeded
+			#######################
+			# A temperature sensor has reported that its value has gone above an
+			# upper critical threshold setting or below a lower critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+                        
+
+		case "10": ### - sunHwTrapTempCritThresholdDeasserted
+			#######################
+			# A temperature sensor has reported that its value has gone below an
+			# upper critical threshold setting or above a lower critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "11": ### - sunHwTrapTempNonCritThresholdExceeded
+			#######################
+			# A temperature sensor has reported that its value has gone above an
+			# upper non-critical threshold setting or below a lower non-critical
+			# threshold setting. The sunHwTrapThresholdType object indicates whether
+			# the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+#			details($sunHwTrapSystemIdentifier,$sunHwTrapChassisId,$sunHwTrapProductName,$sunHwTrapComponentName,$sunHwTrapThresholdType,$sunHwTrapThresholdValue,$sunHwTrapSensorValue,$sunHwTrapAdditionalInfo,$sunHwTrapAssocObjectId,$sunHwTrapSeverity)
+
+		case "12": ### - sunHwTrapTempOk
+			#######################
+			# A temperature sensor has reported that its value is in the normal
+			# operating range.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Temperature"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+#                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+			@Summary = "A Temperature sensor ( " + $sunHwTrapComponentName + " has reported that its value (" + $sunHwTrapThresholdValue + ") is in the normal operating range."
+			
+
+		case "13": ### - sunHwTrapElectricalCurrentFatalThresholdExceeded
+			#######################
+			# An electrical current sensor has reported that its value has gone above
+			# an upper fatal threshold setting or below a lower fatal threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "14": ### - sunHwTrapElectricalCurrentFatalThresholdDeasserted
+			#######################
+			# An electrical current sensor has reported that its value has gone below
+			# an upper fatal threshold setting or above a lower fatal threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "15": ### - sunHwTrapElectricalCurrentCritThresholdExceeded
+			#######################
+			# An electrical current sensor has reported that its value has gone above
+			# an upper critical threshold setting or below a lower critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "16": ### - sunHwTrapElectricalCurrentCritThresholdDeasserted
+			#######################
+			# An electrical current sensor has reported that its value has gone below
+			# an upper critical threshold setting or above a lower critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "17": ### - sunHwTrapElectricalCurrentNonCritThresholdExceeded
+			#######################
+			# An electrical current sensor has reported that its value has gone above
+			# an upper non-critical threshold setting or below a lower non-critical
+			# threshold setting. The sunHwTrapThresholdType object indicates whether
+			# the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "18": ### - sunHwTrapElectricalCurrentOk
+			#######################
+			# An electrical current sensor has reported that its value is in
+			# the normal operating range.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Electrical Current"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+#                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+			@Summary = "A Electrical Current sensor ( " + $sunHwTrapComponentName + " has reported that its value (" + $sunHwTrapThresholdValue + ") is in the normal operating range."
+			
+
+		case "19": ### - sunHwTrapFanSpeedFatalThresholdExceeded
+			#######################
+			# A fan speed sensor has reported that its value has gone above an upper
+			# fatal threshold setting or below a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "20": ### - sunHwTrapFanSpeedFatalThresholdDeasserted
+			#######################
+			# A fan speed sensor has reported that its value has gone below an upper
+			# fatal threshold setting or above a lower fatal threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deassserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+
+		case "21": ### - sunHwTrapFanSpeedCritThresholdExceeded
+			#######################
+			# A fan speed sensor has reported that its value has gone above an upper
+			# critical threshold setting or below a lower critical threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "22": ### - sunHwTrapFanSpeedCritThresholdDeasserted
+			#######################
+			# A fan speed sensor has reported that its value has gone below an upper
+			# critical threshold setting or above a lower critical threshold setting.
+			# The sunHwTrapThresholdType object indicates whether the threshold was
+			# an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deassserted its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "23": ### - sunHwTrapFanSpeedNonCritThresholdExceeded
+			#######################
+			# A fan speed sensor has reported that its value has gone above an upper
+			# non-critical threshold setting or below a lower non-critical threshold
+			# setting. The sunHwTrapThresholdType object indicates whether the
+			# threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+		case "24": ### - sunHwTrapFanSpeedOk
+			#######################
+			# A fan speed sensor has reported that its value is in
+			# the normal operating range.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fan Speed"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+#                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " NON-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+			@Summary = "A Fan Speed sensor ( " + $sunHwTrapComponentName + " has reported that its value (" + $sunHwTrapThresholdValue + ") is in the normal operating range."
+			
+
+		case "25": ### - sunHwTrapSensorFatalThresholdExceeded
+			#######################
+			# A sensor has reported that its value has gone above an upper fatal
+			# threshold setting or below a lower fatal threshold setting. The 
+			# generic 'sensor' trap is generated when the SNMP agent does not
+			# recognize the component type. The sunHwTrapThresholdType object
+			# indicates whether the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "26": ### - sunHwTrapSensorFatalThresholdDeasserted
+			#######################
+			# A sensor has reported that its value has gone below an upper fatal
+			# threshold setting or above a lower fatal threshold setting. The
+			# generic 'sensor' trap is generated when the SNMP agent does not
+			# recognize the component type. The sunHwTrapThresholdType object
+			# indicates whether the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Fatal Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " FATAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "27": ### - sunHwTrapSensorCritThresholdExceeded
+			#######################
+			# A sensor has reported that its value has gone above an upper critical
+			# threshold setting or below a lower critical threshold setting. The 
+			# generic 'sensor' trap is generated when the SNMP agent does not
+			# recognize the component type. The sunHwTrapThresholdType object
+			# indicates whether the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "28": ### - sunHwTrapSensorCritThresholdDeasserted
+			#######################
+			# A sensor has reported that its value has gone below an upper critical
+			# threshold setting or above a lower critical threshold setting. The
+			# generic 'sensor' trap is generated when the SNMP agent does not
+			# recognize the component type. The sunHwTrapThresholdType object
+			# indicates whether the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Critical Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has deasserted its " + $SunHwTrapThresholdTypeText + " CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "29": ### - sunHwTrapSensorNonCritThresholdExceeded
+			#######################
+			# A sensor has reported that its value has gone above an upper
+			# non-critical threshold setting or below a lower non-critical threshold
+			# setting. The generic 'sensor' trap is generated when the SNMP agent
+			# does not recognize the component type. The sunHwTrapThresholdType
+			# object indicates whether the threshold was an upper or lower.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Non-Critical Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+                        @Summary = $sunHwTrapComponentName + " ( " + $sunHwTrapSensorValue + " ) has exceeded its " + $SunHwTrapThresholdTypeText + " NONE-CRITICAL Threshold ( " + $sunHwTrapThresholdValue + " )"
+
+			
+
+		case "30": ### - sunHwTrapSensorThresholdOk
+			#######################
+			# A sensor has reported that its value is in the normal operating range.
+			# The generic 'sensor' trap is generated when the SNMP agent does not
+			# recognize the component type.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapThresholdType = $5
+			$sunHwTrapThresholdValue = $6
+			$sunHwTrapSensorValue = $7
+			$sunHwTrapAdditionalInfo = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapSeverity = $10
+
+                        $SunHwTrapThresholdTypeText = lookup($sunHwTrapThresholdType, SunHwTrapThresholdType)
+
+                        @AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+                        @AlertGroup = "Non-Critical Sensor"
+                        @UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A generic sensor ( " + $sunHwTrapComponentName + " has reported that its value " + $sunHwTrapThresholdValue + " is in the normal operating range.  The generic 'sensor' trap is generated when the SNMP agent does not recognize the component type."
+			
+
+		case "31": ### - sunHwTrapPowerSupplyFault
+			#######################
+			# A power supply component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@AlertGroup = "PowerSupply"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+			@Summary = "A power supply component is suspected of causing a fault."
+			
+
+		case "32": ### - sunHwTrapPowerSupplyError
+			#######################
+			# A power supply sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "PowerSupply"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A power supply sensor has detected an error."
+			
+
+		case "33": ### - sunHwTrapPowerSupplyOk
+			#######################
+			# A power supply sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "PowerSupply"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A power supply sensor has returned to its normal state."
+			
+
+		case "34": ### - sunHwTrapFanFault
+			#######################
+			# A fan component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "Fan"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A fan component is suspected of causing a fault."
+			
+
+		case "35": ### - sunHwTrapFanError
+			#######################
+			# A fan sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "Fan"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A fan sensor has detected an error."
+			
+
+		case "36": ### - sunHwTrapFanOk
+			#######################
+			# A fan sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@AlertGroup = "Fan"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A fan sensor has returned to its normal state."
+			
+
+		case "37": ### - sunHwTrapProcessorFault
+			#######################
+			# A processor component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "Processor"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A processor component is suspected of causing a fault."
+			
+
+		case "38": ### - sunHwTrapProcessorError
+			#######################
+			# A processor sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "Processor"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A processor sensor has detected an error."
+			
+
+		case "39": ### - sunHwTrapProcessorOk
+			#######################
+			# A processor sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "Processor"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A processor sensor has returned to its normal state."
+
+		case "40": ### - sunHwTrapMemoryFault
+			#######################
+			# A memory component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "Memory"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A memory component is suspected of causing a fault."
+			
+
+		case "41": ### - sunHwTrapMemoryError
+			#######################
+			# A memory sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "Memory"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+			
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A memory sensor has detected an error."
+			
+
+		case "42": ### - sunHwTrapMemoryOk
+			#######################
+			# A memory sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "Memory"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A memory sensor has returned to its normal state."
+			
+
+		case "43": ### - sunHwTrapHardDriveFault
+			#######################
+			# A hard drive component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "HardDrive"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A hard drive component is suspected of causing a fault."
+			
+
+		case "44": ### - sunHwTrapHardDriveError
+			#######################
+			# A hard drive sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "HardDrive"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A hard drive sensor has detected an error."
+			
+
+		case "45": ### - sunHwTrapHardDriveOk
+			#######################
+			# A hard drive sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "HardDrive"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A hard drive sensor has returned to its normal state."
+			
+
+		case "46": ### - sunHwTrapIOFault
+			#######################
+			# A component in the IO subsystem is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "IO"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A component in the IO subsystem is suspected of causing a fault."
+			
+
+		case "47": ### - sunHwTrapIOError
+			#######################
+			# An IO sensor has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "IO"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "An IO sensor has detected an error."
+			
+
+		case "48": ### - sunHwTrapIOOk
+			#######################
+			# An IO sensor has returned to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "IO"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "An IO sensor has returned to its normal state."
+			
+
+		case "49": ### - sunHwTrapSlotOrConnectorFault
+			#######################
+			# A slot or connector component is suspected of causing a fault.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "SlotOrConnector"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A slot or connector component (" + $sunHwTrapSuspectComponentName + ") is suspected of causing a fault."
+			
+
+		case "50": ### - sunHwTrapSlotOrConnectorError
+			#######################
+			# A sensor associated with a slot or connector has detected an error.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "SlotOrConnector"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A sensor associated with a slot or connector (" + $sunHwTrapComponentName + ") has detected an error."
+			
+
+		case "51": ### - sunHwTrapSlotOrConnectorOk
+			#######################
+			# A sensor associated with a slot or connector has returned
+			# to its normal state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "SlotOrConnector"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A sensor associated with a slot or connector (" + $sunHwTrapComponentName + ") has returned to its normal state."
+			
+
+		case "52": ### - sunHwTrapComponentFault
+			#######################
+			# A component is suspected of causing a fault. This generic 'component'
+			# trap is generated when the SNMP agent does not recognize the component
+			# type.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapSuspectComponentName = $4
+			$sunHwTrapFaultClass = $5
+			$sunHwTrapFaultCertainty = $6
+			$sunHwTrapFaultMessageID = $7
+			$sunHwTrapFaultUUID = $8
+			$sunHwTrapAssocObjectId = $9
+			$sunHwTrapAdditionalInfo = $10
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1
+			
+			@AlertGroup = "Component"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapSuspectComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A component is suspected of causing a fault. This generic 'component' trap is generated when the SNMP agent does not recognize the component type."
+			
+
+		case "53": ### - sunHwTrapComponentError
+			#######################
+			# A sensor has detected an error. This generic 'component' trap is
+			# generated when the SNMP agent does not recognize the component type.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 3
+			$tmpSunType = 1
+			
+			@AlertGroup = "Component"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A sensor has detected an error. This generic 'component' trap is generated when the SNMP agent does not recognize the component type."
+			
+
+		case "54": ### - sunHwTrapComponentOk
+			#######################
+			# A sensor has returned to its normal state. This generic 'component'
+			# trap is generated when the SNMP agent does not recognize the component
+			# type.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 1
+			$tmpSunType = 2
+			
+			@AlertGroup = "Component"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A sensor has returned to its normal state. This generic 'component' trap is generated when the SNMP agent does not recognize the component type."
+			
+
+		case "55": ### - sunHwTrapFruInserted
+			#######################
+			# A field replaceable unit has been inserted into the system.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAssocObjectId = $5
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Fru"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A field replaceable unit (" + $sunHwTrapComponentName + ") has been inserted into the system."
+			
+
+		case "56": ### - sunHwTrapFruRemoved
+			#######################
+			# A field replaceable unit has been removed from the system.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAssocObjectId = $5
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Fru"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "A field replaceable unit (" + $sunHwTrapComponentName + ") has been removed from the system."
+			
+
+		case "57": ### - sunHwTrapComponentDisabled
+			#######################
+			# The component operational state has changed or is changing
+			# to disabled.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapDisableReason = $5
+			$sunHwTrapAdditionalInfo = $6
+			$sunHwTrapAssocObjectId = $7
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Fru"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "The component (" + $sunHwTrapComponentName + ") operational state has changed or is changing to disabled."
+			
+
+		case "58": ### - sunHwTrapComponentEnabled
+			#######################
+			# The component operational state has changed or is changing
+			# to enabled.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapAdditionalInfo = $5
+			$sunHwTrapAssocObjectId = $6
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Component"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "The component (" + $sunHwTrapComponentName + ") operational state has changed or is changing to enabled."
+			
+
+		case "59": ### - sunHwTrapPreOSError
+			#######################
+			# An error has been detected in the period before the operating
+			# system has taken control of the system.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapAdditionalInfo = $4
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Component"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapProductName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "An error has been detected in the period before the operating system has taken control of the system."
+			
+
+		case "60": ### - sunHwTrapHAStateChange
+			#######################
+			# The high availability component identified by sunHwTrapSystemIdentifier
+			# has changed state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapNewHAState = $4
+			$sunHwTrapOldHAState = $5
+			$sunHwTrapAdditionalInfo = $6
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "HAStateChange"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapProductName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			$sunHwTrapOldHAStateText = lookup($sunHwTrapOldHAState, SunHwTrapHAState)
+			$sunHwTrapNewHAStateText = lookup($sunHwTrapNewHAState, SunHwTrapHAState)
+
+
+			@Summary = "The high availability component identified by sunHwTrapSystemIdentifier has changed state from " + $sunHwTrapOldHAStateText + " to " + $sunHwTrapNewHAStateText
+			
+
+		case "61": ### - sunHwTrapSecurityIntrusion
+			#######################
+			# An intrusion sensor has detected that someone may have physically
+			# tampered with the system.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapAdditionalInfo = $4
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "Security"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapProductName
+			@UserData = $sunHwTrapAdditionalInfo
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "sunHwTrapSecurityIntrusion: An intrusion sensor has detected that someone may have physically tampered with the system."
+			
+
+		case "62": ### - sunHwTrapHardDriveStatus
+			#######################
+			# The hard drive identified by sunHwTrapComponentName has changed state.
+			#######################
+			$sunHwTrapSystemIdentifier = $1
+			$sunHwTrapChassisId = $2
+			$sunHwTrapProductName = $3
+			$sunHwTrapComponentName = $4
+			$sunHwTrapHardDriveState = $5
+
+
+
+			$tmpSunSev = 4
+			$tmpSunType = 1			
+			@AlertGroup = "HardDriveStatus"
+			@AlertKey = $sunHwTrapChassisId + " " + $sunHwTrapComponentName
+			@UserData = $sunHwTrapAdditionalInfo
+
+			$SunHwTrapHardDriveStatesText = lookup($sunHwTrapHardDriveState, SunHwTrapHardDriveStates)
+
+                        $sunIdentifierAddon = @AlertGroup + @AlertKey
+
+			@Summary = "The hard drive identified by sunHwTrapComponentName has changed state to " + $SunHwTrapHardDriveStatesText
+			
+
+		default:
+			@Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+			@Severity = 1
+			@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+	}
+
+	if (exists($tmpSunSev))
+	{
+		@Severity = $tmpSunSev
+		@Type =	$tmpSunType
+	}
+	else if (exists($sunHwTrapSeverity))
+	{
+		switch ($sunHwTrapSeverity)
+		{
+			case "5":
+				@Severity = 1
+				@Type =2
+			case "4":
+				@Severity = 3
+				@Type =1
+			case "3":
+				@Severity = 4
+				@Type =1
+			case "2":
+				@Severity = 5
+				@Type = 1
+			default:
+				@Severity = 1
+				@Type =1
+		}
+	}
+	else
+	{
+		@Severity = 1
+		@Type =1
+	}
+	
+	
+	@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + $sunIdentifierAddon

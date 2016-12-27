@@ -1,0 +1,58 @@
+#######################################################################
+#
+# Impact alert parsing rules 
+#
+#######################################################################
+
+$ruleset = $ruleset + "impact-logging"
+@UserData = $1
+$ssmClassGidKey = "MICROMUSE"
+$ssmSummary = substr($2,30,254)
+if (regmatch($ssmSummary,"Unhandled Exception")){
+	$ssmAlertKey = "UnhandledException"
+}
+else if (regmatch($ssmSummary,"Could not get error-handling policy")) {
+	$ssmAlertKey = "ErrorHandler"
+}
+else if (regmatch($ssmSummary,"com.micromuse")){
+	$ssmAlertKey = extract($ssmSummary,"^.*com.micromuse.[a-z]+.[a-z]+.([A-Za-z]+).*$")
+}
+else  {
+	$ssmAlertKey = extract($ssmSummary,"^.*java.[a-z]+.([A-Za-z]+).*$")
+}
+$ssmAlertGroup = $4
+$severityOverRide=3
+$ssmType = 1
+switch($ssmAlertKey) {
+	case "ActionException":
+		$ssmSeverity = 5
+	case "RespException":
+		$ssmSeverity = 5
+	case "IOException":
+		$ssmSeverity = 4
+	case "SQLDataSourceException":
+		$ssmSeverity = 4
+	case "SQLOrgNodeException":
+		$ssmSeverity = 4
+	case "NetcoolException":
+		$ssmSeverity = 3
+	case "PolicyProcessingException":
+		$ssmSeverity = 3
+	case "TokenMgrError":
+		$ssmSeverity = 3
+	case "SecurityModelException":
+		$ssmSeverity = 3
+	case "NullPointerException":
+		$ssmSeverity = 3
+	case "VersionControlSystemException":
+		$ssmSeverity = 2
+	case "DynamicBindingException":
+		$ssmSeverity = 2
+	case "UnhandledException":
+		$ssmSeverity = 2
+	case "ErrorHandler":
+		$ssmSeverity = 2
+	default:
+		$ssmSeverity = 2
+}
+$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $ssmType + $1 + $ssmAlertKey + $4

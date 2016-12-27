@@ -1,0 +1,81 @@
+#######################################################################
+#
+#       Copyright (C) 1997, 1998, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: snmp.props 1.8 2001/04/20 08:55:39 romain Development $
+#
+#######################################################################
+
+#######################################################################
+#
+# Properties supported by this monitor:
+#
+# Property Name                 Default
+#
+# AuthPassword          :       ""
+# AuthUserName          :       ""
+# PreviousFields        :       "NONE"
+# SAFFileName           :       ""
+# Manager               :       "Internet Service Monitors"
+# MaxLogFileSize        :       1048576
+# MaxRawFileSize        :       -1
+# MaxSAFFileSize        :       1048576
+# Name                  :       "SNMP"
+# Server                :       "NCOMS"
+# Manager               :       "Internet Service Monitors"
+# PropsFile             :       "$OMNIHOME/monitors/<arch>/snmp.props"
+# RulesFile             :       "$OMNIHOME/monitors/<arch>/snmp.rules"
+# AutoSAF               :       0
+# Buffering             :       0
+# BufferSize            :       10
+# Configfile            :       ""
+# ConfigurationCheckInterval :	1
+# Datalog               :       0
+# DatalogFormat         :       "$oidReturnValues (oidUnits)"
+# Domain                :       ""
+# EventQSize            :       25
+# FullHostInfo		:	0
+# IdentifierChecksumFields : ""
+# IgnoreUnmatchedDVC    :       0
+# IpAddress             :       ""
+# MaxCCA                :       10
+# MessageLog            :       "$OMNIHOME/log/snmp.log"
+# MessageLevel          :       "warn"
+# MibDir		: 	"$OMNIHOME/monitors/mibs"
+# Mibs			:	"IP-MIB:IF-MIB:TCP-MIB:UDP-MIB:SNMPv2-MIB:RFC1213-MIB"
+# MibPrefix		:	"1.3.6.1.2.1"
+# MinPoll               :       60
+# NewProfileCheckMultiple :	10
+# Profile               :       "*"
+# RawCapture            :       0
+# RawCaptureFile        :       "$OMNIHOME/var/snmp.cap"
+# StoreAndForward       :       1
+# Help                  :       0
+# Version               :       0
+#
+#######################################################################
+
+#######################################################################
+#
+# Add your settings here
+#
+#######################################################################
+
+Datalog : 1 
+FullHostInfo : 1
+MaxCCA :  128
+MaxLogFileSize : 40960000
+#MsgDailyLog : 1
+MessageLevel : "debug"
+Manager : "LDNSNMPPROD1"

@@ -1,0 +1,205 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2002 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    IETF-RMON-MIB.include.rules 2.0 2002/05/02 Robert Cowart
+#
+###############################################################################
+#
+# 2.0 - Enhanced for compliance with the Micromuse Rules File Standards
+#       (MUSE-STD-RF-01, May 2002)
+#
+# 1.2 - Simplfied the @Summary text to make the alarm more readable.
+#
+# 1.1 - Added specific-trap 3, packetMatch, from RFC1271-TRAPS
+#
+# 1.0 - Initial Release
+#
+###############################################################################
+
+case "ietfRMON": ### Remote Network Monitoring (RMON) - Traps from RMON-MIB and RMON-TRAPS
+
+@Agent = "IETF-RMON-MIB"
+@Node = $IPaddress
+@NodeAlias = $Node
+$ruleset = $ruleset + "ietf_rmon_rules"
+
+#
+# The Class is reserved for UBS future use
+#    @Class = ""
+    
+    switch ($specific-trap)
+    {
+        case "1": ### risingAlarm
+              
+            ##########
+            # The SNMP trap that is generated when an alarm entry crosses its
+            # rising threshold and generates an event that is configured for
+            # sending SNMP traps.
+            #
+            # $1 = alarmIndex - An index that uniquely identifies an entry in
+            #        the alarm table. Each such entry defines a diagnostic
+            #        sample at a particular interval for an object on the
+            #        device.
+            # $2 = alarmVariable - The object identifier of the particular
+            #        variable to be sampled. Only variables that resolve to an
+            #        ASN.1 primitive type of INTEGER (INTEGER, Counter, Gauge,
+            #        or TimeTicks) may be sampled.
+            #
+            #        Because SNMP access control is articulated entirely in
+            #        terms of the contents of MIB views, no access control
+            #        mechanism exists that can restrict the value of this
+            #        object to identify only those objects that exist in a
+            #        particular MIB view. Because there is thus no acceptable
+            #        means of restricting the read access that could be
+            #        obtained through the alarm mechanism, the probe must only
+            #        grant write access to this object in those views that have
+            #        read access to all objects on the probe.
+            #
+            #        During a set operation, if the supplied variable name is
+            #        not available in the selected MIB view, a badValue error
+            #        must be returned. If at any time the variable name of an
+            #        established alarmEntry is no longer available in the
+            #        selected MIB view, the probe must change the status of
+            #        this alarmEntry to invalid(4).
+            #
+            #        This object may not be modified if the associated
+            #        alarmStatus object is equal to valid(1).
+            # $3 = alarmSampleType - The method of sampling the selected
+            #        variable and calculating the value to be compared against
+            #        the thresholds. (see Lookup Table)
+            # $4 = alarmValue - The value of the statistic during the last
+            #        sampling period. For example, if the sample type is
+            #        deltaValue, this value will be the difference between the
+            #        samples at the beginning and end of the period. If the
+            #        sample type is absoluteValue, this value will be the
+            #        sampled value at the end of the period.
+            #
+            #        This is the value that is compared with the rising and
+            #        falling thresholds.
+            #
+            #        The value during the current sampling period is not made
+            #        available until the period is completed and will remain
+            #        available until the next period completes.
+            # $5 = alarmRisingThreshold - A threshold for the sampled
+            #        statistic. When the current sampled value is greater than
+            #        or equal to this threshold, and the value at the last
+            #        sampling interval was less than this threshold, a single
+            #        event will be generated.  A single event will also be
+            #        generated if the first sample after this entry becomes
+            #        valid is greater than or equal to this threshold and the
+            #        associated alarmStartupAlarm is equal to risingAlarm(1) or
+            #        risingOrFallingAlarm(3).
+            #
+            #        After a rising event is generated, another such event will
+            #        not be generated until the sampled value falls below this
+            #        threshold and reaches the alarmFallingThreshold.
+            #
+            #        This object may not be modified if the associated
+            #        alarmStatus object is equal to valid(1).
+            ##########
+            
+	    $ruleset = $ruleset + " - risingAlarm"
+            $alarmIndex = $1
+            $alarmVariable = $2
+            $alarmSampleType = lookup($3, alarmSampleType)
+            $alarmValue = $4
+            $alarmRisingThreshold = $5
+                        
+            @AlertGroup = "RMON Alarm"
+            @AlertKey = "alarmEntry." + $1
+            @Summary = "RMON Alarm: " + $alarmSampleType + " of " + $2 + " ( " + $4 + " ) crossed " + $5
+            @Severity = 3
+            @Type = 1
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap
+            
+            $alarmSampleType = lookup($3, alarmSampleType) + " ( " + $3 + " )"
+
+        case "2": ### fallingAlarm
+
+            ##########
+            # The SNMP trap that is generated when an alarm entry crosses its
+            # falling threshold and generates an event that is configured for
+            # sending SNMP traps.
+            #
+            # $1 = alarmIndex - (see above)
+            # $2 = alarmVariable - (see above)
+            # $3 = alarmSampleType - (see above)
+            # $4 = alarmValue - (see above)
+            # $5 = alarmFallingThreshold - A threshold for the sampled
+            #        statistic. When the current sampled value is less than or
+            #        equal to this threshold, and the value at the last
+            #        sampling interval was greater than this threshold, a
+            #        single event will be generated. A single event will also
+            #        be generated if the first sample after this entry becomes
+            #        valid is less than or equal to this threshold and the
+            #        associated alarmStartupAlarm is equal to fallingAlarm(2)
+            #        or risingOrFallingAlarm(3).
+            #
+            #        After a falling event is generated, another such event
+            #        will not be generated until the sampled value rises above
+            #        this threshold and reaches the alarmRisingThreshold.
+            #
+            #        This object may not be modified if the associated
+            #        alarmStatus object is equal to valid(1).
+            ##########
+
+	    $ruleset = $ruleset + " - fallingAlarm"
+            $alarmIndex = $1
+            $alarmVariable = $2
+            $alarmSampleType = lookup($3, alarmSampleType)
+            $alarmValue = $4
+            $alarmFallingThreshold = $5
+            
+            @AlertGroup = "RMON Alarm"
+            @AlertKey = "alarmEntry." + $1
+            @Summary = "RMON Alarm Cleared: " + $alarmSampleType + " of " + $2 + " ( " + $4 + " ) crossed " + $5
+            @Severity = 1
+            @Type = 2
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap
+            
+            $alarmSampleType = lookup($3, alarmSampleType) + " ( " + $3 + " )"
+
+        case "3": ### packetMatch
+        
+            ##########
+            # The SNMP trap that is generated when a packet is captured by a
+            # channel that is configured for sending SNMP traps.
+            #
+            # $1 = channelIndex - An index that uniquely identifies an entry in
+            #        the channel table. Each such entry defines one channel, a
+            #        logical data and event stream.
+            # $2 = channelMatches - The number of times this channel has
+            #        matched a packet. Note that this object is updated even
+            #        when channelDataControl is set to off.
+            # $3 = channelDescription - A comment describing this channel.
+            ##########
+            
+	    $ruleset = $ruleset + " - packetMatch"
+            $channelIndex = $1
+            $channelMatches = $2
+            $channelDescription = $3
+            
+            @AlertGroup = "RMON Packet Match"
+            @AlertKey = "channelEntry." + $1
+            @Summary = "Packet Captured by Channel Matched  ( " + $3 + " )"
+            @Severity = 2
+            @Type = 0
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap
+
+        default:
+        
+	    $ruleset = $ruleset + " - Default"
+            @Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+            @Severity = 1
+            @Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }

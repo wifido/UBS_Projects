@@ -1,0 +1,2 @@
+map(name="_DATA-IT_CDR_UAT",bgImage="bloack_diag.jpg",bgColor="white",w=780,h=780,acl="*")
+button(name="CDR Primary",label="CDR Primary",x=65,y=72,action="Open URL",url="",target="main",entity="APP_DATA_IT_CDR_UAT",datasource="NCOMS",flash="true",w=93,h=25,type="rectangle",arc diameter=20,legend=Label,font="Helvetica",size=10,font color="black",style="p")

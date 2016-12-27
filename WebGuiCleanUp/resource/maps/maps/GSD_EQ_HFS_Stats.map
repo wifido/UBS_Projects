@@ -1,0 +1,2 @@
+map(name="GSD_EQ_HFS_Stats",bgImage="AlertDuration.GIF",bgColor="white",w="577",h="490",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="yellow",label="Under Construction!",style="b",y="203",url="",size="30",name="visual_1",x="163")

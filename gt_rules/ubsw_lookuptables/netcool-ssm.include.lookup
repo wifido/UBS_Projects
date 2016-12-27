@@ -1,0 +1,437 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2004 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    netcool-ssm.include.snmp.lookup 1.2 2004/01/16 Robert Cowart
+#
+###############################################################################
+#
+# 1.2 - Updated for SSM 3.0.
+#
+# 1.1 - Updated for SSM 2.1.
+#
+# 1.0 - Initial Release
+#
+###############################################################################
+#
+table TruthValue = ### Represents a boolean value
+ {
+    {"1","True"},
+    {"2","False"}
+ }
+ default = "Unknown"
+table RowStatus =
+{
+    ##########
+    # The RowStatus textual convention is used to manage the creation and
+    # deletion of conceptual rows, and is used as the value of the SYNTAX
+    # clause for the status column of a conceptual row (as described in
+    # Section 7.7.1 of [2].)
+    ##########
+    
+    {"1","Active"}, ##########
+                    # indicates that the conceptual row is available for use by
+                    # the managed device
+                    ##########
+                    
+    {"2","Not In Service"}, ##########
+                            # indicates that the conceptual row exists in the
+                            # agent, but is unavailable for use by the managed
+                            # device. 'notInService' has no implication
+                            # regarding the internal consistency of the row,
+                            # availability of resources, or consistency with
+                            # the current state of the managed device.
+                            ##########
+                          
+    {"3","Not Ready"}, ##########
+                       # indicates that the conceptual row exists in the agent,
+                       # but is missing information necessary in order to be
+                       # available for use by the managed device (i.e., one or
+                       # more required columns in the conceptual row have not
+                       # been instanciated)
+                       ##########
+                      
+    {"4","Create and Go"}, ##########
+                           # is supplied by a management station wishing to
+                           # create a new instance of a conceptual row and to
+                           # have its status automatically set to active,
+                           # making it available for use by the managed device.
+                           ##########
+                         
+    {"5","Create and Wait"}, ##########
+                             # is supplied by a management station wishing to
+                             # create a new instance of a conceptual row (but
+                             # not make it available for use by the managed
+                             # device).
+                             ##########
+                           
+    {"6","Destroy"} ##########
+                    # is supplied by a management station wishing to delete all
+                    # of the instances associated with an existing conceptual
+                    # row.
+                    ##########
+}
+default = "Unknown"
+
+table StorageType =
+{
+    ##########
+    # Describes the memory realization of a conceptual row. (All illegal
+    # modifications result in a 'wrongValue' error.)
+    ##########
+    
+    {"1","Other"}, ### cannot be modified to be permanent(4) or readOnly(5)
+    {"2","Volatile"}, ### in RAM, lost upon reboot, cannot be modified to be permanent(4) or readOnly(5)
+    {"3","Non-volatile"}, ### in NVRAM, backed up by stable storage, cannot be modified to be permanent(4) or readOnly(5)
+    {"4","Permanent"}, ### partially in ROM, backed up by stable storage, can be changed but not deleted
+    {"5","Read-Only"} ### completely in ROM, backed up by stable storage, cannot be changed nor deleted
+}
+default = "Unknown"
+
+
+
+table appflowAlarmVariable = ### Variable of the control row to monitor.
+{
+    {"1","Setup Failure"}, ### setupFailure
+    {"2","Setup Pecentage"}, ### setupPecentage
+    {"3","Release Failure"}, ### releaseFailure
+    {"4","Release Pecentage"}, ### releasePecentage
+    {"5","Duration"}, ### duration
+    {"6","Setup Time"}, ### setupTime
+    {"7","Teardown Time"}, ### teardownTime
+    {"8","In Last Network Time"}, ### inLastNetworkTime
+    {"9","In Avgerage Network Time"}, ### inAvgNetworkTime
+    {"10","In Last Application Time"}, ### inLastApplicationTime
+    {"11","In Avgerage Application Time"}, ### inAvgApplicationTime
+    {"12","In Last Packet Arrival Delay"}, ### inLastPacketArrivalDelay
+    {"13","In Avgerage Packet Arrival Delay"}, ### inAvgPacketArrivalDelay
+    {"14","In Retransmissions"}, ### inRetransmissions
+    {"15","Out Last Network Time"}, ### outLastNetworkTime
+    {"16","Out Avgerage Network Time"}, ### outAvgNetworkTime
+    {"17","Out Last Application Time"}, ### outLastApplicationTime
+    {"18","Out Avgerage Application Time"}, ### outAvgApplicationTime
+    {"19","Out Last Packet Arrival Delay"}, ### outLastPacketArrivalDelay
+    {"20","Out Avgerage Packet Arrival Delay"}, ### outAvgPacketArrivalDelay
+    {"21","Out Retransmissions"} ### outRetransmissions
+}
+default = "Unknown"
+
+table appflowConnStatus = ### Current connection status.
+{
+    {"1","Setup"}, ### setup
+    {"2","Active"}, ### active
+    {"3","Closing"}, ### closing
+    {"4","Closed"}, ### closed
+    {"5","Attempted"}, ### attempted
+    {"6","Aborted"}, ### aborted
+    {"7","Expired"} ### expired
+}
+default = "Unknown"
+
+table availabilityControlMethod =
+{
+    ##########
+    # Application mode determines whether the application is listening on the
+    # port specified. Network mode determines whether the destAddress is
+    # reachable via ICMP.
+    ##########
+
+    {"1","Application"},
+    {"2","Network"}
+}
+default = "Unknown"
+
+table programmableControlProgramStatus =
+{
+    ##########
+    # Defines the program status.
+    #
+    # idle - (settable) the default program state can be set from failed,
+    #   completed, aborted.
+    # running - (settable) the program may be set to running from idle,
+    #   completed.
+    # completed - is the result of the application finishing irrespective of
+    #   return code.
+    # failed - if the application failed to run.
+    # aborted - (settable) may be set from running to terminate the
+    #   application.
+    ##########
+    
+    {"1","Idle"},
+    {"2","Running"},
+    {"3","Completed"},
+    {"4","Failed"},
+    {"5","Aborted"}
+}
+default = "Unknown"
+
+table genAlarmSeverity = ### Defines the alarm severity.
+{
+    {"1","Info"}, ### info
+    {"2","Warning"}, ### warning
+    {"3","Severe"}, ### severe
+    {"4","Critical"} ### critical
+}
+default = "Unknown"
+
+table genAlarmControlSampleType =
+{
+    ##########
+    # The method of sampling the selected variable and calculating the value to
+    # be compared against the thresholds.  If the value of this object is
+    # absoluteValue(1), the value of the selected variable will be compared
+    # directly with the thresholds at the end of the sampling interval.  If the
+    # value of this object is deltaValue(2), the value of the selected variable
+    # at the last sample will be subtracted from the current value, and the
+    # difference compared with the thresholds.  This object may not be modified
+    # if the associated alarmStatus object is equal to active(1).
+    ##########
+    
+    {"1","Absolute Value"}, ### absoluteValue
+    {"2","Delta Value"} ### deltaValue
+}
+default = "Unknown"
+
+table genAlarmControlAlarmMode =
+{
+    ##########
+    # Alarm generation Mode.
+    #
+    # If the value of this object is set to hysteresis(1), the alarm generation
+    # is as per RMON Alarm and Event groups.
+    #
+    # If the value of this object is set to risingContinuous(2), a rising alarm
+    # will be generated on every sample interval, when the selected variable
+    # sample value greater or equal to the rising threshold.
+    #
+    # If the value of this object is set to singleEdge(3), an alarm will be
+    # generated once when the selected variable exceeds the threshold. 
+    #
+    # If the value of this object is set to fallingContinuous(4), a falling
+    # alarm will be generated on every sample interval, when the selected
+    # variable sample value less than the falling threshold.
+    #
+    # If the value of this object is set to matchMode(5), an alarm will be
+    # generated when the monitored object value is equal to the match value.
+    #
+    # If the value of this object is set to pushMode(6), an alarm will be
+    # generated at every sample interval.
+    #
+    # This object may not be modified if the associated alarmStatus object is
+    # equal to active(1).
+    ##########
+    
+    {"1","Hysteresis"}, ### hysteresis
+    {"2","Rising Continuous"}, ### risingContinuous
+    {"3","Single Edge"}, ### singleEdge
+    {"4","Falling Continuous"}, ### fallingContinuous
+    {"5","Match Mode"}, ### matchMode
+    {"6","Push Mode"} ### pushMode
+}
+default = "Unknown"
+
+table psControlTestOperator =
+{
+    ##########
+    # The logical operator to apply to TestAttribute and TestThreshold:
+    #   eq  Equal, ne  Not equal, gt  Greater than, lt  Less than,
+    #   ge  Greater than or equal, le  Less than or equal
+    #
+    # For example, to check for when a process uses more than 50MB of memory:
+    #   TestAttribute: size(2)
+    #   TestOperator: gt
+    #   TestThreshold: 50000
+    ##########
+    
+    {"1","Equal To"}, ### eq
+    {"2","Not Equal To"}, ### ne
+    {"3","Greater Than"}, ### gt
+    {"4","Less Than"}, ### lt
+    {"5","Greater Than or Equal To"}, ### ge
+    {"6","Less Than or Equal To"} ### le
+}
+default = "Unknown"
+
+table psControlFilterType =
+{
+    ##########
+    # Specifies how to identify the subset of processes to monitor.
+    #
+    # Name - means to match a process's short name (psRunningName).
+    # Command - means to match a process's full command and arguments string.
+    # Pid - means to match a specific process ID.
+    # groupLeaderName - means to match a process's short name and only match
+    #   process group leaders (those for which process ID = process group ID).
+    # noName - means to check that NO process names match the filter, and if
+    #   so, skip attribute checking and start an action. Any objects in
+    #   ExceptionTable including those sent in traps, as a result of a noName
+    #   match will have undefined contents.
+    # nameOldest - means to match the oldest process whose short name
+    #   corresponds to FilterPattern.
+    # noCommand - is similar to noName except that it operates on the process
+    #   command string rather than the short name.
+    # groupLeaderCommand - matches a process's command line, but only for
+    #   process group leaders. 
+    # commandOldest - matches the oldest process whose command line corresponds
+    #   to FilterPattern.
+    #
+    # Any objects resulting from a noName or noCommand match in
+    # ExceptionTable or in traps will have undefined contents.
+    ##########
+    
+    {"1","Name"}, ### name
+    {"2","Command"}, ### command
+    {"3","Group Leader Name"}, ### groupLeaderName
+    {"4","PID"}, ### pid
+    {"5","No Name"}, ### noName
+    {"6","Name Oldest"}, ### nameOldest
+    {"7","No Command"}, ### noCommand
+    {"8","Group Leader Command"}, ### groupLeaderCommand
+    {"9","Command Oldest"} ### commandOldest
+}
+default = "Unknown"
+
+table psControlSampleType =
+{
+    ##########
+    # Specifies whether samples are to be of exact attribute values, or their
+    # deltas (differences between samples).
+    ##########
+    
+    {"1","Exact"}, ### exact
+    {"2","Delta"} ### delta
+}
+default = "Unknown"
+
+table psControlTestAttribute =
+{
+    ##########
+    # The process attribute to be tested each sample:
+    #
+    # alive - The value 1 or 0 for true or false. Zero is only possible when
+    #   the process existed in the previous sample but has since died.
+    # size - As defined in psRunningTable.
+    # rss - As defined in psRunningTable.
+    # priority - As defined in psRunningTable.
+    # pageFaults - As defined in psRunningTable.
+    # hardPageFaults - As defined in psRunningTable.
+    # contextSwitches - As defined in psRunningTable.
+    # threads - As defined in psRunningTable.
+    # handles - As defined in psRunningTable.
+    # totalTime - kernelTime + userTime
+    # kernelTime - As defined in psRunningTable.
+    # userTime - As defined in psRunningTable.
+    # age - How long the process has been running, in seconds.
+    # averageCpu - totalTime / (N * SampleInterval) - A percentage of total CPU
+    #   usage on an N-CPU machine. To monitor average CPU usage over a period
+    #   of time you should use the 'delta' sample type. The averageCpu
+    #   attribute makes no sense in 'exact' mode and is therefore disallowed by
+    #   the agent to prevent confusion.
+    ##########
+    
+    {"1","Alive"}, ### alive
+    {"2","Memory Size"}, ### size
+    {"3","RAM Resident Size"}, ### rss
+    {"4","Priority"}, ### priority
+    {"5","Page Faults"}, ### pageFaults
+    {"6","Hard Page Faults"}, ### hardPageFaults
+    {"7","Context Switches"}, ### contextSwitches
+    {"8","Threads"}, ### threads
+    {"9","Handles"}, ### handles
+    {"10","Total CPU Time"}, ### totalTime
+    {"11","Kernel CPU Time"}, ### kernelTime
+    {"12","User CPU Time"}, ### userTime
+    {"13","Age"}, ### age
+    {"14","Average CPU"} ### averageCpu
+}
+default = "Unknown"
+
+table slaControlSLAType =
+{
+    ##########
+    # Defines the monitored response time: network layer or application layer.
+    # Note certain protocols/application do not support network layer response
+    # time.
+    ##########
+    
+    {"1","Network Layer"}, ### networkLayer
+    {"2","Application Layer"} ### applicationLayer
+}
+default = "Unknown"
+
+table SrLogMonLevel = ### A generic severity level for log entries.
+{
+    {"1","Unknown"}, ### unknown
+    {"2","Information"}, ### information
+    {"3","Warning"}, ### warning
+    {"4","Error"} ### error
+}
+default = "Unknown"
+
+table timerInfoDayOfWeek = ### Day of week of local time.
+{
+    {"1","Sunday"}, ### sunday
+    {"2","Monday"}, ### monday
+    {"3","Tuesday"}, ### tuesday
+    {"4","Wednesday"}, ### wednesday
+    {"5","Thursday"}, ### thursday
+    {"6","Friday"}, ### friday
+    {"7","Saturday"} ### saturday
+}
+default = "Unknown"
+
+table timerInfoMonth = ### Month of local itme.
+{
+    {"1","January"}, ### january
+    {"2","February"}, ### february
+    {"3","March"}, ### march
+    {"4","April"}, ### april
+    {"5","May"}, ### may
+    {"6","June"}, ### june
+    {"7","July"}, ### july
+    {"8","August"}, ### august
+    {"9","September"}, ### september
+    {"10","October"}, ### october
+    {"11","November"}, ### november
+    {"12","December"} ### december
+}
+default = "Unknown"
+
+table crontabControlCronType =
+{
+    ##########
+    # Setting this value to crontime(1) will mean that the control row will use
+    # the crontabControlCronEventTime object to determine when events will be
+    # fired, and the StartTime and Period objects will be ignored. Setting it
+    # to periodicwithstart(2) will mean the control row will use
+    # crontabControlStartTime and crontabControlPeriod to determine when events
+    # etc are fired, and CronEventTime will be ignored.
+    ##########
+    
+    {"1","cron Event Time"}, ### crontime
+    {"2","Periodic with Start Time"} ### periodicwithstart
+}
+default = "Unknown"
+
+table LogMonXLevel =
+{
+    ##########
+    # A generic severity level for log entries.
+    ##########
+    
+    {"1","Unknown"}, ### unknown
+    {"2","Information"}, ### information
+    {"3","Warning"}, ### warning
+    {"4","Error"} ### error
+}
+default = "Unknown"
+

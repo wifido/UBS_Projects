@@ -1,0 +1,7 @@
+map(name="APP_GSD_E_DIST_FI_DB",bgImage="",bgColor="white",w="500",h="300",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="red",label="Stamford",y="200",style="p",url="",size="24",name="visual_4",x="268")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="red",label="London",y="200",style="p",url="",size="24",name="visual_3",x="80")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#3333ff",label="sstm2095psy",y="155",style="p",url="",size="12",name="visual_2",x="285")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#3333ff",label="sldn0182psy",y="155",style="p",url="",size="12",name="visual_1",x="85")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="80",x="300",w="40",entity="APP_GSD_E_DISTRIBUTION_FI_2905",font="Helvetica",size="10",flash="true",action="Lightweight Event List (LEL)",h="60",style="p",target="_self",name="APP_GSD_E_DIST_FI_DB_2905")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="80",x="100",w="40",entity="APP_GSD_E_DISTRIBUTION_FI_0812",font="Helvetica",size="10",flash="true",action="Open URL",h="60",style="p",target="_self",name="APP_GSD_E_DIST_FI_DB_0812")

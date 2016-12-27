@@ -1,0 +1,95 @@
+001	2	System power-down
+011	3	Login Server database found to be invalid
+021	3	Name Server database found to be invalid
+031	2	SNMP request received from unauthorized community
+051	3	Management Server database found to be invalid
+052	2	Management Server internal error
+061	3	Fabric Control er database found to be invalid
+062	2	Maximum interswitch hop count exceeded
+063	4	Received link state record too large
+070	2	E_Port has become segmented
+071	2	The switch has become isolated
+072	2	E_Port connected to unsupported switch
+073	2	Fabric Init Error 
+074	2	ISL Frame Delivery Error Threshold
+080	2	Unauthorized worldwide name
+081	2	Port has been set to Invalid Attachment state
+120	2	Error detected while processing system management command
+121	2	Zone Set activation failed.  Zone Set too large
+140	2	Congestion has been detected on an ISL
+141	2	End of congestion has been detected on an ISL
+142	2	BB Credit starvation detected on an ISL
+143	2	End of BB Credit starvation has been detected on an ISL
+150	2	Informational
+200	4	Power supply ac voltage failure
+201	4	Power supply DC voltage failure
+202	4	Power supply thermal failure
+203	2	Power supply ac voltage recovery
+204	2	Power supply DC voltage recovery
+206	2	Power supply removed
+207	2	Power supply installed
+208	4	Power supply false shutdown
+300	4	First cooling fan propeller has failed
+301	4	Second cooling fan propeller has failed
+302	4	Third cooling fan propeller has failed
+303	4	Fourth cooling fan propel er has failed
+304	4	Fifth cooling fan propel er has failed
+305	4	Sixth cooling fan propel er has failed
+306	4	First cooling fan propeller in Fan2 FRU type has failed
+307	4	Second of two cooling fan propellers in Fan2 FRU type has failed
+310	2	First cooling fan propeller has recovered
+311	2	Second cooling fan propeller has recovered
+312	2	Third cooling fan propeller has recovered
+313	2	Fourth cooling fan propel er has recovered
+314	2	Fifth cooling fan propel er has recovered
+315	2	Sixth cooling fan propel er has recovered
+316	2	First cooling fan propeller in Fan2 FRU type has recovered
+317	2	Second cooling fan propeller in Fan2 FRU type has recovered
+400	4	Power-up diagnostics failure
+410	2	CTP card reset
+411	4	Firmware fault occurred
+412	2	CTP Watchdog Timer Reset
+421	2	Firmware download complete
+423	2	CTP firmware download initiated
+426	3	Multiple ECC single bit errors occurred
+430	2	Excessive Ethernet transmit errors
+431	2	Excessive Ethernet receive errors
+432	3	Ethernet adapter reset
+433	4	Non-recoverable Ethernet fault
+440	4	Embedded Port hardware has failed
+442	2	Embedded Port Anomaly Detected
+445	2	ASIC detected a system anomaly
+453	2	New feature key installed
+460	2	Management request out of range
+502	2	Port module anomaly has been detected
+504	4	Port module failure - error threshold exceeded
+505	3	Port module revision not supported
+506	4	Fibre Channel port failure
+507	2	Loopback diagnostics port failure
+508	2	Fibre Channel port anomaly detected
+510	2	SFP hot-insertion initiated
+512	3	SFP optics nonfatal error
+513	2	SFP hot-removal completed
+514	4	SFP failure
+523	2	FL_Port open request failed
+524	2	No AL_PA acquired
+525	2	FL_Port arbitration timeout
+581	4	Implicit incident
+582	4	Bit-error threshold exceeded
+583	4	Loss-of -signal or loss-of-synchronization
+584	4	Not Operational primitive sequence (NOS) received
+585	4	Primitive sequence timeout
+586	4	Invalid primitive sequence received for link state
+602	2	SBAR module anomaly detected
+604	4	SBAR module failure
+605	3	SBAR module revision not supported
+800	4	High-temperature warning (Port module thermal sensor)
+801	4	Critically hot temperature warning (Port module thermal sensor)
+802	4	Port module shutdown due to thermal violations
+805	4	High-temperature warning (SBAR module thermal sensor)
+806	4	Critically hot temperature warning (SBAR module thermal sensor)
+807	4	SBAR module shutdown due to thermal violation
+810	4	High temperature warning (CTP thermal sensor)
+811	4	Critically hot temperature warning (CTP thermal sensor)
+812	4	CTP shutdown due to thermal violations
+850	5	System shutdown due to CTP thermal violations

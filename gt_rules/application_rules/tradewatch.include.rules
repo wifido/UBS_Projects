@@ -1,0 +1,66 @@
+case "50200":
+	$ruleset = $ruleset + " - Tradewatch"
+        # First off we need to set the Node and NodeAlias fields correctly from the TradeWatch system.
+        # Tradewatch uses a hostname value that reflects the application base rather than the FQDN name
+        # or IP Address. This is the name that the support team and TradeWatch system knows the remote 
+        # hosts by. The values for these are supplied to the Log4Perl logger as a combined parameter
+        # -msgid. The values are supplied in the form -msgid = $_HOSTNAME + "--" + $_REALHOSTID.
+        # This will then be mapped in the Logger / Appender code to populate $EventIdentifier token
+        # Therefore the first action will be to extract all text before the "--" as the value for 
+        # temporary token $TW_hostname. We then extract all data after the "--" as the value for
+        # temporary token $TW_realhostid. These values are then assigned to @Node and @NodeAlias.
+
+        $TW_hostname = extract($EventIdentifier,"(.*)--.*")
+        $TW_realhostid = extract($EventIdentifier,".*--(.*)")
+
+        # We need to extract values for @AlertGroup and @AlertKey based upon the $Component token
+        # passed from Tradewatch. The format of this token is value1.value2.value3
+        # We will make @AlertGroup = $SAPname + " " + value1 and @AlertKey = value2.
+
+        $tempAlertGroup = extract($Component,"([A-Z|a-z|0-9]+)\..*")
+        $tempAlertKey = extract($Component,"[A-Z|a-z|0-9]+\.(.*)")
+
+        # We now set the values of @Node and @Node Alias, @AlertGroup and @AlertKey based on the 
+        # values of these temp tokens and as many other default fields.
+
+        @Node = $TW_hostname
+        @NodeAlias = $TW_realhostid
+        @AlertGroup = $SAPname + " " + $tempAlertGroup
+        @AlertKey = $tempAlertKey
+
+        @Class = $ClassID
+        @Agent = $Transport
+        @Summary = $MessageText
+        @Location = $Location
+        @Stream = $Stream
+        # Added extra name value pairs to be passed by the applications generating events.
+        # Giles Blake, Abilitec. 040406
+        @Environment = $Environment
+        @Subclass = $Subclass
+        @UserData = $Userdata
+        @UserInt = $Userint
+
+        
+        # As there are only 3 states of events in Tradewatch
+        # CRITICAL, WARNING and OK.
+        # These events map to ERROR, WARN and INFO in the logger. This is translated to
+        # Severity 4,3,2 in Netcool.     ERROR and WARN are for events depending upon
+        # the seriousness of the problem. OK is the indication that the problem has cleared.
+        # From these values we define the @Type value within Netcool.
+
+        switch(@Severity)
+                {
+                case "2":
+                        # Here we reset back to defacto standard values for all Clear events.
+                        @Severity = 1
+                        @Type = 2
+                # case "3":
+                        # This case value if the WARN events are not correlated by OK events.
+                        # @Type = 180
+                default:
+                        @Type = 1
+                }
+        
+
+
+        

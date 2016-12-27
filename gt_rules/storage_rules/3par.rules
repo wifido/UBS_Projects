@@ -1,0 +1,47 @@
+#########################################################################################################
+#
+#    3par.rules 
+#
+#########################################################################################################
+#
+# 1.0 - Initial Release. 20071115	Chris Janes of Abilitec
+#					Based on 3PAR_MIB Rev 1.3 dated 13th Dec 2004
+#
+#
+#########################################################################################################
+
+
+
+
+case "3par":
+#	$3parIndex = $1			# Index to access entries in alert table
+	$3parComponent = $1		# The component which the event applies to eg power supply, SCSI disk, BIOS, cage
+	$3parDetails = $2		# Additional detailed description of the alert
+	$3parNodeID = $3		# The node the alert was posted on
+	$3parSeverity = $4		# Severity of the alert
+	$3parTimeOccurred = $5		# The local time and date when the alert occurred
+	$3parID = $6			# Unique ID that identifies the instance of an alert
+	$3parMessageCode = $7		# Message code is assigned to a particular event type
+	$3parState = $8			# This provides information about the state of the alert
+
+	$ruleset = $ruleset + " 3PAR state = " + $3parState
+
+
+	@Agent = '3PAR'
+	@AlertGroup = $3parNodeID
+	@AlertKey = $3parID
+	@Class = 128130
+	@OwnerGID = lookup(@Class,SocketClassGID)
+	@Severity = lookup($3parSeverity, parSeverityLookup)
+	@Summary = $3parDetails
+	@Type = lookup($3parState, parTypeLookup)
+	@UserData = $3parComponent 
+	@UserInt = $3parMessageCode
+
+	$TempDoLookup = 2
+    	@Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + @UserData
+
+
+
+
+

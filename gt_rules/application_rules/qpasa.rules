@@ -1,0 +1,439 @@
+#
+# Alan Charlton - Abilitec - 20040930
+#
+
+case "candle-Alert-MIB":
+    $ruleset = $ruleset + "-qpasa candle-Alert-MIB"
+    @Agent = "Candle"
+    @AlertGroup = $2
+    @AlertKey = $1
+    @Summary = $6
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129020
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "-SpecTrap " + $specific-trap
+    switch ($specific-trap)  {
+	case "1":
+	    @Severity = 2
+	    @Type = 1
+	case "2":
+	    @Severity = 4
+	    @Type = 1
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "3":
+	    @Severity = 5
+	    @Type = 1
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "4":
+	    @Severity = 3
+	    @Type = 1
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "5":
+	    @Severity = 3
+	    @Type = 1
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "6":
+	    @Severity = 2
+	    @Type = 1
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "7":
+	    $ruleset = $ruleset + "-case:7"
+	    @Severity = 1
+	    @Type = 2
+	    @NodeAlias = $8
+	    @Origin = $Node
+	case "8":
+	    @Severity = 2
+	    @Type = 1
+	    @AlertGroup = $5
+        default:
+            $ruleset = $ruleset + " def"
+    	    @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "qpasa":
+
+#	Trap Details
+#
+#	$1	trapAppl		MQSoftware application that generated the trap
+#	$2      trapTime		The time the trap was generated
+#	$3      trapSystemName		The qpasa server that generated the trap
+#	$4      trapMQqmgrName		MQSeries Queue Manager
+#	$5      trapMQobjectName	MQSeries object name
+#	$6      trapMQobjectAttribute	MQSeries object attribute
+#	$7      trapMQvalue		Value associated with MQSeries object attribute
+#	$8      trapBusinessApp		Business Application
+#	$9      trapContact		Contact Information
+#	$10     trapDuration		Trap Duration
+#	$11     trapSeverity		Severity level of trap
+#	$12     trapType		Severity type of trap
+
+
+	$trapSystemName = $3
+	$trapMQqmgrName = $4
+	$trapMQobjectName = $5
+	$trapMQobjectAttribute = $6
+#	20061030	Changes by Chris Janes	HDLDN0000686510 
+	$trapMQvalue = $7
+#	20061030	End of Changes
+
+	$trapSeverity	= $11
+	$trapType = $12
+
+#	20051003	Change by Chris Janes of Abilitec
+    	$ruleset = $ruleset + "-qpasa.rules" 
+#	20051003	End of Change
+    	@Agent = "Q Pasa!"
+    	@AlertGroup = "Trap " + $specific-trap
+#	20051003	Change by Chris Janes of Abilitec
+#   	@AlertKey = $3 + ":" + $4 + ":" + $5 + ":" + $6 + ":" + $7
+    	@AlertKey = $trapSystemName + ":" + $trapMQqmgrName + ":" + $trapMQobjectName + ":" + $trapMQobjectAttribute 
+#	20051003	End of Change
+
+    @Origin = $trapSystemName
+    @OwnerGID = 88
+    @OwnerUID = 65534
+    @Class = 122200
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - $trapSeverity " + $trapSeverity
+    switch ($trapSeverity)  {
+        case "Error":
+            @Severity = 4
+            @Type = 1
+        case "Warning":
+            @Severity = 3
+            @Type = 1
+        case "Critical":
+            @Severity = 5
+            @Type = 1
+        case "Debug":
+            @Severity = 5
+            @Type = 1
+        case "Information":
+            @Severity = 1
+            @Type = 1
+        default:
+            $ruleset = $ruleset + " Def"
+            @Severity = 5
+            @Type = 1
+    }
+#	Use Type element if possible
+    if ( exists ($12)) 
+	{
+
+#	20051003	Change by Chris Janes of Abilitec
+    	$ruleset = $ruleset + "- $trapType " + $trapType
+#	$type = extract($trapType, "(.).*")		## single character
+#	switch ($type) 
+	switch ($trapType) 
+#	20051003	End of Change
+	{
+	    case "1" : @Type = 1
+	    case "2" : @Type = 2
+	    default  : @Type = 0
+	}
+    }
+#	20051003	Change by Chris Janes of Abilitec
+    
+#	20051003	End of Change
+    $ruleset = $ruleset + "- SpecTrap " + $specific-trap
+    switch ($specific-trap)  {
+        case "1000":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "The Queue Manager can not be contacted by Q Pasa!"
+            @Summary = "The Queue Manager unavailable or not responding"
+#	20060912	End of Changes
+
+        case "1001":
+            @Summary = "The Channel Initiator is Unavailable"
+        case "1002":
+            @Summary = "Trigger Monitor is Unavailable"
+        case "1003":
+            @Summary = "MQSI Broker is Unavailable"
+        case "2000":
+            @Summary = "Queue greater than 50% full"
+        case "2001":
+            @Summary = "Queue greater than 60% full"
+        case "2002":
+            @Summary = "Queue greater than 70% full"
+        case "2003":
+            @Summary = "Queue greater than 80% full"
+        case "2004":
+#	20061124	Change by Chris Janes of Abilitec HDSNG0000610202
+            @Summary = "Queue greater than 90% full"
+#           @Summary = "Queue greater than 95% full"
+#	20061124	End of Change
+
+        case "2005":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Queue full"
+            @Summary = "Queue is full"
+#	20060912	End of Changes
+        case "2006":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Message(S) arrived on Dead Letter Queue"
+            @Summary = "Message on dead letter queue"
+#	20060912	End of Changes
+        case "2007":
+            @Summary = "Message(S) arrived on Application Error Queue"
+        case "2008":
+            @Summary = "Message(S) not being removed from Queue "
+        case "2009":
+            @Summary = "Warning - No message activity on Queue"
+        case "2010":
+            @Summary = "Error - No message activity on Queue"
+        case "2011":
+            @Summary = "Error - Input adapter process not running"
+        case "2012":
+            @Summary = "Error - Output adapter process not running"
+        case "2013":
+            @Summary = "Error - Input-Output adapter process not running"
+        case "2014":
+            @Summary = "Queue Depth > 10"
+        case "2015":
+            @Summary = "Queue Get Inhibited"
+        case "2016":
+            @Summary = "Queue Put Inhibited"
+        case "2017":
+            @Summary = "Queue Depth Changed"
+        case "2018":
+            @Summary = "Queue Threshold exceeded"
+        case "3000":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Channel Stopped"
+            @Summary = "Receiver channel stopped"
+#	20060912	End of Changes
+        case "3001":
+            @Summary = "Channel Retrying"
+        case "3002":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+            @Summary = "Sender Channel is not running"
+#	20060912	End of Changes
+        case "3003":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Channel not running or not Inactive"
+            @Summary = "Receiver Channel is not running"
+#	20060912	End of Changes
+        case "3004":
+            @Summary = "Channel Status Changed"
+        case "3005":
+            @Summary = "Receiver Channel Stopped"
+        case "3006":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Sender Channel Stopped"
+            @Summary = "Sender Channel stopped"
+#	20060912	End of Changes
+        case "3007":
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#           @Summary = "Agent Unavailable"
+            @Summary = "QPasa Agent Unavailable or not responding"
+#	20060912	End of Changes
+
+#	20061124	Changes by Chris Janes of Abilitec HDSNG0000610202
+        case "3008":
+            @Summary = "Sender Channel is in RETRYING state"
+        case "3009":
+            @Summary = "Sender Channel is in BINDING state"
+#	20061124	End of Changes
+
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+        case "4000":
+            @Summary = "Queue Threshold of 2 exceeded: Current Depth " + $trapMQvalue
+        case "4001":
+            @Summary = "Queue Threshold of 3 exceeded: Current Depth " + $trapMQvalue
+        case "4002":
+            @Summary = "Queue Threshold of 4 exceeded: Current Depth " + $trapMQvalue
+        case "4003":
+            @Summary = "Queue Threshold of 5 exceeded: Current Depth " + $trapMQvalue
+        case "4004":
+            @Summary = "Queue Threshold of 10 exceeded: Current Depth " + $trapMQvalue
+        case "4005":
+            @Summary = "Queue Threshold of 15 exceeded: Current Depth " + $trapMQvalue
+        case "4006":
+            @Summary = "Queue Threshold of 20 exceeded: Current Depth " + $trapMQvalue
+        case "4007":
+            @Summary = "Queue Threshold of 25 exceeded: Current Depth " + $trapMQvalue
+        case "4008":
+            @Summary = "Queue Threshold of 50 exceeded: Current Depth " + $trapMQvalue
+        case "4009":
+            @Summary = "Queue Threshold of 75 exceeded: Current Depth " + $trapMQvalue
+        case "4010":
+            @Summary = "Queue Threshold of 100 exceeded: Current Depth " + $trapMQvalue
+        case "4011":
+            @Summary = "Queue Threshold of 125 exceeded: Current Depth " + $trapMQvalue
+        case "4012":
+            @Summary = "Queue Threshold of 150 exceeded: Current Depth " + $trapMQvalue
+        case "4013":
+            @Summary = "Queue Threshold of 200 exceeded: Current Depth " + $trapMQvalue
+        case "4014":
+            @Summary = "Queue Threshold of 250 exceeded: Current Depth " + $trapMQvalue
+        case "4015":
+            @Summary = "Queue Threshold of 300 exceeded: Current Depth " + $trapMQvalue
+        case "4016":
+            @Summary = "Queue Threshold of 400 exceeded: Current Depth " + $trapMQvalue
+        case "4017":
+            @Summary = "Queue Threshold of 500 exceeded: Current Depth " + $trapMQvalue
+        case "4018":
+            @Summary = "Queue Threshold of 1000 exceeded: Current Depth " + $trapMQvalue
+        case "4019":
+            @Summary = "Queue Threshold of 5000 exceeded: Current Depth " + $trapMQvalue
+        case "4020":
+            @Summary = "Queue Threshold of 10000 exceeded: Current Depth " + $trapMQvalue
+        case "4021":
+            @Summary = "Queue Threshold of 50000 exceeded: Current Depth " + $trapMQvalue
+        case "4022":
+            @Summary = "Maximum number of client connections has been nearly reached - currently 90%"
+        case "4023":
+            @Summary = "Maximum number of clientconnections has been reached"
+#	20061124 Changes by Chris Janes of Abilitec HDSNG0000610202
+        case "4024":
+            @Summary = "Queue Threshold of 1 exceeded: Current Depth " + $trapMQvalue
+#	20061124 End of Change
+
+#	20070109	Changes by Chris Janes of Abilitec HDLDN0000868531
+        case "4025":
+            @Summary = "Queue Threshold of 35 exceeded: Current Depth " + $trapMQvalue
+        case "4026":
+            @Summary = "Queue Threshold of 40 exceeded: Current Depth " + $trapMQvalue
+        case "4027":
+            @Summary = "Queue Threshold of 45 exceeded: Current Depth " + $trapMQvalue
+        case "4028":
+            @Summary = "Queue Threshold of 60 exceeded: Current Depth " + $trapMQvalue
+        case "4029":
+            @Summary = "Queue Threshold of 65 exceeded: Current Depth " + $trapMQvalue
+        case "4030":
+            @Summary = "Queue Threshold of 70 exceeded: Current Depth " + $trapMQvalue
+        case "4031":
+            @Summary = "Queue Threshold of 80 exceeded: Current Depth " + $trapMQvalue
+        case "4032":
+            @Summary = "Queue Threshold of 90 exceeded: Current Depth " + $trapMQvalue
+        case "4033":
+            @Summary = "Queue Threshold of 110 exceeded: Current Depth " + $trapMQvalue
+        case "4034":
+            @Summary = "Queue Threshold of 140 exceeded: Current Depth " + $trapMQvalue
+        case "4035":
+            @Summary = "Queue Threshold of 175 exceeded: Current Depth " + $trapMQvalue
+        case "4036":
+            @Summary = "Queue Threshold of 190 exceeded: Current Depth " + $trapMQvalue
+        case "4037":
+            @Summary = "Queue Threshold of 195 exceeded: Current Depth " + $trapMQvalue
+        case "4038":
+            @Summary = "Queue Threshold of 225 exceeded: Current Depth " + $trapMQvalue
+        case "4039":
+            @Summary = "Queue Threshold of 230 exceeded: Current Depth " + $trapMQvalue
+        case "4040":
+            @Summary = "Queue Threshold of 280 exceeded: Current Depth " + $trapMQvalue
+        case "4041":
+            @Summary = "Queue Threshold of 290 exceeded: Current Depth " + $trapMQvalue
+        case "4042":
+            @Summary = "Queue Threshold of 350 exceeded: Current Depth " + $trapMQvalue
+        case "4043":
+            @Summary = "Queue Threshold of 375 exceeded: Current Depth " + $trapMQvalue
+        case "4044":
+            @Summary = "Queue Threshold of 420 exceeded: Current Depth " + $trapMQvalue
+        case "4045":
+            @Summary = "Queue Threshold of 530 exceeded: Current Depth " + $trapMQvalue
+        case "4046":
+            @Summary = "Queue Threshold of 575 exceeded: Current Depth " + $trapMQvalue
+        case "4047":
+            @Summary = "Queue Threshold of 600 exceeded: Current Depth " + $trapMQvalue
+        case "4048":
+            @Summary = "Queue Threshold of 630 exceeded: Current Depth " + $trapMQvalue
+        case "4049":
+            @Summary = "Queue Threshold of 660 exceeded: Current Depth " + $trapMQvalue
+        case "4050":
+            @Summary = "Queue Threshold of 770 exceeded: Current Depth " + $trapMQvalue
+        case "4051":
+            @Summary = "Queue Threshold of 800 exceeded: Current Depth " + $trapMQvalue
+        case "4052":
+            @Summary = "Queue Threshold of 890 exceeded: Current Depth " + $trapMQvalue
+        case "4053":
+            @Summary = "Queue Threshold of 900 exceeded: Current Depth " + $trapMQvalue
+        case "4054":
+            @Summary = "Queue Threshold of 950 exceeded: Current Depth " + $trapMQvalue
+        case "4055":
+            @Summary = "Queue Threshold of 1100 exceeded: Current Depth " + $trapMQvalue
+        case "4056":
+            @Summary = "Queue Threshold of 1200 exceeded: Current Depth " + $trapMQvalue
+        case "4057":
+            @Summary = "Queue Threshold of 1300 exceeded: Current Depth " + $trapMQvalue
+        case "4058":
+            @Summary = "Queue Threshold of 1500 exceeded: Current Depth " + $trapMQvalue
+        case "4059":
+            @Summary = "Queue Threshold of 1700 exceeded: Current Depth " + $trapMQvalue
+        case "4060":
+            @Summary = "Queue Threshold of 1775 exceeded: Current Depth " + $trapMQvalue
+        case "4061":
+            @Summary = "Queue Threshold of 2460 exceeded: Current Depth " + $trapMQvalue
+        case "4062":
+            @Summary = "Queue Threshold of 2720 exceeded: Current Depth " + $trapMQvalue
+        case "4063":
+            @Summary = "Queue Threshold of 2800 exceeded: Current Depth " + $trapMQvalue
+        case "4064":
+            @Summary = "Queue Threshold of 2890 exceeded: Current Depth " + $trapMQvalue
+        case "4065":
+            @Summary = "Queue Threshold of 3000 exceeded: Current Depth " + $trapMQvalue
+        case "4066":
+            @Summary = "Queue Threshold of 3295 exceeded: Current Depth " + $trapMQvalue
+        case "4067":
+            @Summary = "Queue Threshold of 3500 exceeded: Current Depth " + $trapMQvalue
+        case "4068":
+            @Summary = "Queue Threshold of 4320 exceeded: Current Depth " + $trapMQvalue
+        case "4069":
+            @Summary = "Queue Threshold of 4800 exceeded: Current Depth " + $trapMQvalue
+        case "4070":
+            @Summary = "Queue Threshold of 6000 exceeded: Current Depth " + $trapMQvalue
+        case "4071":
+            @Summary = "Queue Threshold of 6400 exceeded: Current Depth " + $trapMQvalue
+        case "4072":
+            @Summary = "Queue Threshold of 7200 exceeded: Current Depth " + $trapMQvalue
+        case "4073":
+            @Summary = "Queue Threshold of 11600 exceeded: Current Depth " + $trapMQvalue
+        case "4074":
+            @Summary = "Queue Threshold of 12925 exceeded: Current Depth " + $trapMQvalue
+        case "4075":
+            @Summary = "Queue Threshold of 15060 exceeded: Current Depth " + $trapMQvalue
+        case "4076":
+            @Summary = "Queue Threshold of 15100 exceeded: Current Depth " + $trapMQvalue
+        case "4077":
+            @Summary = "Queue Threshold of 20000 exceeded: Current Depth " + $trapMQvalue
+        case "4078":
+            @Summary = "Queue Threshold of 24500 exceeded: Current Depth " + $trapMQvalue
+        case "4079":
+            @Summary = "Queue Threshold of 30000 exceeded: Current Depth " + $trapMQvalue
+        case "4080":
+            @Summary = "Queue Threshold of 31250 exceeded: Current Depth " + $trapMQvalue
+        case "4081":
+            @Summary = "Queue Threshold of 30 exceeded: Current Depth " + $trapMQvalue
+#	20070109	End of Changes
+
+#	20060912	End of Changes
+        default:
+            $ruleset = $ruleset + " Def"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "/sbclocal/netcool/omnibus/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }
+
+#	  20060912	Change by ChrisJanes of Abilitec HDLDN0000626672
+#	This has been done at the end user Philip Davis-Lyons Request
+#	20061030	Changes by Chris Janes	HDLDN0000686510 
+#@Summary = @Summary + $7
+#	20061030	End of Changes
+#	20060912	End of Changes
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey

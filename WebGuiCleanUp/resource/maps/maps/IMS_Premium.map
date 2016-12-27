@@ -1,0 +1,6 @@
+map(name="IMS_Premium",bgImage="",bgColor="#003366",w="176",h="250",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ffffcc",label="AIMS (Global)",y="23",style="b",url="",size="14",name="AIMS",x="30")
+button(legend="Count",arc diameter="20",type="rounded",url="",datasource="NCOMS",label="AIMS_View",font color="black",y="90",x="100",w="50",entity="AIMS_view",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="main",name="visual_2")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ffffcc",label="AIMS",style="b",y="110",url="",size="11",name="IMS_Original_1",x="7")
+button(legend="Count",arc diameter="20",type="rounded",url="",datasource="NCOMS",label="IMS_DMA",font color="black",y="50",x="100",w="50",entity="IMS_DMA_DSA",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="main",name="visual_1")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="#ffffcc",label="ECE",style="b",y="70",url="",size="11",name="IMS_Premium",x="6")

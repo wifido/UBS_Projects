@@ -1,0 +1,62 @@
+########################################################################
+#
+# Sun T3 disk array trap rules
+#
+########################################################################
+case "t300Events":
+    @Agent = "Sun"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128080
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - sun-t300"
+
+# Sun T3x Message format:
+# Apr 06 13:54:21 sh37[1]: N: fru stat
+# Apr 06 13:54:21 sh37[1]: E: <fruid>: fru stat
+    $allMsg = extract($1, "^[^ ]+ [^ ]+ [^:]+:[^:]+:[^ ]+ [^:]+: ([^:]: .*$)")
+    $msgType = substr($allMsg, 1, 1)
+    $restMsg = extract($allMsg, "^[EWNI]: (.*)$")
+    if (regmatch($restMsg, "^u[0-9][a-z]+[0-9]? ?:? .*$"))  {
+        log(DEBUG, "Message '" + $restMsg + "' matches regexp for t300Events")
+        $thing = extract($restMsg, "^([^ :]+)[ :]+.*$")
+        $enclosure = substr($thing, 1, 2)
+        $fru = substr($thing, 3, 4)
+        $tempAlertGroup = $enclosure
+        $tempAlertKey = $fru
+        $tempSummary = extract($restMsg, "^[^ :]+ ?:? (.*)$")
+    }
+    else  {
+        $tempAlertGroup = ""
+        $tempAlertKey = ""
+        $tempSummary = $restMsg
+    }
+
+    switch ($specific-trap)  {
+        case "1":
+            switch ($msgType)  {
+              case "E":
+                @Severity = 5
+                @Type = 1
+              case "W":
+                @Severity = 3
+                @Type = 1
+              case "N":
+                @Severity = 2
+                @Type = 1
+              case "I":
+                @Severity = 2
+                @Type = 2
+              default:
+                @Severity = 4
+                @Type = 1
+            }
+            @AlertKey = $tempAlertKey
+            @AlertGroup = $tempAlertGroup
+            @Summary = $tempSummary
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey

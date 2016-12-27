@@ -1,0 +1,8 @@
+map(name="FIRC_Test",bgImage="",bgColor="white",w="256",h="256",acl="*")
+map(name="FIRC_TriDent_UAT",bgColor="#cccccc",w=250,h=250,acl="*")
+button(legend="Count",type="rounded",url="",datasource="NCOMS",label="",y="141",x="167",w="65",entity="firc_trident_uat_all",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",style="p",h="23",arc diameter="20",font color="black",target="_blank",name="trident1_1")
+text(name="trident_1",label="TriDent UAT       ",x=7,y=157,action="Active Event List (AEL)",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+button(font color="black",name="visual_2",url="",font="Helvetica",color="#ccccff",action="Open URL",h="29",target="_self",arc diameter="20",type="rectangle",y="138",label="untitled",x="0",legend="None",w="246",size="10",transparent="false")
+button(legend="Count",type="rounded",url="",datasource="NCOMS",label="",y="103",x="167",w="65",entity="firc_trident_prod_all",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",style="p",h="23",arc diameter="20",font color="black",target="_blank",name="trident1")
+text(name="trident",label="TriDent Prod      ",x=5,y=118,action="Active Event List (AEL)",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+button(font color="black",name="visual_1",url="",font="Helvetica",color="#ccccff",action="Open URL",h="29",target="_self",arc diameter="20",type="rectangle",y="100",label="untitled",x="0",legend="None",w="246",size="10",transparent="false")

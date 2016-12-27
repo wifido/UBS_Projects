@@ -1,0 +1,121 @@
+================ Start of PA Server LDN1052_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+OBJECTSERVER         LDNOBJENG1           xldn1052daproot      RUNNING   14481
+                     PROCMON              xldn1052daproot      RUNNING   14494
+FAILOVER             LDNOBJENG2           xldn1052daproot      RUNNING   15023
+                     FG_LDN-ENG           xldn1052daproot      RUNNING   19925
+PROBES               SSM_MTTRAPD          xldn1052daproot      RUNNING   14894
+                     SOCKET               xldn1052daproot      RUNNING   14933
+                     MTTRAPD              xldn1052daproot      RUNNING   14970
+Remedy               G_REM_ELDN           xldn1052daproot      DEAD          0
+Gateway              BG_LDN-STM           xldn1052daproot      RUNNING   10958
+Cold_Gates           BG_LDN2-STM          xldn1052daproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server LDN1052_PA========================================
+ 
+================ Start of PA Server LDN1054_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+LDNEDSD3             LDNOBJEDSP3          xldn1054daproot      RUNNING   30568
+                     UG_LDNE3             xldn1054daproot      RUNNING   26526
+                     PROCMON              xldn1054daproot      RUNNING    4295
+Webtop               WEBTOP               xldn1054daproot      RUNNING   19030
+-------------------------------------------------------------------------------
+================ End of PA Server LDN1054_PA========================================
+ 
+================ Start of PA Server LDN1019_PA========================================
+================ End of PA Server LDN1019_PA========================================
+ 
+================ Start of PA Server STM1953_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+STMENG               STMOBJENG1           xstm1953daproot      RUNNING    6956
+                     STMOBJENG2           xstm1953daproot      RUNNING    7013
+                     FG_ENG-ENG2          xstm1953daproot      RUNNING   31898
+OtherGateways        UNI_TST2ENG          xstm1953daproot      RUNNING   20525
+                     G_REM_ESTM           xstm1953daproot      DEAD          0
+Probes               SSM_Mttrapd          xstm1953daproot      RUNNING   15483
+                     PROCMON              xstm1953daproot      RUNNING   15485
+                     MTTRAPD              xstm1953daproot      RUNNING   15487
+                     SOCKET               xstm1953daproot      RUNNING   15500
+Musebot              Decoupler            xstm1953daproot      DEAD          0
+                     musebot_persist      xstm1953daproot      DEAD          0
+                     musebot_fast_track   xstm1953daproot      DEAD          0
+donotrun             BG_STM-LDN           xstm1953daproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server STM1953_PA========================================
+ 
+================ Start of PA Server STM1935_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 STMOBJDDSP1          xstm1935daproot      RUNNING    9690
+                     UNI_DDISP            xstm1935daproot      RUNNING   17271
+                     Webtop               xstm1935daproot      RUNNING    5231
+                     Webtop2              xstm1935daproot      RUNNING    2416
+                     PROCMON              xstm1935daproot      RUNNING    2418
+-------------------------------------------------------------------------------
+================ End of PA Server STM1935_PA========================================
+ 
+================ Start of PA Server STM1979_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+ENG_DSD1             STMOBJEDSP1          xstm1979daproot      RUNNING    6025
+                     UG_STME1             xstm1979daproot      RUNNING   11028
+                     PROCMON              xstm1979daproot      RUNNING    2448
+ENG_DSD2             STMOBJEDSP2          xstm1979daproot      DEAD          0
+                     UG_STME2             xstm1979daproot      DEAD          0
+WEBTOP               WEBTOP               xstm1979daproot      RUNNING    6290
+                     WEBTOP2              xstm1979daproot      DEAD          0
+IMPACT               IMPACT               xstm1979dapnetcool   DEAD          0
+                     JREXEC               xstm1979dapnetcool   DEAD          0
+Musebot              Decoupler            xstm1979dapnetcool   DEAD          0
+                     musebot_persist      xstm1979dapnetcool   DEAD          0
+LogManage            manage_pa_logs       xstm1979dapnetcool   DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server STM1979_PA========================================
+ 
+================ Start of PA Server STM9174_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+ISM_MONITORS         DATA_BRIDGE          xstm9174daproot      RUNNING   30229
+                     SNMP_MON             xstm9174daproot      RUNNING   30256
+                     HTTP_MON             xstm9174daproot      RUNNING   30257
+                     TCPPORT_MON          xstm9174daproot      RUNNING   30260
+                     HTTPS_MON            xstm9174daproot      RUNNING   30273
+                     TRANSX_MON           xstm9174daproot      RUNNING   30296
+                     ISM_SERVER           xstm9174daproot      RUNNING   30342
+IMPACTSERVER         IMPACT               xstm9174dapnetcool   RUNNING    9378
+                     JREXEC               xstm9174dapnetcool   RUNNING   30860
+                     SECURITY             xstm9174dapnetcool   RUNNING   30861
+                     CLUSTER_SYNC         xstm9174dapnetcool   RUNNING   30862
+                     POSTGRESS            xstm9174dapnetcool   DEAD          0
+MUSEBOT              DECOUPLER            xstm9174dapnetcool   RUNNING   30376
+                     MONITOR_BOT          xstm9174dapnetcool   RUNNING   30384
+-------------------------------------------------------------------------------
+================ End of PA Server STM9174_PA========================================
+ 
+================ Start of PA Server SNG1281_PA========================================
+-------------------------------------------------------------------------------
+Service Name         Process Name         Hostname   User      Status      PID
+-------------------------------------------------------------------------------
+Core                 SNGOBJENG1           xsng1281daproot      RUNNING   11517
+                     PROCMON              xsng1281daproot      RUNNING   28977
+                     HG_SNG-LDN           xsng1281daproot      RUNNING   21009
+                     NG_SNG-ENG           xsng1281daproot      RUNNING   22115
+                     SOCKET               xsng1281daproot      RUNNING   10220
+                     SSM_MTTRAPD          xsng1281daproot      RUNNING   28980
+                     MTTRAPD              xsng1281daproot      RUNNING   28981
+GT-TEST              SNGOBJTEST1          xsng1281daproot      RUNNING   11408
+                     HG_SNG-SNG           xsng1281daproot      DEAD          0
+                     BG_SN1-ST1           xsng1281daproot      RUNNING   20889
+                     BG_SN2-ST1           xsng1281daproot      DEAD          0
+-------------------------------------------------------------------------------
+================ End of PA Server SNG1281_PA========================================
+ 

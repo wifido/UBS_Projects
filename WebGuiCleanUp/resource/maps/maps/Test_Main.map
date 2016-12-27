@@ -1,0 +1,8 @@
+map(name="Test_Main",bgColor="white",w=250,h=529,acl="*")
+monitor(name="visual_4",label="untitled",x=34,y=331,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",w=159,h=83,w=159,h=83,type="histogram",show label=true,show total=true,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)
+line(name="visual_3",label="untitled",x=285,y=207,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=289,y2=208)
+line(name="visual_1",label="untitled",x=5,y=141,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=241,y2=138)
+text(name="visual_2",label="untitled",x=132,y=268,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+text(name="Test",label="Test",x=41,y=165,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=12,justify="center",style="p",color="black")
+button(name="Test_Entity",label="Test_Entity",x=106,y=152,action="Active Event List (AEL)",url="",target="main",entity="Test_Entity",datasource="NCOMS",flash="true",w=50,h=25,type="ellipse",arc diameter=20,legend=Count,font="Helvetica",size=13,font color="black",style="p")
+text(name="Test Webtop",label="Test Webtop",x=66,y=61,action="Open URL",url="",target="main",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=20,justify="center",style="p",color="black")

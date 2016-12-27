@@ -1,0 +1,64 @@
+#	imp.lookup created by Chris Janes of Abilitec
+#	8th September 2006
+
+
+#This Lookup associates instance Class
+#	Instance Class
+
+table InstanceClass =
+{
+{"janesch","999999"}
+{"imsibdq1-L60","1057095"}
+{"imsibdq2-L60","1057095"}
+{"imsibdu1-L60","1057095"}
+{"imsibdp1-L60","1057095"}
+{"imsibdb1-L60","1057095"}
+{"ldnibdqa2_S5112","1057089"}
+{"ldnibduat2_S5112","1057089"}
+{"ldnibdprd2_S5112","1057089"}
+{"stmibdbcp2_S5112","1057089"}
+{"hkgibdprd3_S5112","1057089"}
+}
+default = {"666"}
+
+#added By Sharif Johnson
+#ISM Monitoring Platform class mappings based on value of AlertKey
+table ProcessClass =
+{
+{"Audit Reporting","2222231"}
+{"AuditReportingCluster_server1","2222231"}
+{"BA","2222232"}
+{"BI Web Reporting","1057460"}
+{"BusinessApprovalsCluster_server1","2222232"}
+{"CI","2222242"}
+{"Client Planning","2222244"}
+{"ClientInteractionsCluster_server1","2222242"}
+{"ClientPlanningCluster_server1","2222244"}
+{"DMS","1016189"}
+{"Data Management Suite","1016189"}
+{"DataManagementSuiteCluster_server1","1016189"}
+{"DealFile","2222250"}
+{"DealFileCluster_server1","2222250"}
+{"Information Workbench","2222240"}
+{"InformationWorkbenchCluster_server1","2222240"}
+{"My Portal","2222243"}
+{"MyPortalCluster_server1","2222243"}
+{"ParameterLoader_AuditReportingCluster","2222231"}
+{"ParameterLoader_BusinessApprovalsCluster","2222232"}
+{"ParameterLoader_ClientInteractionsCluster","2222242"}
+{"ParameterLoader_ClientPlanningCluster","2222244"}
+{"ParameterLoader_DataManagementSuiteCluster","1016189"}
+{"ParameterLoader_DealFileCluster","2222250"}
+{"ParameterLoader_InformationWorkbenchCluster","2222240"}
+{"ParameterLoader_MyPortalCluster","2222243"}
+{"ParameterLoader_RevenueBookingCluster","2222251"}
+{"ParameterLoader_StaffPlanningCluster","2222246"}
+{"RBEar","2222251"}
+{"RevenueBookingCluster_server1","2222251"}
+{"SPEar","2222246"}
+{"StaffPlanningCluster_server1","2222246"}
+
+}
+default = {"667"}
+
+

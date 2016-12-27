@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?><viewbox name="global">
+<view viewName="AutoConf" os="NCOMS">
+<columns>
+<visualEntry columnWidth="25" fieldType="2" fieldName="NodeAlias" dataJustify="left" titleJustify="left" sequenceNumber="0" fieldTitle="NodeAlias"/>
+<visualEntry columnWidth="25" fieldType="2" fieldName="Agent" dataJustify="left" titleJustify="left" sequenceNumber="1" fieldTitle="Agent"/>
+<visualEntry columnWidth="25" fieldType="0" fieldName="Class" dataJustify="left" titleJustify="left" sequenceNumber="2" fieldTitle="Class"/>
+<visualEntry columnWidth="40" fieldType="2" fieldName="Summary" dataJustify="left" titleJustify="centre" sequenceNumber="3" fieldTitle="Summary"/>
+<visualEntry columnWidth="25" fieldType="0" fieldName="Severity" dataJustify="left" titleJustify="left" sequenceNumber="4" fieldTitle="Severity"/>
+<visualEntry columnWidth="12" fieldType="8" fieldName="LastOccurrence" dataJustify="centre" titleJustify="centre" sequenceNumber="5" fieldTitle="LastOccurrence"/>
+<visualEntry columnWidth="12" fieldType="5" fieldName="Serial" dataJustify="centre" titleJustify="centre" sequenceNumber="6" fieldTitle="Serial"/>
+<visualEntry columnWidth="12" fieldType="2" fieldName="Node" dataJustify="centre" titleJustify="centre" sequenceNumber="7" fieldTitle="Node"/>
+<visualEntry columnWidth="12" fieldType="6" fieldName="Tally" dataJustify="centre" titleJustify="centre" sequenceNumber="8" fieldTitle="Count"/>
+<visualEntry columnWidth="25" fieldType="2" fieldName="Origin" dataJustify="left" titleJustify="left" sequenceNumber="9" fieldTitle="Origin"/>
+<visualEntry columnWidth="25" fieldType="0" fieldName="Supt_Lvl" dataJustify="left" titleJustify="left" sequenceNumber="10" fieldTitle="Supt_Lvl"/>
+<visualEntry columnWidth="25" fieldType="0" fieldName="Type" dataJustify="left" titleJustify="left" sequenceNumber="11" fieldTitle="Type"/>
+<visualEntry columnWidth="25" fieldType="2" fieldName="UserData" dataJustify="left" titleJustify="left" sequenceNumber="12" fieldTitle="UserData"/>
+<visualEntry columnWidth="25" fieldType="0" fieldName="UserInt" dataJustify="left" titleJustify="left" sequenceNumber="13" fieldTitle="UserInt"/>
+</columns>
+<sorting>
+<sortColumn fieldName="Severity" sequenceNumber="0" order="desc"/>
+</sorting>
+</view>
+</viewbox>

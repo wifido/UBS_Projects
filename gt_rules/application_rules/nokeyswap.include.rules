@@ -1,0 +1,99 @@
+# This next section added as per GCMS #190516
+# The following Class values are *not* transposed in the
+# Graet AlertKey/AlertGroup swap of 2004
+#
+
+# The following cse values convert to:
+# 50404   = Piranha
+# 54850   = JAWS
+# 54860   = Equity Finance MIS
+# 54970   = REEF
+# 80110   = Rambo London
+# 80500   = Logger
+# 81700   = Dealhub
+# 110040  = Risk Monitor
+# 123000  = Unix
+# 126030  = SunCluster (IFX Intra)
+# 128040  = Netapp
+# 1056815 = European STP TOM
+# 1057087 = DMA STP TOM
+#	20070910	Change by Chris Janes of Abilitec see HDLDN0001377040
+#case "123000" | "54850" | "54970" | "50404" | "54860" | "126030" | "122200":
+case "123000" | "54850" | "54970" | "50404" | "54860" | "126030" | "122200" | "1058344":
+
+#       20070910        End of Change
+
+$ruleset = $ruleset + "-case:123000"
+@Agent = $Transport
+@Class = $ClassID
+@Summary = $MessageText
+@Stream = $Stream
+$temp_length_location = length($Location)
+if (exists($Location) && int($temp_length_location) > 0)
+{
+	@Location = $Location
+	$ruleset = $ruleset + "-@location"
+}
+@Environment = $Environment
+@Subclass = $Subclass
+@UserData = $Userdata
+@UserInt = $Userint
+@SAPNumber = $SAPnumber
+if (exists($Component))
+{
+	@AlertGroup = $Component
+	$ruleset = $ruleset + "-$Component"
+}
+else
+{
+	@AlertGroup = $SAPname
+}
+@AlertKey = $EventIdentifier
+if (exists($ProcessID) && int($ProcessID) > 0)
+{
+	@AlertKey = $EventIdentifier + "-" + $ProcessID
+}
+if (int($ClassID) == 49999)
+{
+		@AlertKey = $MessageText
+}
+$tempArchiveOnly = $ArchiveOnly
+
+switch($tempArchiveOnly)
+{
+	case "true": 
+	        $ruleset = $ruleset + "-case:true"  
+		@Type = 180
+		@Display_Hide = 1
+	default:
+	        $ruleset = $ruleset + "-case:default"
+		$tempEventType = $EventType
+		@Display_Hide = 0
+		switch ($tempEventType)
+		{
+			case "1":
+				@Type = $EventType
+				$ruleset = $ruleset + "-case:1"
+			case "2":
+			        $ruleset = $ruleset + "-case:2"
+				@Type = 2
+				@Severity = 1
+			default:
+				if (int($TimeToClear) > 0 && int($TimeToClear) < 180 )
+				{
+					@Type = 180
+					$ruleset = $ruleset + "-case:default"
+				}
+				else if (int($TimeToClear) == 0)
+				{
+					@Type = 1
+				}
+				# EndOfFix1
+				else
+				{
+					@Type = $TimeToClear
+				}
+		}
+}
+#$tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + @Class + " " + @Subclass + " " + @Environment
+$tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass + " " + @Environment

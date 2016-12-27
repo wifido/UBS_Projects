@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth		required	/lib/security/pam_ldap.so config=/sbclocal/netcool/UBS_ENVIRONMENT/PAM/ldap.conf
+account		required	/lib/security/pam_ldap.so
+#password	required	/lib/security/pam_ldap.so

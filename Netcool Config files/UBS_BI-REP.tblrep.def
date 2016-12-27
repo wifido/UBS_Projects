@@ -1,0 +1,61 @@
+##############################################################################
+# Netcool/OMNIbus Bi-directional ObjectServer Gateway 7.2
+#
+# UBS Specific BI gateway tablerep definitions file for ObjectServerA to ObjectServerB
+#
+# Version 2.0 
+#
+# Revision History:
+#	2.0 	28 May 2008	Initial cut By G.Thomas
+# Notes:
+#
+##############################################################################
+REPLICATE ALL FROM TABLE 'alerts.status'
+	USING MAP 'StatusMap';
+
+REPLICATE ALL FROM TABLE 'alerts.journal'
+	USING MAP 'JournalMap';
+
+REPLICATE ALL FROM TABLE 'custom.suppress'
+	USING MAP 'CustomSuppressMap';
+
+REPLICATE ALL FROM TABLE 'security.users'
+	USING MAP 'SecurityUsersMap'
+	INTO 'transfer.users';
+
+REPLICATE ALL FROM TABLE 'security.groups'
+	USING MAP 'SecurityGroupsMap'
+	INTO 'transfer.groups'
+	RESYNC DELETE FILTER 'GroupID > 7';
+
+REPLICATE ALL FROM TABLE 'security.group_members'
+	USING MAP 'SecurityGroupMembersMap'
+	INTO 'transfer.group_members';
+
+REPLICATE ALL FROM TABLE 'alerts.conversions'
+	USING MAP 'AlertsConversionsMap';
+
+REPLICATE ALL FROM TABLE 'alerts.objclass'
+	USING MAP 'AlertsObjClassMap';
+
+REPLICATE ALL FROM TABLE 'custom.Infra_Status'
+	USING MAP 'CustomInfraStatusMap';
+
+REPLICATE ALL FROM TABLE 'iduc_system.channel'
+	USING MAP 'IDUCSystemChannel';
+
+REPLICATE ALL FROM TABLE 'iduc_system.channel_interest'
+	USING MAP 'IDUCSystemChannelInterest';
+
+REPLICATE ALL FROM TABLE 'iduc_system.channel_summary'
+	USING MAP 'IDUCSystemChannelSummary';
+
+REPLICATE ALL FROM TABLE 'iduc_system.channel_summary_cols'
+	USING MAP 'IDUCSystemChannelSummaryCols';
+
+REPLICATE ALL FROM TABLE 'alerts.iduc_messages'
+	USING MAP 'IDUCMessages';
+
+REPLICATE ALL FROM TABLE 'custom.app_hbt_status'
+	USING MAP 'CustomAppHbtStatusMap';
+

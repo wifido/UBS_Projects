@@ -1,0 +1,3 @@
+map(name="GSD_EQ_HFS_T24_Informatica_TLM",bgImage="",bgColor="#003366",w="250",h="250",acl="GSD_EQ_HFS_GLOBAL")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="red",label="TLM Cash Balance",style="b",y="32",url="",size="12",name="visual_2",x="4")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="11",x="119",w="50",entity="1_HFS_T24_Infor_Tlm1",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="visual_1")

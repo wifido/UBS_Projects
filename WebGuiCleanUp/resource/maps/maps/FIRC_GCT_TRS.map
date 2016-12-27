@@ -1,0 +1,2 @@
+map(name="FIRC_GCT_TRS",bgImage="FIRC_GSD-TRS-PROD.jpg",bgColor="white",w="1250",h="750",acl="*")
+monitor(show highest="false",type="lavalamp",url="",show lowest="false",show highest severity as border="false",datasource="NCOMS",label="nldn8105pap",show total="false",y="221",x="49",w="100",entity="FIRC_GCT_TRS_NLDN8105PAP",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",show label="true",h="50",foreground color="black",style="p",background color="lightGray",show metric="false",target="_self",name="nldn8105pap")

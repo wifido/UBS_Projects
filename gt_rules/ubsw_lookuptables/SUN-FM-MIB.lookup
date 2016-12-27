@@ -1,0 +1,15 @@
+###############################################################################
+#
+#	SUN-FM-MIB.lookup
+#	used with SUN-FM-MIB.rules
+#
+#	20080507	Chris Janes	Original
+#
+###############################################################################
+
+table sunFmProblemCode =
+{
+        {"Test","Test Summary", "Test AlertGroup", "Test AlertKey", "4"}
+}
+default = {"Default Summary", "Default AlertGroup", "Default AlertKey", "5"}
+

@@ -1,0 +1,2 @@
+map(name="UNIX-BladeMC",bgImage="",bgColor="white",w="162",h="91",acl="*")
+monitor(show highest="false",type="lavalamp",url="",foreground color="black",show label="true",show lowest="false",label="Blade Chassis - Development",y="7",x="4",w="148",entity="UNIX-BladeMC",show highest severity as border="false",font="Helvetica",size="10",action="ael",background color="lightGray",style="p",h="74",show total="false",show metric="true",target="_self",name="visual_1")

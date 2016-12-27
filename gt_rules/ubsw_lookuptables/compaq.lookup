@@ -1,0 +1,17 @@
+table cpqDaPhyDrvStatus_table =
+{
+        {"1","Other","5","1"}
+        {"2","OK","1","2"}
+        {"3","Failed","5","1"}
+        {"4","Predictive Failure","5","1"}
+}
+default = {"Unknown","5","1"}
+
+table cpqDaSpareStatus_table =
+{
+        {"3","Failed","5","1"}
+        {"4","Inactive","1","2"}
+        {"5","Building","2","1"}
+        {"6","Active","1","2"}
+}
+default = {"Unknown","1","1"}

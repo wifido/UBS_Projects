@@ -1,0 +1,92 @@
+case "InnerWall":
+# UBSW Monitoring Script for MTTRAPD probes
+# Karey Weston
+$ruleset = "Innerwall"
+############################################
+# Uncomment this if you want to turn on 
+# Details for all events in this ruleset
+############################################
+
+
+##########################################
+# For Innerwall we need to look at string
+# 2 for location.  This looks to see if
+# string 2 is populated.
+#########################################
+	@Node = $IPaddress
+	@NodeAlias = $Node
+	@Identifier = $Node + $2
+	@Class = "8000"
+	@OwnerGID=575
+	@OwnerUID=65534
+	$TempDoLookup=2
+
+#########################################
+# Switch to the @Location field to run
+# the case statements and define defaults
+########################################
+
+#####################################
+# This is the start of the Innerwall
+# IDS components.  The data is real
+# clean so this should work fine.
+####################################
+######### Check to see what type of stream this is ######
+       ###### Split up the stream ######
+       $location = extract($2, "([A-Za-z0-9 ]+):.*")
+       $product = extract($2, "[A-Za-z0-9 ]+:([A-Za-z0-9 \(\)\_\+\.\-]+):.*")
+       $generic_error = extract($2, "[A-Za-z0-9 ]+:[A-Za-z0-9 \(\)\_\+\.\-]+:([A-Za-z0-9 \_\.\-]+)\/.*")
+       $enclave_agent = extract($2, "[A-Za-z0-9 ]+:[A-Za-z0-9 \(\)\_\+\.\-]+:[A-Za-z0-9 \_\.\-]+\/([A-Za-z0-9\.\-]+):.*")
+       $severity = extract($2, "[A-Za-z0-9 ]+:[A-Za-z0-9 \(\)\_\+\.\-]+:[A-Za-z0-9 \_\.\-]+\/[A-Za-z0-9\.\-]+:([A-Za-z]+):.*")
+       $specific_error = extract($2, "[A-Za-z0-9 ]+:[A-Za-z0-9 \(\)\_\+\.\-]+:[A-Za-z0-9 \_\.\-]+\/[A-Za-z0-9\.\-]+:[A-Za-z]+:(.*)")
+		{
+                        ##########################
+                        @AlertGroup = "SECURITY"
+			@Agent = "Innerwall" 
+                        @AlertKey = $generic_error
+                        @Summary = "Enclave Realm Controller " + $Node + " Reports Agent " + $enclave_agent + " Is Seeing " + " " + $specific_error
+                                switch($severity)
+                                {
+                                        case "CLEAR":
+                                                @Severity=0
+                                                @Type=2
+                                        case "INFORMATION":
+                                                @Severity=2
+                                                @Type=600
+                                        case "INFO":
+                                                @Severity=2
+                                                @Type=600
+                                        case "WARNING":
+                                                @Severity=2
+                                                @Type=600
+                                        case "MINOR":
+                                                @Severity=3
+                                                @Type=600 
+                                        case "MAJOR":
+                                                @Severity=4
+                                                @Type=3600
+                                        case "CRITICAL":
+                                                @Severity=5
+                                                @Type=3600
+                                        default:
+						@Severity=1
+                                                @Type=3600
+
+                                }
+				switch($token3)
+				{
+					case "unknown-ids-alert":
+						@AlertKey="UNCLASSIFIED THREAT"
+					case "spp_portscan":
+						@AlertKey="PORT SCAN"
+					case "DDOS":
+						@AlertKey="DISTRIBUTED DENIAL OF SERVICE"
+					case "DOS":
+						@AlertKey="DENIAL OF SERVICE"
+					Case "Tampered File":
+						@AlertKey="HOST CHECK"
+					default:
+						@AlertKey = $generic_error
+				}
+             }
+@Identifier = @Node + $enclave_agent + @Severity + $generic_error

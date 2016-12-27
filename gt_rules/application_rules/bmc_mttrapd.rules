@@ -1,0 +1,84 @@
+######
+# BMC Patrol include file
+######
+
+case "patrolTraps":
+$ruleset = $ruleset + " - bmc_mttrapd.rules" + "-case:patrolTraps"
+@Agent = "BMC"
+if (regmatch($1,".*<.*>.*"))
+{
+	# Properly formatted message
+	$shortmessage = extract($1,".*<(.*)>.*")
+	$ruleset = $ruleset + " - if regmatch$1"
+}
+else if (regmatch($1,".*<[^>]"))
+{
+	# Properly formatted message, but truncated
+	$ruleset = $ruleset + " - elseif regmatch$1"
+	$shortmessage = extract($1,".*<(.*)$")
+	$msgqual="   ###TRUNCATED MESSAGE###"
+}
+@AlertGroup = upper(extract($shortmessage,".*:.*:([A-Za-z0-9]*)\..*:.*:.*:.*"))
+@AlertKey   = upper(extract($shortmessage,".*:.*:.*:(.*):.*:.*"))
+@Summary = extract($shortmessage,".*:.*:.*:.*:.*:(.*)") + $msgqual
+
+$severity = upper(extract($shortmessage,"^.*:.*:.*:.*:([A-Z]*):.*"))
+$ruleset = $ruleset + " severity=" + $severity
+switch($severity) 
+{
+	case "CRITICAL":
+		@Severity = 5
+		@Type = 1
+	case "MAJOR":
+		@Severity = 4
+		@Type = 1
+	case "MINOR":
+		@Severity = 3
+		@Type = 1
+	case "WARNING":
+		@Severity = 3
+		@Type = 1
+	case "INFORMATION":
+		@Severity = 2
+
+#		20070112	Change by Chris Janes of Abilitec
+#		@Type = 0
+		@Type = 1
+
+#		20070112
+
+	case "CLEAR":
+		@Severity = 2
+		@Type = 2
+	default:
+		$ruleset = $ruleset + " default ST=" + $specific-trap
+		switch($specific-trap)
+		{
+			case "2":
+				@Severity = 1
+				@Type = 2
+
+			case "1":
+				@Severity = 2
+	
+#				20070112	Change by Chris Janes of Abilitec
+				@Type = 1
+
+#				20070112
+
+			default:
+				$ruleset = $ruleset + " default"
+				@Severity = $specific-trap
+
+#				20070112	Change by Chris Janes of Abilitec
+				@Type = 1
+
+#				20070112
+		}
+		@AlertGroup = "PATROL"
+		@AlertKey = "PATROL"
+		@Summary = upper($1)
+}
+@Class = 6999
+$TempDoLookup = 2
+$tempIdentifier = @Node + @Summary + $generic-trap + $specific-trap + @Agent + @Manager

@@ -1,0 +1,64 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2002 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    IETF-IF-MIB.include.lookup 1.0 2002/04/08 Robert Cowart
+#
+###############################################################################
+#
+# 1.0 - Initial Release
+#
+###############################################################################
+
+table ifAdminStatus =
+{
+    ##########
+    # The desired state of the interface.  The testing(3) state indicates that
+    # no operational packets can be passed.  When a managed system initializes,
+    # all interfaces start with ifAdminStatus in the down(2) state.  As a
+    # result of either explicit management action or per configuration
+    # information retained by the managed system, ifAdminStatus is then changed
+    # to either the up(1) or testing(3) states (or remains in the down(2)
+    # state).
+    ##########
+    
+    {"1","Up"}, ### up - ready to pass packets
+    {"2","Down"}, ### down
+    {"3","Testing"} ### testing - in some test mode
+}
+default = "Unknown"
+
+table ifOperStatus =
+{
+    ##########
+    # The current operational state of the interface. The testing(3) state
+    # indicates that no operational packets can be passed. If ifAdminStatus is
+    # down(2) then ifOperStatus should be down(2).  If ifAdminStatus is changed
+    # to up(1) then ifOperStatus should change to up(1) if the interface is
+    # ready to transmit and receive network traffic; it should change to
+    # dormant(5) if the interface is waiting for external actions (such as a
+    # serial line waiting for an incoming connection); it should remain in the
+    # down(2) state if and only if there is a fault that prevents it from going
+    # to the up(1) state; it should remain in the notPresent(6) state if the
+    # interface has missing (typically, hardware) components.
+    ##########
+    
+    {"1","Up"}, ### up - ready to pass packets
+    {"2","Down"}, ### down
+    {"3","Testing"}, ### testing - in some test mode
+    {"4","Unknown"}, ### unknown - status can not be determined for some reason.
+    {"5","Dormant"}, ### dormant
+    {"6","Not Present"}, ### notPresent - some component is missing
+    {"7","Lower Layer Down"} ### lowerLayerDown - down due to state of lower-layer interface(s)
+}
+default = "Unknown"
+

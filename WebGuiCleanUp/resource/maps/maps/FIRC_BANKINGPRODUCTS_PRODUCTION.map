@@ -1,0 +1,3 @@
+map(name="FIRC_BANKINGPRODUCTS_PRODUCTION",bgImage="CrDerivs_background_517x400.jpg",bgColor="white",w="517",h="400",acl="*")
+text(color="black",action="Open URL",label="Under Construction",target="_self",style="p",y="86",entity="",url="",size="10",name="visual_3",x="25",justify="center",font="Helvetica")
+text(color="#000066",action="Open URL",label="[BU] Overview",target="_self",style="b",y="18",entity="",url="",size="14",name="Overview_title",x="323",justify="center",font="TimesRoman")

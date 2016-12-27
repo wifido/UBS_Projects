@@ -1,0 +1,177 @@
+#######################################################################
+#       
+#       Copyright (C) 2003 Micromuse Ltd.                             
+#       All Rights Reserved.                                          
+#                                                                     
+#       THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE                   
+#       The copyright notice above does not evidence any              
+#       actual or intended publication of such source code.           
+#                                                                     
+#       RESTRICTED RIGHTS:                                            
+#                                                                     
+#       This file may have been supplied under a license.             
+#       It may be used, disclosed, and/or copied only as permitted    
+#       under such license agreement.  Any copy must contain the      
+#       above copyright notice and this restricted rights notice.     
+#       Use, copying, and/or disclosure of the file is strictly       
+#       prohibited unless otherwise provided in the license agreement.
+#
+######################################################################
+# Derive Location and Region from the host info where possible
+table regloc = "$OMNIHOME/all_rules/ubsw/lookuptables/regloc.lookup"
+default = {"Undefined","Undefined","Undefined"}
+table hbtdnsexceptions = "$OMNIHOME/all_rules/ubsw/lookuptables/hbtdnsexceptions.lookup"
+default = {"","","","0"}
+# Alan Charlton - Abilitec - Lookup table for lookups "common" to all probes
+include "$OMNIHOME/all_rules/ubsw/lookuptables/common.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/routing.lookup"
+# The following lookup contains the default ExpireTime lookup table (it should really be in common.lookup)
+include "$OMNIHOME/all_rules/ubsw/lookuptables/app_severity.lookup"
+# This gets Class from a lookup via the ism profile Chris Janes of Abilitec 27th July 2005
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ism_class.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassStream.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/version.lookup"
+#
+
+
+ 
+if(match(@Manager, "MonitorWatch"))
+{
+   if(regmatch(@Summary, "Running"))
+   {
+       @Severity = 1
+       @AlertGroup = "monitorstat"
+       @Type = 2
+   }
+
+   if(regmatch(@Summary, "Going Down"))
+   {
+       @Severity = 5
+       @AlertGroup = "monitorstat"
+       @Type = 1
+   }
+
+   @Summary = @Agent + " monitor on " + @Node + ": " + @Summary
+}
+else
+{
+
+#       20080116        Change by Chris Janes of Abilitec
+        @ProbeHostName = $monitorHost
+
+#       20080116        End of Change
+
+
+#	20061115	Changes by Chris Janes of Abilitec to provide version info in Probe_rules
+        include "$OMNIHOME/all_rules/ubsw/common_includes/version.include.rules"
+	$LookupVersion=lookup("lookup_version", LookupVersion)
+	$ruleset = $RulesVersion + ' ' + $LookupVersion + ' ISM_Rules'
+
+#	20061115	End of Changes
+
+   switch($service)
+   {
+      case "HTTP":
+         include "$OMNIHOME/all_rules/ubsw/ism_rules/http_ism.rules"
+      case "HTTPS":
+         include "$OMNIHOME/all_rules/ubsw/ism_rules/https_ism.rules"
+      case "SNMP":
+         include "$OMNIHOME/all_rules/ubsw/ism_rules/snmp_ism.rules"
+      case "TCPPORT":
+         include "$OMNIHOME/all_rules/ubsw/ism_rules/tcp_ism.rules"
+      case "TRANSX":  
+         include "$OMNIHOME/all_rules/ubsw/ism_rules/transx_ism.rules"
+      default:
+            @Identifier = $profile + $service + $FQHostname + $host + $message + $status + $serviceLevel
+            @Summary = "Unknown service: " + $message
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+   }              
+
+	#
+	# Derive the Region and Location fields here
+	#
+	$Node = $host
+	include "$OMNIHOME/all_rules/ubsw/common_includes/location.include.rules"
+
+	#
+	# Fudge the Manager string (this may have to be changed for something more elegant later)
+	#
+        $devEnvChar = substr($monitorHost, 9, 1)
+	switch($devEnvChar)  {
+		case "d":
+			$envString = "DEV1"
+		case "p":
+			$envString = "PROD1"
+		default:
+			$envString = "UNK1"
+	}
+	$regionCode = substr($monitorDomain, 1, 3)
+	@Manager = upper($regionCode) + $service + $envString
+	@Agent = $profile + "-" + $service
+
+	@ExpireTime = lookup(@Severity, expire_values)
+
+
+        if(match($profileNotification,""))
+        {
+#               ~don't do anythingi
+                $ruleset = $ruleset + " No Chat"
+        }
+        else
+        {
+                if((match(@Severity, "5")) or (match(@Severity, "4")))
+                {
+                        @Notification = 3
+                        @Alarm_Dest = $profileNotification
+                        $ruleset = $ruleset + " Chat to " + $profileNotification
+                }
+                else
+                {
+                        $ruleset = $ruleset + " No Chat to " + $profileNotification
+                }
+        }
+
+
+        if (match(@Alarm_Dest, ""))
+        {
+                [@Notification, @Alarm_Dest] = lookup($Profile, NotifyTable_by_Profile)
+        }
+
+
+
+        @BusinessStream = lookup(@Class, ClassStream)
+
+#	20080104	Line added by GT
+	switch (@Type)
+	{
+		case "1":
+			# We use these values so problems still get deleted via DeleteClears automation
+			@SystemDesig = 1006
+		case "2":
+			# The resolutions remain in the Object Server persistently
+			@SystemDesig = 1001
+		default:
+			# We should never get here	
+			@SystemDesig = 0
+	}
+	update(@SystemDesig)
+
+#	20080104	End of Change
+
+#	20080415	Change by Chris Janes of Abilitec TD 4793
+	if (match($profile, "BPS_Monitoring_Support"))
+	{
+		@UserInt = @Grade
+		@Grade = 999
+	}
+	
+#	20080415	End of Change
+
+
+        #
+        # Include various debugging utilities
+        #
+	include "$OMNIHOME/all_rules/ubsw/common_includes/debug.include.rules"
+   @Probe_Rule = $ruleset
+}

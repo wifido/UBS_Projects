@@ -1,0 +1,69 @@
+#######################################################################
+#
+#       Copyright (C) 2003, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+# 
+#######################################################################
+#
+# Property Name                 Default
+#
+# IpAddress              :        "" 
+# Manager                :        "Internet Service Monitors" 
+# MaxLogFileSize         :        1048576 
+# MessageLevel           :        "warn" 
+# MessageLog             :        "/opt/Omnibus/log/bridge.log" 
+# Module0PropFile        :        "/opt/Omnibus/monitors/<ARCH>/objectserver.props" 
+# Module0SharedLib       :        "libSMModuleObjectServer34" 
+# Module1PropFile        :        ""
+# Module1SharedLib       :        "libSMModuleDatalog" 
+# Module2PropFile        :        "" 
+# Module2SharedLib       :        "NONE" 
+# Module3PropFile        :        "" 
+# Module3SharedLib       :        "NONE" 
+# Module4PropFile        :        "" 
+# Module4SharedLib       :        "NONE" 
+# Module5PropFile        :        "" 
+# Module5SharedLib       :        "NONE" 
+# Module6PropFile        :        "" 
+# Module6SharedLib       :        "NONE" 
+# Module7PropFile        :        "" 
+# Module7SharedLib       :        "NONE" 
+# Module8PropFile        :        "" 
+# Module8SharedLib       :        "NONE" 
+# Module9PropFile        :        "" 
+# Module9SharedLib       :        "NONE" 
+# MsgDailyLog            :        0 
+# MsgTimeLog             :        "0000" 
+# Name                   :        "bridge" 
+# NoRecover              :        0 
+# PidFile                :        "/opt/Omnibus/var/bridge.11265" 
+# PropsFile              :        "/opt/Omnibus/monitors/<ARCH>/bridge.props" 
+# QFile                  :        "/opt/Omnibus/var/sm_bridge.saf" 
+# QSize                  :        1024000 
+# SocketBacklog          :        10 
+# SocketBufferSize       :        256 
+# SocketPort             :        9510
+# SocketTimeout          :        10 
+#
+#######################################################################
+MessageLevel : "warning"
+MsgDailyLog : 0
+MaxLogFileSize : 40960000
+QFile : "/sbclocal/ism/var/ism/ubsw_bridge.saf"
+QSize : 512000000
+Module0PropFile : "/sbclocal/netcool/UBS_PROPS/ubs_objectserver.props"
+#Module0PropFile : "/sbclocal/netcool/omnibus/monitors/linux2x86/ubsw_objserv_ism.props" 
+Module0SharedLib : "libSMModuleObjectServer" 
+Module1PropFile : ""
+Module1SharedLib : "libSMModuleDatalog" 
+Datalog : 1
+MaxCCA :  320

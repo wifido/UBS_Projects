@@ -1,0 +1,82 @@
+Notes on NOI_8 1_TestTitles_For_Review
+
+Initial comments
+
+	Document should be in SharePoint
+	Like tests should be grouped, for example all the probe functionality tests should be grouped, that way they don't get duplicated and it's easier to check that nothing gets missed
+	
+	Each integration should have it's own tab or be grouped together in one tab, don't see 
+		Agent heartbeating, 
+		Agent Status
+		Application Heartbeating
+		TBSM - this should be integrated with the TBSM testing
+		ITM - needs to be integrated with ITM testing
+		and on for all the other integrations
+		
+		These tests should include all OS triggers, Impact Policies and scripts for a given integration
+		
+	There should be a tab for architecture testing
+		this should include but not be limited to
+		Normal functioning
+		Component Version
+		Correct component Logging
+		Failover testing
+		Process Control
+		Rules/Lookup pushes
+
+NOI 8.1 LLD
+
+	What is component meant to be
+	3/5	you cant check Collection with webgui
+	Event Catalogue is not available - have to put own data into it for test events
+	How are you going to insert events
+	Quaac, still in design and is not part of this project - separate testing
+	
+ObjectServer
+	Filters/Views/Tools here are only available to the Netcool support teams. They don't have the same restrictions as webgui
+	
+WebGUI
+	Access - talk with our L3 team (Pavan)
+	21	why all resolution events should come in as indeterminate, what's wrong with info event
+	26/27/28/29	These are all OS actions not WebGUI
+	30/31/32	rally for all events - good luck
+	59	this is a probe function
+	60	how are you going to do this
+	
+Impact
+	this should test basic functionality here GUI/Datasources/JR Exec
+	Projects/Policies should be tested as part of their integration
+	
+Omnibus Admin tool
+	This is just testing the product not the Application config. This should have been done before development started
+	
+Suppression
+	This is testing what we used to offer not what we are going to
+	
+Server Crash Detection
+	PDH is part of suppression
+	
+Miro
+	This is becoming part of Quaac/ACE and should be tested as part of that integration
+	
+PDH
+	PDH is part of suppression
+	
+Snow
+	Now a single point integration
+	
+ImpactedComp and NotifyingComp
+	Why it's just a field value from ACE
+	
+CLAM
+	This is only here to provide further functionality with a later Project
+	
+ITCAM event relay zOS
+	This is main frame integration, this is documented
+	
+Self Monitoring
+	This is documented
+	
+9.4 - Impact policies
+	These should be tested as part of the integration
+	

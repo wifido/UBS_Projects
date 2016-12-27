@@ -1,0 +1,63 @@
+###############################################################################
+#
+#	SUN-FM-MIB.rules
+#	Rulesfile based SUN-FM-MIB
+#
+#	sunFmMIB MODULE-IDENTITY
+#	LAST-UPDATED	"200512170000Z"
+#	ORGANIZATION	"Sun Microsystems, Inc."
+#	DESCRIPTION	MIB providing access to Sun Fault Manager information"
+#	REVISION	"200512170000Z"
+#	DESCRIPTION	"Version: 1.0"
+#
+#	20080507	Chris Janes	Original
+#
+###############################################################################
+case "sunFmMIB":
+
+
+@Agent = "SUN-FM-MIB"
+$ruleset = $ruleset + " " + @Agent
+@Class = 999996
+
+#################################################################################
+#
+#	20080213	Following section Added for development only
+
+@Description = $enterprise + "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6 + " $7 = " + $7 + " $8 = " + $8 + " $9 = " + $9 + " $10 = " + $10 
+
+#
+#
+#################################################################################
+
+$ruleset = $ruleset + " " + $specific-trap
+switch($specific-trap) 
+	{
+		case "1": ### - sunFmProblemTrap
+			#################################################
+			# Trap notification that a diagnosis has been made or the
+			# fault manager fmd(1M) has restarted and the corresponding
+			# problem is still believed to be present in the managed entity.
+			#################################################
+
+			$sunFmProblemUUID = $1	# he Universal Unique Identifier (UUID) for this problem, as recorded by fmd(1M) and shown by fmadm(1M) or fmdump(1M).
+
+			$sunFmProblemCode = $2	# The SUNW-MSG-ID static message identifier for this class of problem, as recorded by fmd(1M) and shown by fmdump(1M).  The message identifier can be used as a key at http://sun.com/msg
+
+			$sunFmProblemURL = $3  # The URL of an appropriate knowledge article providing more detailed information about this problem.
+			
+			
+                        [@Summary, @AlertGroup , @AlertKey, @Summary] = lookup($sunFmProblemCode, sunFmProblemCode)
+                        @UserData = ""
+                        $IdentifierAddon = @AlertGroup + @AlertKey
+                        @Description = ""
+                        
+
+		default:
+			@Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+			@Severity = 1
+			@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+	}
+
+	
+	@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + $IdentifierAddon

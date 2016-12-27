@@ -1,0 +1,75 @@
+#####################################################################################
+#
+#	app_hbt.rules - rules associated with Application Heartbeating
+#
+#	20071213	Chris Janes	Original
+#
+#
+#####################################################################################
+
+
+if(match(@AlertGroup, "AppHeartbeat" ) || int($IsAppHbt) == 1) 
+{
+	$ruleset = $ruleset + " app_hbt"
+	@SystemDesig = 1000
+
+
+	## We test for the $AppHbtPeriod token first, any valid value will OVERRIDE the lookup.
+	#if (length($AppHbtPeriod) > 2)
+	if (int($AppHbtPeriod) > 119)
+	{
+		@Poll = $AppHbtPeriod
+	}
+	else
+	{
+		switch (@Class)
+		{
+		## Put Classes where we cannot just use the Class value for the lookup here....
+			# case xxxxxx:
+			# build the lookup key here.
+			# $lookuphbtkey = some action
+			case "49940":
+					$lookuphbtkey = @Class + "-" + $GTPOLL
+			default:
+				$lookuphbtkey = @Class
+		}
+		@Poll = lookup($lookuphbtkey,AppHbtClass)
+	}
+	@LastOccurrence = getdate
+	update(@Poll)
+	update(@SystemDesig)
+
+#	20080208	Changes by Chris Janes of Abilitec - ref Ryan/Gary
+	if(int(@Grade)==1057337)
+	{
+
+#	20080304	Added line to granularise the AlertKey for correct Generic Clear operation. GT
+		@AlertKey = $Subclass
+
+#	20080304	End of change .. GT
+
+		$tmpLowerNodealias = lower($Nodealias)
+		if(regmatch($tmpLowerNodealias, "^.*\.swissbank.com$"))
+		{
+			$tmpGetDate = timetodate(getdate, "%T, %F, %Z")
+			@UserData1 = "swissbank.com " + $tmpGetDate
+			update(@UserData1)
+		}
+		else if(regmatch($tmpLowerNodealias, "^.*\.ubsw.net$"))
+		{
+			$tmpGetDate = timetodate(getdate, "%T, %F, %Z")
+			@UserData2 = "ubsw.net " + $tmpGetDate
+			update(@UserData2)
+		}
+	}
+#	20080208	End of Changes
+#	20090216 GT  . Added tokens ready for Object Server routing change for app heartbeats..
+	[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $UBS_CAHOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+	switch($UBS_CAHOS)
+	{
+		include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+		
+	}
+	$tempServer = $UBS_CAHOS
+#	20090216 GT End of Change
+}

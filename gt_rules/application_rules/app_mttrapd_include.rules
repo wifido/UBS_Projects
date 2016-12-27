@@ -1,0 +1,186 @@
+# UBSW Monitoring Include Script for MTTRAPD probes
+# Karey Weston
+
+############################################
+# Uncomment this if you want to turn on 
+# de tails for all events in this ruleset
+############################################
+############################################
+$ruleset = $ruleset + "+app_mttrapd_include"
+#########################################
+# Switch to the @Location field to run
+# the case statements and define defaults
+########################################
+if ( regmatch($4, "^'[A-Za-z0-9\_\.]+\-[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:"))
+	{	                        
+	$ruleset = $ruleset + "-ext1"
+        $AlertGroup2 = extract($4, "[A-Za-z0-9\_\.]+\-[A-Za-z0-9\_\.\-]+:([A-Za-z0-9]+):.*")
+	$AlertKey2 = extract($4, "[A-Za-z0-9\_\.]+\-[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:([A-Za-z0-9_\.\-]+):.*")
+	$Severity2 = extract($4, "[A-Za-z0-9\_\.]+\-[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:[A-Za-z0-9_\.\-]+:([A-Za-z0-9_\.\-]+):.*")
+	}
+if ( regmatch($4, "^'[A-Za-z0-9\_\.]+:[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:"))
+        {
+	$ruleset = $ruleset + "-ext2"
+        $AlertGroup2 = extract($4, "[A-Za-z0-9\_\.]+:[A-Za-z0-9\_\.\-]+:([A-Za-z0-9]+):.*")
+        $AlertKey2 = extract($4, "[A-Za-z0-9\_\.]+:[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:([A-Za-z0-9_\.\-]+):.*")
+        $Severity2 = extract($4, "[A-Za-z0-9\_\.]+:[A-Za-z0-9\_\.\-]+:[A-Za-z0-9]+:[A-Za-z0-9_\.\-]+:([A-Za-z0-9_\.\-]+) .*")
+	}
+else
+        {
+	$ruleset = $ruleset + "-ext3"
+        log(INFO, "Did not regmatch [$4] (" + $4 + ") in app_mttrapd.rules - Location will be blank !")
+        }
+
+# Setup the Field Inserts #	
+##########################
+@Node = $IPaddress
+@AlertGroup = $AlertGroup2
+@AlertKey = $AlertKey2
+$Severity2=lower($Severity2)
+[@Severity, @Type, @Flash] = lookup($Severity2,app_MttrapdSeverity)
+update(@AlertGroup)
+update(@AlertKey)
+update(@Severity)
+update(@Summary)
+			
+switch(@AlertGroup)
+	{
+	case "heartbeat":
+		@AlertGroup="HEARTBEAT"
+		@AlertKey="UNIX"
+		@Summary = "Heartbeat from " + @NodeAlias
+		@Impact = 0
+		@Severity = 2
+	case "process":
+		@Summary=$4
+		@AlertGroup = "UNIX"
+	case "USRouterNYFix":
+		@AlertGroup="USROUTER"
+	case "Sybase" | "SYBASE" | "Oracle" | "ORACLE":
+		include "$OMNIHOME/all_rules/ubsw/application_rules/DBServices_include.rules"
+	case "USRouterBrass":
+		@AlertGroup="USROUTER"
+	case "Tetris":
+		@AlertGroup="TETRIS"
+	case "tetris.cfg":
+		@AlertGroup="TETRIS"
+	case "TesReportingAdapter":
+		@AlertGroup="DETOX"
+	case "cosmos.cfg":
+		@AlertGroup="COSMOS"
+	case "DetoxColtAdapter":
+		@AlertGroup="DETOX-SUBSCRIBER"
+	case "DetoxCosmosOTCAdapter":
+		@AlertGroup="DETOX-SUBSCRIBER"
+	case "detox.cfg":
+		@AlertGroup="DETOX"
+	case "DIGISLE":
+		@AlertGroup="Digital Island"
+	case "Oasis-kruncher":
+		@AlertGroup="OASIS"
+	case "OASIS-sgw_ftp":
+		@AlertGroup="OASIS"
+	case "oasis.cfg":
+		@AlertGroup="OASIS"
+	case "OASIS-check_printers":
+		@AlertGroup="OASIS"
+	case "OASISDEVL":
+		@AlertGroup="OASIS"
+	case "EME_DELAY_OASISP1":
+		@AlertGroup="OASIS"
+	case "OASISP1DR":
+		@AlertGroup="OASIS"
+		@Summary= $tmpAlertGroup + " - " + $tmpSummary
+	case "OHPOpera":
+		@AlertGroup="OHPOPERA"
+	case "OHPFix":
+		@AlertGroup="OHPFIX"
+	case "Global_One":
+		@AlertGroup="GLOBAL_ONE"
+	case "Global1":
+		@AlertGroup="GLOBAL_ONE"
+	case "HOG_Notifier":
+		@AlertGroup="HOG-NOTIFIER"
+	case "HOG_Cluster":
+		@AlertGroup="HOG-CLUSTER"
+	case "HOG_Cluster4":
+		@AlertGroup="HOG-CLUSTER"
+	case "hog.cfg":
+		@AlertGroup="HOG"
+	case "FIXSESAME":
+		@AlertGroup="FIX-SESAME"
+	case "REJECT":
+		@AlertGroup="FIX-ENGINE"
+	case "SENDFAIL":
+		@AlertGroup="FIX-ENGINE"
+	case "FixStats":
+		@AlertGroup="FIX-ENGINE"
+	case "FIX-COMMS":
+		@AlertGroup="FIXCOMMS"
+	case "GSD_RV":
+		@AlertGroup="DETOX"
+		@AlertKey="TIBCO"
+	case "Sweep":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "STAR":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "STARR":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "SAFE":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "FIXWEB":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "SHOE":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "SWEEP":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "RFQ":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "FixWebServer":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "DEALENGIN":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "FixWeb":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "USERMANAGER":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "Safe":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "UserManager":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "Intserver":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "InstServer":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "UpdateController":
+		@AlertGroup="FIXWEB"
+		@Summary = @AlertKey + "-" + @Summary
+	case "3KN_NMS":
+		@Severity=3
+	default:
+	}
+switch(@AlertKey)
+	{
+	case "file-missing":
+		@Severity = 3
+		@Type = 1
+	default:
+	}	
+@Identifier = @Manager + " " + $Node + " " + @Location + " " + @AlertGroup + " " + @AlertKey + " "  + @Summary
+#Das end of this thing.  Press go to go back ;)

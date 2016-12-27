@@ -1,0 +1,733 @@
+
+        case "34" | "35": ### genAlarmRisingAlarm and genAlarmFallingAlarm
+	    # GThomas. The following mib descriptiona re relevan for both trap 34 and Trap 35.
+            # References are made to genAlarmControlRisingxxxxx and genAlarmControlFallingxxxxx
+	    # To tidy up the rules file as these 2 traps are essentially the same, we use the tokens
+            # genAlarmControlxxxxxxx. There will be specific differences handled at the bottom of this case
+	    # section.
+
+            ##########
+            # The SNMP trap that is generated when a genAlarmControlEntry
+            # crosses the rising threshold and generates an event that is
+            # configured for sending SNMP traps. This trap will only be sent if
+            # the genAlarmControlRisingEventIndex object is non-zero, and the
+            # corresponding eventType in the eventTable is set to either
+            # snmp-trap(3) or log-and-trap(4).
+            #
+            # $1 = genAlarmControlVariable - The object identifier of the
+            #        particular variable to be sampled. Only variables that
+            #        resolve to an ASN.1 primitive type of INTEGER (INTEGER,
+            #        Counter, Gauge, or TimeTicks) may be sampled. This may be
+            #        wildcarded, and the wildcards can only be specified for
+            #        INDEX fields. The wildcards is denoted by the character
+            #        
+            #          '?' or '*'. '?' - Represents a single sub-object
+            #                            identifier.
+            #          '*' - Represents object identifier of variable length.
+            #                The '*' can only be used for the last OID of the
+            #                control variable.
+            #        
+            #        For example:
+            #          1) Trailing Wildcards - To monitor ifInOctets for all
+            #               interfaces, set the variable to the ifInOctets OID
+            #               as follows: .1.3.6.1.2.1.2.2.1.10.?
+            #          2) Multiple Wildcards (Contiguous) - To monitor the SLA
+            #               last response time for any slaControlIndex any
+            #               slaClientAddr, set the variable to the
+            #               slaDataLastResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.2.1.3.?.?.?.?.?.206.104.226.3
+            #          3) Multiple Wildcards (Segmented) - To monitor the
+            #               appflowConnOutLastPacketArrivalDelay for any
+            #               appflowControlIndex any server port of server
+            #               address 203.166.18.222, and any client port of
+            #               client address 203.63.54.132, set the variable to
+            #               the appflowConnOutLastPacketArrivalDelay OID as
+            #               follows: .1.3.6.1.4.1.1977.4.1.36.?.?.203.166.18.
+            #                 222.?.203.63.54.132
+            #          4) Multiple Wildcards (Variable length) - To monitor the
+            #               SLA last response time for any slaControlIndex any
+            #               slaHistorySampleIndex, any slaHistoryClientAddr and
+            #               any slaHistoryServerAddr, set the variable to the
+            #               slaHistoryWorstResponseTime OID as follows:
+            #               .1.3.6.1.4.1.1977.4.3.1.8.* OR
+            #               .1.3.6.1.4.1.1977.4.3.1.8.?.?.?.?.?.?.*
+            #
+            #        If the variable syntax of those objects is not usable, a
+            #        'badValue' error must be returned. This object may not be
+            #        modified if the associated alarmStatus object is equal to
+            #        valid(1).
+            # $2 = genAlarmControlVariableDescription - A textual description
+            #        of the variable being monitored.
+            # $3 = genAlarmDataInstance - The object identifier of the MIB
+            #        object to sample to see if the event should be generated.
+            #        If at any time the instance is no longer avalable in the
+            #        selected MIB view, the entire row entry will be removed.
+            # $4 = genAlarmControlSampleType - The method of sampling the
+            #        selected variable and calculating the value to be compared
+            #        against the thresholds. If the value of this object is
+            #        absoluteValue(1), the value of the selected variable will
+            #        be compared directly with the thresholds at the end of the
+            #        sampling interval. If the value of this object is
+            #        deltaValue(2), the value of the selected variable at the
+            #        last sample will be subtracted from the current value, and
+            #        the difference compared with the thresholds. This object
+            #        may not be modified if the associated alarmStatus object
+            #        is equal to active(1).
+            # $5 = genAlarmControlAlarmMode - Alarm generation Mode. If the
+            #        value of this object is set to hysteresis(1), the alarm
+            #        generation is as per RMON Alarm and Event groups. If the
+            #        value of this object is set to risingContinuous(2), a
+            #        rising alarm will be generated on every sample interval,
+            #        when the selected variable sample value greater or equal
+            #        to the rising threshold. If the value of this object is
+            #        set to singleEdge(3), an alarm will be generated once when
+            #        the selected variable exceeds the threshold. If the value
+            #        of this object is set to fallingContinuous(4), a falling
+            #        alarm will be generated on every sample interval, when the
+            #        selected variable sample value less than the falling
+            #        threshold. If the value of this object is set to
+            #        matchMode(5), an alarm will be generated when the
+            #        monitored object value is equal to the match value. If the
+            #        value of this object is set to pushMode(6), an alarm will
+            #        be generated at every sample interval. This object may not
+            #        be modified if the associated alarmStatus object is equal
+            #        to active(1).
+            # $6 = genAlarmDataValue - The value of the statistic during the
+            #        last sampling period. For example, if the sample type is
+            #        deltaValue, this value will be the difference between the
+            #        samples at the beginning and end of the period. If the
+            #        sample type is absoluteValue, this value will be the
+            #        sampled value at the end of the period. This is the value
+            #        that is compared with the rising and falling thresholds.
+            #        The value during the current sampling period is not made
+            #        available until the period is completed and will remain
+            #        available until the next period completes.
+            # $7 = genAlarmControlRisingThreshold - A threshold for the sampled
+            #        statistic. When the current sampled value is greater than
+            #        or equal to this threshold, and the value at the last
+            #        sampling interval was less than this threshold, a single
+            #        event will be generated. A single event will also be
+            #        generated if the first sample after this entry becomes
+            #        valid is greater than or equal to this threshold and the
+            #        associated alarmStartupAlarm is equal to risingAlarm(1) or
+            #        risingOrFallingAlarm(3). After a rising event is
+            #        generated, another such event will not be generated until
+            #        the sampled value falls below this threshold and reaches
+            #        the alarmFallingThreshold. This object may not be modified
+            #        if the associated alarmStatus object is equal to
+            #        active(1).
+            # $8 = genAlarmControlRisingDuration - The duration in seconds that
+            #        the sample value maintains the threshold condition for
+            #        Rising event generation. A rising duration value of 0
+            #        indicates that an event will be generated as when the
+            #        current sample value is less than or equal to the rising
+            #        threshold. This object may not be modified if the
+            #        associated alarmStatus object is equal to active(1).
+            # $9 = genAlarmControlRisingSeverity - Rising Alarm Severity. This
+            #        object may not be modified if the associated alarmStatus
+            #        object is equal to active(1).
+            # $10 = genAlarmControlRisingDescription - A description that will
+            #         be sent in the trap when the rising event is triggered.
+            #         This string can contain elements of the form '$i', where
+            #         i is an index into the variable binding list sent when a
+            #         trap triggered by this alarm row is sent. These elements
+            #         are expanded to the textual representation of the value
+            #         of the specified variable binding. i must be in the range
+            #         [1,N], where N is the number of bindings in the list.
+            #         Given that there are 10 bindings in the
+            #         genAlarmRisingAlarm notification, N = 10 +
+            #         genAlarmControlVarBindSize NB. a literal '$' character is
+            #         specified as '$$'.
+            ##########
+		$ruleset = $ruleset + ' - Trap 34/35'
+
+#		In preparation for GenAlarm class Ids for system and application teams
+            $genAlarmControlVariable = $1
+            $genAlarmControlVariableDescription = $2
+
+            if(nmatch($3,"OID: .iso."))
+            {
+                $genAlarmDataInstance = ".1" + extract($3, "^OID: \.iso(.*)$")
+            }
+            else
+            {
+                $genAlarmDataInstance = $3
+            }
+            $genAlarmControlSampleType = lookup($4, genAlarmControlSampleType) + " ( " + $4 + " )"
+            $genAlarmControlAlarmMode = lookup($5, genAlarmControlAlarmMode) + " ( " + $5 + " )"
+            $genAlarmDataValue = $6
+            $genAlarmControlThreshold = $7
+            $genAlarmControlDuration = $8 + " seconds"
+            $genAlarmControlSeverity = lookup($9, genAlarmSeverity) + " ( " + $9 + " )"
+            $genAlarmControlDescription = $10
+            $lowerGenDesc = lower($genAlarmControlVariableDescription)
+            if (nmatch($lowerGenDesc, "ssm_gen_system:"))  {
+                $ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+		if(match($ssmAppClass, "123000"))
+		{
+			$ssmAppClass = $CommunityClass
+		}
+
+
+                $ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                $ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                $ssmAppName = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                $ssmAlertGroup = "System"
+                $ssmAlertKey = $ssmAppName
+                $processNameSwitch = 2
+		$ruleset = $ruleset + ' - ssm_gen_system'
+            }
+
+            else if (nmatch($lowerGenDesc, "ssm_gen_process:"))  {
+                $ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+
+#	20080523	Change by Chris Janes of Abilitec	TD 4851
+#                
+		if(match($ssmAppClass, "123000"))
+		{
+			$ssmAppClass = $CommunityClass
+		}
+
+#	20080523	 End of Change
+
+                $ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                $ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                $ssmAppName = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+                $ssmAlertGroup = "Process"
+                $ssmAlertKey = $ssmAppName
+                $processNameSwitch = 2
+		$ruleset = $ruleset + ' - ssm_gen_process'
+            }
+
+            else if (nmatch($lowerGenDesc, "premiumcpu:3"))  
+	    {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+
+                $ssmAlertGroup = "PremiumCPU"
+                $ssmAlertKey = "Process ID " + substr($genAlarmDataInstance,29,10) 
+                $ruleset = $ruleset + ' - PremiumCPU:3'
+                switch($specific-trap)
+                {
+                case "34":
+ 			@Severity = 3
+			@Type = 1
+		case "35":
+ 			@Severity = 2
+			@Type = 2
+		default:
+ 			@Severity = 2
+			@Type = 2
+		}
+            }
+            else if (nmatch($lowerGenDesc, "premiumcpu:4"))
+            {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+
+                $ssmAlertGroup = "PremiumCPU"
+                $ssmAlertKey = "Process ID " + substr($genAlarmDataInstance,29,10) 
+                $ruleset = $ruleset + ' - PremiumCPU:4'
+                switch($specific-trap)
+                {
+                case "34":
+                        @Severity = 4
+                        @Type = 1
+                case "35":
+                        @Severity = 2
+                        @Type = 2
+                default:
+                        @Severity = 2
+                        @Type = 2
+                }
+            }
+            else if (nmatch($lowerGenDesc, "premiumcpu:5"))
+            {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+                $ssmAlertGroup = "PremiumCPU"
+                $ssmAlertKey = "Process ID " + substr($genAlarmDataInstance,29,10) 
+                $ruleset = $ruleset + ' - PremiumCPU:5'
+                switch($specific-trap)
+                {
+                case "34":
+                        @Severity = 5
+                        @Type = 1
+                case "35":
+                        @Severity = 2
+                        @Type = 2
+                default:
+                        @Severity = 1
+                        @Type = 0
+                }
+            }
+
+
+            else if (nmatch($lowerGenDesc, "premiumload:5"))
+            {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+                $ssmAlertGroup = "Processor Load"
+		@UserData = substr($genAlarmDataInstance,25,2)
+                $ssmAlertKey = "Processor No. " + substr($genAlarmDataInstance,25,2)
+                $ruleset = $ruleset + ' - Process Load:5'
+                switch($specific-trap)
+                {
+                case "34":
+                        @Severity = 5
+                        @Type = 1
+                case "35":
+                        @Severity = 2
+                        @Type = 2
+                default:
+                        @Severity = 1
+                        @Type = 0
+                }
+            }
+
+
+            else if (nmatch($lowerGenDesc, "premiumload:4"))
+            {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+                $ssmAlertGroup = "Processor Load"
+		@UserData = substr($genAlarmDataInstance,25,2)
+                $ssmAlertKey = "Processor No. " + substr($genAlarmDataInstance,25,2)
+                $ruleset = $ruleset + ' - Process Load:4'
+                switch($specific-trap)
+                {
+                case "34":
+                        @Severity = 4
+                        @Type = 1
+                case "35":
+                        @Severity = 2
+                        @Type = 2
+                default:
+                        @Severity = 1
+                        @Type = 0
+                }
+            }
+
+
+            else if (nmatch($lowerGenDesc, "premiumload:3"))
+            {
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+#                $ssmAppClass = 123000
+                 $ssmAppClass = $CommunityClass
+   
+#       20080523         End of Change
+                $ssmAlertGroup = "Processor Load"
+		@UserData = substr($genAlarmDataInstance,25,2)
+                $ssmAlertKey = "Processor No. " + substr($genAlarmDataInstance,25,2)
+                $ruleset = $ruleset + ' - Process Load:3'
+                switch($specific-trap)
+                {
+                case "34":
+                        @Severity = 3
+                        @Type = 1
+                case "35":
+                        @Severity = 2
+                        @Type = 2
+                default:
+                        @Severity = 1
+                        @Type = 0
+                }
+            }
+
+
+
+#		20061026	End of Changes HDLDN0000716738
+            else if (nmatch($lowerGenDesc, "configchecker"))  
+	    {
+                $ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+#       20080523        	Change by Chris Janes of Abilitec       TD 4851
+                		if(match($ssmAppClass, "123000"))
+                		{
+			                 $ssmAppClass = $CommunityClass
+	                	}
+
+#       20080523         	End of Change
+
+                $ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                $ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                $ssmAppName = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+#		Change made by Kris Newport - 20060719 -time 1132
+                $ssmAlertGroup = "configchecker"
+                $ssmAlertKey = $ssmAppName
+		
+		$tmpSummary = $11 + $12 
+		@UserData = $13 
+		update (@UserData)
+                $processNameSwitch = 2
+		$ruleset = $ruleset + ' - configchecker ' + $lenSummary
+            }
+            else if (nmatch($lowerGenDesc, "configstartup"))  
+	    {
+                $ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+#       20080523        	Change by Chris Janes of Abilitec       TD 4851
+                		if(match($ssmAppClass, "123000"))
+                		{
+			                 $ssmAppClass = $CommunityClass
+	                	}
+
+#       20080523         	End of Change
+
+                $ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                $ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+                $ssmAppName = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+#		Change made by Kris Newport - 20060719 -time 1132
+                $ssmAlertGroup = "Generic"
+                $ssmAlertKey = "0"
+		
+		$tmpSummary = $11 + $12 
+		@UserData = $13 
+		update (@UserData)
+                $processNameSwitch = 2
+		$ruleset = $ruleset + ' - configStartup ' + $lenSummary
+            }
+
+            else if (nmatch($lowerGenDesc, "ssm_fsmon"))  
+	    {
+			$ruleset = $ruleset + ' - ssm_fsmon'
+			$ssmTrap34-5fields = 0
+			# The match for 6 fields will only be used while we await the deployment of the ssm config to utilise
+			# the array that stores the Severity value across events.
+			if (regmatch($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$'))
+			{
+				$ssmTrap34-5fields = 6
+                		$ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+:[^:]+$')
+
+                		if(match($ssmAppClass, "123000"))
+                		{
+			                 $ssmAppClass = $CommunityClass
+	                	}
+
+#	20080826			changes by Chris Janes of Abilitec TD 5026
+				else if(match($ssmAppClass, "123004"))
+                                {
+					$tempMarkForDiscard = 2
+                                }
+#	20080826		 End of Change
+
+#       20080523         	End of Change
+
+                		$ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+                		$ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                		$ssmAlertKey = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+				$ssmAlertGroup = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+			}
+			else
+			{
+				$ssmTrap34-5fields = 5
+        	        	$ssmAppClass = extract($genAlarmControlVariableDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+
+#       20080523        	Change by Chris Janes of Abilitec       TD 4851
+                		if(match($ssmAppClass, "123000"))
+                		{
+			                 $ssmAppClass = $CommunityClass
+	                	}
+
+#	20080826			changes by Chris Janes of Abilitec TD 5026
+				else if(match($ssmAppClass, "123004"))
+                                {
+					$tempMarkForDiscard = 2
+                                }
+
+#	20080826		 End of Change
+
+#       20080523         	End of Change
+
+
+                		$ssmSubclass = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+                		$ssmSystemDesig = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+	                	$ssmAlertKey = extract($genAlarmControlVariableDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+				$ssmAlertGroup = "Disk usage"
+				if (match($ssmAlertKey,"Disk Name"))
+				{
+					$ssmAlertKey = $11
+				}
+			}
+                	$processNameSwitch = 2
+	    }
+            	else if (nmatch($lowerGenDesc, "ssm_if_inbound"))  
+		{
+			$ruleset = $ruleset + ' - ssm_if_inbound'
+                        $NoElements = 0
+                        clear(SplitArray)
+
+			$NoElements = split($genAlarmControlVariableDescription, SplitArray, ":")
+			$ssmAppClass = SplitArray[2]
+#       20080523        Change by Chris Janes of Abilitec       TD 4851
+                	if(match($ssmAppClass, "123000"))
+                	{
+				$ssmAppClass = $CommunityClass
+	                }
+
+#       20080523         	End of Change
+
+			$ssmSubclass = SplitArray[3]
+			$ssmSystemDesig = SplitArray[4]
+			$ssmAppName = SplitArray[5]
+
+			$ssmAlertGroup = "System"
+			$ssmAlertKey = $ssmAppName
+
+		}
+
+            else
+	    {	
+		$ruleset = $ruleset + "None of the Above"
+		$ssmAlertGroup = $2
+            	if (regmatch($11, '^[^:]+:.*$'))  
+                {
+			$ssmAlertKey = extract($11, '^([^:]+):.*$')
+            	}
+            	else if (nmatch($ssmAlertGroup, "Page Faults"))
+		{
+			$ssmAlertKey = "Page Faults"
+			$tempMarkForDiscard = 2
+		}
+            	else if (nmatch ( $ssmAlertGroup, "Swap space in use >="))
+		{
+			$ssmAlertKey = "Swap Space"
+		}
+#	GT 27/8/9 BR_672.
+		else if( (nmatch ( $ssmAlertGroup, "Interface inbound errors")) && (regmatch($genAlarmControlDescription, "inbound errors per.*$")) )
+		{
+			$tempMarkForDiscard = 2
+		}
+		else if( (nmatch ( $ssmAlertGroup, "Interface outbound errors")) && (regmatch($genAlarmControlDescription, "outbound errors per.*$")) )
+		{
+			$tempMarkForDiscard = 2
+		}
+#	GT 27/8/9 End of change.
+		else  
+		{
+                	$ssmAlertKey = $11
+            	}
+	    }
+
+            @AlertKey = $ssmAlertKey
+	    @AlertGroup = $ssmAlertGroup
+	    @Subclass = $ssmSubclass
+	    @SystemDesig = $ssmSystemDesig
+
+		if( exists($tmpSummary))
+		{
+			@Summary = $tmpSummary
+			$ruleset = $ruleset + " tmpSummary"
+		}
+		else
+		{
+			@Summary = $10
+		}
+		
+            @SysInt = $6
+	    $ssmSuppliedSeverity = $9
+	    $tmpIsDiskUsage=0		## Set this to Zero, we will use it in the Disk calculation.
+	    if (match(@AlertGroup, "Disk usage")) {	## requested by Kris Newport 24/5/2005
+		$ruleset = $ruleset + ' - Disk usage'
+		$tmpIsDiskUsage=1
+		@Subclass = "Absolute"
+
+		$AllocMaxSize = $14
+		$AllocUnits = $15
+		$AllocUsedSize = $16
+		$SizeMaxMb = real($AllocMaxSize) * real($AllocUnits) / 1000000
+		$SizeUsedMb =real($AllocUsedSize) * real($AllocUnits) / 1000000 
+		if (int($SizeMaxMb) < 1000 )
+		{
+			$DispSizeUsedMbCalc = int($SizeUsedMb)
+			$DispSizeMaxMbCalc = int($SizeMaxMb)
+			$DispSizeMb = $DispSizeUsedMbCalc  + " of " + $DispSizeMaxMbCalc + " Mb Used)"
+		}
+		else if (int($SizeMaxMb) < 1000000 )
+		{
+			$DispSizeUsedMbCalc = real($SizeUsedMb)/1000
+			$DispSizeMaxMbCalc = real($SizeMaxMb)/1000
+			$DispSizeMb = substr($DispSizeUsedMbCalc,1,4) + " of " + substr($DispSizeMaxMbCalc,1,4) + " Gb Used)"
+		}
+		else
+		{
+			$DispSizeUsedMbCalc = int($SizeUsedMb)/1000
+			$DispSizeMaxMbCalc = int($SizeMaxMb)/1000
+			$DispSizeMb = $DispSizeUsedMbCalc + " of " + $DispSizeMaxMbCalc + " Gb Used)"
+		}
+		@Summary = @Summary + " ( " + $DispSizeMb 
+		}
+		if ((nmatch($ssmAlertGroup, "Hardware")) && (regmatch(@Summary, "DGC")))
+		{
+			# Here I set $ssmClassGidKey to a NULL value to ensure the $ssmAppClass token is used at the bottom of the 
+			# rules for the OwnerGID and Class assignment when inserting the event into the Object Server.
+			$ssmClassGidKey = ""
+			$ssmAppClass = 128040
+		}
+
+
+		# Here we  evaluate the current events severity against its previous stored value. We switch on $specific-trap
+		# in order to provide the correct logic. First we must create a token to be used in the following array statements
+		# This token will be similar in construction to the $tempIdentifier token, but should not contain the @Type value in
+		# order to maintain integrity regardless of whether the trap is a Problem or Resolution event.
+		switch ($ssmAppClass)
+		{
+			case "123000"|"120000":
+				$AddKey = ""
+			default:
+				$AddKey = $ssmAppClass
+				$ruleset = $ruleset + ' - AddKey=' + $AddKey
+		}
+		$tmpgenAlarmKey = $Node + @AlertGroup + @AlertKey + $AddKey
+		$tmpgenAlarmRiseThresholdKey = $tmpgenAlarmKey + "-" + "genAlarmControlThreshold"
+
+	if (nmatch($ssmAlertGroup, "Disk usage"))
+	{
+		switch($specific-trap)
+		{
+		case "34":
+			# Here we initialise the array to store Severity (keyed against $tmpgenAlarmKey), this will be actioned only on first
+			# receipt of any Trap 34. After that correct values will be stored for the current state.
+			if (match("",ssmgenAlarm_array[$tmpgenAlarmKey]))
+			{
+				ssmgenAlarm_array[$tmpgenAlarmKey] = 0
+				ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey] = 0
+				
+			}
+			# Here we evaluated last stored Severity value against the Severity reported in the current trap. If the stored
+			# severity was higher, then we continue to use the stored severity.
+			$previous_severity = ssmgenAlarm_array[$tmpgenAlarmKey]
+			$previous_Threshold = ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey]
+			if (int($ssmSuppliedSeverity) < int($previous_severity))
+			{
+				$ssmSuppliedSeverity = $previous_severity
+				switch($tmpIsDiskUsage)
+				{
+					case "1":
+						@Summary = 'Disk space for "' + @AlertKey + '" filesystem has exceeded the ' + $previous_Threshold + '% threshold, it is ' + $genAlarmDataValue + '% full ( ' + $DispSizeMb
+					default:
+						# Leave everything as it is.
+				}
+			}
+			# If current severity is higher than stored, update the stored value.
+			else if (int($ssmSuppliedSeverity) > int($previous_severity))
+			{
+				ssmgenAlarm_array[$tmpgenAlarmKey] = $ssmSuppliedSeverity
+				ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey] = $genAlarmControlThreshold
+				# We can leave the Summary as it came from the SSM
+			}
+			else
+			{
+				# The severity has not changed across any thresholds, pass the severity through untouched and leave the stored
+				# values alone as well.
+			}
+
+		case "35":
+			# Here we initialise the array to store Severity (keyed against $tmpgenAlarmKey), this will be actioned only on first
+			# receipt of any Trap 35. After that correct values will be stored for the current state.
+			if (match("",ssmgenAlarm_array[$tmpgenAlarmKey]))
+			{
+				ssmgenAlarm_array[$tmpgenAlarmKey] = 5
+				# We need to initialise the Threshold value, as we should only return a no match if the probe has just restarted.
+				# The initial value needs to be greater than Zero, but below any valid Threshold that we would recieve from any Trap 34
+				# If this value is too high, it will be the only value reported throughout the lifetime of the event.
+				ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey] = 70
+			}
+			# Here we evaluated last stored Severity value against the Severity reported in the current trap. 
+			# Theoretically the current Severity should ALLWAYS be less than or equal to the stored Severity
+			# otherwise we should of received a Trap 34 in between the trap 35's.
+			$previous_severity = ssmgenAlarm_array[$tmpgenAlarmKey]
+			$previous_Threshold = ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey]
+			if (int($ssmSuppliedSeverity) < int($previous_severity))
+			{
+				ssmgenAlarm_array[$tmpgenAlarmKey] = $ssmSuppliedSeverity
+				# We can leave the $ssmSuppliedSeverity token as it is and just update the Severity value in the array.
+				switch($tmpIsDiskUsage)
+				{
+					case "1":
+						@Summary = 'Disk space for "' + @AlertKey + '" filesystem has fallen below the ' + $previous_Threshold + '% threshold, it is ' + $genAlarmDataValue + '% full ( ' + $DispSizeMb
+					default:
+						# Leave everything as it is.
+				}
+			}
+			# If current severity is higher than stored, we have a bit of a problem so we ought to log an error as well as updating the array.
+			# We should never get here either, Trap 35 is only sent when the event drops below a trigger threshold.
+			else 
+			{
+				log(ERROR, "GenAlarm trap 34 must have been missed as current Severity is higher than stored severity for " + ssmgenAlarm_array[$tmpgenAlarmKey])
+				ssmgenAlarm_array[$tmpgenAlarmKey] = $ssmSuppliedSeverity
+			}
+			
+			
+		default:
+			# We should never get here.
+			log(ERROR, "Invalid specific-trap number for genAlarm")
+		}
+	}
+	if (nmatch($ssmAlertGroup,"Hardware Status monitor"))
+	{
+		$ruleset = $ruleset + ' - Hardware Status monitor'
+	}
+
+	    # Here we now set the severity based upon the value supplied by the SSM. After evaluating against the array.
+            switch($ssmSuppliedSeverity)
+            {
+                case "1":
+                    @Severity = 1
+                    @Type = 2
+		    # Just for good measure, we can now set the array values to reflect the initial trigger thresholds configured in the SSM
+		    # That way, if the evnt recurrs again before the probe restarts, we are good to go with valid values.
+		    ssmgenAlarm_array[$tmpgenAlarmKey] = $ssmSuppliedSeverity
+		    ssmgenAlarm_array[$tmpgenAlarmRiseThresholdKey] = $genAlarmControlThreshold
+		    
+                case "2":
+                    @Severity = 3
+                    @Type = 1
+			if (match(@AlertKey, "Swap Space"))
+			{
+				$tempMarkForDiscard = 2
+			}
+                case "3":
+                    @Severity = 4
+                    @Type = 1
+			if (match(@AlertKey, "Swap Space"))
+			{
+				$tempMarkForDiscard = 2
+			}
+                case "4":
+                    @Severity = 5
+                    @Type = 1
+                default:
+                    @Severity = 2
+                    @Type = 1
+			if (match(@AlertKey, "Swap Space"))
+			{
+				$tempMarkForDiscard = 2
+			}
+	    }
+
+
+	switch ($ssmAppClass)
+	{
+		case "123000"|"120000":
+			$AddID = ""
+		default:
+			$AddID = $ssmAppClass
+			$ruleset = $ruleset + ' - AddID=' + $AddID
+	}
+
+           $tempIdentifier = $Node + $enterprise + $generic-trap + "34-35" + @Type + @AlertGroup + @AlertKey + $genAlarmDataInstance + $AddID
+	   # End of Trap 34 and 35 rules.

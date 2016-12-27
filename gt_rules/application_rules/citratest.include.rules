@@ -1,0 +1,142 @@
+#######################################################################
+#
+#	citratest.include.rules
+#	Created		20051108	Chris Janes Abilitec
+#	Revised		20080109	Gary Thomas Abilitec
+#
+#	Changes made to accomodate new Application heartbeating system.
+#
+#######################################################################
+#
+#	$1 = Step Name(@AlertKey)
+#	$2 = Step Result
+#	$3 = Step Start Time
+#	$4 = Step Complete Time
+#	$5 = Step delta Time
+#	£6 = Script name (@AlertGroup)
+#	$7 = Script Start Time
+#	$8 = hostname
+#	$9 = ?
+#	$10 = ?
+#	$9 = ?
+
+
+case "Citra_Test":
+	$ruleset = $ruleset + " Citra Test"
+	if (regmatch($1,"^.*_Failed$"))
+	{
+		$stepname = extract($1,"^(.*)_Failed$")
+	}
+	else
+	{
+		$stepname = $1
+	}
+	@AlertKey =  'CitraTest test in progress'
+	@UserData = $6
+
+	if (regmatch($6, "^[^_]*_[^_]*_[0-9]+$"))
+	{
+		$ruleset = $ruleset + " ext3"
+                @AlertGroup = extract ($6, "^([^_]*)_[^_]*_[0-9]+$")
+                @Subclass = extract ($6, "^[^_]*_([^_]*)_[0-9]+$")
+		if (regmatch(@AlertGroup, "^[^_]+_.*$"))
+		{
+			$ClassLookup = extract (@AlertGroup, "^([^_]+)_.*$")
+			$ruleset = $ruleset + " CL=Ext"
+		}
+		else
+		{	
+			$ClassLookup = @AlertGroup
+			$ruleset = $ruleset + " CL=NoExt"
+		}
+                @Class = extract ($6, "^[^_]*_[^_]*_([0-9]+)$")
+		[$Discard, $TmpSysInt] = lookup($ClassLookup, citra_class)
+        }
+        else if (regmatch($6, "^[^_]*_[0-9]+$"))
+	{
+		$ruleset = $ruleset + " ext2"
+		@AlertGroup = extract ($6, "^(.*)_[0-9]+$")
+		if (regmatch(@AlertGroup, "^[^_]+_.*$"))
+		{
+			$ClassLookup = extract (@AlertGroup, "^([^_]+)_.*$")
+			$ruleset = $ruleset + " CL=Ext"
+		}
+		else
+		{	
+			$ClassLookup = @AlertGroup
+			$ruleset = $ruleset + " CL=NoExt"
+		}
+		@Class = extract ($6, "^.*_([0-9]+)$")
+		[$Discard, $TmpSysInt] = lookup($ClassLookup, citra_class)
+	}
+	else
+	{
+		$ruleset = $ruleset + " ext1"
+		@AlertGroup = $6
+		if (regmatch(@AlertGroup, "^[^_]+_.*$"))
+		{
+			$ClassLookup = extract (@AlertGroup, "^([^_]+)_.*$")
+			$ruleset = $ruleset + " CL=Ext"
+		}
+		else
+		{	
+			$ClassLookup = @AlertGroup
+			$ruleset = $ruleset + " CL=NoExt"
+		}
+		[@Class, $TmpSysInt] = lookup($ClassLookup, citra_class)
+		$ruleset = $ruleset + " Regmatch Failed Using Default"
+	}
+	$ruleset = $ruleset + " $ClassLookup = " + $ClassLookup
+	@Agent = "CitraTest"
+	if (match ($stepname, $6))
+	{
+		if (match ($2 ,"StopTimerFail"))
+		{
+			@Summary = "CitraTest Script " + @AlertGroup + " Failed on Workstation " + $PeerAddress 
+			@Severity = 4
+			@Type = 1
+			@SysInt = 0
+		}
+		else
+		{
+			@Summary = "CitraTest Script " + @AlertGroup + " OK on Workstation " + $PeerAddress 
+			@Severity = 2
+			@Type = 2
+			@SysInt = $TmpSysInt
+			@AlertKey = 'CitraTest test Completed'
+			# SystemDesig and Poll set here as this option is treated as the CitraTest Heartbeat.
+			@SystemDesig = 1003
+			@Poll = $TmpSysInt
+			update(@SystemDesig)
+			update(@Poll)
+		}
+	}
+	else
+        {
+                if (match ($2 ,"StopTimerFail"))
+                {
+                        @Summary = $stepname + " Failed on Workstation " + $PeerAddress
+                        @Severity = 4
+                        @Type = 1
+                }
+                else
+                {
+                        @Summary = $stepname + " OK on Workstation " + $PeerAddress
+                        @Severity = 2
+                        @Type = 2
+                }
+        }
+	@OwnerGID = lookup(@Class, SocketClassGID)
+	$location_key = lower(substr($PeerAddress, 2, 3))
+	[@Location, @Region, $tmpDomain] = lookup($location_key, regloc)
+	@UserInt = $5
+	@Node = $PeerIPaddress
+	@NodeAlias = $PeerAddress
+	$TempDoLookup = 2
+	if(match(@Class,"1057419"))
+	{
+ 		@Alarm_Dest = "ITSM_ALerts_Citratest"
+		@Notification = "3"
+	}
+
+	$tempIdentifier = @Node + @NodeAlias + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type

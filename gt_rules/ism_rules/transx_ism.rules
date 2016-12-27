@@ -1,0 +1,161 @@
+#
+#####################################################################
+#
+#       Copyright (C) 1997, 1998, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: transx.rules,v 1.1 2002/07/10 12:00:22 nik Development $
+#
+#######################################################################
+ 
+if(match(@Manager, "MonitorWatch"))
+{
+	switch(@Summary)
+	{
+	case "Running ...":
+		@Severity = 1
+		@AlertGroup = "monitorstat"
+		@Type = 2
+	case "Going Down ...":
+		@Severity = 5
+		@AlertGroup = "monitorstat"
+		@Type = 1
+	default:
+	}
+
+	@Summary = @Agent + " monitor on " + @Node + ": " + @Summary
+}
+else
+{
+#######################################################################
+## The following logic can be used to modify an event based on the
+## number of times it's happened in a row.  This segment of the rules
+## will only send an event every $interval times it happens:
+#
+#  $interval = 2
+#
+#  $temp = real($serviceLevelCounter) / real($interval)
+#  $temp1 = real($temp) - int($temp)
+#
+#  if( match($temp1, "0.000000"))
+#  {
+#    # Modify the event in some way
+#  }
+#  else
+#  {
+#    discard
+#  }
+#
+## The next piece of rulesfile will only send an event if the serviceLevel
+## is changing state.  serviceLevel is defined by:
+##
+##      serviceLevel = 0; then SLA is unknown
+##      serviceLevel = 1; then SLA is good
+##      serviceLevel = 2; then SLA is marginal
+##      serviceLevel = 3; then SLA is failed
+#
+#  if( match($lastServiceLevel, $serviceLevel))
+#  {
+#    discard
+#  }
+#
+#######################################################################
+
+	# Get the fully qualified hostname of the machine running the monitor
+	if(!exists($monitorDomain))
+	{
+		if(exists($monitorDNSDomain))
+		{
+			$monitorDomain = $monitorDNSDomain
+		}
+		else if(exists($monitorNISDomain))
+		{
+			$monitorDomain = $monitorNISDomain
+		}
+	}
+	$FQHostname = $monitorHost
+	if(exists($monitorDomain))
+	{
+		$FQHostname = $FQHostname + "." + $monitorDomain
+	}
+
+
+	#Setup ObjectServer to update Summary, AlertKey and Poll
+	update(@Summary)
+	update(@AlertKey)
+	update(@Poll)
+	# Get general information
+
+#       20050908        Change by Chris Janes of Abilitec
+        $ruleset = $ruleset + ' - Transx Monitor'
+#       20050908        End of Change
+
+	@Identifier = $profile + $service + $FQHostname + $transxName + $message
+	@Location = $FQHostname
+	@Agent = $profile
+
+#       20060508 Changes by Chris Janes of Abilitec to enable us to vary the Class if these events dependent on profile name
+#       @Class = 6350
+
+
+#       20081119        Changes by Chris Janes of Abilitec TD 5152 & 5153
+#       @Class = lookup ($profile,prof_class)
+        [@Class, @Subclass, @Environment] = lookup ($profile,prof_class)
+
+#       20081119        End of Change
+
+        if(match(@Class, "6050"))
+        {
+                @Class = 6350
+        }
+#       20060508        end of changes
+
+        if(match(@Class, "124010"))
+        {
+                @AlertGroup = "Lexicon"
+        }
+
+
+	@Manager= $service + " ISM"
+	@AlertKey = $totalTime
+	@Node = $transxName
+	@Poll = $pollInterval
+
+	@Summary = $message
+
+	# Uncomment this next line if you wish to update the services
+	# information in the ObjectServer
+	#$service_name = $service + " on " + $host + ":" + $port + " from " + $FQHostname
+
+
+	if(match($message, "Successfully completed transaction"))
+	{
+		if(exists($service_name))
+		{
+			service($service_name, GOOD)
+		}
+        	@Type = 2
+		@Severity = 1
+		@Summary = @Summary + " " + $transxName + " in " + $totalTime + " secs"
+	}
+	else
+	{
+        	@Type = 1
+		if(exists($service_name))
+		{
+			service($service_name, BAD)
+		}
+		@Severity = 4
+		@Summary = @Summary + ": Step " + $stepFailedNumber + " failed :" + $stepResultStringFailed
+	}
+}

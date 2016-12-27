@@ -1,0 +1,49 @@
+# Register all potential target ObjectServers
+#Eng ObjectServers
+#LDNENG = registertarget ( "LDNENG" , "" , "alerts.status" )
+#STMENG = registertarget ( "STMENG" , "" , "alerts.status" )
+
+#Dev ObjectServers
+#STMTEST = registertarget ( "STMTEST" , "" , "alerts.status" )
+
+#Prod ObjectServers
+#EMEA = registertarget ( "EMEA" , "" , "alerts.status" )
+#USAPAC = registertarget ( "USAPAC" , "" , "alerts.status" )
+#PACIFIC = registertarget ( "PACIFIC" , "" , "alerts.status" )
+
+#Eng FastTrack ObjectServers
+#LDNENG_FT = registertarget ( "AEN_ENG" , "" , "alerts.status" )
+#STMENG_FT = registertarget ( "AEN_ENG" , "" , "alerts.status" )
+
+#Eng Application Heartbeat ObjectServers
+#LDNENG_AH = registertarget ( "LDNENG", "" , "custom.app_hbt_status" )
+#STMENG_AH = registertarget ( "STMENG", "" , "custom.app_hbt_status" )
+
+
+#Dev FastTrack ObjectServers
+#STMTEST_FT = registertarget ( "STMTEST" , "" , "custom.fast_track" )
+
+#Dev Application Heartbeat ObjectServers
+#STMTEST_AH = registertarget ( "STMTEST", "" , "custom.app_hbt_status" )
+
+#Prod FastTrack ObjectServers
+#EMEA_FT = registertarget ( "EMEA" , "" , "custom.fast_track" )
+#USAPAC_FT = registertarget ( "USAPAC" , "" , "custom.fast_track" )
+#PACIFIC_FT = registertarget ( "PACIFIC" , "" , "custom.fast_track" )
+
+#Prod Application Heartbeat ObjectServers
+#EMEA_AH = registertarget ( "EMEA" , "" , "custom.app_hbt_status" )
+#USAPAC_AH = registertarget ( "USAPAC" , "" , "custom.app_hbt_status" )
+#PACIFIC_AH = registertarget ( "PACIFIC" , "" , "custom.app_hbt_status" )
+
+#Engineering Heartbeat ObjectServers
+#DEV_HBT_OS = registertarget ( "DEV_HBT_OS" , "" , "custom.heartbeat" )
+
+#Production Heartbeat ObjectServers
+#UBS_HBT_OS = registertarget ( "UBS_HBT_OS" , "" , "custom.heartbeat" )
+
+## Destinations here:
+EMEA = registertarget ( "EMEA" , "" , "alerts.status" )
+EMEA_FT = registertarget ( "EMEA" , "" , "alerts.status" )
+UBS_HBT_OS = registertarget ( "UBS_HBT_OS" , "" , "custom.heartbeat" )
+EMEA_AH = registertarget ( "EMEA" , "" , "custom.app_hbt_status" )

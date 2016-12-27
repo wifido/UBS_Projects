@@ -1,0 +1,27 @@
+##############################################################################
+# Netcool/OMNIbus Bi-directional ObjectServer Gateway 7.2
+#
+# UBS Specific BI gateway tablerep definitions file for ObjectServerB to ObjectServerA
+#
+# Version 2.0 
+#
+# Revision History:
+#	2.0 	28 May 2008	Initial cut By G.Thomas
+# Notes:
+#
+##############################################################################
+REPLICATE ALL FROM TABLE 'alerts.status'
+	USING MAP 'StatusMap';
+
+REPLICATE ALL FROM TABLE 'alerts.journal'
+	USING MAP 'JournalMap';
+
+REPLICATE ALL FROM TABLE 'custom.suppress'
+	USING MAP 'CustomSuppressMap';
+
+REPLICATE ALL FROM TABLE 'custom.Infra_Status'
+	USING MAP 'CustomInfraStatusMap';
+
+REPLICATE ALL FROM TABLE 'custom.app_hbt_status'
+	USING MAP 'CustomAppHbtStatusMap';
+

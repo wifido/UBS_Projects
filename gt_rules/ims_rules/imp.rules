@@ -1,0 +1,212 @@
+################################################################################
+#
+#	imp.rules	Chris Janes of Abilitec
+#	20060907	Original
+#
+#
+#
+###############################################################################
+
+
+#case "2070990" | "2070991" | "2070992"| "2070993" | "1057089" | "1057095":
+#Sharif add this line to include Post processing for Class "1057089" and "1057095" (Banker Portal and IBDocs)
+case "2070990" | "2070991" | "2070992"| "2070993":
+	$ruleset =  $ruleset + " - IMP"
+
+	@Agent = "IMP"
+
+	@Class = $ClassID
+       
+	@AlertGroup = $Component
+        @AlertKey = $EventIdentifier
+	@NodeAlias = lower($Nodealias)
+        @Summary = $MessageText
+	@Environment = $Environment
+        @Stream = $Stream
+        @Subclass = $Subclass
+        @Type = $EventType
+	@UserData=$Userdata
+	$ArraySize = split($Userdata, SplitArray, ",")
+
+	switch ($ArraySize)
+	{
+		case "3":
+#			$ruleset =  $ruleset + " - ArraySize =3"
+			$DataToTest = SplitArray[1]
+			include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"	
+			$DataToTest = SplitArray[2]
+			include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"	
+			$DataToTest = SplitArray[3]
+			include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"	
+                case "2":
+#			$ruleset =  $ruleset + " - ArraySize =2"
+                        $DataToTest = SplitArray[1]
+                        include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"
+                        $DataToTest = SplitArray[2]
+                        include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"
+                default:
+#			$ruleset =  $ruleset + " - ArraySize = other"
+                        $DataToTest = SplitArray[1]
+                        include "$OMNIHOME/all_rules/ubsw/ims_rules/imp.include.rules"
+	}
+
+#	this only for testing remove before push to prod details
+	@Description = "Debug Info "
+	if (exists($instance))
+	{
+#		$ruleset =  $ruleset + " - instance"
+		@Description = @Description + "Instance = " + $instance
+	}
+	if (exists($cluster))
+	{
+#		$ruleset =  $ruleset + " - cluster"
+		@Description = @Description + " cluster = " + $cluster
+	}
+	if (exists($process))
+	{
+#		$ruleset =  $ruleset + " - process"
+		@Description = @Description + " process = " + $process
+	}
+#	end of testing only bit
+
+
+	$ClassReset = "0"
+	if (exists($instance))
+        {
+                $ruleset =  $ruleset + " InstanceHostClass lookup"
+                $HostInstance = @NodeAlias + $instance
+#@RemData3= "HostInstance = " + $HostInstance
+                $NewClass = lookup($HostInstance, InstanceClass)
+#                $ruleset = $ruleset + "NewClass = " + $NewClass
+                if (nmatch($NewClass,"666"))
+                {
+#                        $ruleset =  $ruleset + " No NewClass2"
+                }
+                else
+                {
+                        @Class = $NewClass
+#                        $ruleset =  $ruleset + " Set NewClass2 " + $NewClass
+                        $ClassReset = "1"
+                }
+        }
+        if (nmatch($NewClass,"666"))
+	{
+#		$ruleset =  $ruleset + " InstanceClass lookup"
+		$NewClass = lookup($instance, InstanceClass)
+#		$ruleset = $ruleset + "NewClass = " + $NewClass
+		if (nmatch($NewClass,"666"))
+		{
+#			$ruleset =  $ruleset + " No NewClass1"
+		}
+		else
+		{
+			@Class = $NewClass
+#			$ruleset =  $ruleset + " Set NewClass1 " + $NewClass
+			$ClassReset = "1"
+		}	
+	}
+
+
+
+
+
+	#added by Sharif Johnson for class mappings based on AlertKey
+	if (exists($process) && match ($ClassReset, "0"))
+        {
+                $ruleset =  $ruleset + " ProcessClass lookup"
+                $NewClass = lookup($process, ProcessClass)
+                $ruleset = $ruleset + "NewClass = " + $NewClass
+                if (nmatch($NewClass,"667"))
+                {
+                        $ruleset =  $ruleset + " No NewClass"
+                }
+                else
+                {
+                        @Class = $NewClass
+                        $ruleset =  $ruleset + " Set NewClass"
+                }
+        }
+
+
+#	20080213	Change by Chris Janes of Abilitec
+	$tempClass = @Class
+
+#	20080213	End of Changes
+
+#	20071221	Changes by Chris Janes of Abilitec ref Tom Acunzo / Simon Waller
+
+	clear(SplitArray)
+	$ArraySize = split(@Summary, SplitArray, " ")
+	$AdditionalIdentifier = SplitArray[1] + " " + SplitArray[2] + " " + SplitArray[3] + " " + SplitArray[4]
+	@Description = @Description + " AddID = " + $AdditionalIdentifier
+
+#	20080220	Changes by Chris Janes to make 'state unknown events dedup with running events
+	if( match ($AdditionalIdentifier, "Process state unknown -"))
+	{
+		$AdditionalIdentifier = "Process is running -"
+	}
+
+        if( match ($AdditionalIdentifier, "Application state unknown -"))
+        {
+                $AdditionalIdentifier = "Application is running -"
+        }
+
+        if( match ($AdditionalIdentifier, "Resource state unknown -"))
+        {
+                $AdditionalIdentifier = "Resource is running -"
+        }
+
+
+#	20080220	End of Changes
+
+
+##	20081127	GT. Emergency fix to this ruleset. Due to high numbers of Erroneous INFO Type 2 events
+##			hitting the object servers (3300+ currently in OS. > 110,000 over past 10 days in Oracle).
+##			These need to be blown away here, until we can better identify who, why, where and how.
+	
+	if (int(@Severity) == 2 && int(@Type) == 1 )
+	{
+		$ruleset = $ruleset + " GT-DISCARDED"
+		$tempMarkForDiscard = 2
+	}
+
+
+##	20081127	End of change.. GT
+
+#	20080114	Change by Chris Janes to set some resolution events ****** DO NOT PUSH TO PROD ***********
+#
+#	if(match(SplitArray[2], "started") || match(SplitArray[3], "started"))
+#	{
+#		@Type = "2"
+#	}
+#
+        $tempIdentifier = lower($Nodealias) + "SOCKETPROD" + $Transport + $EventIdentifier + $EventType + $ClassID + $Subclass + @UserData + $AdditionalIdentifier
+
+#       20071221	End of Changes
+
+#        $tempIdentifier = lower($Nodealias) + @Manager + $Transport + $EventIdentifier + $EventType + $ClassID + $Subclass
+#	20061212	Change by Chris Janes of Abilitec at Thomas Acunzo's request
+#       $tempIdentifier = lower($Nodealias) + "SOCKETPROD" + $Transport + $EventIdentifier + $EventType + $ClassID + $Subclass
+
+#	20071221	Changes by Chris Janes of Abilitec ref Tom Acunzo / Simon Waller
+#        $tempIdentifier = lower($Nodealias) + "SOCKETPROD" + $Transport + $EventIdentifier + $EventType + $ClassID + $Subclass + @UserData
+#       20071221	End of Changes
+#	20061212	End of Changes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

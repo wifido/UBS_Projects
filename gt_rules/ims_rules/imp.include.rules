@@ -1,0 +1,40 @@
+################################################################################
+#
+#	imp.include.rules	Chris Janes of Abilitec
+#	20060907		Original
+#
+#
+#
+###############################################################################
+
+
+	if(nmatch($DataToTest, "instance="))
+	{
+		$instance = extract($DataToTest, "^instance=(.*)$")
+	}
+
+
+	if(nmatch($DataToTest, "cluster="))
+	{
+		$cluster = extract($DataToTest, "^cluster=(.*)$")
+	}
+
+
+	if(nmatch($DataToTest, "process="))
+	{
+		$process = extract($DataToTest, "^process=(.*)$")
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

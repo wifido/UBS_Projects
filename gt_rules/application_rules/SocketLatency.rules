@@ -1,0 +1,87 @@
+case "49900":
+	$ruleset = $ruleset + " LatencySock"
+	@Agent = $Transport
+	@Manager = %Manager
+	@Class = $ClassID
+	@Summary = $MessageText
+	@Stream = $Stream
+	$temp_length_location = length($Location)
+	if (exists($Location) && int($temp_length_location) > 0)
+	{
+		@Location = $Location
+	}
+	@Environment = $Environment
+	@Subclass = $Subclass
+	@UserData = $Userdata
+	@UserInt = $Userint
+	@SAPNumber = $SAPnumber
+	if (exists($Component))
+	{
+		@AlertKey = $Component
+	}
+	else
+	{
+		@AlertKey = $SAPname
+	}
+	
+	@AlertGroup = $EventIdentifier
+	if (exists($ProcessID) && int($ProcessID) > 0)
+	{
+		@AlertGroup = $EventIdentifier + "-" + $ProcessID
+	}
+	#
+	
+	$tempEventType = $EventType
+	@Display_Hide = 0
+	switch ($tempEventType)
+	{
+	case "2":
+		@Type = 2
+		@Severity = 1
+                       	
+	default:
+	@Type = $EventType
+                        	
+	# If TimeToClear token is set to 0 event will never
+	# expire from Object Server. If TimeToClear token
+	# value set to 1-180 seconds, it is unlikely that the
+	# event will have enough time to propogate
+	# through all gateways, before expiring. So we set a default
+	# value of 180.
+                        	
+	#if (int($TimeToClear) > 0 && int($TimeToClear) < 180 )
+	#{
+		#@Type = 180
+	#}
+	##
+	## This elseif statement added short term to resolve
+	## an issue with the log4perl never sending $EventType or $TimeToClear
+	## Read to EndOfFix1.
+	#else if (int($TimeToClear) == 0)
+	#{
+		#@Type = 1
+	#}
+	## EndOfFix1
+	#else
+	#{
+	#@Type = $TimeToClear
+	#}
+	#
+	}
+	
+#	20080104 Change by GT..
+	@SystemDesig = 1005
+	@Poll = 600
+
+#	20080104 End of Change
+	#Added by Sharif Johnson to for improved processing of Latency Scripts
+	update(@UserData)
+	update(@Severity)
+
+        # Changes made by Mahesh Kumar
+        # Set identifier to use ProbeHostName. Will not be overridden in mttrapd rules. TD #5201
+        $TD_Num = 5201
+        $tempProbeHostName = hostname()
+        $tempIdentifier = $tempProbeHostName + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + "SOCKETPROD" + " " + @Class + " " + @Subclass + " " + @Environment
+        @Identifier = $tempIdentifier
+

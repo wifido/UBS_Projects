@@ -1,0 +1,2 @@
+map(name="rm_profile",bgImage="",bgColor="white",w="250",h="250",acl="*")
+text(datasource="NCOMS",action="Open URL",flash="true",target="_self",entity="",justify="center",font="Helvetica",color="black",label="RM PROFILE",y="124",style="p",url="",size="10",name="visual_1",x="88")

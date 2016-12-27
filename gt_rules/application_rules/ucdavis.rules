@@ -1,0 +1,196 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2003 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    ucdavis.include.snmp.rules 1.0 2003/12/12 Robert Cowart
+#
+###############################################################################
+#
+# 1.0 - Initial Release.  Complies with the Micromuse Rules File Standards
+#       (MUSE-STD-RF-02, July 2002)
+#
+###############################################################################
+#
+# 20051026 - Rules rebuilt by R Harper to make them expandable
+# Structure now based on switch of OID1 which is specific to event groups
+#
+###############################################################################
+case "ucdTraps": ### UC Davis-UCD-SNMP Agent - Notifications from UCD-SNMP-MIB
+
+    $ruleset = $ruleset + " -ucdavis" + " ucdTraps"
+    @Agent = "UC Davis-UCD-SNMP" + " ( " + lookup(extract($enterprise, "\.1\.3\.6\.1\.4\.1\.2021\.250\.(.*)"), ucdSnmpAgentPlatforms) + " )"
+    @Class = 123000
+    @OwnerGID = 468
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "ST " + $specific-trap	
+    switch ($specific-trap)
+    {
+        case "1": ### ucdStart
+	
+            @AlertGroup = "Agent Status"
+            @AlertKey = ""
+            @Summary = "UCD SNMP Agent Started"
+            @Severity = 1
+            @Type = 2
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap
+
+        case "2": ### ucdShutdown
+        
+            @AlertGroup = "Agent Status"
+            @AlertKey = ""
+            @Summary = "UCD SNMP Agent Shutdown"
+            @Severity = 3
+            @Type = 1
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap
+
+        default:
+
+            $ruleset = $ruleset + "def"
+            @Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+            @Severity = 1
+            @Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }
+    
+case "ucdavis":
+
+	$ruleset = $ruleset + " ucdavis"
+	@Class = 123000
+    	@OwnerGID = 468		# OwnerGID added 20060316 by RH
+
+#	20060708	Change by Chris Janes of Abilitec	
+	$TempDoLookup = 2
+
+#	20060708	End of Change
+
+	# 20051014 - Added by R Harper, Abilitec Ltd
+	# For correct population of fields due to resolution events using $1 &
+	# problem events using $2 for description (for problems, $1 = 1)
+	
+	if (exists($2))
+	{
+		$TmpDesc = $2
+		$ruleset = $ruleset + " $2"
+	}
+	else
+	{
+		$TmpDesc = $1
+		$ruleset = $ruleset + " if $1"
+	}
+	
+	# Added to make rules expandable to follow MIB
+	$OIDStrip = extract($OID1, "^\.(1\.3\.6\.1\.4\.1\.2021\.[0-9]+).*$")
+
+	$TmpSeverity = extract($TmpDesc, "^([^ ]+).*$")
+	$LowerTmpSeverity = lower($TmpSeverity)
+	[@Severity,@Type,$chuck]=lookup($LowerTmpSeverity,app_MttrapdSeverity)
+	$TmpExtract = extract($TmpDesc, "^[^ ]+ (.*)$")
+#	$TmpExtract2 = extract($TmpDesc, "^[^ ]+ [^ ]+ [^ ]+ (.*)$")
+#	$CjChk = ">" + extract($TmpDesc, "^[^ ]+ (.*)$")
+#	$CjChk1 = ">" + extract($TmpDesc, "^[^ ]+ [^ ]+ [^ ]+ (.*)$")
+
+	$ruleset = $ruleset + " OID " + $OIDStrip
+	switch($OIDStrip) {
+		case "1.3.6.1.4.1.2021.2":
+			@AlertGroup = "Process"
+			$ruleset = $ruleset + " Process"
+			@AlertKey = extract($TmpExtract,"^[^ ]+ ([^ ]+) [^ ]+.*$")
+			$ShortNode = substr(@NodeAlias,1,11)
+			@Summary = extract($TmpExtract,"(.*)\.$") + " on " + $ShortNode
+			
+		case "1.3.6.1.4.1.2021.4":
+			@AlertGroup = "Memory"
+			
+		case "1.3.6.1.4.1.2021.8":
+			@AlertGroup = "Commands"
+			
+		case "1.3.6.1.4.1.2021.9":
+			@AlertGroup = "Disk"
+			$ruleset = $ruleset + " Disk"
+			@AlertKey = extract($TmpExtract,"^[^ ]+ [^ ]+ [^ ]+ ([^ ]+).*$")
+			[@Severity,@Type,$chuck]=lookup($LowerTmpSeverity,app_MttrapdSeverity)
+			$ShortNode = substr(@NodeAlias,1,11)
+			@Summary = "Disk Partition " + @AlertKey + " on " + $ShortNode 
+			
+		case "1.3.6.1.4.1.2021.10":
+			@AlertGroup = "Load Average"
+			$ruleset = $ruleset + " Load"
+			@AlertKey = extract($TmpExtract,"^([^ ]+ [^ ]+).*$")
+			$ShortNode = substr(@NodeAlias,1,11)
+			@Summary = extract($TmpDesc, "^[^ ]+ [^ ]+ [^ ]+ (.*)$") + " on " + $ShortNode
+			
+		case "1.3.6.1.4.1.2021.11":
+			@AlertGroup = "System Stats"
+			
+		case "1.3.6.1.4.1.2021.14":
+			@AlertGroup = "UCDavis Demo"
+			
+		case "1.3.6.1.4.1.2021.15":
+			@AlertGroup = "File"
+			
+		case "1.3.6.1.4.1.2021.16":
+			@AlertGroup = "NFS"
+			if (nmatch($TmpExtract,"Logical Drive")) {
+				$ruleset = $ruleset + "-if logicaldrive"
+				@Summary = $TmpExtract
+				@AlertKey = extract($TmpExtract, "^([^ ]+ [^ ]+).*$")
+				$ruleset = $ruleset + " LogDrv"
+			}
+			else {
+				$ruleset = $ruleset + "-else TmpDesc"
+				$nfsDesc = extract($TmpDesc, "^[^ ]+ [^ ]+ [^ ]+ [^ ]+ [^ ]+ (.*)$")
+				@Summary = $nfsDesc
+	
+				if (nmatch($nfsDesc,"nfs_write")) {
+					$ruleset = $ruleset + "-if nfs write"
+					@AlertKey = extract($nfsDesc, "^([^ ]+).*$")
+#					$serverPath = "null"
+					$ruleset = $ruleset + " NFS Write"
+				}
+				else if (nmatch($nfsDesc,"nfs send error")) {
+					$ruleset = $ruleset + "-if nfs send error"
+					[$errorCode,$serverPath] = scanformat($nfsDesc, "nfs send error %d for server %s")
+					@AlertKey = "Send Error " + $errorCode
+					@Severity = 3
+
+				}
+				else {
+					# Default event handling within NFS case
+					$ruleset = $ruleset + " NFS Def"
+					@AlertGroup = $Node
+					@AlertKey = extract($TmpExtract, "^([^ ]+ [^ ]+).*$")
+					@Summary = $TmpExtract
+#					$serverPath = "null"
+				}
+				if (regmatch($nfsDesc,"nfs_write.*send.*error.*")) {
+					$ruleset = $ruleset + "-else nfsDesc"
+					# Garbled events from source, chuck them away
+					@AlertKey = "Bad Event"
+					#discard()
+				}	
+			}
+			
+			
+		default:
+			$ruleset = $ruleset + " Default"
+			@AlertGroup = $Node
+			@AlertKey = extract($TmpExtract, "^([^ ]+ [^ ]+).*$")
+			@Summary = $TmpExtract
+	}
+		
+	@Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $specific-trap + " " + $serverPath
+
+#	20070125	Changes by Chris Janes of Abilitec
+#	@Stream = $OID1
+#	20070125	End of Changes	

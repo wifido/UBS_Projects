@@ -1,0 +1,2 @@
+map(name="Rajesh_test",bgColor="white",w=250,h=250,acl="*")
+button(name="visual_1",label="untitled",x=49,y=86,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",w=81,h=76,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="p")

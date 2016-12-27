@@ -1,0 +1,281 @@
+  case "oraEM4Traps":
+		##################################################################################
+		#
+		#	oraEM4Alert TRAP-TYPE
+		#		ENTERPRISE  oraEM4Traps
+		#		VARIABLES   { oraEM4AlertTargetName, "The name of the target to which this alert applies."
+		#					  oraEM4AlertTargetType, "The type of the target to which this alert applies."
+		#					  oraEM4AlertHostName,   "The name of the host on which this alert originated."
+		#					  oraEM4AlertMetricName, "The name of the metric or policy which generated this alert."
+		#					  oraEM4AlertKeyName,    "The name of the key-column, if present, for the metric which generated this alert."
+		#					  oraEM4AlertKeyValue,   "The value of the key-column, if present, for the metric which generated this alert."
+		#					  oraEM4AlertTimeStamp,  "The time at which this alert was generated."
+		#					  oraEM4AlertSeverity,   "The severity of the alert e.g. Critical."
+		#												FATAL, 
+		#												CRITICAL, 
+		#												WARNING, 
+		#												MINOR_WARNING,
+		#												INFORMATIONAL, 
+		#												CLEAR
+		#												Ureachable Start, 
+		#												Blackout End, 
+		#												Blackout Start, 
+		#												Metric Error Clear, 
+		#												Metric Error Start,
+		#												Status Pending
+		#					  oraEM4AlertMessage,    "The message associated with the alert."
+		#					  oraEM4AlertRuleName,   "The name of the notification rule that caused this notification."
+		#					  oraEM4AlertRuleOwner,  "The owner of the notification rule that caused this notification."
+		#					  oraEM4AlertMetricValue, "The value of the metric which caused this alert to be generated."
+		#					  oraEM4AlertContext,     "A comma separated list of metric column names and values associated with the metric that caused this alert to be generated."
+		#					  oraEM4AlertCycleGuid,   "An EM generated identifier that is unique for the lifecyle of an alert."
+		#					  oraEM4AlertRepeatCount, "The repeat notification counter for the alert."
+		#					  oraEM4AlertUDTargetProperties, "User-defined target properties associated with the target."
+		#					  oraEM4AlertAck,         "Acknowledged status flag associated with the alert. 1 indicates acknowledged, 0 indicates unacknowledged."
+		#					  oraEM4AlertAckBy,       "Acknowledged By value  associated with the alert."
+		#					  oraEM4AlertNotifType,   "Notification Type. 1 - Normal, 4 - Repeat, 9 - Duration"
+		#												GC$NOTIFICATION.NOTIF_NORMAL
+		#												GC$NOTIFICATION.NOTIF_RETRY
+		#												GC$NOTIFICATION.NOTIF_REPEAT
+		#												GC$NOTIFICATION.NOTIF_DURATION
+		#												GC$NOTIFICATION.NOTIF_CA
+		#												GC$NOTIFICATION.NOTIF_RCA
+		#					  oraEM4AlertViolationGuid "An EM generated identifier that identifies a particular alert."
+		#                   }
+		#		DESCRIPTION
+		#		 "The variables included in the oraEM4Alert trap."
+		##	::= 1
+		##
+		#
+		#
+		#	oraEM4JobAlert TRAP-TYPE
+		#		ENTERPRISE  oraEM4Traps
+		#		VARIABLES   { oraEM4JobAlertJobName, 		"The name of the job to which this alert applies."
+		#					  oraEM4JobAlertJobOwner,		"The owner of the job to which this alert applies."
+		#					  oraEM4JobAlertJobType, 		"The type of the job to which this alert applies."
+		#					  oraEM4JobAlertJobStatus,		"The status of the job to which this alert applies."
+		#					  oraEM4JobAlertTargets, 		"A comma separated list of target to which this alert applies."
+		#					  oraEM4JobAlertTimeStamp,		"The time at which this job status changed causing this alert."
+		#					  oraEM4JobAlertRuleName, 		"The name of the notification rule that caused this notification."
+		#					  oraEM4JobAlertRuleOwner, 		"The owner of the notification rule that caused this notification."
+		#					  oraEM4JobAlertMetricName, 	The name of the metric or policy which caused the Corrective Action to run that caused this alert."
+		#					  oraEM4JobAlertMetricValue, 	"The value of the metric which caused the Corrective Action to run that caused this alert."
+		#					  oraEM4JobAlertContext, 		"A comma separated list of metric column names and values associated with the metric which caused the Corrective Action to run that caused this alert."
+		#					  oraEM4JobAlertKeyName, 		"The name of the key-column, if present, for the metric which caused the Corrective Action to run that generated this alert."
+		#					  oraEM4JobAlertKeyValue,		 "The value of the key-column, if present, for the metric which caused the Corrective Action to run that generated this alert."
+		#					  oraEM4JobAlertSeverity,		"The severity of the metric which caused the Corrective Action to run that generated this alert e.g. Critical."
+		#					  oraEM4JobAlertJobId, 			"The Job Id of the EM Job that triggered this notification."
+		#					  oraEM4JobAlertJobExecId		"The Job Execution Id of the EM Job that triggered this notification."
+		#					  }
+		#		DESCRIPTION
+		#		 "The variables included in the oraEM4JobAlert trap."
+		#	::= 2
+		#
+		#
+		#	oraEMNGEvent TRAP-TYPE
+		#		ENTERPRISE  oraEM4Traps
+		#		VARIABLES   {
+		#			  oraEMNGEventNotifType,
+		#			  oraEMNGEventMessage, 
+		#			  oraEMNGEventMessageURL,
+		#			  oraEMNGEventSeverity, 
+		#			  oraEMNGEventSeverityCode, 
+		#			  oraEMNGEventRepeatCount, 
+		#			  oraEMNGEventActionMsg,
+		#			  oraEMNGEventOccurrenceTime, 
+		#			  oraEMNGEventReportedTime,
+		#			  oraEMNGEventCategories, 
+		#			  oraEMNGEventCategoryCodes,
+		#			  oraEMNGEventType, 
+		#			  oraEMNGEventName,
+		#			  oraEMNGAssocIncidentId, 
+		#			  oraEMNGAssocIncidentOwner,
+		#			  oraEMNGAssocIncidentAcked, 
+		#			  oraEMNGAssocIncidentStatus,
+		#			  oraEMNGAssocIncidentPriority, 
+		#			  oraEMNGAssocIncidentEscLevel,
+		#			  oraEMNGEventTargetName, 
+		#			  oraEMNGEventTargetNameURL,
+		#			  oraEMNGEventTargetType, 
+		#			  oraEMNGEventHostName,
+		#			  oraEMNGEventTargetOwner, 
+		#			  oraEMNGEventTgtLifeCycleStatus,
+		#			  oraEMNGEventTargetVersion, 
+		#			  oraEMNGEventUserDefinedTgtProp,
+		#			  oraEMNGEventSourceObjName, 
+		#			  oraEMNGEventSourceObjNameURL,
+		#			  oraEMNGEventSourceObjType, 
+		#			  oraEMNGEventSourceObjSubType,
+		#			  oraEMNGEventSourceObjOwner, 
+		#			  oraEMNGEventCAJobName,
+		#			  oraEMNGEventCAJobStatus, 
+		#			  oraEMNGEventCAJobOwner,
+		#			  oraEMNGEventCAJobStepOutput, 
+		#			  oraEMNGEventCAJobType,
+		#			  oraEMNGEventRuleSetName, 
+		#			  oraEMNGEventRuleName,
+		#			  oraEMNGEventRuleOwner, 
+		#			  oraEMNGEventSequenceId,
+		#			  oraEMNGEventRCADetails, 
+		#			  oraEMNGEventContextAttrs,
+		#			  oraEMNGEventUserComments, 
+		#			  oraEMNGEventUpdates,
+		#			  oraEMNGEventTypeAttr1, 
+		#			  oraEMNGEventTypeAttr2,
+		#			  oraEMNGEventTypeAttr3, 
+		#			  oraEMNGEventTypeAttr4,
+		#			  oraEMNGEventTypeAttr5, 
+		#			  oraEMNGEventTypeAttr6,
+		#			  oraEMNGEventTypeAttr7, 
+		#			  oraEMNGEventTypeAttr8,
+		#			  oraEMNGEventTypeAttr9, 
+		#			  oraEMNGEventTypeAttr10,
+		#			  oraEMNGEventTypeAttr11, 
+		#			  oraEMNGEventTypeAttr12,
+		#			  oraEMNGEventTypeAttr13, 
+		#			  oraEMNGEventTypeAttr14,
+		#			  oraEMNGEventTypeAttr15, 
+		#			  oraEMNGEventTypeAttr16,
+		#			  oraEMNGEventTypeAttr17, 
+		#			  oraEMNGEventTypeAttr18,
+		#			  oraEMNGEventTypeAttr19, 
+		#			  oraEMNGEventTypeAttr20,
+		#			  oraEMNGEventTypeAttr21, 
+		#			  oraEMNGEventTypeAttr22,
+		#			  oraEMNGEventTypeAttr23, 
+		#			  oraEMNGEventTypeAttr24,
+		#			  oraEMNGEventTypeAttr25
+		#	}
+		#		DESCRIPTION
+		#		 "The variables included in the oraEMNGAlert trap."
+		#	::= 3
+		#	
+		#	
+		#	
+		##################################################################################
+
+        $ruleset = $ruleset + "-oracle oraEM4Traps " 
+        @Class = 120000
+        @OwnerGID = 239
+        @OwnerUID = 65534
+        $TempDoLookup = 2
+	    $ruleset = $ruleset + " " + $specific-trap
+        switch ($specific-trap) 
+        {
+            case "1": # oraEM4EventOcc
+		        $ruleset = $ruleset + " >" + $8 + "<"
+                switch ($8)  #  oraEM4AlertSeverity
+                {
+                    case "Warning":
+                        @Severity = 3
+                        @Type = 1
+                    case "Errors":
+                        @Severity = 4
+                        @Type = 1
+                    case "Critical":
+                        @Severity = 5
+                        @Type = 1
+                    case "Target Down":
+                        @Severity = 5
+                        @Type = 1
+                    case "Agent Unreachable":
+                        @Severity = 5
+                        @Type = 1
+                    case "Unreachable Start":
+                        @Severity = 5
+                        @Type = 1
+                    case "Clear":
+                        @Severity = 1
+                        @Type = 2
+                    case "Unreachable Clear":
+                        @Severity = 1
+                        @Type = 2
+                    case "Cleared":
+                        @Severity = 1
+                        @Type = 2
+
+
+                    case "Blackout Start":
+                        @Severity = 2
+                        @Type = 1
+                    case "Blackout End":
+                        @Severity = 2
+                        @Type = 2
+
+
+                    case "Blacked Out":
+                        @Severity = 1
+                        @Type = 2
+                    case "Unknown Availability":
+                        @Severity = 1
+                        @Type = 2
+                    default:
+                        $ruleset = $ruleset + "-def"
+
+                if (nmatch($8, "Agent is Unreachable"))
+			    {
+				    $ruleset = $ruleset + " Agent is Unreachable"
+				    @Severity = 5
+                    @Type = 1
+			    }
+			    else
+			    {        
+					$ruleset = $ruleset + " else"
+					@Severity = 2
+					@Type = 1
+				}
+
+			}
+
+			@Summary = $9    # oraEM4AlertMessage
+
+			@Node = "139.149.61.203"
+			@NodeAlias = $3       # oraEM4AlertHostName
+			if (match($6, ""))    # oraEM4AlertKeyValue
+			{
+				@AlertGroup = $4 + ": " + $2    # oraEM4AlertMetricName oraEM4AlertTargetType
+				$ruleset = $ruleset + "-t6"
+			} 
+			else 
+			{
+				@AlertGroup = $4 + ": " + $2 + $6    # oraEM4AlertMetricName oraEM4AlertTargetType oraEM4AlertKeyValue
+				$ruleset = $ruleset + "+t6"
+			}
+					@AlertKey = $1
+
+			if (regmatch($9, "^User [A-Z]+.*$"))   # oraEM4AlertMessage
+			{
+				$ruleset = $ruleset + ":User"
+				[$oraUser, $oraHost] = scanformat($9, "User %s logged on from %s")
+				$tempIdAdditional = $oraUser + "@" + $oraHost
+			}
+			else if (regmatch($9, "^Filesystem.*$"))    # oraEM4AlertMessage
+			{
+				$ruleset = $ruleset + ":FS"
+				$oraFS = extract($9, "^Filesystem (.+) has.*$")
+				$tempIdAdditional = $oraFS
+				@AlertGroup = @AlertGroup + ": " + $oraFS
+			}
+			else if (regmatch($9, "^[0-9]+.*dump area.*$"))    # oraEM4AlertMessage
+			{
+				$ruleset = $ruleset + ":Dumps"
+				$oraDump = extract($9, "^[0-9]+% of (.+) dump.*$")
+				$tempIdAdditional = $oraDump
+			}
+
+
+			@Stream = $9    # oraEM4AlertMessage
+			@UserData = $10 # oraEM4AlertRuleName
+
+		default:
+			$ruleset = $ruleset + "-def"
+			@Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+			@Severity = 2
+			@AlertGroup = $enterprise-name
+			@AlertKey = $specific-trap
+        }
+
+		@Agent = "OEM"
+
+
+		$tempIdentifier = $enterprise  + $generic-trap + $specific-trap + @AlertKey + @Type + $4 + $6 + $tempIdAdditional

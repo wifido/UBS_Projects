@@ -1,0 +1,2 @@
+map(name="NETBACKUP",bgImage="",bgColor="#ccccff",w="256",h="256",acl="GESS_SUPPORT")
+monitor(show highest="false",type="histogram",url="",show lowest="false",show highest severity as border="true",datasource="NCOMS",label="All Entries",show total="false",y="10",x="20",w="123",entity="NETBACKUP_ALL",font="Helvetica",size="15",action="Active Event List (AEL)",style="b",show label="true",h="119",foreground color="#990033",background color="#ccff66",show metric="true",target="main",name="visual_1")

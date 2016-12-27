@@ -1,0 +1,100 @@
+################################################################################
+#
+# Ruleset for DBServices.
+# Author: Gary Thomas
+# Date	: 2nd February 2004
+#
+################################################################################
+
+$ruleset    = $ruleset + "-DBServices"
+
+# Set the Class, OwnerGID and OwnerUID values here. It would be more efficient to
+# Set Class in app_mttrapd.rules, but to remain consistent with the existing
+# rules file structure, we do it here. The $TempDoLookup token allows the overide
+# on the ClassGroup lookup table.
+$TempDoLookup = 2
+@OwnerGID     = 239
+@OwnerUID     = 65534
+switch(@AlertGroup)
+        {
+        case "Oracle"|"ORACLE":
+                @Class = 120000
+        case "Sybase"|"SYBASE":
+                @Class = 121000
+        default:
+                # Oh dear, we should never get here.
+                $TempDoLookup = 0
+                @Severity     = 1
+                @Summary      = $tmpSummary + "Incorrect Class assignment. This is a malformed event"
+        }
+
+########################################
+# First identify if we got here direct from app_mttrapd.rules,
+# or arrived via app_mttrapd_include.rules
+########################################
+
+if ( regmatch($ruleset, "app_mttrapd_include"))
+	{
+	#############################################################
+	#
+	# We came here from app_mttrapd_include.rules
+	#
+	#############################################################
+	#
+	# As below the tokens mappings are a bit weird, but essentially 
+	# the same general framework as below. To date the only bad ones we 
+	# have seen, have an extra colon after the location token
+	# i.e. 'loc:-DBinstance(-script name):Syb/Ora:AlertGroup:Sev Summary
+	# rather than 'loc-DBinstance(-script name):Syb/Ora:AlertGroup:Sev:Summary
+	
+	if (regmatch($tmpAlertGroup, "^-.*-.*"))
+		{
+		$tmpLocation3  = extract($tmpAlertGroup,"-.*-(.*)")
+		$tmpLocation2  = extract($tmpAlertGroup,"-(.*)-.*")
+		}
+	else 
+		{
+		$tmpLocation2  = extract($tmpAlertGroup,"-(.*)")
+		}
+	$tmpAlertKey = $AlertKey2
+	$tmpSeverity = $Severity2
+	}
+else
+	{
+	#############################################################
+	# 
+	# We must have come direct from app_mttrapd.rules then:
+	#
+	#############################################################
+	#
+	# Now set all fields that are common to both Oracle and Sybase.
+	# Most values are set appropriately in the app_mttrapd.rules file.
+	# Here we set the DBServices specifics. Due to the way that the events arte reported
+	# via patrol, the mappings look somewhat strange.
+	# These tokens should have been extracted correctly from app_mttrapd.rules and passed
+	# down to here.
+	# £tmpLocation
+	# $tmpAlertGroup
+	# $tmpAlertKey
+	# $tmpSeverity	- This should now be set correctly and validated
+	# $tmpSummary
+	# However we need to break out accurately the $tmpLocation token correctly and then
+	# extract that properly as well.
+	if (regmatch($tmpLocation, "^.*\-.*\-.*"))
+		{
+		$tmpLocation3	= extract($tmpLocation,"^.*\-.*\-(.*)")
+		$tmpLocation2	= extract($tmpLocation,"^.*\-(.*)\-.*")
+		}
+	else if (regmatch($tmpLocation, "^.*\-.*"))
+		{
+		$tmpLocation2	= extract($tmpLocation,"^.*\-(.*)")
+		}
+	
+	}
+	# Now set the tokens correctly
+	@AlertKey = $tmpLocation2
+	@AlertGroup = $tmpAlertKey
+	@Origin = $tmpLocation3
+	@Summary = $tmpSummary
+	$tmpSeverity=lower($tmpSeverity)
+	[@Severity,@Type,@Flash] = lookup($tmpSeverity,app_MttrapdSeverity)

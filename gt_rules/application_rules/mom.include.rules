@@ -1,0 +1,214 @@
+######################################################################################################################
+#
+#    mon.include.rules
+#
+#	20071116	Chris Janes	All comments older than 6 Months removed to aid readability
+#					The previous version can be found in CleaarCase as "mom.include.rules" 
+#					version "/main/22"
+#
+#######################################################################################################################
+
+
+case "1057337" | "2057337":
+        # Rule set for MOM events sent via the log4net appender.
+	$ruleset =  $ruleset + " - MOM $Severity=" + $Severity
+	$StartClass = $ClassID
+       
+        @Agent = $Transport
+	@AlertGroup = extract($Component, "^MOM\.(.*)")
+	@AlertKey = $AlertKey
+        @Description = extract($MessageText, "^[^:]+:(.*)")
+	@NodeAlias = lower($Nodealias)
+	### GT. 21/12/2007 - For MOM events the statement Poll/Grade=1057337 is defined here in the MOM include ruleset.
+	### This value is detected in both the new row and dedup triggers (UBS_new_row and UBS_deduplication).
+	### Due to the vast number of Class values that can be associated with MOM events, this statement provides an integer switch 
+	### to detect MOM events of any Class entering the system.
+	### This is needed for events coming in from MOM already Acknowledged. The combination of Acknowledged=1 and Poll/Grade=1057337 indicates
+	### that ownerUID should be extracted from the security.users table rather than defaulted to 65534(nobody),
+	### as the users wintel login is passed across in the Environment field.
+	@Poll = 1057337
+	$bypassGradeLookup = 1
+	$tempGrade = 1057337
+	### GT- End of change
+        @SAPNumber = $SAPnumber
+        @SourceKey = $EventIdentifier
+        @Stream = $Stream
+        @Subclass = $Subclass
+        @Summary = extract($MessageText, "^[^:]+:(.*)")
+        @Type = $EventType
+        @UserData = $Userdata
+
+#	20080208	Changes by Chris Janes of Abilitec
+#	 @UserData1 = $UserData1
+	if(exists($UserData1))
+	{
+		 @UserData1 = $UserData1
+        	 update (@UserData1)
+	}
+
+#       20080208        End of Changes
+
+       	@UserData2 = $Userdata2
+
+        if (exists($Domain))
+	{
+		@Domain = $Domain
+	}
+	@UserInt1 = $Userint1
+
+	$ruleset =  $ruleset + " - StartClass = " + $StartClass + " "
+	switch($StartClass)
+	{
+		case "2057337":
+			$tempClass = lookup($Userdata, MOMSocketClassGID2)
+		default:
+			$tempClass = lookup($Userdata, MOMSocketClassGID)
+	}
+	$ArraySize = split(lower($Owner), SplitArray, "-")
+	@Environment = SplitArray[1]
+
+
+	@Class = $tempClass
+	# 20050805 Changes by Chris Janes of Abilitec
+	if (match($Acknowledged, "1"))
+	{
+		$TempDoLookup=1
+		@Acknowledged = 1
+		$ruleset =  $ruleset + " - SI=85"
+		@SysInt = 85
+	}
+	else
+	{
+		@OwnerUID = 65534 
+
+#	20080117	GT Changed to prevent forced update of OwnerUID.
+		#update (@OwnerUID)
+#	20080117	End of change
+		$TempDoLookup=1
+		@Acknowledged = 0
+		$ruleset =  $ruleset + " - SI=0"
+		@SysInt = 0
+	}
+
+	if (match($EventType, "2"))
+        {
+                $ruleset =  $ruleset + " - SI=255"
+                @SysInt = 255
+                if( not match(@AlertGroup,"AppHeartbeat"))
+		{
+                        @Severity = 0
+                        @ExpireID = 65512
+                }
+                update (@ExpireID)
+        }
+
+#	20080117	GT Changed to prevent forced update of Acknowledged.
+	#update (@Acknowledged)
+#	20080117	End of change
+
+#	20090215 GT, a little pre-processing here to identify and resolve dodgy mom events that look like app heartbeats.
+	switch($Subclass)
+	{
+            case "Mom To Netcool Connector" | "MOM Synthetic Event":
+		if (match(@AlertGroup,"AppHeartbeat"))
+		{
+			# Everything lines up. there is an inner karma here. Lets set everything we need for app heartbeating now.
+			$momIsValidHBT = 1
+			@UserInt=1000
+			@Severity=2 
+        		$tempIdentifier = @Node + "SOCKETPROD" + $Transport + "-APPHeartbeat-1" + $tempClass + $Subclass
+		} else {
+			$momIsValidHBT = 0
+		}
+            default:
+		$momIsValidHBT = 0
+		if (match(@AlertGroup,"AppHeartbeat"))
+		# Reset the value of AlertGroup to the value of $Subclass, otherwise this will still trigger app heartbeat logic.
+		{
+			@AlertGroup = $Subclass
+		}
+	
+	}
+
+        if (match($momIsValidHBT,"0")) 
+	# We are not a heartbeat, lets go ahead with normal processing.
+
+
+	## Next few bits moved upwards where we detect evrything a heartbeat needs to have.
+	##if (match(@AlertGroup,"AppHeartbeat"))
+	{
+
+		#@UserInt=1000
+		#@Severity=2 
+        	#$tempIdentifier = @Node + "SOCKETPROD" + $Transport + "-APPHeartbeat-1" + $tempClass + $Subclass
+	#####--
+	#else 
+	#####-
+#	20090215 GT End of change.
+
+#		20090127 Change by GT for Ryan, TD 5202. This little section identifies qtree events ans sets Node / NodeAlias fields correctly.
+		if (regmatch(@Subclass,"StorageManagement"))
+		{
+
+		# Here we will extract more accurate values for Node, NodeAlias and AlertKey from the Summary string.
+		# The Summary string should be in this format:  "Less than 1% on \\DOPF0260VPFS\zur_home03$ : 2713Mb of 311296Mb remaining"
+		# First noticed that this string has about 200 whitespaces at the end of the string (we have not run the substr command on it yet
+			if (regmatch(@Summary,"Less than [0-9%]+"))
+			{
+				$tmpmomsummary      = substr(@Summary,1,250)
+				$tmpmomcleansummary = rtrim($tmpmomsummary)
+				clear(SplitArray)
+				$tmpmomarray        = split($tmpmomcleansummary,SplitArray," ")
+				$tmpqtree           = SplitArray[5]
+
+#	20090309 GT - Final bit of work here for Ryan. Break out and reset the NodeAlias, so that Remedy tickets show the correct Item.
+				clear(SplitArray)
+				$tmpmomarray2       = split($tmpqtree,SplitArray,"\")
+				@NodeAlias          = SplitArray[1]
+
+#	20090309 GT End of Change
+				# Now reset the OS fields.
+				@Summary            = $tmpmomcleansummary
+				@Node               = $tmpqtree
+				@AlertKey           = $tmpqtree
+				$ruleset            = $ruleset + " - momStor"
+			} 
+			else
+			{
+				$ruleset = $ruleset + " - non_momstor"
+			}
+
+			
+			
+                        
+		}
+
+#		20090127 End of changes.
+        	@UserInt = $Userint
+#		20081112	Change by Chris Janes of Abilitec TD 4708
+#        	$tempIdentifier = lower($Nodealias) + "SOCKETPROD" + $Transport + $EventIdentifier + "1" + $tempClass + $Subclass
+        	$tempIdentifier = @Node + "SOCKETPROD" + $Transport + $EventIdentifier + "1" + $tempClass + $Subclass
+
+#		20081112	End of Change
+	}
+
+
+#	20080918	Changes by Chris Janes of Abilitec ref Ryan Brennan TD 5059
+        switch(@Class)
+        {
+                case "5007844":
+			$TD_Num = "5059"
+			$ruleset =  $ruleset + " - 5007844" + @AlertGroup + " "
+			$NoElements = split(@AlertGroup, SplitArray, ":")
+			@AlertGroup = SplitArray[1]
+			@UserData1 = SplitArray[2]
+			@UserData2 = SplitArray[3]
+                default:
+        }
+#	20080918	End of change
+
+	update (@Environment)
+	update (@SysInt)
+	update (@Probe_Rule)
+        update (@UserInt1)
+

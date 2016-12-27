@@ -1,0 +1,682 @@
+########################################################################
+#
+# CA AutoSys rules
+#
+########################################################################
+case "autosys":
+    @Agent = "Autosys"
+    $ruleset = $ruleset + "-autosys.rules" + "-case:autosys-autosys"
+    $asMsg = extract($1, "^[^(]+\(([^)]+)\).*$")
+    $instance = extract($asMsg, "^[^:]+: ?([^ ]+) [^:]+: ?.*$")
+    $machine = extract($asMsg, "^[^:]+: ?[^ ]+ [^:]+: ?(.*)$")
+    @AlertGroup = "AUTOSYS"
+
+#	20080917	Changes by Chris Janes of Abilitec	TD5052
+#@Description = "005 "
+#	20080917	End of Change
+
+#	20070202	HDSNG0000712190 Changes by Chris Janes
+	@UserData = $4
+#	20070202	End of Change
+
+    if (exists($instance))  {
+        @AlertKey = "(" + $instance + ") " + $4
+    }
+    else {
+        @AlertKey = $4
+    }
+
+    if (exists($machine))  {
+        $ruleset = $ruleset + "-if:$machine"
+        @Node = $machine
+        @NodeAlias = $machine
+        @Origin = $Node
+        $machArea = extract($machine, "^([^0-9]+)[0-9]+.*")
+        $machLen = length($machArea)
+        if (int($machLen) == 4)  {
+            $reglocKey = substr($machArea, 2, 3)
+        }
+        else  {
+            $reglocKey = $machArea
+        }
+        [@Location, @Region, $tmpDomain] = lookup($reglocKey, regloc)
+    }
+#
+# Try to lookup the OwnerGID and Class for the job name
+#  - by the Autosys instance (to allow all jobs to have the same IDs for a given Autosys instance)
+#  - then by the full job name
+#  - and finally by a substring of the job name
+#
+
+    [$autosysClass, $autosysGID] = lookup($instance, autosysJobClassGID)
+
+#	20080428	Changes by Chris Janes of Abilitec TD 4817
+    if (int($autosysClass) == 65200)
+    {
+        $ruleset = $ruleset + "Set SDig"
+	$TD_Num = "4817"
+        [$autosysClass, $autosysGID, @SystemDesig] = lookup($4, autosysJobClassGIDSysDesig)
+    }
+
+#	20080522	Change by Chris Janes of Abilitec
+	$NoElements = split($4, SplitArray, "_")
+#	20080522	End of Change
+
+#	20080428	End of Change   
+    if (int($autosysClass) == 65200)
+    {
+        $ruleset = $ruleset + "0st bite "
+        [$autosysClass, $autosysGID] = lookup($4, autosysJobClassGID)
+        @UserData2 = "CK = " + $4
+
+    }
+
+    if (int($autosysClass) == 65200)
+    {
+        $ruleset = $ruleset + "1st bite "
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] + "_" + SplitArray[2] + "_" + SplitArray[3] + "_" + SplitArray[4] + "_" + SplitArray[5] + "_" + SplitArray[6]
+
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+
+    if (int($autosysClass) == 65200)
+    {
+        $ruleset = $ruleset + "2nd bite "
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] + "_" + SplitArray[2] + "_" + SplitArray[3] + "_" + SplitArray[4] + "_" + SplitArray[5]
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+
+ 
+    if (int($autosysClass) == 65200)
+    {
+        $ruleset = $ruleset + "3rd bite "
+#        $classKey = extract($4, "^([^_]+_[^_]+_[^_]+_[^_]+)_.*$")
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] + "_" + SplitArray[2] + "_" + SplitArray[3] + "_" + SplitArray[4] 
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+ 
+    if (int($autosysClass) == 65200)  
+    {
+        $ruleset = $ruleset + "4th bite "
+#    	$classKey = extract($4, "^([^_]+_[^_]+_[^_]+)_.*$")
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] + "_" + SplitArray[2] + "_" + SplitArray[3] 
+
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+    if (int($autosysClass) == 65200)  
+    {
+        $ruleset = $ruleset + "5th bite "
+#    	$classKey = extract($4, "^([^_]+_[^_]+)_.*$")
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] + "_" + SplitArray[2] 
+
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+    if (int($autosysClass) == 65200 )  
+    {
+        $ruleset = $ruleset + "6th bite "
+#	20080522	Change by Chris Janes of Abilitec
+	$classKey = SplitArray[1] 
+
+#	20080522	End of Change
+        [$autosysClass, $autosysGID] = lookup($classKey, autosysJobClassGID)
+    }
+
+#	200080229	Change by Chris Janes of Abiliec
+
+    if (int($autosysClass) == 65200 )  
+    {
+        $ruleset = $ruleset + "Set Default Class (@Origin)"
+	[$autosysClass, $autosysGID] = lookup(@Origin, autosysInstanceClass)
+
+    }
+
+#	200080229	End of Changes
+
+    @Class = $autosysClass
+    @OwnerGID = $autosysGID
+
+
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+    # Hack for GGL Autosys
+    switch ($instance)  {
+        case "ZAT" | "ZAP" | "ZAQ":
+            $ruleset = $ruleset + "-case:ZAT"
+	    @UserInt = 5
+	default:
+    }
+
+    switch($specific-trap) {
+      case "1":
+        # trapEventProcessor
+        $ruleset = $ruleset + "-case:1"
+        @Summary = $1 + ": Contact Autosys Support Immediately"
+        @Severity = 4
+        @Type = 1
+
+      case "2":
+        # trapEventProcessor
+        $ruleset = $ruleset + "-case:2"
+        @Summary = $1
+        @Severity = 3
+        @Type = 1
+
+      case "501":
+        # trapForkFail
+        $ruleset = $ruleset + "-case:501"
+        @Summary = $3 + ": Job " + $4 + " failed: no more process slots were available on remote agent: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "502":
+        # trapMinRunAlarm
+        $ruleset = $ruleset + "-case:502"
+        @Summary = $3 + ": Job " + $4 + " runtime was less than the minimum specified: " + $5
+        @Severity = 2
+        @Type = 1
+
+      case "503":
+        # trapJobFailure
+        $ruleset = $ruleset + "-case:503"
+        @Summary = $3 + ": Job " + $4 + " has failed on " + $asMsg
+        @Severity = 4
+        @Type = 1
+
+      case "505":
+        # trapMaxRetrys
+        $ruleset = $ruleset + "-case:505"
+        $length = length($5)
+        if (int($length) > 0)  
+	{
+		$myMsg = $5
+	}
+
+        else  {
+            $myMsg = " has exceeded maximum number of retries"
+        }
+        @Summary = $3 + ": Job " + $4 + " " + $myMsg
+        @Severity = 3
+        @Type = 1
+
+      case "506":
+        # trapStartJobFail
+        $ruleset = $ruleset + "-case:506"
+        @Summary = $3 + ": Job " + $4 + " failed to start: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "507":
+        # trapEventHdlrError
+        $ruleset = $ruleset + "-case:507"
+        @Summary = $3 + ": Job " + $4 + ": event processor error: " + $5
+        @Severity = 4
+        @Type = 1
+
+      case "508":
+        # trapEventQueError
+        $ruleset = $ruleset + "-case:508"
+        @Summary = $3 + ": Job " + $4 + " was not marked as processed: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "509":
+        $ruleset = $ruleset + "-case:509"
+        # trapJobNotOnHold
+        @Summary = $3 + ": Job " + $4 + " could not be placed ON HOLD: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "510":
+        # trapMaxRunAlarm
+        $ruleset = $ruleset + "-case:510"
+        @Summary = $3 + ": Job " + $4 + " exceed its maximum run time: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "512":
+        # trapResource
+        $ruleset = $ruleset + "-case:512"
+        @Summary = $3 + ": Job " + $4 + " could not be run (resource unavailable): " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "513":
+        # trapMissingHeartbeat
+        $ruleset = $ruleset + "-case:513"
+        @Summary = $3 + ": Job " + $4 + ": heartbeat not received: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "514":
+        # trapChaseAlarm
+        $ruleset = $ruleset + "-case:514"
+        @Summary = $3 + ": Job " + $4 + ": chase alarm generated: " + $5
+        @Severity = 2
+        @Type = 1
+
+      case "516":
+        # trapDatabaseCommAlarm
+        $ruleset = $ruleset + "-case:516"
+        @Summary = $3 + ": Job " + $4 + ": remote agent failed to communicate with database: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "518":
+        # trapVersionMismatch
+        $ruleset = $ruleset + "-case:518"
+        @Summary = $3 + ": Job " + $4 + ": remote agent version mismatch: " + $5
+        @Severity = 2
+        @Type = 1
+
+      case "519":
+        # trapDbRollover
+        $ruleset = $ruleset + "-case:519"
+        @Summary = "Failover from Dual Server to Single Server mode: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "520":
+        # trapEpRollover
+        $ruleset = $ruleset + "-case:520"
+        @Summary = "The shadow event processor is taking over processing: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "521":
+        # trapEpShutdown
+        $ruleset = $ruleset + "-case:521"
+        @Summary = "The event processor is shutting down: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "522":
+        # trapEpHighAvail
+        $ruleset = $ruleset + "-case:522"
+        @Summary = "High availability system has detected a system or network problem: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "523":
+        # trapDbProblem
+        $ruleset = $ruleset + "-case:523"
+        @Summary = "There is a problem with one of the autosys databases: " + $5
+        @Severity = 3
+        @Type = 1
+
+      case "524":
+        # trapDuplicateEvent
+        $ruleset = $ruleset + "-case:524"
+        @Summary = "The Event Server has processed a duplicate event: " + $5
+        @Severity = 3
+        @Type = 1
+
+    default:
+        $ruleset = $ruleset + "-case:default"
+        @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+        @Severity = 1
+        $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+        # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }  
+
+#	20080909	Changes by Chris Janes of Abilitec
+#	If systemdesig is not set then set it	
+	if(match(@SystemDesig,"0"))
+	{
+#	20080917	Changes by Chris Janes of Abilitec	TD5052
+@Description = @Description + " SD=0"
+#	20080917	End of Change
+		if(nmatch(@AlertKey, "(P"))
+		{
+			@SystemDesig = 1
+			@Environment = "Prod"
+#	20080917	Changes by Chris Janes of Abilitec	TD5052
+@Description = @Description + " Prod"
+#	20080917	End of Change
+		}
+		else if(nmatch(@AlertKey, "(D"))
+		{
+			@SystemDesig = 3
+			@Environment = "Dev"
+#	20080917	Changes by Chris Janes of Abilitec	TD5052
+@Description = @Description + " Dev"
+#	20080917	End of Change
+		}
+		else if(nmatch(@AlertKey, "(UAT"))
+		{
+			@SystemDesig = 2
+			@Environment = "UAT"
+#	20080917	Changes by Chris Janes of Abilitec	TD5052
+@Description = @Description + " UAT"
+#	20080917	End of Change
+		}
+	}
+
+
+#	20080909	End of Changes
+
+    ## Changes by Mahesh Kumar to test chat notification
+    if ( exists($autosysClass) ) {
+        [$notifyType, $notifyChatChannel] = lookup($autosysClass, NotifyTable_by_class)
+        if ( exists($notifyChatChannel) && exists($notifyType) ) {
+            @Alarm_Dest = $notifyChatChannel
+            @Notification = $notifyType
+            $ruleset = $ruleset + "job notification to " + @Alarm_Dest
+        }
+    }
+
+    $tempIdentifier = $Node + $machine + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type
+
+case "envision":
+    $ruleset = $ruleset + "-autosys.rules" + "-case:envision"
+    @Class = 65200
+    @OwnerGID = 595
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    @Agent = "Autosys"
+    $ruleset = "autosys-envision"
+
+    switch($specific-trap) {
+      case "2002":
+        # trapDBVoraTabextmaxout
+        $ruleset = $ruleset + "-case:2002"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraTabextmaxout received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2003":
+        # trapDBVoraBgProcdown
+        $ruleset = $ruleset + "-case:2003"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraBgProcdown received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2004":
+        # trapDBVoraHitratio
+        $ruleset = $ruleset + "-case:2004"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraHitratio received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2005":
+        # trapDBVoraDatabufbusywt
+        $ruleset = $ruleset + "-case:2005"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraDatabufbusywt received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2006":
+        # trapDBVoraRolbufbusywt
+        $ruleset = $ruleset + "-case:2006"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraRolbufbusywt received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2007":
+        # trapDBVoraExcsmallredo
+        $ruleset = $ruleset + "-case:2007"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraExcsmallredo received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2008":
+        # trapDBVoraTsexcfrag
+        $ruleset = $ruleset + "-case:2008"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraTsexcfrag received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2009":
+        # trapDBVoraLatchctnmax
+        $ruleset = $ruleset + "-case:2009"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraLatchctnmax received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2010":
+        # trapDBVoraLockwait
+        $ruleset = $ruleset + "-case:2010"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraLockwait received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2011":
+        # trapDBVoraFullscan
+        $ruleset = $ruleset + "-case:2011"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraFullscan received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2012":
+        # trapDBVoraCluextmaxout
+        $ruleset = $ruleset + "-case:2012"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraCluextmaxout received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2013":
+        # trapDBVoraRollextmaxout
+        $ruleset = $ruleset + "-case:2013"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraRollextmaxout received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2014":
+        # trapDBVoraIdextmaxout
+        $ruleset = $ruleset + "-case:2014"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraIdextmaxout received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2015":
+        # trapDBVoraTabnextfail
+        $ruleset = $ruleset + "-case:2015"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraTabnextfail received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2016":
+        # trapDBVoraClunextfail
+        $ruleset = $ruleset + "-case:2016"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraClunextfail received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2017":
+        # trapDBVoraIdxnextfail
+        $ruleset = $ruleset + "-case:2017"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraIdxnextfail received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2018":
+        # trapDBVoraRollnextfail
+        $ruleset = $ruleset + "-case:2018"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraRollnextfail received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2019":
+        # trapDBVoraProcdown
+        $ruleset = $ruleset + "-case:2019"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraProcdown received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2020":
+        # trapDBVoraTshoneycomb
+        $ruleset = $ruleset + "-case:2020"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraTshoneycomb received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2021":
+        # trapDBVoraGenlimit
+        $ruleset = $ruleset + "-case:2021"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraGenlimit received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2022":
+        # trapDBVoraUvLogAlarm
+        $ruleset = $ruleset + "-case:2022"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVoraUvLogAlarm received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2102":
+        # trapDBVsybGenlimit
+        $ruleset = $ruleset + "-case:2102"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybGenlimit received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2103":
+        # trapDBVsybBgProcdown
+        $ruleset = $ruleset + "-case:2103"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybBgProcdown received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2104":
+        # trapDBVsybUvLogAlarm
+        $ruleset = $ruleset + "-case:2104"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybUvLogAlarm received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2105":
+        # trapDBVsybThrFreeWarn
+        $ruleset = $ruleset + "-case:2105"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybThrFreeWarn received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2106":
+        # trapDBVsybTlogUnresvPc
+        $ruleset = $ruleset + "-case:2106"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybTlogUnresvPc received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2107":
+        # trapDBVsybTlogDumpWarn
+        $ruleset = $ruleset + "-case:2107"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybTlogDumpWarn received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2108":
+        # trapDBVsybTlogLstchcWarn
+        $ruleset = $ruleset + "-case:2108"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybTlogLstchcWarn received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2109":
+        # trapDBVsybTlogLongtran
+        $ruleset = $ruleset + "-case:2109"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybTlogLongtran received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2110":
+        # trapDBVsybSegUnResvPc
+        $ruleset = $ruleset + "-case:2110"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybSegUnResvPc received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2111":
+        # trapDBVsybChkDbWarn
+        $ruleset = $ruleset + "-case:2111"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapDBVsybChkDbWarn received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2202":
+        # trapSRVprocdown
+        $ruleset = $ruleset + "-case:2202"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapSRVprocdown received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2203":
+        # trapSRVgenlimit
+        $ruleset = $ruleset + "-case:2203"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapSRVgenlimit received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2204":
+        # trapSRVcpu
+        $ruleset = $ruleset + "-case:2204"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapSRVcpu received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+      case "2205":
+        # trapSRVuvLogAlarm
+        $ruleset = $ruleset + "-case:2205"
+        @AlertKey = $1 + $2 + $3 + $4 + $5 + $6
+        @AlertGroup = ""
+        @Summary = "Trap trapSRVuvLogAlarm received, trapMessage=" + $1 + ", trapDate=" + $2 + ", mibVersion=" + $3 + ", envAlarmName=" + $4 + ", envAlarmCode=" + $5 + ", envAlarmMessage=" + $6 + ""
+        @Severity = 1
+
+    default:
+        $ruleset = $ruleset + "-case:default"
+        @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+        @Severity = 1
+        $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + @Manager
+        # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+}
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey
+
+
+

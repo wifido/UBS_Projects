@@ -1,0 +1,347 @@
+#############################################################################################
+#
+# 	isc.rules include file
+#	This rules file should live towards the end of the rules file as it post processes events
+#	to direct a subset of G100 events it the ISC
+#
+#	20081030	V1.0	Chris Janes	Original
+#
+#					
+#
+#############################################################################################
+
+$NewClass    = "0"
+$NewOwnerGID = "0"
+$ruleset     = $ruleset + "ISC_SW"
+switch (@OwnerGID)
+{
+	case "8":	# Wintel
+		$TD_Num = 5111
+		if( match(@Severity,"5"))
+		{
+			# AlertGroup + @AlertKey Lookup
+			$TempKey = @AlertGroup + @AlertKey
+			[$NewClass, $NewOwnerGID] = lookup($TempKey, isc_wintel_AGAK)
+			$IscRule = "Win_AG"
+			# If no previous match then lookup based upon @AlertGroup
+			if (match($NewOwnerGID, "0"))
+			{
+				 [$NewClass, $NewOwnerGID] = lookup(@AlertGroup, isc_wintel_AG)
+				 $IscRule = "Win_AG"
+			}
+
+			# If still no previous match then specific 'special' rules
+			if (match($NewOwnerGID, "0"))
+			{
+				
+				[$NewClass, $NewOwnerGID] = lookup(@Domain, isc_wintel_DOM)
+				$IscRule = "Win_Domain"
+			}
+		}
+	# End of Wintel case statement.	
+
+	case "239":	# DB Services
+		$TD_Num = 5113
+		switch(@Class)
+		{
+			case "120000" | "121000":
+				if( match(@Severity,"5"))
+				{
+					# @AlertGroup + @AlertKey Lookup
+					$TempKey = @AlertGroup + @AlertKey
+					[$NewClass, $NewOwnerGID] = lookup($TempKey, isc_dbservices_AGAK)
+					$IscRule = "DBS_AGAK"
+					# If no previous match then lookup based upon AlertGroup 
+					if (match($NewOwnerGID, "0"))
+					{
+						[$NewClass, $NewOwnerGID] = lookup(@AlertGroup, isc_dbservices_AG)
+						$IscRule = "DBS_AG"
+					}
+					
+					# If still no previous match then specific 'special' rules
+					if (match($NewOwnerGID, "0"))
+					{
+						# is it a zurich DB?
+						if( regmatch(@NodeAlias, "^[a-z]zur.*$") )
+						{
+							$NewClass    = "0"
+							$NewOwnerGID = "1239"
+							$IscRule     = "4011"
+						}
+						# AG and Summary
+						else if (match(@AlertGroup,"dbs_ora_driver_daily"))
+						{
+							if(regmatch(@Summary, "^[Nn]et.*$"))
+							{
+								$NewClass    = "0"
+								$NewOwnerGID = "1239"
+								$IscRule     = "4003"
+							}
+						}
+					}
+				}
+			default:
+		}
+	# End of DB Services case statement.		
+
+    	case "257":	# GESS Support (NetBackup).
+    		$TD_Num = "BR_754"
+    		switch(@Severity) 
+    		{
+    			case "4" | "5":
+    				# Put it all in here.
+    				switch(@Class)
+    				{
+    					case "128120" | "2525251" | "126040":  # Wysdm  | Decru | ssm events
+    						$NewClass    = "0"
+    						$NewOwnerGID = "1257"
+    						$IscRule     = "BR_754"
+    					default:
+    						# DO nothing
+    				}
+    			default:
+    				# Do Nothing
+    		}            
+    	# End of GESS Support (NetBackup) case statement
+
+	case "468":	# Unix
+		$TD_Num = 5111
+		if( not match(@Supt_Lvl,"3"))
+		{
+			if( match(@Severity,"5"))
+			{
+				# AlertGroup + @AlertKey Lookup
+				$TempKey = @AlertGroup + @AlertKey
+				[$NewClass, $NewOwnerGID] = lookup($TempKey, isc_unix_AGAK)
+				$IscRule = "Unix_AGAK"
+				# If no previous match then lookup based upon @AlertGroup
+				if (match($NewOwnerGID, "0"))
+				{
+					[$NewClass, $NewOwnerGID] = lookup(@AlertGroup, isc_unix_AG)
+					$IscRule = "Unix_AG"
+				}
+
+# 	20090505	TD5220  GT.
+				# If still no previous match then specific 'special' rules
+				# Here we deal with 'Disk usage events'
+
+				if (match(@AlertGroup,"Disk usage")) 
+				{
+
+					# If we find an AlertKey match here we need to modify $tempIdentifier token for correct
+					# correlation and deduplication due to the escalate /de-escalet nature of these events.
+					$TD_Num = 5220
+					if (nmatch(@AlertKey,"/sbclocal"))
+					{
+						$IscRule        = 1002
+						$NewOwnerGID    = 1468
+						$tempIdentifier = $tempIdentifier + "-" + @Severity
+					}
+					else if (nmatch(@AlertKey,"/app"))
+					{
+						$IscRule        = 1014
+						$NewOwnerGID    = 1468
+						$tempIdentifier = $tempIdentifier + "-" + @Severity
+					}
+					else if (regmatch(@AlertKey,"home"))
+					{
+						$IscRule        = 1015
+						$NewOwnerGID    = 1468
+						$tempIdentifier = $tempIdentifier + "-" + @Severity
+					}
+					# Otherwise leave it well alone here.
+					else
+					{
+						$IscRule	= 0
+					} 
+				}
+
+#	20090505	TD 5220 End of change.
+			}
+		}
+	# End of Unix case statement.	
+
+	case "542":	# Storage
+		$TD_Num = 5114
+
+		#20090821	This section rewritten by GT for BR_670
+		switch(@Severity)
+		{
+			case "5":	
+				# do the AlertGroup/AlertKey and AlertGroup lookups here. Unlikely to actually pull anything here
+				$TempKey                  = @AlertGroup + @AlertKey
+				[$NewClass, $NewOwnerGID] = lookup($TempKey, isc_storage_AGAK)
+				$IscRule                  = "Store_AGAK"
+
+				# If no previous match then lookup based upon @AlertGroup
+				if (int($NewOwnerGID) == 0)
+				{
+					[$NewClass, $NewOwnerGID] = lookup(@AlertGroup, isc_storage_AG)
+					$IscRule                  = "Store_AG"
+				}
+			
+			default:	# Pass right on thru here...
+			# Do nothing
+		}
+
+		# If still no previous match then specific 'special' rules
+		if (int($NewOwnerGID) == 0)
+		{
+			# 20091111 GT. BR 670 continued.This section rewritten to acccomodate new netapp lookup and streamline the whole thing.
+			if (match(@AlertGroup, "CX Array"))
+			{ 
+				# isc rules 3010,3011,3014,3021
+				switch ($3)
+				{
+					case "908" | "803" | "7127897c" | "903" | "952" | "a25" | "944" | "76008101" | "a23" | "940" | "960" | "961" | "90d" | "740a":
+						$NewClass    = 0
+						$NewOwnerGID = 1542
+						$IscRule     = 3010
+						$TD_Num      = "br_670"
+					default:
+						# Do nothing
+				}
+			}
+			else if (match(@Agent, "Cisco MDS"))
+			{
+				# Only Severity 4 and 5 events.
+				switch(@Severity)
+				{
+					case "4" | "5":
+						$NewClass    = 0
+						$NewOwnerGID = 1542
+						$IscRule     = "3025"
+						$TD_Num      = "br_670"
+					default:
+						# Do nothing
+				}
+			}
+#			20091123 GT BR_670 Added Centera events.
+			## Centera events.
+			else if (match(@Agent,"Centera"))
+			{
+				# Only Severity 4 and 5 events
+				switch(@Severity)
+				{
+					case "4" | "5":
+						$NewClass    = 0
+						$NewOwnerGID = 1542
+						$IscRule     = "3025"
+						$TD_Num      = "br_670"
+					default:
+						# Do nothing
+				}
+			}
+#			20091123 End of Change.
+					
+
+			# 20091117 GT BR_670  
+			## DMX Events
+			else if (match($enterprise-name, "ecc.notificationTrap"))
+			{
+				$NewClass    = 0
+				$NewOwnerGID = 1542
+				$IscRule     = "DMX"
+				$TD_Num      = "br_670"
+			}
+			# 20091117 GT End of change.
+			## NetApp events.
+			# This match on alert key as it comes via socket probe rather than via snmp.
+			else if (match(@AlertKey, "netapp"))
+			{
+				
+				# isc rule 3002
+				if (regmatch(@Summary, "wafl\.dir\.size") && (int(@Severity) > 3))
+				{
+					$NewClass    = 0
+					$NewOwnerGID = 1542
+					$IscRule     = "3002"
+					$TD_Num      = "br_670"
+				}
+			}
+			else if (nmatch(@Agent, "NetApp "))
+			{
+				# Lookup the specific trap in the netappISC table.
+				[$SevCompare,$ISCpass] = lookup($specific-trap, netappISC)
+				if (int(@Severity) >= int($SevCompare))
+				{
+					# Ok the event is severe enough to be considered. Switch on the value of $ISCpass
+					switch ($ISCpass)
+					{
+						case "1":
+							$NewClass    = 0
+							$NewOwnerGID = 1542
+							$IscRule     = 3000
+							$TD_Num      = "br_670"
+						case "2":
+							# Here we need to do some more checking, possibly Summary or AlertGroup etc.
+							switch ($specific-trap)
+							{
+								case "10165":
+									if (regmatch(@Summary,"using or reserving"))
+									{
+										# DO nothing.
+									}
+									else 
+									{
+										$NewClass    = 0
+										$NewOwnerGID = 1542
+										$IscRule     = 3000
+										$TD_Num      = "br_670"
+									}
+								default:
+									# Do nothing
+							}
+						default:
+							# DO nothing.
+					}
+				}
+			}
+                # BR 670 - end
+		}
+		
+	# End of Storage case statement.
+
+	case "591" | "622":	# BPS Monitoring Support and Remedy Support.
+		$TD_Num = "BR_755"
+		# Initial logic applied 30/11/2009
+		switch (@Severity)
+		{
+			case "4" | "5":  # We only want to send these through to GOC.
+				# No apply a bit more filtering.
+				switch (@AlertKey)
+				{
+					case "CONFIG" | "KM" | "Configs" | "StartStop" | "Average CPU" | "com.ubs.bps.itsm.remedy" | "Re-Start" :
+					# These ones should continue to be sent to BPS Monitoring Support.
+
+					default:
+						$NewClass   = 0
+						$NewOwnerGID = 1591
+						$IscRule     = "BR_755"
+						
+				}
+			default:
+				# DO nothing here. 
+		}
+	## End of BPS monitoring Support case statement.	
+
+	default:
+}
+
+#	Here we set Class to the new value if required
+if( not match ($NewClass, "0"))
+{
+	@Class = $NewClass
+}
+
+#	Here we set OwnerGID to the new value if required
+if( not match ($NewOwnerGID, "0"))
+{
+	@OwnerGID = $NewOwnerGID
+}
+else
+{
+	$IscRule = ""
+}
+
+

@@ -1,0 +1,6 @@
+$ruleset = $ruleset + "-DEV.include.rules"
+# The following 2 update statements are needed for application heartbeat testing.
+
+update (@UserData)
+update (@UserInt)
+

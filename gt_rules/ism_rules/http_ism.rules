@@ -1,0 +1,384 @@
+########################################################################
+#
+#       Copyright (C) 1997, 1998 Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: http.rules,v 1.1 2002/07/09 16:51:18 nik Development $
+#
+#######################################################################
+
+if(match(@Manager, "MonitorWatch"))
+{
+	switch(@Summary)
+	{
+	case "Running ...":
+		@Severity = 1
+		@AlertGroup = "monitorstat"
+		@Type = 2
+	case "Going Down ...":
+		@Severity = 5
+		@AlertGroup = "monitorstat"
+		@Type = 1
+	default:
+	}
+
+	@Summary = @Agent + " monitor on " + @Node + ": " + @Summary
+}
+else
+{
+#######################################################################
+
+
+	# Get the fully qualified hostname of the machine running the monitor
+	if(!exists($monitorDomain))
+	{
+		if(exists($monitorDNSDomain))
+		{
+			$monitorDomain = $monitorDNSDomain
+		}
+		else if(exists($monitorNISDomain))
+		{
+			$monitorDomain = $monitorNISDomain
+		}
+	}
+	$FQHostname = $monitorHost
+	if(exists($monitorDomain))
+	{
+		$FQHostname = $FQHostname + "." + $monitorDomain
+	}
+
+	# Get general information
+	@Agent = $profile
+
+#	20081119	Changes by Chris Janes of Abilitec TD 5152 & 5153
+#	@Class = lookup ($profile,prof_class)
+	[@Class, @Subclass, @Environment] = lookup ($profile,prof_class)
+
+#	20081119	End of Change
+	if(match(@Class, "6050"))
+	{
+		@Class = 6000
+	}
+
+	$ruleset = $ruleset + ' - Http Monitor'
+
+	@OwnerUID = 65534
+	@OwnerGID = $profileIdentifier
+	@AlertKey = $page
+	@AlertGroup = $port
+	@Node = $hostIP
+	@NodeAlias = $host
+	@Origin = $FQHostname
+	@Grade = $status
+	@Poll = $pollInterval
+	@Alarm_Dest = $profileNotification
+	@Identifier = $profile + $service + $FQHostname + $host + $port + $page + $message + $status + $serviceLevel
+
+        switch ($serviceLevel)  {
+                case "0":
+                        $slSeverity = 1
+                        @Type = 1
+                case "1":
+                        $slSeverity = 2
+                        @Type = 2
+                case "2":
+                        $slSeverity = 3
+                        @Type = 1
+                case "3":
+                        $slSeverity = 4
+                        @Type = 1
+                default:
+        }
+
+	# Check for status code from HTTP server
+	if(!exists($status))
+	{
+		# There isn't one, so this must be some sort of error
+		if(regmatch(lower($message), "timed out"))
+		{
+			@Summary = $description + " on " + $host + " (as measured from " + $monitorHost + ") is not responding - please contact " + $profileEmail
+			$tempSeverity = 5
+                	@Type = 1
+		}
+		else if (match($message, "Connection refused"))  {
+			@Summary = $description + " on " + $host + " (as measured from " + $monitorHost + ") has failed - please contact " + $profileEmail
+			$tempSeverity = 5
+                	@Type = 1
+		}
+		else
+		{
+			@Summary = $description + ": Page " + $page + $message
+		}
+	}
+	else
+	{
+		if (match($message, "Connection closed unexpectedly"))
+		{
+                        @Type = 1
+			$tempSeverity = 3
+			@Summary = "Connection to " + $description + " on " + $host + " (as measured from " + $monitorHost + ") may have problems - please contact " + $profileEmail
+		}
+		else if(regmatch(lower($message), "timed out"))
+		{
+                        @Type = 1
+			@Summary = "Exceeded specified timeout of " + $timeout + " seconds"
+			@Summary = $description + " on " + $host + " (as measured from " + $monitorHost + ") timed out (" + $command + " exceeded " + $timeout + " seconds ( actual time " + $totalTime + ") - please contact " + $profileEmail
+			$tempSeverity = 4	
+		}
+		else if(match($message, "Too many page elements in page. Use GET request."))
+		{
+                        @Type = 1
+			@Summary = $description + ": Page " + $page + "Too many page elements in page"
+			$tempSeverity = 4
+		}
+		else if(match($message, "Error downloading page element"))
+		{
+                        @Type = 1
+			@Summary = $description + ": Page " + $page + $message
+			$tempSeverity = 3
+		}
+		else
+		{
+		
+			# Adjust summary and severity depending on status code
+			switch($status)
+			{
+				case "200":
+					switch($regexpStatus1)
+					{
+						case "NONE":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "MATCHED":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "FAILED":
+							@Summary = $description + ": Page " + $page + " did not match specified regexp '" + $regexpMatch1 + "'" + "; download completed in " + $totalTime + " seconds"
+							$tempSeverity = 3
+                                        		@Type = 1
+						default:
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+					}
+				case "201":
+					@Summary = $description + ": Page " + $page + " Resource Created"
+                                        @Type = 2
+					$tempSeverity = 1
+				case "202":
+					@Summary = $description + ": Page " + $page + " Request Accepted"
+                                        @Type = 2
+					$tempSeverity = 1
+				case "204":
+                                        @Type = 1
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + "No content"
+				case "205":
+                                        @Type = 1
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + "Reset content"
+				case "206":
+                                        @Type = 1
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + "Partial content"
+				case "301":
+					switch($regexpStatus1)
+					{
+						case "NONE":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "MATCHED":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "FAILED":
+							@Summary = $description + ": Page " + $page + " did not match specified regexp '" + $regexpMatch1 + "'" + "; download completed in " + $totalTime + " seconds"
+							$tempSeverity = 3
+                                        		@Type = 1
+						default:
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+					}
+				case "302":
+					switch($regexpStatus1)
+					{
+						case "NONE":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "MATCHED":
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+						case "FAILED":
+							@Summary = $description + ": Page " + $page + " did not match specified regexp '" + $regexpMatch1 + "'" + "; download completed in " + $totalTime + " seconds"
+							$tempSeverity = 3
+                                        		@Type = 1
+						default:
+							@Summary = $description + ": Page " + $page + " successfully downloaded from " + $host + " by " + $monitorHost + " in " + $totalTime + " seconds"
+							$tempSeverity = 1
+                                        		@Type = 2
+					}
+				case "304":
+                                        @Type = 2
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + " Not Modified"
+				case "305":
+                                        @Type = 1
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + " Use Proxy"
+				case "400":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Bad Request"
+				case "401":
+                                        @Type = 1
+					$tempSeverity = 3
+					@Summary = $description + ": Page " + $page + " Unauthorized"
+				case "403":
+                                        @Type = 1
+					$tempSeverity = 3
+					@Summary = $description + ": Page " + $page + " Forbidden"
+				case "404":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Not Found: "
+				case "405":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Method not allowed"
+				case "407":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Proxy authentication required on " + $host
+				case "408":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Request timed out on " + $host
+				case "500":
+                                        @Type = 1
+					$tempSeverity = 5
+					@Summary = $description + ": Page " + $page + " Internal Server Error "
+				case "501":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Not Implemented"
+				case "502":
+                                        @Type = 1
+					$tempSeverity = 4
+					@Summary = $description + ": Page " + $page + " Bad Gateway"
+				case "503":
+                                        @Type = 1
+					$tempSeverity = 5
+					@Summary = $description + ": Page " + $page + " Service Unavailable"
+				case "504":
+                                        @Type = 1
+					$tempSeverity = 5
+					@Summary = $description + ": Page " + $page + " Gateway timeout"
+				case "505":
+                                        @Type = 1
+					$tempSeverity = 5
+					@Summary = $description + ": Page " + $page + " HTTP version not supported"
+				default:
+					$tempSeverity = 2
+					@Summary = $description + ": Page " + $page + " Unrecognised response: " + $message
+				}
+			}
+
+	}
+
+	# This is small section that will allow to tag a failure according
+	# to when it happened. If any of the foloowing tokens is not set, 
+	# it means that the monitor failed on that stage
+
+	if (!exists($lookupTime))
+	{
+		$stage = "Lookup stage"
+	}
+	else if (!exists($connectTime))
+	{
+		$stage = "Connection stage"
+	}
+	else if (!exists($responseTime))
+	{
+		$stage = "Response stage"
+	}
+	else if (!exists($downloadTime))
+	{
+		$stage = "Download stage"
+	}
+
+	if (exists($stage))
+	{
+		@Summary = @Summary + " [" + $stage + "]"
+	}
+	
+	# Adjust summary information if we're doing failure retests
+	# This section is designed to separate transient errors/clears 
+	# from real errors/clears if the failureRetest functionality 
+	# is activated.
+
+	if ((int($failureRetests) > 0) and exists($consecutiveFailures))
+	{
+		if (int($lastServiceLevel) > int($serviceLevel))
+		{
+			if (int($lastServiceLevelCounter) > int($failureRetests))
+			{
+				@Identifier = @Identifier + "Real"
+				@Summary = "Real Error Cleared: " + @Summary
+			}
+			else
+			{
+				@Identifier = @Identifier + "Transient"
+				@Summary = "Transient Error Cleared: " + @Summary
+			}
+		}
+		else if (int($consecutiveFailures) <= int($failureRetests))
+		{
+			# Possible transient error 
+			@Identifier = @Identifier + "Transient"
+			@Summary = "Transient Error: " + @Summary
+			$tempSeverity = 3
+		}
+		else if(int($consecutiveFailures) > int($failureRetests))
+		{
+			# Real error
+			@Identifier = @Identifier + "Real"
+			@Summary = "Real Error: " + @Summary
+			$tempSeverity = 5
+		}
+	}
+
+	#
+	# Set Severity to the higher of the Service Level and test result
+	#
+	if (int($tempSeverity) > int($slSeverity))  {
+		$finalSeverity = $tempSeverity
+	}
+	else  {
+		$finalSeverity = $slSeverity
+	}
+	@Severity = $finalSeverity
+
+	if (exists($totalTime))  {
+		@SysInt = real($totalTime) * 1000
+	}
+	update(@Summary)
+	update(@Poll)
+	update(@Severity)
+	update(@SysInt)
+}

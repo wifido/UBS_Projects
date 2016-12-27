@@ -1,0 +1,238 @@
+##################################################################################
+#	
+#	FT-IMAuditor.mib	
+#	Thu Mar 15 17:39:48 IST 2007
+#
+#	20080204	Original	HDLDN0001506497		Chris Janes
+#			
+#
+##################################################################################
+
+
+case "FT-IMAuditor":
+
+	$ruleset = $ruleset + " FT-IMAuditor "
+	@Agent = $enterprise-name
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#	@UserData2 = $enterprise
+#	20080916	End of change
+
+#	These are temp values that need to be set correctly
+	@Class = 2222254
+	@OwnerGID = 90016
+	$TempDoLookup = 2
+
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+#		serverStatusNotification
+		
+		$reason = $1
+		$eventTime = $2
+		$serverStatus = $3	#	1=Active 0=Inactive
+		$serverId = $4		#	Server ID of the IMAuditor server
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#		@Description = "serverStatus = " + $serverStatus + "( " + $OID1 + ") serverId = " + $serverId + "( " + $OID2 + ") eventTime = " + $eventTime + "( " + $OID3 + ") reason = " + $reason + "( " + $OID4 + ") $5 = " + $5 + "( " + $OID5 + ")"
+#	20080916	End of change
+
+		if(int($serverStatus) == 0)
+		{
+			@Summary = "Server " + $serverId + " is Inactive  " + $reason
+			@Severity = 5
+		}
+		else
+		{
+			@Summary = "Server " + $serverId + " is Active  " + $reason
+			@Severity = 2
+		}
+		@Type = 1
+		@AlertGroup = "Server Status"
+		@AlertKey = $serverId
+		@UserData = "To notify the status of the server (Active or inactive)"
+
+        case "2":
+#		dbConnectionStatusNotification
+
+                $reason = $1
+                $eventTime = $2
+                $serverId = $3     	      #       Server ID of the IMAuditor server
+                $dbConnectionStatus = $4      #       1=Active 0=Inactive
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#		@Description = "dbConnectionStatus = " + $dbConnectionStatus + "( " + $OID1 + ") serverId = " + $serverId + "( " + $OID2 + ") eventTime = " + $eventTime + "( " + $OID3 + ") reason = " + $reason + "( " + $OID4 + ") $5 = " + $5 + "( " + $OID5 + ")"
+#	20080916	End of change
+
+                if (int($dbConnectionStatus) == 0)
+                {
+                        @Summary = "Server " + $serverId + " DB Connection is Inactive  " + $reason
+                	@Severity = 5
+                }
+                else
+                {
+                        @Summary = "Server " + $serverId + " DB Connection is Active  " + $reason
+                	@Severity = 2
+                }
+                @Type = 1
+                @AlertGroup = "DB Connection Status"
+                @AlertKey = $serverId
+		@UserData = "To notify the status of the database connection"
+
+        case "3":
+#               licenseStatusNotification
+
+                $reason = $1
+                $eventTime = $2
+                $licenseStatus = $3
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "licenseStatus = " + $licenseStatus + "( " + $OID1 + ") eventTime = " + $eventTime + "( " + $OID2 + ") reason = " + $reason + "( " + $OID3 + ") $4 = " + $4 + "( " + $OID4 + ")"
+#	20080916	End of change
+
+                @Summary = "Server " + $serverId + " License Status is  " + $licenseStatus + "  "+ $reason
+                @Severity = 2
+                @Type = 1
+                @AlertGroup = "License"
+                @AlertKey = $licenseStatus 
+		@UserData = "To notify the expiration of IMAuditor license"
+
+
+        case "4":
+#               companyLicenseExceedLimitNotification
+
+		$companyName = $1
+                $reason = $2
+                $eventTime = $3
+                $licensesCount = $4      
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "licensesCount = " + $licensesCount + "( " + $OID1 + ") companyName = " + $companyName + "( " + $OID2 + ") eventTime = " + $eventTime + "( " + $OID3 + ") reason = " + $reason  + "( " + $OID4 + ") $5 = " + $5 + "( " + $OID5 + ")"
+#	20080916	End of change
+
+                @Summary = "The Company's ( " + $companyName + " ) License Limit has been exceeded. License Count is " + $licensesCount + "   "+ $reason
+                @Severity = 4
+                @Type = 1
+                @AlertGroup = "License"
+                @AlertKey = $companyName 
+		@UserData = "To notify that the company's license limit has been exceeded"
+
+
+        case "5":
+#               exporterFailureNotification
+
+                $exporterName = $1
+                $exporterNumber = $2
+                $companyName = $3
+                $reason = $4
+                $eventTime = $5
+                $serverId = $6
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "serverId = " + $serverId + "( " + $OID1 + ") exporterName = " + $exporterName + "( " + $OID2 + ") exporterNumber = " + $exporterNumber + "( " + $OID3 + ") companyName = " + $companyName + "( " + $OID4 + ") eventTime = " + $eventTime + "( " + $OID5 + ") reason = " + $reason + "( " + $OID6 + ") $7 = " + $7 + "( " + $OID7 + ")"
+#	20080916	End of change
+
+                @Summary = "Exporter " + $exporterName + " on Server " + $serverId + " has Failed  " + $reason
+                @Severity = 5
+                @Type = 1
+                @AlertGroup = "Exporter"
+                @AlertKey = $exporterName
+		@UserData = "To notify when the exporter fails"
+
+
+        case "6":
+#               importerFailureNotification
+
+                $companyName = $1
+                $reason = $2
+                $importerName = $3
+                $importerNumber = $4
+                $eventTime = $5
+                $serverId = $6
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "serverId = " + $serverId + "( " + $OID1 + ") importerName = " + $importerName + "( " + $OID2 + ") importerNumber = " + $importerNumber + "( " + $OID3 + ") companyName = " + $companyName + "( " + $OID4 + ") eventTime = " + $eventTime + "( " + $OID5 + ") reason = " + $reason + "( " + $OID6 + ") $7 = " + $7 + "( " + $OID7 + ")"
+#	20080916	End of change
+
+                @Summary = "Importer " + $importerName + " on Server " + $serverId + " has Failed  " + $reason
+                @Severity = 5
+                @Type = 1
+                @AlertGroup = "Importer"
+                @AlertKey = $importerName
+		@UserData = "To notify when the importer fails"
+
+
+
+
+        case "7":
+#               eventsPerMinuteExceedLimitNotification
+
+                $reason = $1
+                $eventTime = $2
+                $eventsPerMinuteLimit = $3
+                $serverId = $4
+                $numEventsPerMinute = $5
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "numEventsPerMinute = " + $numEventsPerMinute + "( " + $OID1 + ") eventsPerMinuteLimit = " + $eventsPerMinuteLimit + "( " + $OID2 + ") serverId = " + $serverId + "( " + $OID3 + ") eventTime = " + $eventTime + "( " + $OID4 + ") reason = " + $reason + "( " + $OID5 + ") $6 = " + $6 + "( " + $OID5 + ")"
+#	20080916	End of change
+
+                @Summary = "Events per minute ( " + $numEventsPerMinute + " ) exceeds a certain limit ( " + $eventsPerMinuteLimit + " ) on server " + $serverId + "  " + $reason
+                @Severity = 3
+                @Type = 1
+                @AlertGroup = "Event Rate"
+                @AlertKey = $serverId
+		@UserData = "To notify if events per minute exceeds a certain limit"
+
+
+
+        case "8":
+#               autoSyncFalureNotification
+
+                $companyName = $1
+                $reason = $2
+                $eventTime = $3
+                $serverId = $4
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "serverId = " + $serverId + "( " + $OID1 + ") companyName = " + $companyName + "( " + $OID2 + ") eventTime = " + $eventTime + "( " + $OID3 + ") reason = " + $reason + "( " + $OID4 + ") $5 = " + $5 + "( " + $OID5 + ")"
+#	20080916	End of change
+
+                @Summary = "Auto Sync has failed on server " + $serverId + "  " + $reason
+                @Severity = 5
+                @Type = 1
+                @AlertGroup = "Auto Sync"
+                @AlertKey = $serverId
+		@UserData = "To notify when auto sync fails"
+
+        case "9":
+#               logNotification
+
+                $loglevel = $1
+                $logChannelName = $2
+		$logMessage = $3
+                $eventTime = $4
+                $serverId = $5
+
+#	20080916	Change by Chris Janes of Abilitec TD 5052
+#                @Description = "serverId = " + $serverId + "( " + $OID1 + ") eventTime = " + $eventTime + "( " + $OID2 + ") loglevel = " + $loglevel + "( " + $OID3 + ") logChannelName = " + $logChannelName + "( " + $OID4 + ")logMessage = " + $logMessage + "( " + $OID5 + ") $6 = " + $6 + "( " + $OID6 + ")"
+#	20080916	End of change
+
+                @Summary = "IMAuditor logs reach a specific log limit " + $serverId + "  " + $logMessage
+                @Severity = 2
+                @Type = 1
+                @AlertGroup = "Auto Sync"
+                @AlertKey = $serverId
+		@UserData = "To notify when IMAuditor logs reach a specific log limit"
+
+
+
+	default:
+	
+		$ruleset = $ruleset + "-case:default"
+            	@Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            	@Severity = 1
+	}
+
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+

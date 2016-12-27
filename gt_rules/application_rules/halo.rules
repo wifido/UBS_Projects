@@ -1,0 +1,113 @@
+#################################################################################
+#
+#	halo.rules	created by Chris Janes 20070129
+#
+#################################################################################
+
+
+
+
+case "50405":
+
+
+	$ruleset = $ruleset + " HaLo"
+	@Agent = $Transport
+	@Class = $ClassID
+	if(nmatch($MessageText, "Hold could not be found"))
+	{
+		$ruleset = $ruleset + " End of Summary to Identifier"
+		$CountElements = split($MessageText, SplitArray,":")
+		$EndOfSummary = SplitArray[2]
+	}
+	@Summary = $MessageText
+	@Stream = $Stream
+	$temp_length_location = length($Location)
+	if (exists($Location) && int($temp_length_location) > 0)
+	{
+	      @Location = $Location
+	}
+	@Environment = $Environment
+	@Subclass = $Subclass
+	@UserData = $Userdata
+	@UserInt = $Userint
+	@SAPNumber = $SAPnumber
+	@SourceKey=$SourceKey
+	@RemData1=$RemData1
+#	Change by Chris Janes of Abilitec
+#	@RemData2=$RemData2
+#	End of Change
+
+
+	if (exists($Component))
+	{
+		@AlertKey = $Component
+	}
+	else
+	{
+		@AlertKey = $SAPname
+	}
+
+	# Create the AlertGroup field here. Value will change
+	# dependant on the presence of $ProcessID token
+	@AlertGroup = $EventIdentifier
+	if (exists($ProcessID) && int($ProcessID) > 0)
+	{
+                                        @AlertGroup = $EventIdentifier + "-" + $ProcessID
+	}
+
+	$tempEventType = $EventType
+	@Display_Hide = 0
+	switch ($tempEventType)
+	{
+	case "1":
+		# This indicates that the event is a 'Failure' event
+		# that has an associated event that indicates the failure
+		# is resolved. For this reason we ignore the $TimeToClear
+		# token, just setting the  @Type field in order for the
+		#  Generic Clear automation to function correctly.
+
+		@Type = $EventType
+
+	case "2":
+		# This indicates that the event is telling us that the
+		# problem has been resolved (A clear event).
+		# Here we set the @Type field correctly for the Generic
+		# Clear Automation. Additionally we modify
+		# the @Severity field value to insert the 'Clear' event
+		# as Severity = 1. This leads to greater
+		# efficiency in the Generic Clear Automation.
+
+		@Type = 2
+		@Severity = 1
+
+	default:
+
+		# If TimeToClear token is set to 0 event will never
+		# expire from Object Server. If TimeToClear token
+		# value set to 1-180 seconds, it is unlikely that the
+		# event will have enough time to propogate
+		# through all gateways, before expiring. So we set a default
+		# value of 180.
+
+		if (int($TimeToClear) > 0 && int($TimeToClear) < 180 )
+		{
+       		 	@Type = 180
+		}
+		else if (int($TimeToClear) == 0)
+		{
+			@Type = 1
+		}
+		else
+		{
+			@Type = $TimeToClear
+		}
+	}
+	if (exists($EndOfSummary))
+	{
+		$ruleset = $ruleset + " extended identifier"
+		$tempIdentifier = lower($Nodealias) + $Transport + $EventIdentifier + $EventType + $tempClass + $Subclass + $EndOfSummary
+	}
+	else
+	{
+		$tempIdentifier = lower($Nodealias) + $Transport + $EventIdentifier + $EventType + $tempClass + $Subclass
+	}

@@ -1,0 +1,163 @@
+#
+# Included customisations for NetApp filer monitoring
+#
+
+#       20050908        Change by Chris Janes of Abilitec
+        $ruleset = $ruleset + ' - NetApp-snmp Monitor'
+#       20050908        End of Change
+
+#       20060508 Changes by Chris Janes of Abilitec to enable us to vary the Class if these events dependent on profile name
+#	@Class = 128060
+
+#       20081119        Changes by Chris Janes of Abilitec TD 5152 & 5153
+#       @Class = lookup ($profile,prof_class)
+        [@Class, @Subclass, @Environment] = lookup ($profile,prof_class)
+
+#       20081119        End of Change
+
+        if(match(@Class, "6050"))
+        {
+                @Class = 128060
+        }
+#       20060508        end of changes
+
+
+
+
+$myOIDgrp = extract($oidGroupName, "^[^:]+:([^:]+):?")
+
+switch ($message)  {
+	case "Successful Get":
+		switch ($myOIDgrp)  {
+			case "sysStat":
+				@Summary = "CPU utilisation is " + $snmpResult0 + "%"
+			if (int($snmpResult0) < 80)  {
+				$tempSeverity = 1
+				@Type = 2
+			}
+			else if (int($snmpResult0) >= 80 and int($snmpResult0) < 85)  {
+				$tempSeverity = 3
+				@Type = 1
+			}
+			else if (int($snmpResult0) >= 85 and int($snmpResult0) < 90)  {
+				$tempSeverity = 4
+				@Type = 1
+			}
+			else  {
+				$tempSeverity = 5
+				@Type = 1
+			}
+				$tempAlertKey = ""
+				@SysInt = $snmpResult0
+			case "quota":
+				$volume = extract($snmpResult0, '^"(.*)"$')
+				@Summary = "Quota status on volume " + $volume + " is " + $snmpResult1
+				$tempAlertKey = $volume
+				@SysInt = $snmpResult1
+			case "dfTable":
+				if (exists($snmpResult0))  {
+					$mountpoint = extract($snmpResult0, '^"((/[^/]+)+/([^/]+)?)"$')
+					# Snapshot event
+					if (regmatch($mountpoint, '^(/[^/]+)+/[^/]+$'))  {
+						if (int($snmpResult4) < 80)  {
+							$tempSeverity = 1
+							@Type = 2
+						}
+						else if (int($snmpResult4) >= 80 and int($snmpResult4) < 90)  {
+							$tempSeverity = 2
+							@Type = 1
+						}
+						else if (int($snmpResult4) >= 90 and int($snmpResult4) < 100)  {
+							$tempSeverity = 3
+							@Type = 1
+						}
+						else if (int($snmpResult4) >= 100 and int($snmpResult4) < 110)  {
+							$tempSeverity = 4
+							@Type = 1
+						}
+						else  {
+							$tempSeverity = 5
+							@Type = 1
+						}
+					}
+					# Volume event
+					else  {
+						if (int($snmpResult4) < 70)  {
+							$tempSeverity = 1
+							@Type = 2
+						}
+						else if (int($snmpResult4) >= 70 and int($snmpResult4) < 75)  {
+							$tempSeverity = 2
+							@Type = 1
+						}
+						else if (int($snmpResult4) >= 75 and int($snmpResult4) < 78)  {
+							$tempSeverity = 3
+							@Type = 1
+						}
+						else if (int($snmpResult4) >= 78 and int($snmpResult4) < 80)  {
+							$tempSeverity = 4
+							@Type = 1
+						}
+						else  {
+							$tempSeverity = 5
+							@Type = 1
+						}
+					}
+					@Summary = $mountpoint + " is " + $snmpResult4 + "% full (" + $snmpResult7 + "% inodes used)"
+					$tempAlertKey = $mountpoint
+					@SysInt = $snmpResult4
+				}
+			case "fsStatus":
+				$myMsg = extract($snmpResult1, '([^"]+)')
+				@Summary = "Status for all filesystems: inodes used=" + $snmpResult3 + " %; kbytes used=" + $snmpResult2 + " %"
+				$tempAlertKey = ""
+				@SysInt = $snmpResult3
+			case "diskSummary":
+				$myMsg = extract($snmpResult9, '([^"]+)')
+				@Summary = $myMsg + ": " + $snmpResult0 + " " + $oidUnit0 + " total , " + $snmpResult1 + " " + $oidUnit1 + ", " + $snmpResult6 + " " + $oidUnit6 + ", " + $snmpResult7 + " " + $oidUnit7
+		                if (int($snmpResult7) < 2)  {
+		                    $tempSeverity = 5
+		                }
+				$tempAlertKey = $snmpResult7
+				@SysInt = $snmpResult7
+			case "spareEntry":
+				$tempAlertKey = ""
+
+			case "cifsOptions":
+				$dcName = extract($snmpResult0, '^([^"]+)')
+				$wgName = extract($snmpResult1, '^"([aA-zZ]+)')
+				$domainName = extract($snmpResult2, '^([^"]+)')
+				if (match($dcName, ""))  {
+					@Summary = "No CIFS domain controller available, using workgroup " + $wgName
+					$tempSeverity = 5
+					@Type = 1
+					$tempAlertKey = $wgName
+				}
+				else if (match($domainName, ""))  {
+					@Summary = "Not registered in a CIFS domain, using workgroup " + $wgName
+					$tempSeverity = 5
+					@Type = 1
+					$tempAlertKey = $wgName
+				}
+				else  {
+					@Summary = "Registered in CIFS domain " + $domainName + ", using domain controller " + $dcName
+					@Type = 1
+					$tempSeverity = 2
+					$tempAlertKey = $domainName + ":" + $dcName
+				}
+
+			default:
+		} # $myOIDgrp
+	default:
+		@Summary = $message
+		$tempSeverity = 4
+		$tempAlertKey = ""
+} # $message
+
+if (int(@Type) == 2)  {
+    @Display_Hide = 1
+}
+
+### Changed for GESS so that events from multiple ISM Servers are deduplicated
+#$tempIdentifier = $profile + $service + $FQHostname + $host + $oidGroupName + $tempAlertKey + @Type
+$tempIdentifier = $profile + $service + $host + $oidGroupName + $tempAlertKey + @Type

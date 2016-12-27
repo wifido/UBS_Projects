@@ -1,0 +1,84 @@
+table fast_track = 
+{
+	{"999999","musebot"}
+}
+default = {"musebot_dev"}
+
+
+table AenClassSubclass = 
+{
+	{"999999:Subclass","JustChris","2","1"}
+}
+default = {"NoMatch","0","0"}
+
+
+table AenClass = 
+{
+	{"999999","JustChris","2","1"}
+	{"1056365","Client Portal","5","1"}
+	{"1057555","Compass Homepage (IB Intranet Home)","5","1"}
+	{"1057556","Compass Search","5","1"}
+	{"1057557","Content Publisher","5","1"}
+	{"1056625","EDM Prod Infra","5","1"}
+	{"1056970","TelDir","5","1"}
+	{"50700","Swiskey Execution","5","1"}
+	{"1057577","World Clock","5","1"}
+	{"1057811","Boxer Small Sites","5","1"}
+	{"1057758","Encore","5","1"}
+	{"1057612","GPE - Global Pricing Engine","5","1"}
+	{"1057462","I-DEAL","5","1"}
+	{"1057486","PET - Portfolio Evaluation Tool","5","1"}
+	{"1057512","MarginFlex","5","1"}
+	{"1057275","SABRE","5","1"}
+	{"1057468","Cornerstone","5","1"}
+	{"1057031","ASAP","5","1"}
+	{"1057393","Global Portfolio Lending Workbench","5","1"}
+	{"1057290","CSRM","5","1"}
+	{"1057269","LoanetMQ","5","1"}
+	{"1019299","PB Excalibur","5","1"}
+	{"50400","GLOBAL ONE","5","1"}
+	{"1057353","Counterparty Administration Service","5","1"}
+	{"1058280","Equilend Automation Engine","5","1"}
+	{"1057352","ECI","5","1"}
+	{"1057405","AUTO RETURNS","5","1"}
+	{"1057585","Automarks","5","1"}
+	{"1057131","CDS","4","1"}
+	{"1027249","Checker","4","1"}
+	{"1056586","COD","4","1"}
+	{"1027253","COMA","4","1"}
+	{"1054919","Creation","4","1"}
+	{"1006089","Credit Engine","4","1"}
+	{"1057123","Credit Risk Framework SCV","4","1"}
+	{"1057950","CReW","4","1"}
+	{"80890","FMS","4","1"}
+	{"1000235","GRL-RXM","4","1"}
+	{"1056563","GRT","4","1"}
+	{"1057496","Hermes RiskIT","4","1"}
+	{"1056949","MDR","4","1"}
+	{"1056678","Merlin","4","1"}
+	{"1007995","PCE","4","1"}
+	{"11030","Risk Reporting Warehouse","4","1"}
+	{"1056680","RiskOnline","4","1"}
+	{"1056504","SDR","4","1"}
+	{"1056631","Spyda","4","1"}
+	{"110000","SRM","4","1"}
+	{"1056704","TDR","4","1"}
+	{"1056609","TRaPA","4","1"}
+	{"110020","VaR","4","1"}
+	{"110010","XCOLL","4","1"}
+	{"2500003","Platform Agent Team","4","1"}
+	{"2222254","Facetime","4","1"}
+	{"1058651","GGL FBI","4","1"}
+	{"5005870","COMPASS","5","1"}
+	{"5005873","COMPASS SEARCH","5","1"} 
+	{"5005875","TELDIRECTORY","5","1"} 
+	{"5005877","WORLDCLOCK","5","1"} 
+	{"5005878","PUBLIC WEB SITE","5","1"} 
+	{"5005880","CLIENT PORTAL HEADER FRAMESET","5","1"} 
+	{"5005881","CLIENT PORTAL HOMEPAGE","5","1"} 
+	{"5005885","CLIENT PORTAL HEADER TOOL","5","1"} 
+	{"5007313","EACCESS","5","1"}
+	{"2071639","MindAlign","4","1"}
+        {"5009457","Facetime","4","1"}
+}
+default = {"NoMatch","0","0"}

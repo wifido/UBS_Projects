@@ -1,0 +1,8 @@
+map(name="Aditya_Map",bgColor="#003366",w=260,h=600,acl="*")
+line(name="visual_4",label="untitled",x=4,y=383,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=261,y2=383)
+line(name="visual_3",label="untitled",x=1,y=281,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=259,y2=281)
+line(name="visual_2",label="untitled",x=6,y=180,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",thickness=1,x2=254,y2=180)
+button(name="visual_1",label="F35_Securities",x=94,y=309,action="Active Event List (AEL)",url="",target="main",entity="F35_Securities",datasource="NCOMS",flash="true",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+button(name="Training_Entity",label="untitled",x=91,y=209,action="Active Event List (AEL)",url="",target="main",entity="Training_Entity",datasource="NCOMS",flash="true",w=50,h=24,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+text(name="Aditya_View",label="Entity",x=98,y=79,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=16,justify="center",style="p",color="white")
+button(name="Aditya_Entity",label="untitled",x=94,y=126,action="Active Event List (AEL)",url="http://monitoring.swissbank.com/diagframe.html",target="main",entity="Aditya_Entity",datasource="NCOMS",flash="true",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")

@@ -1,0 +1,174 @@
+#!/sbcimp/run/pd/perl/5.8.7/bin/perl -w
+
+use Net::SNMP qw(:ALL);
+use Time::HiRes qw(gettimeofday);
+# use strict;
+use IO::Socket;
+use Getopt::Std;
+use Socket;
+
+my $trap_community = 'AEN';
+my $remote_port = 2004 ;
+#my $sock = "TO_SERVER";
+
+
+sub do_sock
+{
+	my $remote_host = $_[0];
+	print "  $_[0]\n";
+#	my $socket = $sock;
+	$socket = "TO_SERVER";
+	my $time = time();
+	socket($socket, PF_INET, SOCK_STREAM,getprotobyname('tcp'));
+	
+
+        # build the address of the remote machine
+	my $internet_addr = inet_aton($remote_host) or die "no convert $remote_host  $!\n";
+	my $paddr = sockaddr_in($remote_port, $internet_addr);
+
+        # connect
+	connect($socket, $paddr) or die "could not connect to $remote_host:remote_port : $!\n";
+
+	# while we are connected send 9 events	
+	#print $socket "\n";
+	print $socket "'Transport' 'SocketTestScript'\n";
+	print $socket "'Severity' 'INFO'\n";
+	print $socket "'Nodealias' 'WLDN0144847.develop.ubsw.net'\n";
+	print $socket "'EventIdentifier' 'Probe Test Event'\n";
+	print $socket "'SAPname' 'SAPname'\n";
+	print $socket "'Subclass' 'SubClass'\n";
+	print $socket "'ClassID' '999999'\n";
+	print $socket "'MessageText' 'Testing Probe Date Please Ignore\n'\n"; 
+	print $socket "'EventType' '1'\n";
+	print $socket "'EventTime' '$time'\n";
+	print $socket "'Component' '$remote_host'\n";
+	print $socket "'Stream' 'Stream'\n";
+	print $socket "'Resolution' 'False'\n";
+	print $socket "'Location' 'Location'\n";
+	print $socket "'Userdata' ''\n";
+	print $socket "'Acknowledged' '0'\n";
+	print $socket "'Region' 'EMEA'\n";
+	print $socket "\n";
+	close($socket);
+}
+
+sub do_trap 
+{
+	my $trap_dest = $_[0];
+	my $trap_port = $_[1];
+	my ($session, $error) = Net::SNMP->session(
+		-hostname 	=>  $trap_dest,
+		-community 	=> $trap_community,
+		-port		=> $trap_port,);
+
+	if (!defined($session)) 
+	{
+		printf("ERROR: %s.\n", $error);
+		exit 1;
+	}
+
+	# Here we build the trap properly for UBS standard.
+ 
+	my $time = time();
+	my $result = $session->trap(
+		-enterprise	=>	'1.3.6.1.4.1.19945.998.1',
+		-generictrap	=>	'6',
+		-specifictrap	=>	'1',
+		-timestamp	=>	$time,
+		-varbindlist	=>	[
+		'1.3.6.1.4.1.19945.998.1.1.0', OCTET_STRING, '5',
+		'1.3.6.1.4.1.19945.998.1.2.0', OCTET_STRING, 'varbind2',
+		'1.3.6.1.4.1.19945.998.1.3.0', OCTET_STRING, 'varbind3',
+		'1.3.6.1.4.1.19945.998.1.4.0', OCTET_STRING, 'varbind4',
+		'1.3.6.1.4.1.19945.998.1.5.0', OCTET_STRING, 'varbind5',
+		'1.3.6.1.4.1.19945.998.1.6.0', OCTET_STRING, 'varbind6',
+		'1.3.6.1.4.1.19945.998.1.7.0', INTEGER, '4',
+		'1.3.6.1.4.1.19945.998.1.8.0', OCTET_STRING, "varbind8"
+		]
+	);
+	if (!defined($result)) 
+	{
+		printf("ERROR: %s.\n", $session->error());
+
+	}
+
+	$session->close();
+	print "Trap Dest > $trap_dest    Port > $trap_port \n";
+}
+
+# Send the socket Events
+# Send to the dev box
+#do_sock ("151.191.98.138");
+# xstm8951pap
+#do_sock ("151.191.229.167");
+# xldn0065pap
+#do_sock ("139.149.42.166");
+# xopf0101
+#do_sock ("165.222.100.32");
+
+# xsng1283pap
+#do_sock ("xsng1283pap.sng.swissbank.com");
+
+# xzur0565pap.zur.swissbank.com
+#do_sock ("xzur0565pap.zur.swissbank.com");
+
+
+# xsng1001pap
+#do_sock ("147.60.8.174");
+# xldn1014pap
+#do_sock ("139.149.32.210");
+# test
+#do_sock ("151.191.119.183");
+#do_sock ("139.149.52.156");
+
+
+#do_sock ("151.191.119.183");
+#do_sock ("151.191.113.194");
+
+
+# Send the snmp Events
+#	Dev
+do_trap("151.191.98.138", "50162");
+#do_trap("151.191.98.138", "162");
+
+# xsng1001pap
+do_trap("147.60.8.174", "50162");
+#do_trap("147.60.8.174", "162");
+
+# xstm8951pap
+do_trap("151.191.229.167", "50162");
+#do_trap("151.191.229.167", "162");
+
+# xldn1014pap
+do_trap("139.149.32.210", "50162");
+#do_trap("139.149.32.210", "162");
+
+# xsldn0065pap
+do_trap("139.149.42.166", "50162");
+#do_trap("139.149.42.166", "162");
+
+# xopf0101pap
+do_trap("165.222.100.32", "50162");
+#do_trap("165.222.100.32", "162");
+
+
+# xopf0101pap
+do_trap("151.191.113.194", "50162");
+#do_trap("151.191.113.194", "162");
+
+
+# xsng1283pap
+do_trap("xsng1283pap.sng.swissbank.com", "50162");
+#do_trap("xsng1283pap.sng.swissbank.com", "162");
+
+# xopf0101pap
+do_trap("xzur0565pap.zur.swissbank.com", "50162");
+#do_trap("xzur0565pap.zur.swissbank.com", "162");
+
+# xsng1281dap
+do_trap("xsng1281dap.sng.swissbank.com", "50162");
+#do_trap("xsng1281dap.sng.swissbank.com", "162");
+
+
+
+exit 0;

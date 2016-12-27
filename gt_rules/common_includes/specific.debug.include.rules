@@ -1,0 +1,19 @@
+#
+# Determine whether we should enable various "debugging" aids
+#
+
+
+### This file should NEVER be pushed to production. It is for
+### debugging of specific events in Dev/Enginerering environments only.
+$hn = hostname()
+switch ($hn) {
+
+#	20080902 GT. Modified switch values to include xldn2929dap as this will be replacing xldn1052dap.
+	#case "xstm9838dap" | "xldn1052dap" | "xstm1953dap":
+	case "xstm5257dap":
+		details($*)
+	case "xldn2929dap" | "xldn0234dap" | "xstm7743dap":
+		details($*)
+	default:
+		# Do nothing
+}

@@ -1,0 +1,412 @@
+#
+# Veritas Cluster Server (VCS) include file
+# Alan Charlton - Abilitec - 20040707
+#
+case "vcs.agentsTraps":
+    $ruleset = $ruleset + " Veritas -case : Vcs.agentTraps"
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129000
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            $ruleset = $ruleset + "-case : 0"
+            @Severity = 2
+            @Type = 2
+        case "1":
+            $ruleset = $ruleset + "-case : 1"
+            @Severity = 3
+            @Type = 1
+        case "2":
+            $ruleset = $ruleset + "-case : 2"
+            @Severity = 4
+            @Type = 1
+        case "3":
+            $ruleset = $ruleset + "-case : 3"
+            @Severity = 5
+            @Type = 1
+        default:
+        $ruleset = $ruleset + "-default"
+    }
+    
+    switch ($specific-trap)  
+    {
+        case "1":
+            # clusterAgentRestartingTrap
+            $ruleset = $ruleset + "-case : 1"
+
+        case "2":
+            # clusterAgentFaultedTrap
+            $ruleset = $ruleset + "-case : 2"
+
+        default:
+            $ruleset = $ruleset + "-case : default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+
+case "vcs.groupsTraps":
+    $ruleset = $ruleset + " Veritas -case : vcs.groupsTraps"	
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129010
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            $ruleset = $ruleset + "-case : 0"
+            @Severity = 2
+            @Type = 2
+        case "1":
+            $ruleset = $ruleset + "-case : 1"
+            @Severity = 3
+            @Type = 1
+        case "2":
+            $ruleset = $ruleset + "-case : 2"
+            @Severity = 4
+            @Type = 1
+        case "3":
+            $ruleset = $ruleset + "-case : 3"
+            @Severity = 5
+            @Type = 1
+        default:
+        $ruleset = $ruleset + "-case : default"
+    }
+    
+    switch ($specific-trap)  
+    {
+  
+        case "1":
+            # clusterGroupOnlineTrap
+            $ruleset = $ruleset + "-case : 1"
+
+        case "2":
+            # clusterGroupOfflineTrap
+            $ruleset = $ruleset + "-case : 2"
+
+        case "3":
+            # clusterGroupAutoDisabledTrap
+            $ruleset = $ruleset + "-case : 3"
+
+        case "4":
+            # clusterGroupFaultedTrap
+            $ruleset = $ruleset + "-case : 4"
+
+        case "5":
+            # clusterGroupFaultedAndNowhereToFailoverTrap
+            $ruleset = $ruleset + "-case : 5"
+		
+        case "6":
+            # clusterGroupRestartingTrap
+            $ruleset = $ruleset + "-case : 6"	
+
+        case "7":
+            # clusterGroupInitiatingForSwitchingTrap
+            $ruleset = $ruleset + "-case : 7"
+
+        case "8":
+            # clusterGroupConcurencyViolationTrap
+            $ruleset = $ruleset + "-case : 8"
+
+        case "9":
+            # clusterGroupRestInRspnToPerstResGoOnlineTrap
+            $ruleset = $ruleset + "-case : 9"
+
+        default:
+            $ruleset = $ruleset + "-case : default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+
+case "vcs.rdcTraps":
+    $ruleset = $ruleset + " Veritas -case : vcs.rdcTraps"  	
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129020
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            @Severity = 2
+            @Type = 2
+            $ruleset = $ruleset + "-case : 0"
+        case "1":
+            @Severity = 3
+            @Type = 1
+            $ruleset = $ruleset + "-case : 1"
+        case "2":
+            @Severity = 4
+            @Type = 1
+            $ruleset = $ruleset + "-case : 2"
+        case "3":
+            @Severity = 5
+            @Type = 1
+            $ruleset = $ruleset + "-case : 3"
+        default:
+        $ruleset = $ruleset + "-case : default"
+    }
+    
+    switch ($specific-trap)  
+    {
+  
+        case "1":
+            # clusterRDCRlinkInconsistentTrap
+            $ruleset = $ruleset + "-case : 1"
+
+        case "2":
+            # clusterRDCRlinkNotUpToDateTrap
+            $ruleset = $ruleset + "-case : 2"
+
+        case "3":
+            # clusterRDCTakeoverFailedTrap
+            $ruleset = $ruleset + "-case : 3"
+
+        case "4":
+            # clusterRDCMigrateFailedTrap
+            $ruleset = $ruleset + "-case : 4"
+
+        case "5":
+            # clusterRDCTakeoverSuccessTrap
+            $ruleset = $ruleset + "-case : 5"
+
+        case "6":
+            # clusterRDCMigrateSuccessTrap
+            $ruleset = $ruleset + "-case : 6"
+
+        case "7":
+            # clusterRDCActingSecondaryTrap
+            $ruleset = $ruleset + "-case : 7"
+
+        case "8":
+            # clusterRDCResyncFailedTrap
+            $ruleset = $ruleset + "-case : 8"
+
+        case "9":
+            # clusterRDCResyncSuccessTrap
+            $ruleset = $ruleset + "-case : 9"
+
+        case "10":
+            # clusterRDCGroupOfflineTrap
+            $ruleset = $ruleset + "-case : 10"
+
+        default:
+            $ruleset = $ruleset + "-case : default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+
+case "vcs.resourcesTraps":
+    $ruleset = $ruleset + " Veritas -case : vcs.resourcesTraps"
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129030
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            @Severity = 2
+            @Type = 2
+            $ruleset = $ruleset + "-case : 0"
+        case "1":
+            @Severity = 3
+            @Type = 1
+            $ruleset = $ruleset + "-case : 1"
+        case "2":
+            @Severity = 4
+            @Type = 1
+            $ruleset = $ruleset + "-case : 2"
+        case "3":
+            @Severity = 5
+            @Type = 1
+            $ruleset = $ruleset + "-case : 3"
+        default:
+        $ruleset = $ruleset + "-case : default"
+    }
+    
+    switch ($specific-trap)  
+    {
+  
+        case "1":
+            # clusterResourceStateUnknownTrap
+            $ruleset = $ruleset + "-case : 1"
+
+        case "2":
+            # clusterResourceMonitorTimeoutTrap
+            $ruleset = $ruleset + "-case : 2"
+
+        case "3":
+            # clusterResourceNotGoingOfflineTrap
+            $ruleset = $ruleset + "-case : 3"
+
+        case "4":
+            # clusterResourceRestartingByAgentTrap
+            $ruleset = $ruleset + "-case : 4"
+
+        case "5":
+            # clusterResourceWentOnlineByItselfTrap
+            $ruleset = $ruleset + "-case : 5"
+
+        case "6":
+            # clusterResourceFaultedTrap
+            $ruleset = $ruleset + "-case : 6"
+
+        case "7":
+            # clusterResourceAdminWaitTrap
+            $ruleset = $ruleset + "-case : 7"
+
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            $ruleset = $ruleset + "-case : default"
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+
+case "vcs.systemsTraps":
+    $ruleset = $ruleset + " Veritas -case : vcs.systemsTraps"
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129040
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            @Severity = 2
+            @Type = 2
+            $ruleset = $ruleset + "-case : 0"
+        case "1":
+            @Severity = 3
+            @Type = 1
+            $ruleset = $ruleset + "-case : 1"
+        case "2":
+            @Severity = 4
+            @Type = 1
+            $ruleset = $ruleset + "-case : 2"
+        case "3":
+            @Severity = 5
+            @Type = 1
+            $ruleset = $ruleset + "-case : 3"
+        default:
+            $ruleset = $ruleset + "-case : default"
+    }
+    
+    switch ($specific-trap)  
+    {
+  
+        case "vcs.systemsTraps 1":
+            # clusterFirstSystemUpTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 1"
+
+        case "vcs.systemsTraps 2":
+            # clusterSystemRestartingByHashadowTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 2"
+
+        case "vcs.systemsTraps 3":
+            # clusterSystemInJeopardyTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 3"
+
+        case "vcs.systemsTraps 4":
+            # clusterSystemFaultedTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 4"
+
+        case "vcs.systemsTraps 5":
+            # clusterSystemJoinedClusterTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 5"
+
+        case "vcs.systemsTraps 6":
+            # clusterSystemExitedManuallyTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 6"
+
+        case "vcs.systemsTraps 7":
+            # clusterSystemUpButNotInClusterTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 7"
+
+        case "vcs.systemsTraps 8":
+            # clusterSystemUsageExceededThresholdTrap
+            $ruleset = $ruleset + "-case : vcs.systemsTraps 8"
+
+        default:
+            $ruleset = $ruleset + "-case : default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+     }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+  
+case "vcs.vcsTraps":
+    $ruleset = $ruleset + " Veritas -case : vcs.vcsTraps"
+    @Agent = "Veritas"
+    @AlertGroup = $7 + ":" + $4 + ":" + $3
+    @AlertKey = $5
+    @Summary = $13
+    @OwnerGID = 999
+    @OwnerUID = 65534
+    @Class = 129050
+    $TempDoLookup = 2
+    switch ($1)  
+    {
+        case "0":
+            $ruleset = $ruleset + "-case : 0"
+            @Severity = 2
+            @Type = 2
+        case "1":
+            $ruleset = $ruleset + "-case : 1"
+            @Severity = 3
+            @Type = 1
+        case "2":
+            $ruleset = $ruleset + "-case : 2"
+            @Severity = 4
+            @Type = 1
+        case "3":
+            $ruleset = $ruleset + "-case : 3"
+            @Severity = 5
+            @Type = 1
+        default:
+            $ruleset = $ruleset + "-case : default"
+    }
+    switch ($specific-trap)  
+    {
+        case "2":
+            # clusterGUIUserLoginTrap
+            
+
+         default:
+            $ruleset = $ruleset + "-case : default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary

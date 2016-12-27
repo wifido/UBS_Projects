@@ -1,0 +1,429 @@
+################################################################################################# #
+# 	specific.opex.include.rules include file
+#	specific rules files to parse and interpret the action codes received via Impact
+#
+#	20090907	V1.0	Mahesh Kumar	Original
+#
+#################################################################################################
+
+$ruleset     = $ruleset + "-opex_SR"
+$TD_Num      = "612"
+
+# Set a default value for escalation time.
+$OPEXEscTime = 300
+
+## We process only critical alerts
+## and mark them for impact processing
+#if (match(@Severity, "5"))
+switch(@Severity)
+{
+	case "5":
+		switch (@OwnerGID)
+		{
+			case "468": # Unix
+				if (match(@AlertGroup,"UBS_StartStop") && match(@Summary, "Possible Server Crash Please investigate")) {
+					## Check uptime
+					## This event is actually raised via a trigger. Only put here for visibility.
+					## Trigger updated in DEV/ENG by JO
+					@ActionCode   = 2000
+					@ActionStatus = 999
+				}
+				else if (regmatch(@Summary,"swap space is being used")){
+					## Check swap usage
+					@ActionCode   = 2001
+					@ActionStatus = 999
+				}
+				else if (regmatch(@Summary, "kernel: bonding: bond.* making interface.* the new active one.*$")) {
+					## Check bondstatus
+					@ActionCode   = 2002
+					@ActionStatus = 999
+				}
+				else if (regmatch(@Summary, "kernel: bonding: bond.* link status down.*$")) {
+					## Check bondstatus
+					@ActionCode   = 2002
+					@ActionStatus = 1
+				}
+				else if (match(@AlertGroup, "Network") && regmatch(@Summary,"NIC failure detected.* group.*$")){
+					## Check ipmp status
+					@ActionCode   = 2003
+					@ActionStatus = 999
+				}
+				else if (match(@AlertGroup, "Disk usage") && regmatch(@Summary,"Disk space for /var filesystem has exceeded")){
+					## Clean up /var
+					@ActionCode   = 2004
+					@ActionStatus = 999
+				}
+				
+				# End of Unix Class events
+
+                        case "1008": # ISC Wintel
+                                switch(@AlertGroup)
+                                {
+                                        case "Wintel-StorageManagement - Below 1 Percent": #
+                                                if (nmatch(@Summary,"Less than 1% on")) {
+                                                        ## Tidy up qtree
+                                                        @ActionCode   = 1003
+                                                        @ActionStatus = 999
+                                                }
+                                                else if (nmatch(@Summary,"Less than 5% on")) {
+                                                        ## Tidy up qtree
+                                                        @ActionCode   = 1003
+                                                        @ActionStatus = 999
+                                                }
+					default:
+				}
+
+	
+			case "8": # Wintel
+				switch(@AlertGroup)
+                        	{
+					case "The service terminated unexpectedly.": #
+						if (regmatch(@Summary,"service terminated")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"service depends on the")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"service was unable to log")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"service hung on starting")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+
+					case "The service or driver failed to start.": #
+						if (regmatch(@Summary,"gone from RUNNING to STOPP")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"gone from STARTING to STOPP")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"gone from UNKNOWN to STOPP")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"gone from UNKNOWN to STOPP")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"service failed to start")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+						else if (regmatch(@Summary,"The Service Control Manager")) {
+							## Restart service
+							@ActionCode   = 1001
+							@ActionStatus = 999
+							$OPEXEscTime  = 90
+						}
+
+					case "Alert - Servers Have HeartBeats Between 15 and 30 Minutes Old!": #
+						if (regmatch(@Summary,"Error: 60000  Severity: 10  State: 1One or more Agents have not heartbeated within the last")) {
+							## Ping Server
+							@ActionCode   = 1002
+							@ActionStatus = 999
+							$OPEXEscTime  = 180
+						}
+					default:
+				}
+
+				# End of Wintel Class events
+
+
+			case "239" | "1239" : # DBServices
+
+			switch(@Class)
+			{
+
+				case "128600": # MS SQL Server
+					if (regmatch(@Summary,"File Group space for InfoPortal:.* in instance .* has less than the Error threshold of free space")) {
+						@ActionCode   = 3800
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"Database space for .* in instance .* has less than the Error threshold of free space")) {
+						@ActionCode   = 3801
+						@ActionStatus = 999
+					}	
+					# End of MS SQL Server Class events
+
+				case "121000": # Sybase
+		# End of Exact matches
+					if (nmatch(@Summary,"sleeping tasks - check for LOG SUSPEND")) {
+						@ActionCode   = 3737
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"netbackup rerun failure  - please investigate")) {
+						@ActionCode   = 3602
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"netbackup running with WARNINGS")) {
+						@ActionCode   = 3603
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"netbackup running with ERRORS")) {
+						@ActionCode   = 3604
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"netbackup only partially successful")) {
+						@ActionCode   = 3605
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"netbackup did not complete - check logfile")) {
+						@ActionCode   = 3606
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: No such file or directory")) {
+						@ActionCode   = 3695
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: Permission denied")) {
+						@ActionCode   = 3696
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: timeout")) {
+						@ActionCode   = 3697
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/shared: Permission denied")) {
+						@ActionCode   = 3698
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"2: can't find a version of rsync")) {
+						@ActionCode   = 3699
+						@ActionStatus = 999
+					}
+		# End of nmatches
+					else if (regmatch(@Summary,"netbackup failure - .* return code")) {
+						@ActionCode   = 3601
+						@ActionStatus = 999
+					}
+					#else if (regmatch(@Summary,"tran log dump sequence broken on .* - previous have run with truncate_only")) {
+					#	@ActionCode   = 3608
+					#	@ActionStatus = 999
+					#}
+					else if (regmatch(@Summary,"Data Space utilisation of default segment in .* greater than")) {
+						@ActionCode   = 3618
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"REP AGENT Down for")) {
+						@ActionCode   = 3628
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"space utilisation greater than")) {
+						@ActionCode   = 3650
+						@ActionStatus = 999
+					}
+					#else if (regmatch(@Summary,"tran log dump sequence broken for .* - non-logged operation has been run")) {	
+					#	@ActionCode   = 3691
+					#	@ActionStatus = 999
+					#}
+	
+					# End of Sybase Class events
+	
+				case "120000": # Oracle
+		# End of exact matches..
+					if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: No such file or directory")) {
+						@ActionCode   = 3012
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: Permission denied")) {
+						@ActionCode   = 3013
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/run: timeout")) {
+						@ActionCode   = 3014
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"11: checking HUFS: /sbcimp/shared: Permission denied")) {
+						@ActionCode   = 3015
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ERROR: dbs_backtrack_cold_backup - FAILURE Review logfile, No netbackup performed. Abort process")) {
+						@ActionCode   = 3033
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ERROR: dbs_backtrack_hot_backup - FAILURE Review logfile, No netbackup performed. Abort process")) {
+						@ActionCode   = 3034
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ERROR: Execution of dbs_oracle_full_export is not successful. No netbackup performed. Abort process")) {
+						@ActionCode   = 3045
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"FileSystem /sbclocal/app/oracle for admin directory exceeds")) {
+						@ActionCode   = 3062
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"FileSystem for datafile directory exceeds")) {
+						@ActionCode   = 3066
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"Long transaction on")) {
+					@ActionCode   = 3096
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-01400: cannot insert NULL into")) {
+						@ActionCode   = 3161
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-01403: no data found")) {
+						@ActionCode   = 3162
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-01722: invalid number")) {
+						@ActionCode   = 3169
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-06502: PL/SQL: numeric or value error: character string buffer too small")) {
+						@ActionCode   = 3181
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-06502: PL/SQL: numeric or value error")) {
+						@ActionCode   = 3246
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"ORA-12008: error in materialized view refresh path")) {
+						@ActionCode   = 3189
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"URGENT - previous netbackup failure may impact current backup cycle - check dumps space")) {
+						@ActionCode   = 3284
+						@ActionStatus = 999
+					}
+					else if (nmatch(@Summary,"WARNING - Netbackup - WAIT for NetBackup service exceeded defined threshold, bailing out")) {
+						@ActionCode   = 3286
+						@ActionStatus = 999
+					}
+		# End of nmatches.
+					else if (regmatch(@Summary,"ERROR: RMAN - Executing backup database online database .* FAILURE, No NETBACKUP, Check logs. Abort process")) {
+						@ActionCode   = 3040
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"FileSystem .* for archive directory exceeds")) {
+						@ActionCode   = 3063
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"FileSystem .* for backup directory exceeds")) {
+						@ActionCode   = 3064
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"FileSystem .* for .* directory exceeds")) {
+						@ActionCode   = 3065
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"Tablespace .* is .* full")) {
+						@ActionCode   = 3268
+						@ActionStatus = 999
+					}
+					else if (regmatch(@Summary,"Waited [0-9]+ hrs for netbackup")) {
+						@ActionCode   = 3287
+						@ActionStatus = 999
+					}
+	
+					# End of Oracle Class events
+
+				default:
+					## do nothing
+				} # Switch on Class ends here
+			default:
+				## do nothing
+		} # Switch on OwenrGID ends here
+
+	case "3":
+		switch (@OwnerGID)
+		{
+			case "8": # Wintel
+				if (match(@AlertGroup,"MOM Agent heartbeat failure - Custom") && regmatch(@Summary,"agent on this computer failed to heartbeat but it did respond to a ping")) {
+					## Ping Server
+					@ActionCode   = 1002
+					@ActionStatus = 999
+					$OPEXEscTime  = 180
+				}
+				else if (match(@AlertGroup,"MOM Agent heartbeat failure - Custom") && regmatch(@Summary,"has never sent a heartbeat to the Management Server")) {
+					## Ping Server
+					@ActionCode   = 1002
+					@ActionStatus = 999
+					$OPEXEscTime  = 180
+				}
+
+				# End of Wintel Class events
+
+			default:
+				## do nothing
+		} # Switch on Severity 3 - Class ends here
+
+	case "1":
+		switch (@AlertGroup)
+		{
+			case "Agent":
+				if (match(@Type, "2") && match(@AlertKey, "StartStop")) {
+					# Cold Start traps which generate "Possible Server Crash Please investigate" alerts
+					@ActionCode   = 2000
+					@ActionStatus = 999
+				}
+			default:
+				## do nothing
+		} # Switch on Severity 2 - Class ends here
+		
+	default:
+		## do nothing
+
+   
+} # Severity switch ends here
+
+# Now set the correct Escalation time, Hide Display and mark eligible events with TempBamUpdate to bypass aen and app_hbt rules in socket/mttrapd rules.
+#if (int(@ActionCode) > 0 && int(@ActionStatus) == 0 ) {
+	#@SLA_Time      = getdate + int($OPEXEscTime)
+	#@Display_Hide  = 1
+	## Reset AENFlag to prevent it traversing AEN mechanism.
+	#@AENFlag       = 0
+#}
+#else if (int(@ActionStatus) == 999 ) {
+        #@XtraTime = getdate + int($OPEXEscTime)
+        #update(@XtraTime,false)
+#}
+
+if (int(@ActionCode) > 0 ) {
+	# First thing by the time we get here all the normal system fields (Identifier and Summary should be accurately defined.
+	# However the presence of a \n or <lf> character on Identifier or Summary causes us a world of grief. Lets get rid.
+        #$opexSum = rtrim(@Summary)
+	#$opexId  = rtrim(@Identifier)
+	# Now set them properly.
+	#@Identifier = $opexId
+	#@Summary    = $opexSum
+	# Now back on with the job.
+	if (int(@ActionStatus) == 0) {
+		@SLA_Time      = getdate + int($OPEXEscTime)
+		@Display_Hide  = 1
+		# Reset AENFlag to prevent it traversing AEN mechanism.
+		@AENFlag       = 0
+	}
+	else if (int(@ActionStatus) == 999 ) {
+		@XtraTime = getdate + int($OPEXEscTime)
+		update(@XtraTime,false)
+	}
+}

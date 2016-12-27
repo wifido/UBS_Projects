@@ -1,0 +1,2 @@
+map(name="MS-MOM",bgColor="white",w=197,h=120,acl="*")
+monitor(name="visual_1",label="Global MOM",x=7,y=7,action="Lightweight Event List (LEL)",url="",target="_self",entity="Wintel",datasource="LDNOBJPROD1",w=180,h=102,w=180,h=102,type="lavalamp",show label=true,show total=true,show highest=false,show lowest=false,show metric=true,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=true)

@@ -1,0 +1,2 @@
+map(name="SWISSKEY",bgColor="white",w=250,h=250,acl="*")
+monitor(name="visual_1",label="SWISSKEY NT INFRA",x=52,y=80,action="Active Event List (AEL)",url="",target="_self",entity="Pontis_NT4",datasource="LDNOBJPROD1",w=147,h=101,w=147,h=101,type="lavalamp",show label=true,show total=false,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

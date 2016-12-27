@@ -1,0 +1,7 @@
+#
+# PAM Configuration for the Netcool/OMNIbus ObjectServer.
+#
+## Settings for PAM
+auth        required     /lib/security/pam_pwdb.so shadow nullok
+account     required     /lib/security/pam_pwdb.so
+#password    required     /lib/security/pam_pwdb.so nullok use_authtok md5 shadow

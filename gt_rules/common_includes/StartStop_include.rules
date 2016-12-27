@@ -1,0 +1,29 @@
+#####################################################################################
+#
+#	StartStop_include.rules - rules associated with Stopping possible Server
+#					Crash Alerts being generated when a ssm Agent
+#					is installed
+# 
+#
+#	20070525	Chris Janes	Original
+#
+#
+#####################################################################################
+
+
+case "124021":
+
+
+	$ruleset = $ruleset + ' - StartStop '
+#	20091203 GT BR_755 Modeified CLass value.
+	#@Class = 0
+	@Class = 2000000
+#	20091203 End of Change.
+	@Agent = $Transport
+	@Summary = $MessageText
+	@AlertKey = $Component
+	@AlertGroup = $EventIdentifier
+	@Manager = 'StartStop'
+	@Type = 1
+	@Description = "OS = " + $OS		
+	

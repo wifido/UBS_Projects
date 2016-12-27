@@ -1,0 +1,1455 @@
+case "ciscoMgt.entityMIBTraps":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # entConfigChange
+	    @AlertGroup = "entStatus"
+	    @AlertKey = ""
+	    @Summary = "Entity status changed"
+	    @Severity = 2
+	    @Type = 1
+
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		$tempMarkForDiscard = 2
+
+#		20080922	End of Change
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+#######################################################################################################
+#
+#	CISCO-ENTITY-FRU-CONTROL-MIB
+#	20070619	October 2002, Srini Kode Rules by Chris Janes
+#
+#	The CISCO-ENTITY-FRU-CONTROL-MIB is used to monitor and configure operational status of 
+#       Field Replaceable Units (FRUs) and other managable physical entities of the system listed in the 
+#       Entity-MIB (RFC 2737) entPhysicalTable. 
+#       FRUs include assemblies such as power supplies, fans, processor modules, interface modules, etc.
+#
+#	LAST-UPDATED "200509060000Z"
+#
+#######################################################################################################
+
+case "ciscoMgt.cefcMIBNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+    $TD_Num = "5259"
+
+    switch ($specific-trap)  {
+	case "1": # cefcModuleStatusChangei
+		$cefcModuleOperStatus = $1
+		$cefcModuleStatusLastChangeTime = $2
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = "Module"
+	    	[@Severity, @Type, @Summary] = lookup("cefcModuleStatusChange" + ":" + $cefcModuleOperStatus, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+
+	case "2": # cefcPowerStatusChange 
+		$cefcFRUPowerOperStatus = $1
+		$cefcFRUPowerAdminStatus = $2
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = "Power"
+	    	[@Severity, @Type, @Summary] = lookup("cefcPowerStatusChange" + ":" + $cefcFRUPowerOperStatus, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+
+	case "3": # cefcFRUInserted 
+		$entPhysicalContainedIn = $1
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = $entPhysicalContainedIn
+	    	@Summary = "FRU inserted into container " + $entPhysicalContainedIn
+		# MK TD5259
+	   	@Severity = 3
+	    	@Type = 2
+
+	case "4": # cefcFRURemoved 
+		$entPhysicalContainedIn = $1
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = $entPhysicalContainedIn
+	    	@Summary = "FRU removed from container " + $entPhysicalContainedIn
+		# MK TD5259
+	    	@Severity = 5
+	    	@Type = 1
+
+	case "5": # cefcUnrecognizedFRU 
+		$entPhysicalClass = $1
+		$entPhysicalVendorType = $2
+		$entPhysicalName = $3
+		$entPhysicalModelName = $4
+		$cefcPhysicalStatus = $5
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = $entPhysicalClass + $entPhysicalVendorType + $entPhysicalName + $entPhysicalModelName
+	    	@Summary = "Unsupported FRU inserted (see UserData)" 
+	    	@UserData = "Class=" + $entPhysicalClass + "; VendorType=" + $entPhysicalVendorType + "; Name=" + $entPhysicalName + "; Model=" + $entPhysicalModelName
+	    	@Severity = 4
+	    	@Type = 1
+
+	case "6": # cefcFanTrayStatusChange 
+		$cefcFanTrayOperStatus = $1
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = "Fan"
+	    	[@Severity, @Type, @Summary] = lookup("cefcFanTrayStatusChange" + ":" + $cefcFanTrayOperStatus, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+
+	case "7": # cefcPowerSupplyOutputChange
+		$entPhysicalName = $1
+		$entPhysicalModelName = $2
+		$cefcPSOutputModeCurrent = $3
+	    	@AlertGroup = "FRUControl"
+	    	@AlertKey = "Power Supply"
+	    	@Summary = $entPhysicalName + "Power supply's output capacity has changed to " + $cefcPSOutputModeCurrent
+		@Severity = 4
+	    	@Type = 1
+
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+
+#######################################################################################################
+#
+#	CISCO-RF-MIB.my
+#	20070619	-- August 2000, Timothy Kurnik and Bo Berry
+#			-- December 2001, Liwei Wang
+#
+#	This MIB provides configuration control and status for the Redundancy Framework (RF) subsystem. RF provides a mechanism
+#       for logical redundancy of software functionality and is designed to support 1:1 redundancy on processor cards. RF is
+#       not intended to solve all redundancy schemes. Nor is RF designed to support redundant hardware, such as power supplies
+#
+#	LAST-UPDATED "200509010000Z"
+#
+#######################################################################################################
+
+case "ciscoMgt.ciscoRFMIBNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # ciscoRFSwactNotif
+		$RFStatusUnitId = $1
+		$sysUpTime = $2
+		$cRFStatusLastSwactReasonCode = $3
+	    	@AlertGroup = "Redundancy"
+	    	@AlertKey = $RFStatusUnitId
+	    	@Summary = "SWACT action  - activity switched to unit " + $RFStatusUnitId + ": reason code " + $cRFStatusLastSwactReasonCode
+	    	@Severity = 3
+	    	@Type = 1
+
+	case "2": # ciscoRFProgressionNotif
+		$cRFStatusUnitId = $1
+		$cRFStatusUnitState = $2
+		$cRFStatusPeerUnitId = $3
+		$cRFStatusPeerUnitState = $4
+	    	@AlertGroup = "Redundancy"
+	    	@AlertKey = $cRFStatusUnitId + $cRFStatusPeerUnitId
+	    	@Summary = "Status progressing to state " + $cRFStatusUnitState + " on unit " + $cRFStatusUnitId + " from unit " + $cRFStatusPeerUnitId + " in state " + $cRFStatusPeerUnitState
+	    	@Severity = 3
+	    	@Type = 1
+
+	case "3": # ciscoRFIssuStateNotif
+		$RFStatusUnitId = $1
+		$cRFStatusUnitState = $2
+		$cRFStatusIssuState = $3
+	    	@AlertGroup = "Redundancy"
+	    	@AlertKey = $RFStatusUnitId + $cRFStatusIssuState 
+	    	@Summary = "The System " + $RFStatusUnitId + " has entered a new state " + $cRFStatusIssuState
+	    	@Severity = 3
+	    	@Type = 1
+
+	case "4": # ciscoRFIssuStateNotifRev1
+		$cRFStatusIssuStateRev1 = $1
+		$cRFStatusIssuFromVersion = $2
+		$cRFStatusIssuToVersion = $3
+		$cRFStatusLastSwactReasonCode = $4
+	    	@AlertGroup = "Redundancy"
+	    	@AlertKey = $cRFStatusIssuStateRev1 + $cRFStatusIssuToVersion + $cRFStatusLastSwactReasonCode 
+	    	@Summary = "The ISSU state ( " + $cRFStatusIssuStateRev1 + " ) of this system has been upgraded from " + $cRFStatusIssuFromVersion + " to " + $cRFStatusIssuToVersion + ". The reason being " + $cRFStatusLastSwactReasonCode
+	    	@Severity = 3
+	    	@Type = 1
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+#######################################################################################################
+#
+#	CISCO-FC-FE-MIB.my: Cisco Fibre Channel Fibre Element MIB
+#	20070619	September 2002, Srini Kode Rules by Chris Janes
+#
+#       This is the Cisco fibre element management MIB module.
+#            It covers:
+#            - Cisco extension to the interface MIB ( IF-MIB )
+#            - Contains all the groups from FIBRE-CHANNEL-FE-MIB relevant to Cisco fabric.
+#            - Other features specific to Cisco fabric.
+#
+#       This MIB supports all the port types defined by the textual convention FcPortTypes. In addition it also
+#       supports Nx_port, where Nx_port can be either N_port or NL_port. The FC standards define Interconnect_Ports
+#       to be E_ports or B_Ports.
+#
+#       This MIB supports Port Channel ports. Port Channel port is a single logical port, which contains 
+#       multiple physical ports as its members. Presently only E_ports can be a member of Port Channel port.
+#
+#       In addition it provides GigE and port channel information for all the Gigabit Ethernet (GigE) ports in the fabric.
+#
+#	LAST-UPDATED "200607060000Z" 
+#
+#######################################################################################################
+
+case "ciscoMgt.cffFcFeNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+    $TD_Num = "5259"
+
+    switch ($specific-trap)  {
+	case "1": # fcTrunkIfDownNotify
+		$fcTrunkIfOperStatus = $1
+		$fcTrunkIfOperStatusCause = $2
+		$fcTrunkIfOperStatusCauseDescr = $3
+
+	    	@AlertGroup = "TrunkStatus"
+	    	@AlertKey = extract($OID1, "^\.1\.3\.6\.1\.4\.1\.9\.9\.289\.1\.1\.3\.1\.1\.([^.]+)\.[0-9]+$")
+		$tempVSAN = extract($OID2, "^\.1\.3\.6\.1\.4\.1\.9\.9\.289\.1\.1\.3\.1\.2\.([^.]+)\.[0-9]+$")
+	    	@Summary = "Trunk on interface " + @AlertKey + " for VSAN " + $tempVSAN + " is down: " + $fcTrunkIfOperStatusCauseDescr
+	        # Change Severity from 4 to 3, per TD #5259
+	    	@Severity = 3
+	    	@Type = 1
+
+
+		# GT A bit of forward planning here. Capture some of the incoming trap into the Description field here for future development.
+                @Description = @Description + "--OID1-" + $OID1 + "-value= " + $1 + "--OID2-" + $OID2 + "-value= " + $2 + "--OID3-" + $OID3 + "-value= " + $3 + "--END"
+                # Discard alerts from VSAN 1. They are meant to be provisional.
+		if(match(@AlertKey, "1"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+	case "2": # fcTrunkIfUpNotify
+		$fcTrunkIfOperStatus = $1
+		$fcTrunkIfOperStatusCause = $2
+		$fcTrunkIfOperStatusCauseDescr = $3
+
+	    	@AlertGroup = "TrunkStatus"
+	    	@AlertKey = extract($OID1, "^\.1\.3\.6\.1\.4\.1\.9\.9\.289\.1\.1\.3\.1\.1\.([^.]+)\.[0-9]+$")
+	        # Change Summary & Severity from 1 to 0, per TD #5259
+		$tempVSAN = extract($OID2, "^\.1\.3\.6\.1\.4\.1\.9\.9\.289\.1\.1\.3\.1\.2\.([^.]+)\.[0-9]+$")
+	    	@Summary = "Trunk on interface " + @AlertKey + " for VSAN " + $tempVSAN + " is up: " + $fcTrunkIfOperStatusCauseDescr
+	    	@Severity = 2
+	    	@Type = 2
+
+		# GT A bit of forward planning here. Capture some of the incoming trap into the Description field here for future development.
+                @Description = @Description + "--OID1-" + $OID1 + "-value= " + $1 + "--OID2-" + $OID2 + "-value= " + $2 + "--OID3-" + $OID3 + "-value= " + $3 + "--END"
+                # Discard alerts from VSAN 1. They are meant to be provisional.
+		if(match(@AlertKey, "1"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+
+	case "3": # fcIfElpReject
+		$fcIfElpNbrNodeName = $1
+		$fcIfElpNbrPortName = $2
+		$fcIfElpRejectReasonCode = $3
+		$fcIfElpRejectReasonCodeExpl = $4
+	    	@AlertGroup = "ELP"
+	    	@AlertKey = extract($OID1, "^.*([0-9]+)$")
+		@Summary = "Interface on " + $fcIfElpNbrNodeName + ", " + $fcIfElpNbrPortName + " has rejected a ELP request - " + $fcIfElpRejectReasonCodeExpl
+	        # Severity set to 2, per TD #5259
+	    	@Severity = 2
+	    	@Type = 1
+
+#	20090721 GT TD5259  traps 4 and 5 rewritten
+	case "4": # fcotInserted
+                # Mahesh Kumar. Change per TD 5259
+		#$fcIfOperStatusReason = $1
+		$fcIfOperStatusReason = lookup($1,fcIfOperStatusCodes)
+	    	@AlertGroup = "FCOT"
+	    	#@AlertKey = extract($OID1, "^.*([0-9]+)$")
+               	# This bit added temporarily for debug type purposes.
+		@Description = @Description + " --OID1=" + $OID1 
+                if (nmatch($OID1,".1.3.6.1.4.1.9.9.276.1.1.2.1.9.")) {
+			# The next 8 characters give us the port map via lookup.
+			$tmpAlertKey1  = substr($OID1,32,8)
+			$tmpAlertKey2  = "portindex:" + $tmpAlertKey1
+			@AlertKey     = lookup($tmpAlertKey2, FCPortMap)
+                	# This bit added temporarily for debug type purposes.
+			@Description = @Description + " --substrOID1=" + $tmpAlertKey1
+                } else {
+			@AlertKey = "Unknown OID"
+			@Description = @Description + " --" + @AlertKey
+		}
+	    	#@Summary = "FCOT inserted"
+	    	@Summary = "Fibre Channel Optical Transmitter (FCOT) inserted, interface " + @AlertKey + ", Cause= " + $fcIfOperStatusReason
+	        # Change Severity from 1 to 0, per TD #5259  -- No..
+	    	@Severity = 2
+	    	#@Severity = 0	-- Bad Generic clear breaks if we do this.
+	    	@Type = 2
+
+	case "5": # fcotRemoved
+		#$fcIfOperStatusReason = $1
+		$fcIfOperStatusReason = lookup($1,fcIfOperStatusCodes)
+	    	@AlertGroup = "FCOT"
+	    	#@AlertKey = extract($OID1, "^.*([0-9]+)$")
+               	# This bit added temporarily for debug type purposes.
+		@Description = @Description + " --OID1=" + $OID1 
+                if (nmatch($OID1,".1.3.6.1.4.1.9.9.276.1.1.2.1.9.")) {
+			# The next 8 characters give us the port map via lookup.
+			$tmpAlertKey1  = substr($OID1,32,8)
+			$tmpAlertKey2  = "portindex:" + $tmpAlertKey1
+			@AlertKey     = lookup($tmpAlertKey2, FCPortMap)
+                	# This bit added temporarily for debug type purposes.
+			@Description = @Description + " --substrOID1=" + $tmpAlertKey1
+                } else {
+			@AlertKey = "Unknown OID"
+			@Description = @Description + " --" + @AlertKey
+		}
+	    	@Summary = "Fibre Channel Optical Transmitter (FCOT) removed, interface " + @AlertKey + ", Cause= " + $fcIfOperStatusReason
+
+#		20081014	Change by Chris Janes of Abilitec       TD 5088
+		#$TD_Num = "5008"
+		# MK 05Aug2008 - Should have severity 4(major) instead of current 3(minor).
+	    	@Severity = 4
+	    	@Type = 1
+##               20080922        Change by Chris Janes of Abilitec       TD 5060
+#                $tempMarkForDiscard = 2
+#
+##               20080922        End of Change
+#               20081014        End of Change
+#	20090721 GT End of change.
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.fcNameServerNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # fcNameServerRejectRegNotify 
+	    @AlertGroup = "NameServer"
+	    @AlertKey = $1_hex
+	    @Summary = "Name server registration for port " + $1_hex + " rejected: " + $3
+	    @Severity = 4
+	    @Type = 1
+	case "2": # fcNameServerDatabaseFull  
+	    @AlertGroup = "NameServer"
+	    @AlertKey = $1
+	    @Summary = "Name server cannot allocate space for a new database entry: VSAN index " + $1
+	    @Severity = 3
+	    @Type = 1
+	case "3": # fcNameServerEntryAdd 
+                $tempMarkForDiscard = 2
+
+	    @AlertGroup = "NameServer"
+	    @AlertKey = $1_hex
+	    @Summary = "Name server entry added for port " + $1_hex
+	    @Severity = 1
+	    @Type = 2
+	case "4": # fcNameServerEntryDelete 
+                $tempMarkForDiscard = 2
+
+	    @AlertGroup = "NameServer"
+	    @AlertKey = $1_hex
+	    @Summary = "Name server entry deleted for port " + $1_hex
+	    @Severity = 2
+	    @Type = 1
+#               20080922        Change by Chris Janes of Abilitec       TD 5060
+                $tempMarkForDiscard = 2
+
+#               20080922        End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.fcsNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # fcsReqRejNotify 
+	    @AlertGroup = "FCS"
+	    @AlertKey = $1
+	    @Summary = "Fabric Configuration Server request rejected: " + $2
+	    @Severity = 3
+	    @Type = 1
+	case "2": # fcsDiscoveryCompleteNotify 
+	    @AlertGroup = "FCS"
+	    @AlertKey = $1
+	    @Summary = "Discovery complete for " + $1
+	    @Severity = 2
+	    @Type = 1
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		$tempMarkForDiscard = 2
+#		20080922	End of Change
+
+	case "3": # fcsMgmtAddrChangeNotify 
+                $tempMarkForDiscard = 2
+
+	    @AlertGroup = "FCS"
+	    @AlertKey = $1 + ":" + $2_hex
+	    @Summary = "Address changed for port " + $2_hex + " in VSAN " + $1
+	    @Severity = 2
+	    @Type = 1
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		$tempMarkForDiscard = 2
+#		20080922	End of Change
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.ciscoFeatureCtrlMIBNotifs":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # ciscoFeatureOpStatusChange 
+	    @AlertGroup = "OpStatus"
+	    @AlertKey = extract($OID1, "^.*([0-9]+)$")
+	    [@Severity, @Type, @Summary] = lookup("ciscoFeatureOpStatusChange" + ":" + $1, FCStatusMap)
+#               20080922        Change by Chris Janes of Abilitec       TD 5060
+                if(match(@Severity, "2"))
+                {
+                        $tempMarkForDiscard = 2
+                }
+
+#               20080922        End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+#######################################################################################################
+#
+#	CISCO-CFS-MIB.my: Cisco Fabric Service MIB
+#	20070619	September 2004, John Fan, Sanjeev C Joshi, H K Vivek
+#
+#	This MIB applies to one or more of a set of devices which have connectivity through some kind of 'fabric'.
+#        Many features which run in such an environment require the exchange of information between the peer devices
+#        which participate in providing the feature. An example of the type of information exchanged is configuration
+#        information. It would be advantageous to have the ability to have configuration for a feature done on one device
+#        and propagated to all other devices in the fabric.  Cisco Fabric Service (CFS) is a general mechanism for
+#        data distribution within the fabric that could be used by most features.
+#
+#	LAST-UPDATED "200511300000Z"
+#
+#######################################################################################################
+
+case "ciscoMgt.ciscoCFSMIBNotifs":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+	$TD_Num = "5259"
+
+    switch ($specific-trap)  {
+	case "1": # ciscoCFSFeatureActionNotif 
+		$cfsFeatureOpLastAction = $1
+                $cfsFeatureOpLastScopeType = $2
+                $cfsFeatureOpLastScopeVal = $3
+                $cfsFeatureOpLastActionResult = $4
+	    	@AlertGroup = "CFS"
+	    	@AlertKey = $cfsFeatureOpLastAction + $cfsFeatureOpLastScopeType
+	    	[$sevToThrow, $typeToThrow, $tempSummary] = lookup("ciscoCFSFeatureActionNotif" + ":" + $cfsFeatureOpLastAction, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    	switch ($cfsFeatureOpLastActionResult)  {
+		case "1":
+		    @Type = 1
+		    @Severity = 2
+		    @Summary = $tempSummary + " (unknown status)"
+#               	20080922        Change by Chris Janes of Abilitec       TD 5060
+                	$tempMarkForDiscard = 2
+
+#               	20080922        End of Change
+		case "2":
+		    @Type = 2
+                    # Severity set to 2, per TD #5259
+		    @Severity = 2
+		    @Summary = $tempSummary + " (action succeeded)"
+		case "3":
+		    @Type = 1
+                    # Severity set to 3, per TD #5259
+		    @Severity = 3
+		    @Summary = $tempSummary + " (action failed)"
+		case "4":
+		    @Type = 1
+		    @Severity = 2
+		    @Summary = $tempSummary + " (action in progress)"
+#               	20080922        Change by Chris Janes of Abilitec       TD 5060
+                	$tempMarkForDiscard = 2
+
+#               	20080922        End of Change
+		default:
+	    }
+
+
+	case "2": # ciscoCFSMergeFailNotif 
+                $cfsMergeFailFeatureName = $1
+                $cfsMergeFailScopeType = $2
+                $cfsMergeFailScopeVal = $3
+                $cfsMergeFailScopeVal_hex = $3_hex
+                $cfsMergeFailReasonDescription = $4
+
+	    	@AlertGroup = "CFS"
+
+	    	@AlertKey = $cfsMergeFailFeatureName + $cfsMergeFailScopeType
+                # Summary changed, per TD #5259
+	    	@Summary = "CFS Database " + $cfsMergeFailReasonDescription + " (scope type " + $cfsMergeFailScopeType + ", value " + $cfsMergeFailScopeVal_hex + ")"
+	    	@Severity = 3
+	    	@Type = 1
+
+	case "3": # cfsMergeFailReasonDescription
+		$cfsPeersDiscoveryFailureReason = $2
+	    	@AlertGroup = "CFS"
+		switch ($1)
+		{
+		case "1":
+			$cfsPeersDiscoveryResult = "notInitiated"
+			@Summary = "Discovery of the CFS capable devices in the fabric has not been Initiated"
+			@AlertKey = $cfsPeersDiscoveryResult + $cfsPeersDiscoveryFailureReason
+			@Severity = 2
+                	@Type = 1
+#               	20080922        Change by Chris Janes of Abilitec       TD 5060
+                	$tempMarkForDiscard = 2
+
+#               	20080922        End of Change
+		case "2":
+			$cfsPeersDiscoveryResult = "inProgress"
+			@Summary = "Discovery of the CFS capable devices in the fabric is in Progress"
+			@AlertKey = $cfsPeersDiscoveryResult + $cfsPeersDiscoveryFailureReason
+			@Severity = 2
+                	@Type = 1
+#               	20080922        Change by Chris Janes of Abilitec       TD 5060
+                	$tempMarkForDiscard = 2
+
+#               	20080922        End of Change
+		case "3":
+			$cfsPeersDiscoveryResult = "successful"
+			@Summary = "Discovery of the CFS capable devices in the fabric was successful"
+			@AlertKey = $cfsPeersDiscoveryResult + $cfsPeersDiscoveryFailureReason
+                        # MK TD5259
+			@Severity = 2
+                	@Type = 2
+		case "4":
+			$cfsPeersDiscoveryResult = "failed"
+			@Summary = "Discovery of the CFS capable devices in the fabric failed due to " + $cfsPeersDiscoveryFailureReason
+			@AlertKey = $cfsPeersDiscoveryResult + $cfsPeersDiscoveryFailureReason
+                        # MK TD5259
+			@Severity = 3
+                	@Type = 1
+		
+		default:
+
+		}
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+#######################################################################################################
+#
+#	CISCO-VSAN-MIB.my: Virtual Storage Area Network MIB
+#	20070619	September 2002, Vinay Gaonkar
+#			September 2003, Arul Mozhi 
+#			May 2005,       John Fan
+#	The MIB module for the management of the Virtual Storage Networks (VSANs) within the frame  work of Cisco's VSAN 
+#           Architecture.  This MIB enables the users to configure and monitor VSAN parameters
+#	
+#	LAST-UPDATED "200602060000Z"	
+#
+#######################################################################################################
+
+case "ciscoMgt.vsanNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+    $TD_Num = "5259"
+
+    switch ($specific-trap)  {
+	case "1": # vsanStatusChange  
+		$notifyVsanIndex = $1
+		$vsanAdminState = $2 
+		$vsanOperState = $3
+	    	@AlertGroup = "vsanStatus"
+	    	@AlertKey = $notifyVsanIndex
+	    	[@Severity, @Type, @Summary] = lookup("vsanStatusChange" + ":" + $vsanOperState, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+                # Change Summary based on Type & Discard VSAN 1 alerts.
+		# VSANID found in AlertKey. Per TD #5259
+		if(match(@Type, "1"))
+                {
+                    #Problem. VSAN down
+                    @Summary = "VSAN is down, VSAN number is " + @AlertKey
+                }
+                else{
+                    #Resolution. VSAN up
+                    @Summary = "VSAN is up, VSAN number is " + @AlertKey
+                }
+		if(match(@Severity, "2") || match(@AlertKey, "1"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+
+	case "2": # vsanPortMembershipChange
+		$vsanFcFeElementName = $1
+		$ifIndex = $2 
+		$notifyVsanIndex = $3
+	    	@AlertKey = $notifyVsanIndex
+		@AlertGroup = "vsanPortMembership"
+		@Summary = "port-vsan membership of a port is changed see UserData for further details"
+		@UserData = "vsanFcFeElementName = " + $vsanFcFeElementName + " ifIndex = " + $ifIndex + " notifyVsanIndex = " + $notifyVsanIndex
+		# Change severity to 2. Per TD #5259
+		@Severity = 2
+		@Type = 1
+                # Discard VSAN 1 alerts of severity 2.
+		# VSANID found in AlertKey. Per TD #5259
+		if( (match(@AlertKey, "1")) || (match(@Severity, "2")) )
+		{
+			$tempMarkForDiscard = 2
+		}
+
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.dmNotification":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # dmDomainIdNotAssignedNotify
+	    @AlertGroup = "domainMgt"
+	    @AlertKey = $1 + ":" + $2_hex
+	    @Summary = "Domain ID not assigned on VSAN " + $1
+	    @Severity = 4
+	    @Type = 1
+	case "2": # dmNewPrincipalSwitchNotify
+	    @AlertGroup = "domainMgt"
+	    @AlertKey = $1 + ":" + $2_hex
+	    @Summary = "Node " + $2_hex + " is now Principal Switch on VSAN " + $1
+	    @Severity = 2
+	    @Type = 1
+#           20080922        Change by Chris Janes of Abilitec       TD 5060
+            $tempMarkForDiscard = 2
+
+#           20080922        End of Change
+	case "3": # dmFabricChangeNotify
+	    @AlertGroup = "domainMgt"
+	    @AlertKey = $1
+	    @Summary = "BF or RCF message received for VSAN " + $1
+	    @Severity = 3
+	    @Type = 1
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.ciscoFCCMIBNotifs":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # ciscoFCCCongestionStateChange 
+	    @AlertGroup = "FCCCongestion"
+	    @AlertKey = $1
+	    [@Severity, @Type, @Summary] = lookup("ciscoFCCCongestionStateChange" + ":" + $2, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    @Summary = @Summary + " on interface " + $1
+	case "2": # ciscoFCCCongestionRateLimitStart 
+	    @AlertGroup = "FCCCongestion"
+	    @AlertKey = $4 + $1
+	    @Summary = "Congestion rate limiting started between " + $2 + " and " + $3 + " on interface " + $1 + ", VSAN " + $4
+	    @Severity = 4
+	    @Type = 1
+	case "3": # ciscoFCCCongestionRateLimitEnd 
+	    @AlertGroup = "FCCCongestion"
+	    @AlertKey = $4 + $1
+	    @Summary = "Congestion rate limiting ceased between " + $2 + " and " + $3 + " on interface " + $1 + ", VSAN " + $4
+	    @Severity = 1
+	    @Type = 2
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.fspfNotification":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+    $TD_Num = "5259"
+
+    switch ($specific-trap)  {
+	case "1": # fspfNbrStateChangeNotify
+	    # MK TD5259
+	    @AlertGroup = "FSPFStatus"
+	    @AlertKey = $2 + $1 + $3 + $4
+	    [@Severity, @Type, $curStatus] = lookup("fspfIfNbrState" + ":" + $5, FCStatusMap)
+	    [$severityToThrow, $TypeToThrow, $prvStatus] = lookup("fspfIfNbrState" + ":" + $6, FCStatusMap)
+	    @Summary = "FSPF neighbours " + $3 + " and " + $4 + " changed state from " + $prvStatus + " to " + $curStatus
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+case "ciscoMgt.ciscoFdmiMIBNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # cfdmiRejectRegNotify
+	    @AlertGroup = "FDMIreject"
+	    @AlertKey = $1 + $2 + $3
+	    @Summary = "FDMI registration request rejected on VSAN " + $1 + ", port " + $3 + ": " + $5
+	    @Severity = 4
+	    @Type = 1
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+#######################################################################################################
+#
+#	CISCO-IVR-MIB.my: Inter Virutal Storage Area Network (Inter-VSAN) Routing MIB	
+#	20070619	-- July 2003, Vinay Gaonkar
+#			-- November 2004, John Fan
+#	The MIB module for the management of Inter-VSAN routing within the framework of Cisco's 
+#	Inter-VSAN Routing (IVR) Architecture. IVR allows traffic between VSANs. VSANs are logically separated
+#	Storage Area Networks (SANs) where traffic does not cross VSAN boundaries. Certain SAN applications need
+#	restricted communication between initiators and targets which are in different VSANs. This MIB enables
+#	the users to manage IVR.
+#	
+#	The VSANs logically separate a single physical fabric into multiple logical fabrics. Each of these physical 
+#	fabrics are called Autonmous Fabrics. In addition to Inter-VSAN communication, IVR also enables 
+#	communication between Autonomous Fabrics.
+#	
+#	LAST-UPDATED "200606300000Z"	
+#
+#######################################################################################################
+
+case "ciscoMgt.ciscoIvrMIBNotifications":
+    	@Agent = "Cisco MDS"
+   	@OwnerGID = 542
+    	@OwnerUID = 65534
+    	@Class = 128090
+    	$TempDoLookup = 2
+    	$ruleset = $ruleset + "cisco-" + $enterprise-name + " ST=" + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # civrZoneActivationDoneNotify 
+		$civrZoneSetName = $1
+		$civrZoneSetActvatDeactvatResult = $2
+		$civrZoneSetActDeactPartialSucss = $3
+	    	@AlertGroup = "IVR"
+	    	@AlertKey = $civrZoneSetName
+	    	[@Severity, @Type, $tempSummary] = lookup("civrZoneSetActvatDeactvatResult" + ":" + $civrZoneSetActvatDeactvatResult, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    	@Summary = $tempsummary + $civrZoneSetName
+
+	case "2": # civrZoneDeactivationDoneNotify  
+		$civrZoneSetName = $1
+		$civrZoneSetActvatDeactvatResult = $2
+		$civrZoneSetActDeactPartialSucss = $3
+	    	@AlertGroup = "IVR"
+	    	@AlertKey = $civrZoneSetName
+	    	[@Severity, @Type, $tempSummary] = lookup("civrZoneSetActvatDeactvatResult" + ":" + $civrZoneSetActvatDeactvatResult, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    	@Summary = $tempsummary + $civrZoneSetName
+
+	case "3": # civrDomainConflictNotify  
+		$civrZoneEnforcedZoneMemberID = $1
+		$civrZoneEnforcedZoneMemberVsan = $2
+		$civrZoneMemberFabricId = $3
+		$civDomainIdConflictVsan = $4
+	    	@AlertGroup = "IVR"
+	    	@AlertKey = $civrZoneEnforcedZoneMemberID + $civrZoneEnforcedZoneMemberVsan + $civrZoneMemberFabricId + $civDomainIdConflictVsan
+	    	@Summary = "Domain conflict detected for IVR zone member " + $civrZoneEnforcedZoneMemberID + " on VSAN " + $civrZoneEnforcedZoneMemberVsan + " (conflicts with " + $civDomainIdConflictVsan + ")"
+	        @Severity = 3
+	        @Type = 1
+
+        case "4": # civrAfidConfigNotify
+                $civrAfidMisConfigLocalAfid = $1
+                $civrAfidMisConfigRemoteAfid = $2
+                $civrAfidMisConfigLocalSWwn = $3
+                $civrAfidMisConfigRemoteSWwn = $4
+                $civrAfidMisConfigVsan = $5
+                $civrTopologyMisConfigReason = $6
+		if (int($civrTopologyMisConfigReason) == 2)
+		{
+			$civrTopologyMisConfigReasonText = "afidMismatch"
+		}
+		else
+		{
+			$civrTopologyMisConfigReasonText = "unknown"
+		}
+                @AlertGroup = "IVR"
+                @AlertKey = $civrAfidMisConfigLocalAfid + $civrAfidMisConfigRemoteAfid + $civrAfidMisConfigLocalSWwn + $civDomainIdConflictVsan
+                @Summary = "Aan IVR AFID mis-configuration occured.  Please see Userdata for further info"
+		@UserData = "civrAfidMisConfigLocalAfid = " + $civrAfidMisConfigLocalAfid + "  civrAfidMisConfigRemoteAfid = " + $civrAfidMisConfigRemoteAfid + " civrAfidMisConfigLocalSWwn = " + $civrAfidMisConfigLocalSWwn + " civrAfidMisConfigRemoteSWwn + " + $civrAfidMisConfigRemoteSWwn + " civrAfidMisConfigVsan = " + $civrAfidMisConfigVsan + " civrTopologyMisConfigReason = " + $civrTopologyMisConfigReasonText
+            @Severity = 3
+            @Type = 1
+
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.rscnNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # rscnElsRejectReqNotify 
+	    @AlertGroup = "RSCN"
+	    @AlertKey = $2
+	    [@Severity, @Type, $tempSummary] = lookup("rscnNotifications" + ":" + $1, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    @Summary = "SCR or RSCN request rejected for unit ID " + $2 + ": " + $tempSummary
+	case "2": # rscnIlsRejectReqNotify 
+	    @AlertGroup = "RSCN"
+	    @AlertKey = $2
+	    [@Severity, @Type, $tempSummary] = lookup("rscnNotifications" + ":" + $1, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	    @Summary = "SW_RSCN request rejected for unit ID " + $2 + ": " + $tempSummary
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.virtualNwIfNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # virtualNwIfCreateEntryNotify 
+	    @AlertGroup = "virtualNwIf"
+	    @AlertKey = $1 + $2
+	    @Summary = "Virtual network interface " + $1 + " (" + $2 + ") created"
+	    # MK TD 5259
+	    @Severity = 2
+	    @Type = 2
+	case "2": # virtualNwIfDeleteEntryNotify 
+	    @AlertGroup = "virtualNwIf"
+	    @AlertKey = $1 + $2
+	    @Summary = "Virtual network interface " + $1 + " deleted"
+	    @Severity = 2
+	    @Type = 1
+#               20080922        Change by Chris Janes of Abilitec       TD 5060
+                $tempMarkForDiscard = 2
+
+#               20080922        End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.wwnmNotificationPrefix":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # wwnmType1WwnShortageNotify  
+	    @AlertGroup = "wwnType1"
+	    @AlertKey = ""
+	    @Summary = "WWN shortage - only " + $1 + " Type 1 WWNs available"
+	    @Severity = 3
+	    @Type = 1
+	case "2": # wwnmType1WwnAvailableNotify  
+	    @AlertGroup = "wwnType1"
+	    @AlertKey = ""
+	    @Summary = "WWN Type 1 shortage resolved: " + $1 + " now available"
+	    @Severity = 1
+	    @Type = 2
+	case "3": # wwnmTypeOtherWwnShortageNotify 
+	    @AlertGroup = "wwnOther"
+	    @AlertKey = ""
+	    @Summary = "WWN shortage - only " + $1 + " Type 2 or Type 5 WWNs available"
+	    @Severity = 3
+	    @Type = 1
+	case "4": # wwnmTypeOtherWwnAvailableNotify  
+	    @AlertGroup = "wwnOther"
+	    @AlertKey = ""
+	    @Summary = "WWN Type 2/5 shortage resolved: " + $1 + " now available"
+	    @Severity = 1
+	    @Type = 2
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+
+#######################################################################################################
+#
+#	CISCO-ZS-MIB.my: Zone Server Mib
+#	20070619	September 2002 H K Vivek
+#
+#	The MIB module for the management of zoning within the framework of Cisco's Zoning Server (ZS) Archi-
+#                tecture which realizes the FC-GS3 requirements for Zone Server. This MIB enables managers to configure 
+#                and monitor zoning server parameters.  Additionally, Cisco's Zoning Server allows for
+#                configuration of Lun zoning, which is an extension to the Zoning Server standard specified by FC-GS3
+#
+#	LAST-UPDATED "200607050000Z"
+#
+#######################################################################################################
+
+case "ciscoMgt.zoneNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+
+    switch ($specific-trap)  {
+	case "1": # zoneServiceReqRejNotify 
+		$zoneMemberFormat = $1 
+		$zoneMemberID = $2
+        	$zoneServiceRejReasonCode = $3
+        	$zoneServiceRejReasonCodeExp = $4
+	    	@AlertGroup = "zoneService"
+	    	@AlertKey = $zoneMemberFormat + $zoneMemberID
+	    	@Summary = "Zone Server rejected registration request from zoner member " + $zoneMemberID + ": " + $zoneServiceRejReasonCodeExp
+	    	@Severity = 3
+	    	@Type = 1
+
+	case "2": # zoneMergeFailureNotify 
+		$ifIndex = $1 
+		$zoneMergeFailureVSANNum = $2
+        	$zoneMergeFailureObject = $3
+        	$zoneMergeFailureReason = $4
+	    	@AlertGroup = "zoneMerge"
+	    	@AlertKey = $ifIndex + $zoneMergeFailureVSANNum
+	    	@Summary = "Zone merge failed on interface " + $ifIndex + " for VSAN " + $zoneMergeFailureVSANNum
+	    	@Severity = 4
+	    	@Type = 1
+
+	case "3": # zoneMergeSuccessNotify 
+		$ifIndex = $1 
+		$zoneMergeSuccessVSANNum = $2
+	    	@AlertGroup = "zoneMerge"
+	    	@AlertKey = $ifIndex + $zoneMergeSuccessVSANNum
+	    	@Summary = "Zone merge succeeded on interface " + $ifIndex + " for VSAN " + $zoneMergeSuccessVSANNum
+	    	@Severity = 1
+	    	@Type = 2
+
+	case "4": # zoneDefZoneBehaviourChngNotify 
+		$zoneDefaultZoneBehaviour = $1 
+	    	@AlertGroup = "zoneBehaviour"
+	    	@AlertKey = ""
+	    	[@Severity, @Type, @Summary] = lookup("zoneBehaviour" + ":" + $zoneDefaultZoneBehaviour, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+
+	case "5": # zoneUnsuppMemInIntOpModeNotify 
+		$zoneVsanId = $1 
+	    	@AlertGroup = "zoneMember"
+	    	@AlertKey = $zoneVsanId
+	    	@Summary = "One or more zone members on VSAN " + $zoneVsanId + " are not supported in the mode in which the switch is currently configured"
+	    	@Severity = 4
+	    	@Type = 1
+
+	case "6": # zoneActivateNotify 
+
+		$zoneSetActivateResult = $1
+		$zoneSwitchWwn = $2
+	    @AlertGroup = "zoneActivation"
+	    @AlertKey = $zoneSwitchWwn
+	    switch ($1)  {
+		case "1": # activation success
+                        # Change Summary, per TD #5259
+		   	@Summary = "Zoneset activation  on switch " + $zoneSwitchWwn + " - success" 
+		   	@Type = 2
+		   	@Severity = 0
+
+		case "2": # activation failure
+                        # Change Summary and Severity, per TD #5259
+		   	@Summary = "Zoneset activation  on switch " + $zoneSwitchWwn + " - failure" 
+		   	@Type = 1
+		   	@Severity = 3
+
+		case "3": # deactivation success
+                        # Change Summary, per TD #5259
+		   	@Summary = "Zoneset deactivation  on switch " + $zoneSwitchWwn + " - success" 
+		   	@Type = 1
+		   	@Severity = 0
+
+		case "4": # deactivation failure
+                        # Change Summary and Severity, per TD #5259
+		   	@Summary = "Zoneset deactivation  on switch " + $zoneSwitchWwn + " - failure" 
+		   	@Type = 2
+		   	@Severity = 3
+
+		case "5": # in progress
+		   	@Summary = "Zone activation in progress" 
+		   	@Severity = 2 
+#               	20080922        Change by Chris Janes of Abilitec       TD 5060
+                	$tempMarkForDiscard = 2
+
+#               	20080922        End of Change
+		case "6": # entry just created
+#               	20070619        Changes by Chris Janes of Abilitec HDLDN0001137914
+		   	@Summary = "Zone set entry created for switch WWN " + $zoneSwitchWwn
+#		   	@Summary = "Zone set on switch WWN '" + $2 + "' has been activated" 
+#               	20070619        End of Changes	 
+		   	@Severity = 2 
+
+		default:
+	    }
+
+#	20060320: End of changes
+#       20070619        Changes by Chris Janes of Abilitec HDLDN0001137914
+
+        case "7": # zoneCompactNotify
+                $zoneCompactVsan = $1
+                @AlertGroup = "zone compaction"
+                @AlertKey = $zoneCompactVsan
+                @Summary = "Zone compaction on the VSAN " + $zoneCompactVsan + " has happened successfully"
+                @Severity = 2
+                @Type = 1
+#               20080922        Change by Chris Janes of Abilitec       TD 5060
+                $tempMarkForDiscard = 2
+
+#               20080922        End of Change
+#      	20070619        End of Changes	 
+
+
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.ciscoExtScsiNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+
+    switch ($specific-trap)  {
+	case "1": # ciscoExtScsiLunDiscDoneNotify 
+	    @AlertGroup = "lunDiscovery"
+	    @AlertKey = ""
+	    [@Severity, @Type, @Summary] = lookup("lunDiscovery" + ":" + $1, FCStatusMap)
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+case "ciscoMgt.ciscoLicenseMgrNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+
+    switch ($specific-trap)  {
+	case "1": # clmLicenseExpiryNotify 
+	    @AlertGroup = "licMgr"
+	    @AlertKey = ""
+	    @Summary = "Feature licence expires at " + $1
+	    @Severity = 3
+	    @Type = 1
+	case "2": # clmNoLicenseForFeatureNotify 
+	    @AlertGroup = "licMgr"
+	    @AlertKey = ""
+	    @Summary = "Licence issued for unlicenced feature - grace period of " + $1 + " days allowed"
+	    @Severity = 3
+	    @Type = 1
+	case "3": # clmLicenseFileMissingNotify 
+	    @AlertGroup = "licMgr"
+	    @AlertKey = ""
+	    @Summary = "Total of " + $1 + " installed licence files are missing"
+	    @Severity = 3
+	    @Type = 1
+	case "4": # clmLicenseExpiryWarningNotify 
+	    @AlertGroup = "licMgr"
+	    @AlertKey = ""
+	    @Summary = "Licence for a feature being used is due to expire at " + $1
+	    @Severity = 3
+	    @Type = 1
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.ccmCallHomeNotifications":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+
+    switch ($specific-trap)  {
+	case "1": # ccmSmtpServerFailNotif 
+	    @AlertGroup = "callHome"
+	    @AlertKey = $1
+	    @Summary = "Email notification by SMTP failed on port " + $1
+	    @Severity = 4
+	    @Type = 1
+	case "2": # ccmAlertGroupTypeAddedNotif 
+	    @AlertGroup = "callHome"
+	    @AlertKey = $1
+	    @Summary = "New CallHome alert group added: " + $1
+	    @Severity = 2
+	    @Type = 1
+#               20080922        Change by Chris Janes of Abilitec       TD 5060
+                $tempMarkForDiscard = 2
+
+#               20080922        End of Change
+	case "3": # ccmAlertGroupTypeDeletedNotif 
+	    @AlertGroup = "callHome"
+	    @AlertKey = $1
+	    @Summary = "New CallHome alert group deleted: " + $1
+            # Change  Severity per TD 5259
+	    @Severity = 2
+	    @Type = 1
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.ccCopyMIBTraps":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+
+    switch ($specific-trap)  {
+	case "1": # ccCopyCompletion
+	    @AlertGroup = "ConfigCopy"
+	    @AlertKey = $1 + $2
+	    [@Severity, @Type, $tempState] = lookup("ccCopyState" + ":" + $3, FCStatusMap)
+	    [$ignore1, $ignore2, $tempCause] = lookup("ccCopyFailCause" + ":" + $6, FCStatusMap)
+	    @Summary = "Config copy of " + $2 + " from/to " + $1 + $tempSummary + $tempCause
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+case "ciscoMgt.cseHaNotificationPrefix":
+    @Agent = "Cisco MDS"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128090
+    $TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+#	20070619	End of Changes
+
+    switch ($specific-trap)  {
+	case "1": # cseHaRestartNotify
+	    @AlertGroup = "cseHa"
+	    @AlertKey = $2
+	    [@Severity, @Type, $tempSummary] = lookup("CseHaRestartReason" + ":" + $1, FCStatusMap)
+	    @Summary = "Service " + $2 + " restarted: " + $tempSummary
+#		20080922	Change by Chris Janes of Abilitec	TD 5060
+		if(match(@Severity, "2"))
+		{
+			$tempMarkForDiscard = 2
+		}
+
+#		20080922	End of Change
+	default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+
+#		20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#######################################################################################################
+#
+#	CISCO-ENTITY-SENSOR-MIB	
+#	20070619	November 1997, Cliff L. Sojourner
+#	The CISCO-ENTITY-SENSOR-MIB is used to monitor the values of sensors in the Entity-MIB (RFC 2037) entPhysicalTable
+#	LAST-UPDATED "9812102112Z"	
+#
+#######################################################################################################
+
+case "ciscoMgt.entitySensorMIBNotifications":
+    	@Agent = "Cisco MDS"
+    	@OwnerGID = 542
+    	@OwnerUID = 65534
+    	@Class = 128090
+	@AlertGroup = "entitySensor"
+    	$TempDoLookup = 2
+#	20070619	Changes by Chris Janes of Abilitec HDLDN0001137914
+#	$ruleset = $ruleset + " - cisco-" + $enterprise-name
+	$ruleset = $ruleset + " - cisco-" + $enterprise-name + " specific-trap " + $specific-trap
+	$TD_Num = "5259"
+#	20070619	End of Changes
+
+    	switch ($specific-trap)  
+	{
+	case "1": # entSensorThresholdNotification
+		$entSensorThresholdValue = $1
+		$entSensorValue = $2
+		@Summary = "The sensor value (" + $entSensorValue + ") crossed the threshold (" + $entSensorThresholdValue + ") listed in entSensorThresholdTable"
+		# MK TD5259
+		@Severity = 5
+		@Type = 1
+	default:
+            	@Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            	@Severity = 1
+            	$tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+	}
+
+
+    	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+#               20070619        End of Changes 
+

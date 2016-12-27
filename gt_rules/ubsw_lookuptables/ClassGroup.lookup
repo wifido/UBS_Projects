@@ -1,0 +1,1473 @@
+table MttrapdClassGID =
+{
+	{"/home/oasisprd/LOCAL/bin/daily_us_princ_allocations.sh","51030","577"}
+	{":WISPA:file_formatter_RP20_ftp:FATAL:Error","50350","602"}
+	{":WISPA:morning_check:WARNING:Error","50350","602"}
+	{":WISPA:OvernightCheck:FATAL:Error","50350","602"}
+	{":WISPA:ProcessGabsFeed:FATAL:Error","50350","602"}
+	{":WISPA:ProcessMartiniFeed:FATAL:Error","50350","602"}
+	{":WISPA:real_overnight_conv:FATAL:Error","50350","602"}
+	{":WISPA:SMS_ONCALL_NIGHTSHIFT:WARNING:Error","50350","602"}
+	{":WISPA:Volumes_Report:FATAL:Error","50350","602"}
+	{":WISPA:Wispa_Trade_Q:FATAL:Error","50350","602"}
+	{"3KEYS","200","6"}
+	{"3KN_NMS","201","464"}
+	{"3KN_NMS","203","464"}
+	{"3PAR","128130","542"}
+	{"A4 APAC","1057517","47"}
+	{"A4","53000","576"}
+	{"A4-CSomGW","50600","47"}
+	{"A4-CSomGw","53000","576"}
+	{"A4EUPROD","54700","47"}
+	{"a4euprod.cfg","54700","47"}
+	{"A4-PREP-LDN","54700","47"}
+	{"a4-prep-ldn.cfg","54700","47"}
+	{"a4-qa-ldn.cfg","54700","47"}
+	{"Abilisoft AS Agent","2252522","616"}
+	{"ABLCC","80840","103"}
+	{"ABN","54910","66"}
+	{"ABS Risk Generator","1056800","619"}
+	{"Account Workflow","1056767","285"}
+	{"ACS","2071939","468"}
+	{"Actimize","1057644","637"}
+	{"Active Directory","128780","8"}
+	{"ADT","1057292","461"}
+	{"Adva DWDM","321","464"}
+	{"AIMS","125010","88"}
+	{"AIMS_GSD","125010","88"}
+	{"Alacra","2222230","105"}
+	{"Alloc","1057672","671"}
+	{"AOL Swiss Version","1057650","637"}
+	{"AOL","1056895","637"}
+	{"APAC Contract Manager","1058653","703"}
+	{"APAC CS","2222260","773"}
+	{"APAC Equity Trader","1057519","47"}
+	{"APACHE","2070991","88"}
+	{"APACHE_Test","2070995","40000"}
+	{"APEX Thailand","55390","417"}
+	{"APEX-HK","55250","417"}
+	{"APEX-KR","55230","417"}
+	{"APEX-SN","55240","417"}
+
+#Following entry is disabled as per request CHGLDN001135793
+#{"APEX-TK","1006098","417"}
+#The above entry is disabled as per request CHGLDN001135793
+
+	{"APEX-TW","55260","417"}
+	{"APM ReleaseCenter","1058371","762"}
+	{"Apollo","1034177","54001"}
+	{"AppCritical","325","464"}
+	{"Aramis Equipment","1057927","162"}
+	{"ArchiveEventReceiver","51040","577"}
+	{"Ares","55080","198"}
+	{"A-RISK","5009892","90"}
+	{"A-RISK ANALYTICS","5010256","90"}    
+	{"A-RISK WORKFLOW","5010255","90"}     
+	{"A-RISK REPORTING","5010254","90"}    
+	{"As4it","5010155","95004"}
+	{"ARS","1057419","622"}
+	{"ART-DB","125010","88"}
+	{"ASAP","1057031","703"}
+	{"ASI","1056519","162"}
+	{"AssetServices - Corp Act Reconciliation","1057862","528"}
+	{"Athena","1057088","54002"}
+	{"Atlas","55020","198"}
+	{"ATR","1057521","285"}
+	{"Audit Reporting","2222231","105"}
+	{"Authenticator","1054911","90"}
+	{"AUTO RETURNS","1057405","703"}
+	{"Automarks","1057585","703"}
+	{"Autosys Discard","65999","595"}
+	{"Autosys","65200","595"}
+	{"Autosys_WM","2065200","90595"}
+	{"Avaya Servers","128500","626"}
+	{"B2BUploader","1057972","50"}
+	{"BAFTA","1056937","766"}
+	{"Banker Portal","1057095","105"}
+	{"Banking Gateway","1057812","407"}
+	{"Barclays SYMTEC","1009453","396"}
+	{"BAT","1056953","49"}
+	{"BAT_RDS","50000","49"}
+	{"BAT-MCP_SI","50006","49"}
+	{"BAT-MDS","50001","49"}
+	{"BAT-ME","50002","49"}
+	{"BAT-OES","50004","49"}
+	{"BAT-RA","50003","49"}
+	{"BAT-Sesame","50005","49"}
+	{"BEA_Weblogic","49990","999"}
+	{"Bear","1053541","396"}
+	{"Big Brother","305","464"}
+	{"BIMS","1057438","88"}
+	{"BizTalk Automated Reconciliation Tool","1057870","707"}
+	{"Biztalk Server","128100","627"}
+	{"Blackberry","128700","100"}
+	{"Book Builder","1015255","105"}
+	{"BorrowBook","1056872","50"}
+	{"Boxer Small Sites","1057811","690"}
+	{"BPDocs","1057931","586"}
+	{"BPSA - Advantage Reporting","1000064","162"}
+	{"BRASS","51020","577"}
+	{"BrassRing","1057667","86"}
+	{"Bridges-FUSA","1057832","689"}
+	{"Brocade Switch (ITFX-Infra)","126010","601"}
+	{"BUC PB DATABASE","5004530","90027"}
+	{"Business Approvals","2222232","105"}
+	{"Business Intelligence","1057460","105"}
+	{"Butterfly Client","2222261","90025"}
+	{"C21 Adaptor","50315","162"}
+	{"CAIRO Confirmations","1057396","569"}
+	{"Cairo MCA","1057402","569"}
+	{"CAIRO Settlements","1057397","569"}
+	{"CALCULATION_ENGINE","52020","578"}
+	{"CALMEventReceiver","51040","577"}
+	{"CALMViewManager","51040","577"}
+	{"CAMELOT","1057637","556"}
+	{"CAMS","50320","162"}
+	{"CapitalCommitment","1057639","50"}
+	{"CARE NOTIFICATION AND RESPONSE","5008623","162"}
+	{"CARE T24","5009063","162"}
+	{"CARE","1057677","162"}
+	{"CASE","1057177","162"}
+	{"CAT","1058657","637"}
+	{"CATS","1000059","396"}
+	{"cats.cfg","1000059","396"}
+	{"CaTSMonitor","51030","577"}
+	{"CBT","1007356","637"}
+	{"CCM","1058656","637"}
+	{"CDE","55140","198"}
+	{"CDE_QA","2055140","20198"}
+	{"CDR","1057361","285"}
+	{"CDS Workflow","1057933","90"}
+	{"CDS","1057131","90"}
+        {"CDSWAPS TACTICAL","5009530","90"}
+	{"CF-CDL","1058650","782"}
+	{"CFS","50820","162"}
+	{"Chat Alerts","126070","601"}
+	{"check_DR_latency","51030","577"}
+	{"check_DR_latency_US","51030","577"}
+	{"Checker","1027249","90"}
+	{"Cheetah","54900","198"}
+	{"CIS","2222233","105"}
+	{"Cisco MDS fabric Switches","128090","542"}
+	{"Claims Manager","1056924","162"}
+	{"CLAS","1056567","527"}
+	{"CLEARCASE","127000","461"}
+	{"ClearQuest","127200","504"}
+	{"ClearVision","54870","56"}
+	{"Client Flow Analysis","1057497","50"}
+	{"Client Master","2300004","285"}
+	{"CLIENT PORTAL HEADER FRAMESET","5005880","764"}
+	{"CLIENT PORTAL HEADER TOOL","5005885","764"}
+	{"CLIENT PORTAL HOMEPAGE","5005881","764"}
+	{"Client Portal","1056365","764"}
+	{"CLIENT SUBLEDGER","5007906","703"}  # Modified by Suresh K S as per CHGLDN001155551
+	{"CLIP","1057676","636"}
+	{"Clouseau","1057528","117"}
+	{"CMDB","2100000","622"}
+	{"CMIS Decaf","1007299","57"}
+	{"CMIS Loads","1007274","57"}
+	{"CMIS Reporting","1007253","57"}
+	{"CMIS SMRS","1056183","57"}
+	{"CMS","2090000","766"}
+	{"COASTERS","81610","463"}
+	{"COD","1056586","90"}
+	{"Collateral Portal","1057294","571"}
+	{"COLT TOM","50070","49"}
+	{"COLT","50210","49"}
+	{"com.ubs.ct.gateway.mkv.server.credit.CreditCheckClient","1057316","571"}
+	{"com.ubs.ct.gateway.mkv.server.ecn.RTCTradeDetail","1057316","571"}
+	{"com.ubs.ct.util.socket.SocketServer","1057316","571"}
+	{"com.ubs.eq.a4europe.cameron.mba.MBAEngineSource","50610","47"}
+	{"com.ubs.eq.a4europe.cameron.routing.BizInternalRoutingListener","50610","47"}
+	{"com.ubs.eq.a4europe.cameron.sessmgt.BizCustomMonitor","50610","47"}
+	{"com.ubs.eq.a4europe.cameron.sessmgt.pmon.ProcessorMonitorManager","50610","47"}
+	{"com.ubs.ib.eq.arch.marketlinks.TOM","50190","49"}
+	{"com.ubsw.directory.gfsmicromusealert.gfsAlert","125010","88"}
+	{"com.ubsw.eq.arch.jms.ftgroup.rv.RvFtGroupTransport","51011","577"}
+	{"com.ubsw.eq.gob.pub.OEPublisher","51011","577"}
+	{"com.ubsw.eq.gob.pub.OEQueueReader","51011","577"}
+	{"com.ubsw.eq.tes.adapters.colt.GobColt","51012","577"}
+	{"com.ubsw.eq.tes.adapters.colt.NyfixColtManager","51012","577"}
+	{"com.ubsw.eq.tes.adapters.colt.NyfixColtMessage","51012","577"}
+	{"com.ubsw.eq.tes.adapters.cosmos.GobCosmos","51013","577"}
+	{"com.ubsw.eq.tes.adapters.eod.noah.AbstractNoahEODAdapter","52038","577"}
+	{"com.ubsw.eq.tes.adapters.eod.noah.NoahEODDataProcessor","52038","577"}
+	{"com.ubsw.eq.tes.adapters.tesreporting.GobTesReporting","51017","577"}
+	{"COMA","1027253","90"}
+	{"Commodity-XL","1057584","586"}
+	{"Compass Homepage (IB Intranet Home)","1057555","105"}
+	{"Compass Search","1057556","105"}
+	{"COMPASS SEARCH","5005873","764"}
+	{"COMPASS","5005870","764"}
+	{"COMPLIANCENOW","5008542","90023"}
+	{"Concord PS","316","464"}
+	{"Concord","315","464"}
+	{"Confluence (XTools)","1058212","461"}
+	{"Content Publisher","1057557","105"}
+	{"CoreProcessing","1056821","56"}
+	{"CoreProcessing","54870","56"}
+	{"Cornerstone","1057468","703"}
+	{"Correspondent Banking Portal","2057645","637"}
+	{"COSMOS","51030","577"}
+	{"COSMOS-LDN-DR","51030","577"}
+	{"cosmos-ldn-dr.cfg","51030","577"}
+	{"COSMOS-LDN-QA","51030","577"}
+	{"cosmos-ldn-qa.cfg","51030","577"}
+	{"COSOMOS","51030","577"}
+	{"COT-BS","5004520","90"}
+	{"Counterparty Administration Service","1057353","703"}
+	{"COUNTERPARTY ANALYTICS","5009899","90"}
+	{"CPM","55090","198"}
+	{"CPPO","2300001","90007"}
+	{"CPPO","2300001","90008"}
+	{"CRAIG","1057622","707"}
+	{"Creation","1054919","90"}
+	{"CREDIT Arb","1057421","556"}
+	{"Credit Broil","81560","625"}
+	{"Credit Engine","1006089","90"}
+	{"Credit Research","1056988","110"}
+	{"Credit Risk Framework SCV","1057123","90"}
+	{"CreditDelta","1056409","110"}
+	{"Crelox","1056019","90"}
+	{"Crest SAA","2000001","396"}
+	{"CREST","50300","162"}
+	{"CReW","1057950","90"}
+	{"CRVS","1007297","285"}
+#The Folloing entry is disabled by Raj as per CHGLDN00114072
+#{"CSR","1000106","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"CSR","1000106","162"}
+	{"CSRM","1057290","703"}
+	{"CST Manual Tasks","2222248","703"}
+	{"CTAS Equities London","1056627","66"}
+	{"CTAS FI London","1057315","66"}
+	{"CTAS","50403","66"}
+	{"CTCS - Fixed Income Stamford","1057317","571"}
+	{"CTCS Equities London","1056513","66"}
+	{"CTS","1057930","162"}
+	{"CUBS","1000108","285"}
+	{"CUBS++","1056624","285"}
+	{"CVA","5008052","90021"}
+	{"D&EL - RDP","2000217","53010"}
+	{"dAISy","1057840","530"}
+	{"DataDomain","2525261","90021"}
+	{"DataSynapse_Mortgage_Grid","1057302","463"}
+	{"DatingServer","54990","609"}
+	{"dbAdapter","122000","88"}
+	{"DBO-CMS-CM2","81630","407"}
+	{"DDCTDNFS","123004","468"}
+	{"Deal Files","2222250","105"}
+	{"Deal Maven","2222234","105"}
+	{"DealEngine","53060","576"}
+	{"Dealhub","81700","133"}
+	{"Dealogic DealAxis","2076087","105"}
+	{"Dealogic ECM Analytics","2222235","105"}
+	{"Dealogic Excel Plugin for Analysts","2222236","105"}
+	{"Dealogic Strategy Manager Product","2222237","105"}
+	{"DEBUG","999999","999"}
+	{"Decru Appliances","126080","257"}
+	{"Decru","2525251","257"}
+	{"DEL Manual Tasks","2222255","641"}
+	{"Delta One Processor","1057550","703"}
+	{"DES","1057640","50"}
+	{"Desy Host","81570","133"}
+	{"Detox.ColtAdapter","51012","577"}
+	{"Detox.CosmosListedAdapter","51013","577"}
+	{"Detox.CosmosOTCAdapter","51014","577"}
+	{"Detox.FIXPublisher","51011","577"}
+	{"Detox: GR Sub","51015","577"}
+	{"Detox: IOI Sub","51016","577"}
+	{"Detox: Spare1","51018","577"}
+	{"Detox: Spare2","51019","577"}
+	{"DETOX-DR","51010","577"}
+	{"DETOX-FAILOVER","51010","577"}
+	{"DETOX-PRIMARY","51010","577"}
+	{"DETOX-PROCMON","51010","577"}
+	{"Dimension","1057929","162"}
+	{"Discard_Event","3000000","591"}
+	{"DIVIDEND PROFIT PREDICTOR","5007844","703"}
+	{"DMA","1056939","47"}
+	{"DMA_SOM_TOM","1057087","49"}
+	{"DMA-ASIA","1056939","47"}
+	{"DMAPER","1057970","50"}
+	{"DMAUS","53030","576"}
+	{"DMCP","1675","702"}
+	{"DMG (Data Management)","1016346","285"}
+	{"DMI","2300003","90007"}
+	{"DMI","2300003","90008"}
+	{"DMS","1016189","105"}
+	{"DMS","53030","576"}
+	{"DMS-I Data Master-IParty","1058600","285"}
+	{"DMSI EQUITIES","5007676","285"}
+#Following entry is disabled by Rajshekhar as per request CHGLDN001122172
+#{"DMS-I FI - Mortgage Pools","1058405","90"}
+
+#Following entry is added by Rajshehar as per request CHGLDN001122172
+	{"DMS-I Corp & Govs","1058405","90"}
+#Above entry is added by rajshekhar as per request CHGLDN001122172
+	{"DMS-I FI - Municipal Bonds","1058406","285"}
+	{"DMS-I","1056745","285"}
+	{"DOX (Replacement) - Swiss Version","1058430","637"}
+	{"DOX_Replacement","1057805","637"}
+	{"DSS","1056840","703"}
+	{"DUFFORA","300000","999"}
+	{"E-Access","1054388","636"}
+	{"EACCESS","5007313","764"}
+	{"Easyscreen","50020","49"}
+	{"eClaims","1056535","766"}
+	{"eConnect","53030","576"}
+	{"ECP Research","54950","198"}
+	{"ECP_QA","2054950","20198"}
+	{"ECT","5009788","703"}
+	{"ECTWB","1057439","703"}
+	{"EDM Prod Infra","1056625","648"}
+	{"EDM","122200","88"}
+	{"EFLOW","81580","129"}
+	{"EFX","5008690","703"}
+	{"eJot","81740","133"}
+	{"ek9","1037063","52005"}
+#Following entry is disabled by rajshekhar as per request CHGLDN001130976 & enabled by Amrut as per CHGLDN001133346 and is disabled by Ras as per CHGLDN001139974
+#{"EMC Centera","128010","542"}
+#Following entry is added by Amrut as per request CHGLDN001133346
+	{"Centera ","128010","1542"}
+#Above entry modified by Surendra as per Simon's request  Centera alerts to be assigned to 1542 previouslly pointing to 542 
+
+
+#Following entry is added by rajshekhar as per request CHGLDN001130976 & dissabled by Amrut as per CHGLDN001133346 and is enabled by Raj as per CHGLDN001139974
+{"EMC Centera","128010","1542"}
+#Above entry is added by rajshekhar as per request CHGLDN001130976 & dissabled by Amrut as per CHGLDN001133346
+
+#Following entries are added by Rajshekhar as per request CHGLDN001131785
+	{"CARE US","5007970","162"}
+	{"LISTED OPTIONS","5007406","162"}
+	{"TAS NA GDMP","5008733","162"}
+	{"TOPCAT CM","5000842","162"}
+	{"ATLAS","5010315","162"}
+#Above entry is added by Rajshekhar as per request CHGLDN001131785
+#The Following entry is added by rajshekhar on 20091125 as per CHGLDN001143975
+{"DESK DEV TACTICAL TOOLS APAC","5008551","641"}
+{"GREYBOX APAC","5005690","641"}
+{"DESK DEV TACTICAL TOOLS EMEA","5009980","641"}
+{"DESK DEV ANALYTICS NA","5008194","641"}
+{"GREYBOX UK","5008185","641"}
+{"PRICE CONTRIBUTIONS MANAGEMENT LAYER","5006729","641"}
+{"QUANT TOOLS","5009390","641"}
+{"TONTO","5005689","641"}
+{"STOMP","5009532","641"}
+{"STRUCTURED FUND TOOL","5009483","641"}
+#The above entries are added by Rajshekhar on 20091125 as per CHGLDN001143975
+	{"EMC Symmetrix","128080","542"}
+	{"EME_DELAY_OASISFE","51030","577"}
+	{"EME_DELAY_OASISP1yy","51030","49"}
+	{"EME_DELAY_OASISUS","51030","577"}
+	{"EMIRS","1057857","117"}
+	{"Encore PPE","1157758","556"}
+	{"ENCORE","1057758","703"}
+	{"Energy CPG Reporting","81520","117"}
+	{"Energy DCAF Confirm","81430","117"}
+	{"Energy DCAFII Confirm","81440","117"}
+	{"Energy Fundamentals","57171","117"}
+	{"Energy Gas Portcalc","81460","117"}
+	{"Energy Global Credit","81480","117"}
+	{"Energy Global Ref","81530","117"}
+	{"Energy RMS RisktRAC","81470","117"}
+	{"Energy Sitara","81340","117"}
+	{"Energy TAGG","81330","117"}
+	{"Energy TDS","81350","117"}
+	{"Engineering Inbound Interface","2500003","90015"}
+	{"ENSIGN","125000","591"}
+	{"EPIC","50390","162"}
+	{"EQ portal","55030","198"}
+	{"EQDEL_Storage","2222249","530"}
+	{"Equilend Automation Engine","1058280","703"}
+	{"Equilend Client Integrator","1057352","703"}
+	{"Equities SharePoint","2524242","636"}
+	{"Equity Consol","1056697","624"}
+	{"Equity Finance MIS","54860","703"}
+	{"EQUITYTRADER","53010","576"}
+	{"EQY_HOG_checkDRConsistency.sh","51040","577"}
+	{"ER&D","55100","198"}
+	{"ERDS","1056759","636"}
+	{"ESP","50330","162"}
+	{"ESX","123000","468"}
+	{"ESX","5017181","90019"}
+	{"ESX_SWISS","5917181","90019"}
+	{"ETD_Gateway","54890","56"}
+	{"etd_gateway.cfg","54890","56"}
+	{"ETDGATEWAY-LINUX","54890","56"}
+	{"etdgateway-linux.cfg","54890","56"}
+	{"ETD-WebMon","12700","56"}
+	{"ETFeeder","53030","576"}
+	{"ETOP3","81590","129"}
+	{"etop3.cfg","81590","129"}
+	{"ETWEB","1056239","637"}
+	{"EVA-FX/MM","81720","133"}
+	{"eValuate","1057784","198"}
+	{"EVT","1056901","999"}
+	{"EXCESS MANAGEMENT","5009412","90"}
+	{"Exchange 2000","128720","100"}
+	{"Exchange 5.5","128730","8"}
+	{"Exchange IM","128740","8"}
+	{"Exchange","128710","100"}
+	{"EXE_TOM","1056818","50"}
+	{"Execution Manager","50090","49"}
+	{"EXPENSE MANAGEMENT","5008203","105"}
+	{"Explain","1057175","524"}
+	{"Explorer_Internal_Error","52020","578"}
+	{"External SSO Suite","2222257","88"}
+	{"External SSO Suite","5009194","88"}
+	{"FA MIB","128110","542"}
+	{"FACE TIME","5009457","559"}
+	{"FACE","1057666","50"}
+	{"Facetime","2222254","100"} #Modified by Rayagouda Patil as per CHGLDN001089588
+	{"Factiva","2222238","105"}
+	{"FACTS","1000270","129"}
+	{"Factset","2222239","105"}
+	{"FC SCSI Fabric","128030","542"}
+	{"FCD Metrics Database","1052979","766"}
+	{"FI Composite Pages","1000526","110"}
+	{"FI VaR Margining System","1058401","90"}
+	{"FIIS","5009569","616"}
+	{"File System","20010","100"}
+	{"File Transfer Gateway (FTG)","1058501","769"}
+	{"FIRC-GSD-ClearQuest","1057575","463"}
+	{"Firewall","301","464"}
+	{"First Window","1057388","463"}
+	{"FishEye (XTools)","1058211","461"}
+	{"FIX","53020","576"}
+	{"fix.cfg","53020","576"}
+	{"FIX-BOM-AddressBookServer","53040","576"}
+	{"FIX-BOM-AdminIOIServer","53040","576"}
+	{"FIX-BOM-CrossPublishLink","53040","576"}
+	{"FIX-BOM-InformationExchangeServer","53040","576"}
+	{"FIX-BOM-ioi_file_feed","53040","576"}
+	{"FIX-BOM-QuoteIOIServer","53040","576"}
+	{"FIX-BOM-VendorManager","53040","576"}
+	{"FIXCOMMS","53020","576"}
+	{"FIX-COMMS","53020","576"}
+	{"Fixed Income Investor","2222223","90003"}
+	{"FIX-ENGINE","53020","576"}
+	{"FixerF18","1056467","110"}
+	{"FIX-FHP","53020","576"}
+	{"FIX-FHR","53020","576"}
+	{"FIX-FMS","53020","576"}
+	{"FIX-FRS","53020","576"}
+	{"FIX-OPENSERVER","53020","576"}
+	{"FIX-SellEngine1","53020","576"}
+	{"FIX-SellEngine1655","53020","576"}
+	{"FIX-SellEngine3","53020","576"}
+	{"FIX-SellEngine4","53020","576"}
+	{"FIX-SellEngine5","53020","576"}
+	{"FIX-SellEngine6","53020","576"}
+	{"FIX-SellEngine7","53020","576"}
+	{"FIXSESAME","53020","49"}
+	{"FIX-SESAME","53050","576"}
+	{"FixStats","53020","576"}
+	{"Fixweb Quote","1056510","47"}
+	{"FIXWEB","53060","576"}
+	{"Flash","1056932","463"}
+	{"FLCC","80830","103"}
+	{"FMS","1007996","90"}
+	{"FMS","80890","103"}
+	{"Foglight_PB","2217101","66"}
+	{"FOS","81230","85"}
+	{"FOSPlusPlus","81230","85"}
+	{"FOSPlusPlus2","81230","85"}
+	{"FOSPNL","81230","85"}
+	{"FOSPP","81230","85"}
+	{"FRA","53080","576"}
+	{"Frankfurt:TERMINATOR","1056306","51011"}
+	{"FSM_MQ","122200","88"}
+	{"FSM_PUBSUB","122200","88"}
+	{"FSM_TPOS","122200","88"}
+	{"FTP ISM","5900","0"}
+	{"FUNDGATE","4203406","728"}
+#Following entry is disabled as per request CHGLDN001135793 
+#{"Fusion Sharp","50900","98"}  
+#Following entries are added  as per request CHGLDN001135793
+	{"FUSIONIDP JAPAN","50900","98"}
+	{"FUSIONIDP ASIA","1057505","50"}
+	{"APEX - TK","1006098","417"}
+#The above entries added as per request CHGLDN001135793
+	{"FX_Prime_Brokerage","1056592","129"}
+	{"fx2b.cfg","81580","129"}
+	{"FX2BFutures","81580","129"}
+	{"FXALL","81600","129"}
+	{"FxG","81580","129"}
+	{"fxtrader.cfg","81590","129"}
+	{"FXWeb","1056312","129"}
+	{"FXWEB","81600","129"}
+	{"g1lnprd1.ldn.swissbank.com","50400","66"}
+	{"Gauss Gauss","1058130","641"}
+	{"GCB Web","1057231","524"}
+	{"GCD Apps Suite - Autoconf","80250","586"}
+	{"GCD Apps Suite - NTS","1057662","586"}
+	{"GCD Apps Suite - SALS","80200","625"}
+	{"GCD Apps Suite - TRS","80230","561"}
+	{"GCD Risk Reporting","1057500","586"}
+	{"GCIS","1057648","637"}
+	{"GCMS LONDON","5008220","621"}
+	{"GDMP","5018182","90020"}
+	{"GDS","1000211","999"}
+	{"GEARS","1057828","569"}
+	{"GEM","80880","103"}
+	{"Genetix Interactive","1058059","703"}
+	{"Geneva Portfolio Accounting","1058045","703"}
+	{"GENIUS","50300","162"}
+	{"genius.cfg","50300","162"}
+	{"GERONIMO","1000217","999"}
+	{"GetIt Portal","1056950","766"}
+	{"GGL CAL","1057051","413"}
+	{"GGL FBI","1058651","413"}
+	{"GGL FDD","1056951","413"}
+	{"GGL H3","1056918","413"}
+	{"GGL MOUSETRAP","1057841","413"}
+	{"GGL RAM","1057052","413"}
+	{"GGL: Autosys","1056457","413"}
+	{"GGL: Controller View","1056456","413"}
+	{"GGL: GPP PPP","1056460","413"}
+	{"GGL: H3-GCR Adjustment Handler","1057035","413"}
+	{"GGL: IBID Console","1058553","413"}
+	{"GGL: IBID","1058552","413"}
+	{"GGL: MERIDIAN","1058334","413"}
+	{"GGL: PL/SQL","2056457","413"}
+	{"GGL: SAP Business Warehouse","1056452","413"}
+	{"GGL: SAP R3 Financials","1008242","413"}
+	{"GGLTK-J Vendor","1051265","413"}
+	{"Global Amortizing Bonds","80700","463"}
+	{"GLOBAL AVAILABILITY SERVICE","5006662","703"}
+	{"Global Portfolio Lending Workbench","1057393","703"}
+	{"Global Recall Management","1057827","703"}
+	{"GLOBAL RETURNS SERVICE","5007841","703"}
+	{"GLOBAL_ONE","50400","703"}
+	{"GLOBAL1","50400","66"}
+	{"GLOBALONE","126050","100"}
+	{"GLR","2500001","703"}
+	{"GMCC","20010","100"}
+	{"GMS-G100","20020","8"}
+	{"GOLD Dragon","1057932","162"}
+	{"Goldfinch","53070","576"}
+	{"GPAS XT","1057230","524"}
+	{"GPAS","1054883","524"}
+	{"GPAS","65100","524"}
+	{"GPE","1057612","703"}
+	{"Green Belt","1057371","133"}
+	{"Green Dragon","50340","162"}
+	{"Gremlin-Broil","81760","638"}
+	{"GRL-RXM","1000235","90"}
+	{"Group Cost Transparency Control","1058530","769"}
+	{"Group Shareholding","1056912","637"}
+	{"GRS LONDON","5008224","621"}
+	{"GRT","1056563","90"}
+	{"GSD_JEEP","122200","88"}
+	{"GSFCC","80850","103"}
+	{"GSS","1056954","637"}
+	{"GUSI","1057869","707"}
+	{"HALO","50405","703"}
+	{"HARD","81730","133"}
+	{"Hardware","128790","8"}
+	{"HEARTBEAT","1600","999"}
+	{"Hermes RiskIT","1057496","90"}
+	{"HFS Genetix","1057334","703"}
+	{"HKLMI","1057186","162"}
+	{"HLLAPI","1056660","396"}
+	{"HOG","51040","577"}
+	{"HOG_ActiveWorksPinger","51040","577"}
+	{"HOG_ArchivingServer","51040","577"}
+	{"Holmes","1052913","624"}
+	{"Hong Kong:EVT","1056901","52007"}
+	{"Hong Kong:GERONIMO","1000217","52010"}
+	{"Host","20010","100"}
+	{"HP OpenView NNM","400","464"}
+	{"HPSL2r","1057155","535"}
+	{"HRI","1057495","86"}
+	{"HTTP ISM","6000","0"}
+	{"HTTPS ISM","6100","0"}
+	{"IB Consol","1056686","624"}
+	{"IBD Filing Database","1057459","105"}
+	{"IBDocs","1057089","105"}
+	{"IBDWeb","1056210","105"}
+	{"IBIS Report (Previously known as GoFR","1056004","103"}
+	{"IBIS Sender","1057480","407"}
+	{"IBIS","80810","103"}
+	{"IBSS","1057508","637"}
+	{"ICC Portal","1058253","110"}
+	{"ICE","2230000","1000"}
+	{"ICT","53010","576"}
+	{"I-DEAL","1057462","703"}
+	{"IDM TUMBLEWEED FTP APPLICATION","5009644","88"}
+	{"I-Flow","1058251","90"}
+	{"IIS","128800","8"}
+	{"IIS","2070998","88"}
+	{"IIS_Test","2071000","40000"}
+	{"IMB (Burt)","2057338","396"}
+	{"IMPSERVER","2070993","88"}
+	{"IMPSERVER_Test","2070997","40000"}
+	{"IMS","50401","66"}
+	{"IMS_Test","2071001","88"}
+	{"IMS_Unix","2071002","88"}
+	{"InfoBlox","324","464"}
+	{"InfoMetrix","1057802","105"}
+	{"Inform CRM System","1057331","556"}
+	{"Information Workbench","2222240","105"}
+	{"Insight","5004770","641"}
+# Following Entry is disable by Santhosh as per CHGLDN001111185 on 20091009
+#{"Interchange","5009454","559"}
+#Following Entry is added by Santhosh as per CHGLDN001111185 on 20091009
+	{"Interchange","5009454","100"}
+#Above Entry is added by Santhosh as per CHGLDN001111185 on 20091009
+	{"Internal Directory Suite","2222259","88"}
+	{"Internal Directory Suite","5009213","88"}
+	{"Internal Provisioning Suite","5009214","88"}
+	{"Internal SSO Suite","2222258","88"}
+	{"Internal SSO Suite","5009201","88"}
+	{"International Message Broker","1057307","707"}
+#The Following entry is disabled by rajshekhar as per request CHGLDN001129576
+#{"Introscope","100002","664"}
+
+#The Following entry is added by rajshekhar as per request CHGLDN001129576
+	{"Introscope","100002","90040"}
+#Above entry is added by Rajshekhar as per request CHGLDN001129576
+	{"IPC Turret","320","464"}
+	{"IPT","318","464"}
+	{"IRD Flow","2222224","90004"}
+	{"IRDB","1058109","90"}
+	{"Iress","1057673","105"}
+	{"IRIS API","1057847","105"}
+	{"ISSTS - Taiwan","1057191","407"}
+	{"Issuer Risk Coaster Transformer","5009427","90"}
+	{"IT Billing","1057533","766"}
+	{"ITI_CMS_Voicemail","2045921","60020"}
+	{"ITSP","2100001","622"}
+	{"Jade","1056747","129"}
+	{"Jade","1057509","571"}
+	{"jade.cfg","1056747","129"}
+	{"Jaffa","1056589","90"}
+	{"javafax","126050","100"}
+	{"JAWS","54850","703"}
+	{"Jetpac Julius","81210","85"}
+	{"Jetweb","81200","85"}
+	{"JRisk","80400","586"}
+	{"Kerberos","8002","575"}
+	{"Kestrel","2057252","463"}
+	{"Key Alert","1057645","637"}
+	{"KEY Physical","81670","407"}
+	{"KEY_TRADER","55180","552"}
+	{"key_trader.cfg","55180","552"}
+	{"KeyInvest","1056744","54009"}
+	{"KEYTRADER","55180","552"}
+	{"KMP","1057113","637"}
+	{"L1OperaSource","52010","578"}
+	{"L2OperaSource","52010","578"}
+	{"L3OperaSource","52010","578"}
+	{"L4OperaSource","52010","578"}
+	{"L5OperaSource","52010","578"}
+	{"L6OperaSource","52010","578"}
+	{"L7OperaSource","52010","578"}
+	{"L8OperaSource","52010","578"}
+	{"Laredo","1057442","586"}
+	{"Latency","49900","1"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"LAUNCHPAD","1057395","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"LAUNCHPAD","1057395","162"}
+	{"LCM","1057958","90004"}
+	{"LDAP ISM","6300","0"}
+	{"LEGO.DeskTop.alexancl","52000","578"}
+	{"LEGO.DeskTop.baedkewi","52000","578"}
+	{"LEGO.DeskTop.bertolmi","52000","578"}
+	{"LEGO.DeskTop.billhajo","52000","578"}
+	{"LEGO.DeskTop.brodyro","52000","578"}
+	{"LEGO.DeskTop.caseyjoa","52000","578"}
+	{"LEGO.DeskTop.chenjn","52000","578"}
+	{"LEGO.DeskTop.coulsoke","52000","578"}
+	{"LEGO.DeskTop.cowardch","52000","578"}
+	{"LEGO.DeskTop.dibaccjo","52000","578"}
+	{"LEGO.DeskTop.donovami","52000","578"}
+	{"LEGO.DeskTop.ellisbr","52000","578"}
+	{"LEGO.DeskTop.faragoge","52000","578"}
+	{"LEGO.DeskTop.fordbi","52000","578"}
+	{"LEGO.DeskTop.fosterwi","52000","578"}
+	{"LEGO.DeskTop.foxallch","52000","578"}
+	{"LEGO.DeskTop.garciaje","52000","578"}
+	{"LEGO.DeskTop.godfreto","52000","578"}
+	{"LEGO.DeskTop.goelrb","52000","578"}
+	{"LEGO.DeskTop.healeymi","52000","578"}
+	{"LEGO.DeskTop.herschje","52000","578"}
+	{"LEGO.DeskTop.hillegwi","52000","578"}
+	{"LEGO.DeskTop.hoquema","52000","578"}
+	{"LEGO.DeskTop.jerometi","52000","578"}
+	{"LEGO.DeskTop.kainwi","52000","578"}
+	{"LEGO.DeskTop.keighemi","52000","578"}
+	{"LEGO.DeskTop.kilkenki","52000","578"}
+	{"LEGO.DeskTop.kimda","52000","578"}
+	{"LEGO.DeskTop.klaffjo","52000","578"}
+	{"LEGO.DeskTop.konstaro","52000","578"}
+	{"LEGO.DeskTop.lynchlu","52000","578"}
+	{"LEGO.DeskTop.marschke","52000","578"}
+	{"LEGO.DeskTop.murawcmi","52000","578"}
+	{"LEGO.DeskTop.palmonri","52000","578"}
+	{"LEGO.DeskTop.paredegr","52000","578"}
+	{"LEGO.DeskTop.pashamve","52000","578"}
+	{"LEGO.DeskTop.paturzro","52000","578"}
+	{"LEGO.DeskTop.periakch","52000","578"}
+	{"LEGO.DeskTop.phelanka","52000","578"}
+	{"LEGO.DeskTop.popeal","52000","578"}
+	{"LEGO.DeskTop.porcelam","52000","578"}
+	{"LEGO.DeskTop.pricesp","52000","578"}
+	{"LEGO.DeskTop.primmery","52000","578"}
+	{"LEGO.DeskTop.saierssc","52000","578"}
+	{"LEGO.DeskTop.sarkarpa","52000","578"}
+	{"LEGO.DeskTop.schmidsa","52000","578"}
+	{"LEGO.DeskTop.shivarsu","52000","578"}
+	{"LEGO.DeskTop.siegeljo","52000","578"}
+	{"LEGO.DeskTop.strohja","52000","578"}
+	{"LEGO.DeskTop.SYSTEM","52000","578"}
+	{"LEGO.DeskTop.vermajo","52000","578"}
+	{"LEGO.DeskTop.vigsnes","52000","578"}
+	{"LEGO.DeskTop.zegrasga","52000","578"}
+	{"LEGO.DeskTop.zhengmi","52000","578"}
+	{"LEGO.ENGINE1","52000","578"}
+	{"LEGO.ENGINE2","52000","578"}
+	{"LEGO.ENGINE3","52000","578"}
+	{"LEGO.ENGINE4","52000","578"}
+	{"LEGO.ETF","52000","578"}
+	{"LEGO.Listed","52000","578"}
+	{"LEGO.MANUAL1","52000","578"}
+	{"LEGO.MANUAL2","52000","578"}
+	{"LEGO.mdsR","52000","578"}
+	{"LEGO.mdsU","52000","578"}
+	{"LEGO.OES1","52000","578"}
+	{"LEGO.OES2","52000","578"}
+	{"LEGO.OES3","52000","578"}
+	{"LEGO.OES4","52000","578"}
+	{"LEGO.OES5","52000","578"}
+	{"LEGO.OPE1","52000","578"}
+	{"LEGO.OPE2","52000","578"}
+	{"LEGO.OPE3","52000","578"}
+	{"LEGO.OPE4","52000","578"}
+	{"LEGO.OPE5","52000","578"}
+	{"LEGO.PAIR1","52000","578"}
+	{"LEGO.PairReport","52000","578"}
+	{"LEGO.Pairs2","52000","578"}
+	{"LEGO.Principal","52000","578"}
+	{"LEGO.rdsServer","52000","578"}
+	{"LEGO_not_connected","52000","578"}
+	{"LEGO-PROCMON","52000","578"}
+	{"Lexicon","124010","591"}
+	{"Linkpic","1056904","105"}
+	{"Load Balancer","302","464"}
+	{"Loan Finance","1057338","592"}
+	{"Loan IQ","80860","103"}
+	{"LoanetMQ","1057269","703"}
+	{"Log4Training","2500000","95000"}
+	{"Logistics M.I.B","1058599","439"}
+	{"Logs","20010","100"}
+	{"London:EVT","1056901","53007"}
+	{"London:GDS","1000211","53008"}
+	{"London:GERONIMO","1000217","53010"}
+	{"London:TERMINATOR","1056306","53011"}
+	{"Mail","20010","100"}
+	{"MarginFlex","1057512","703"}
+	{"Market Links - Madrid","50110","49"}
+	{"Markets Pro","2222241","105"}
+	{"MarketView","81220","85"}
+	{"Masterfiles PB: HK Singapore & Tokyo","1015325","285"}
+	{"Masterfiles","1000306","285"}
+	{"Matchbox","1056790","90"}
+	{"Mazu","307","464"}
+	{"mbaLog","122200","88"}
+	{"MDI","1057392","703"}
+	{"MDR","1056949","90"}
+	{"MDS","1056661","144"}
+	{"Meetings & Call Reports","2222242","105"}
+	{"Memphis Banking Products Confirmations","80130","569"}
+	{"Memphis Banking Products Settlements","80050","569"}
+	{"Memphis BP Settlements Stamford","1057453","407"}
+	{"Memphis CUPID","80060","569"}
+	{"Memphis EQ OMIS","80070","569"}
+	{"Memphis GR Confirmations","80000","569"}
+	{"Memphis GR Settlements","80010","569"}
+	{"Memphis IR Advices","80020","569"}
+	{"Memphis IR Confirmations","80030","569"}
+	{"Memphis IR OMS","80090","569"}
+	{"Memphis IR Settlements","80040","569"}
+	{"Memphis MCD","80080","569"}
+	{"Memphis Peripherals","1058038","689"}
+	{"Memphis WHT Settlements","1057678","569"}
+	{"Merlin","1056678","90"}
+	{"Messaging","122200","88"}
+# MICROMUSE entry modified to Class 2000000 rather than 0 to enable ESM_SD to correctly raise remedy tickets. GT 3/12/2009 BR_755
+	{"MICROMUSE","2000000","591"}
+	{"MindAlign","2071639","559"}
+	{"MINT","50310","162"}
+	{"Misc Batch","1000217","641"}
+	{"MKTLNK.AMX1","52000","578"}
+	{"MKTLNK.ARC1","52000","578"}
+	{"MKTLNK.ARC2","52000","578"}
+	{"MKTLNK.ILD1","52000","578"}
+	{"MKTLNK.ILD2","52000","578"}
+	{"MKTLNK.NFX1","52000","578"}
+	{"MKTLNK.NITE1","52000","578"}
+	{"MKTLNK.NITE2","52000","578"}
+	{"MKTLNK.NITE3","52000","578"}
+	{"MKTLNK.NITE4","52000","578"}
+	{"MKTLNK.NYS1","52000","578"}
+	{"MKTLNK.NYS2","52000","578"}
+	{"MKTLNK.NYS3","52000","578"}
+	{"MKTLNK.NYS4","52000","578"}
+	{"MKTLNK.NYS5","52000","578"}
+	{"MKTLNK.SCH1","52000","578"}
+	{"MKTLNK.SLK1","52000","578"}
+	{"MKTLNK.SLK2","52000","578"}
+	{"MKTLNK.SLK3","52000","578"}
+	{"MKTLNK.SLK4","52000","578"}
+	{"MLM","1057295","617"}
+	{"MOAP","126050","50"}
+	{"MOAP","50930","98"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"MOES","1056795","582"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"MOES","1056795","162"}
+	{"MOM","128810","8"}
+	{"MOM-IMB","2057337","651"}
+	{"MOM-NC Connector","1057337","8"}
+	{"MonitorBlocks","51040","577"}
+	{"MON-Netcool Integration","88888","591"}
+	{"MOR Analytics","81690","133"}
+	{"MOR","81680","133"}
+	{"Morena","1000444","129"}
+	{"Morpheus","1057276","117"}
+	{"MOSG Rewrite","1056960","613"}
+	{"MQ Services","1058344","90011"}
+	{"MQSeries","126050","100"}
+	{"MRDB","1058607","90"}
+	{"MRS","5009808","569"}
+	{"MS Transcation Server","128820","8"}
+	{"MSSQL Server","128000","542"}
+	{"MSSQL Server","128600","239"}
+	{"MTS","1016136","614"}
+	{"MTS-FI","1056105","463"}
+	{"Multimedia Production Platform","55110","198"}
+	{"MyPortal  (Dashboard)","2222243","105"}
+	{"Netapp DFM","128050","542"}
+	{"Netapp SNMP Agent","128040","542"}
+	{"Netapp SNMP ISM","128060","542"}
+	{"NETBACKUP","126040","257"}
+	{"NetQOS","313","464"}
+	{"New Issues","1054241","105"}
+	{"NEW TOPCAT","5007443","162"}
+	{"Nicelog","317","464"}
+	{"Niksun NetVCR","322","464"}
+	{"NOAH","55370","528"}
+	{"noah.cfg","52038","577"}
+	{"NOAH-HUDSON-QA","55370","528"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"Noahs Ark","1057491","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"Noahs Ark","1057491","162"}
+	{"Not Known","19299","595"}
+	{"Not Known","314","464"}
+	{"Not Known","49920","999"}
+	{"Not Known","80609","999"}
+	{"NWContent","202","464"}
+	{"NWiTracs","206","464"}
+	{"NWRemax","403","464"}
+	{"NWSmarts","311","464"}
+	{"NWSmtraps","312","464"}
+	{"NWVideo","310","464"}
+	{"NWVM","309","464"}
+	{"Oasis Eur","1057778","50"}
+	{"OASIS","51030","577"}
+	{"OASIS_APAC","1057780","50"}
+	{"oasis_OasisSalesProxy","51030","577"}
+	{"oasis_OHPCaTS","51030","577"}
+	{"oasis_OHPFix","51030","577"}
+	{"oasis_OHPOasis","51030","577"}
+	{"oasis_OHPOpera","51030","577"}
+	{"OASIS_ROUTER","51030","577"}
+	{"oasis_TOMMonitor","51030","577"}
+	{"OASIS_TPOS_WATCHER","51030","577"}
+	{"OASIS_WATCHER","51030","577"}
+	{"oasis1_OasisSalesProxy","51030","577"}
+	{"oasis1_OHPOpera","51030","577"}
+	{"oasis2_OasisSalesProxy","51030","577"}
+	{"oasis2_OHPFix","51030","577"}
+	{"oasis2_OHPOpera","51030","577"}
+	{"oasis3_CaTSMonitor","51030","577"}
+	{"oasis3_DMAEUMonitor1","51030","577"}
+	{"oasis3_ExpiryService","51030","577"}
+	{"oasis3_FixMonitor","51030","577"}
+	{"oasis3_OasisEventExpiry","51030","577"}
+	{"oasis3_OasisMonitor","51030","577"}
+	{"oasis3_OasisSalesProxy","51030","577"}
+	{"oasis3_OasisTraderProxy","51030","577"}
+	{"oasis3_OHPCaTS","51030","577"}
+	{"oasis3_OHPFix","51030","577"}
+	{"oasis3_OHPOasis","51030","577"}
+	{"oasis3_OHPOpera","51030","577"}
+	{"oasis3_OHPTerminator","51030","577"}
+	{"oasis3_OperaMonitor","51030","577"}
+	{"oasis3_SompilMonitor","51030","577"}
+	{"oasis3_TerminatorSource","51030","577"}
+	{"oasis3_TOMMonitor1","51030","577"}
+	{"oasis3_TOMMonitor2","51030","577"}
+	{"oasis3_TOMMonitor3","51030","577"}
+	{"oasis4_CaTSMonitor","51030","577"}
+	{"oasis4_DMAEUMonitor1","51030","577"}
+	{"oasis4_ExpiryService","51030","577"}
+	{"oasis4_FixMonitor","51030","577"}
+	{"oasis4_OasisEventExpiry","51030","577"}
+	{"oasis4_OasisMonitor","51030","577"}
+	{"oasis4_OasisSalesProxy","51030","577"}
+	{"oasis4_OasisTraderProxy","51030","577"}
+	{"oasis4_OHPCaTS","51030","577"}
+	{"oasis4_OHPFix","51030","577"}
+	{"oasis4_OHPOasis","51030","577"}
+	{"oasis4_OHPOpera","51030","577"}
+	{"oasis4_OHPTerminator","51030","577"}
+	{"oasis4_OperaMonitor","51030","577"}
+	{"oasis4_SompilMonitor","51030","577"}
+	{"oasis4_TerminatorSource","51030","577"}
+	{"oasis4_TOMMonitor1","51030","577"}
+	{"oasis4_TOMMonitor2","51030","577"}
+	{"oasis4_TOMMonitor3","51030","577"}
+	{"OASIS-check_printers","51040","577"}
+	{"oasishdr","51040","577"}
+	{"OASIS-kruncher","51030","577"}
+	{"OASISMILANFAX","126050","100"}
+	{"OasisMonitor","51030","577"}
+	{"OASIS-pheonix","51030","577"}
+	{"OASIS-prg_download","51030","577"}
+	{"OASIS-prg_upload","51030","577"}
+	{"OasisSalesProxy","51030","577"}
+	{"OASIS-sgw_ftp","51040","577"}
+	{"OasisTraderProxy","51030","577"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"OASYSD","55350","528"}
+#{"oasysd310","55350","528"}
+#{"oasysdirect","55350","528"}
+
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"OASYSD","55350","162"}
+	{"oasysd310","55350","162"}
+	{"oasysdirect","55350","162"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"OASYSDIRECT","55360","528"}
+#{"OASYSGLOBALDIRECT","55360","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+{"OASYSDIRECT","55360","162"}
+{"OASYSGLOBALDIRECT","55360","162"}
+{"OBS Swap Feeds","57261","117"}
+	{"OBS","80600","117"}
+	{"OBS_Dating","81050","117"}
+	{"OBS_DB","81060","117"}
+	{"OBS_Distributor","80940","117"}
+	{"OBS_Elvis","81020","117"}
+	{"OBS_Jersey","81030","117"}
+	{"OBS_Listener","80970","117"}
+	{"OBS_Magic_Marker","80980","117"}
+	{"OBS_Naming","81040","117"}
+	{"OBS_ODS","81000","117"}
+	{"OBS_Panther","80910","117"}
+	{"OBS_Pollers","81010","117"}
+	{"OBS_Pricing","80960","117"}
+	{"OBS_Prion","80930","117"}
+	{"OBS_Risk","80920","117"}
+	{"OBS_Servers","80990","117"}
+	{"OBS_TQ","80900","117"}
+	{"OBS_WAS","80950","117"}
+	{"od2adp","55350","528"}
+	{"OD2ADP","55360","528"}
+	{"ODE-CI","1056725","568"}
+	{"ODIRECT","55350","528"}
+	{"odPublisher","55350","528"}
+	{"odsfh41","55350","528"}
+	{"ODSGATEWAY","52010","578"}
+	{"OdSubscriber","55350","528"}
+	{"ogd_connect","55360","528"}
+	{"ogd_mt511_in","55360","528"}
+	{"ogd_mt511_out","55360","528"}
+	{"OGDCAN","55360","528"}
+	{"OGDUS","55360","528"}
+	{"OHPCaTS","51030","577"}
+	{"OHPFIX","51030","577"}
+	{"OHPOasis","51030","577"}
+	{"OHPOPERA","51030","577"}
+	{"OHPTerminator","51030","577"}
+	{"OMGEO MIS","1058078","162"}
+	{"OnLine Feedback","1057652","637"}
+	{"Opal","1057251","90"}
+	{"OPENIMAGE","80100","569"}
+	{"OPENTEXT","5008024","100"}
+	{"OPERA TOM","1057976","50"}
+	{"OPERA","52010","578"}
+	{"OperaMonitor","51030","577"}
+	{"OPERATIONAL RISK HEATMAP REPORTING","5009498","439"}
+	{"Operational Risk Inventory","1057749","766"}
+	{"OPERAUS","52010","578"}
+	{"Opportunities","2222244","105"}
+	{"Ops Reporting","1058606","407"}
+	{"OpsReporting","1058060","689"}
+	{"Opsware SAS","5023960","90018"}
+	{"OPtera","306","464"}
+	{"Optima","1057182","766"}
+	{"Oracle Micromuse","2222252","999"}
+	{"Oracle Portal","2500006","648"}
+	{"ORACLE","120000","239"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"ORBIT","55380","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"ORBIT","55380","162"}
+	{"ORCA","1057586","577"}
+	{"ORCA-FUSA","1057833","689"}
+	{"Orchestra","128750","100"}
+	{"OrderOperationCounterReceiver","51040","577"}
+	{"OTTOMAN","1057928","162"}
+	{"OWX","1058042","689"}
+	{"Pactual","2222253","90010"}
+	{"PAD Answer Web","1057653","637"}
+	{"PANDA","1058207","359"}
+	{"PAR","1057617","703"}
+	{"Passport","402","464"}
+	{"PATROL","125000","591"}
+	{"PB Asset Servicing","2080000","528"}
+	{"PB Billing and MIS","1058098","703"}
+	{"PB CALCULATION ENGINES","5010085","703"}
+	{"PB Custody","1057588","556"}
+	{"PB Workstation","1058058","556"}
+	{"PB_EXCALIBUR","54820","556"}
+	{"PCE","1007995","90"}
+	{"PDH Inserts","1640","0"}
+	{"PEM zOS","2222229","90005"}
+	{"PET","1057486","703"}
+	{"Petra","1056200","105"}
+	{"PhiCDM Framework","1057432","620"}
+	{"Phileas","1052041","766"}
+	{"PILAW","2300002","90007"}
+	{"PILAW","2300002","90008"}
+	{"PIM-DS","1058414","703"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"Ping Pong","1057493","528"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"Ping Pong","1057493","162"}
+	{"Piranha","50404","703"}
+	{"PM2","1057457","609"}
+	{"PMM","1015152","86"}
+	{"POLE_POSITION","54840","66"}
+	{"PortMonitor","20010","100"}
+	{"Position Service","1057663","98"}
+	{"Position_Monitor_Database_Exception","52020","578"}
+	{"Position_Monitor_Feeder_Hospital_Exception","52020","578"}
+	{"Position_Monitor_Feeder_Not_Reading","52020","578"}
+	{"PPP","1057868","707"}
+	{"Premium File System","123005","468"}
+	{"PresTrak","1057801","105"}
+	{"PresXpress","1056806","105"}
+	{"PRI_PROBE_TELE","5201","999"}
+	{"PRI_PROBE_UNIX","123000","468"}
+	{"PriceMachine","54920","609"}
+	{"Prime Brokerage GSD","1019299","703"}
+	{"Prime Brokerage GSD","1057223","703"}
+	{"Prime Brokerage TP Engine","1058106","703"}
+	{"PRIME SERVICES RISK DESKTOP","5004434","703"}
+	{"PRIS","2500005","90022"}
+	{"PRISM","50402","571"}
+	{"Probe_Tools","2300008","591"}
+	{"Proteus","303","464"}
+	{"Protox.BrassPublisher","52032","578"}
+	{"Protox.ConduitEODAdapter","52036","578"}
+	{"Protox.NoahEODAdapter","52038","578"}
+	{"Protox.TESPublisher","52031","578"}
+	{"Protox: Brass Conn","52034","578"}
+	{"PROTOX-DR","52030","578"}
+	{"PROTOX-FAILOVER","52030","578"}
+	{"PROTOX-PRIMARY","52030","578"}
+	{"Provisioning Suite","2222256","88"}
+	{"PTA","1056980","50"}
+	{"PTS Portal","1056992","569"}
+	{"PTS","1057244","54013"}
+	{"PUBLIC WEB SITE","5005878","764"}
+	{"PW_FIX4.0","53030","576"}
+	{"QRC Angel","1057443","90"}
+	{"Quality Center","1058218","566"}
+	{"Quarks","1057492","162"}
+	{"QuickGrid","1057116","556"}
+	{"Radar CRM","1056377","636"}
+	{"RAGE","1057689","586"}
+	{"RAM (Energy)","1057168","766"}
+	{"Rambo Zurich","80120","569"}
+	{"Rambo(London)","80110","569"}
+	{"Ranger","1052225","624"}
+	{"Rant","1058261","117"}
+	{"RANtask","1058030","56"}
+	{"RAP_QA","2018741","20198"}
+	{"Raptor - AU","1057772","552"}
+	{"Raptor","50910","98"}
+	{"RAR_L&C","1057351","637"}
+	{"RAR_L&C","1057351","90020"}
+	{"RAVE","1058129","586"}
+	{"RCAT","5009040","586"}
+	{"Red_Dragon","1056843","162"}
+	{"REEF","54970","703"}
+	{"Rehypothecation-AG","1058395","703"}
+	{"REMAX","2004258","90017"}
+	{"REMAX_DEV","99403","464"}
+	{"Remedy","1057419","622"}
+	{"REMUS (Hong Kong)","1008221","407"}
+	{"REMUS (Singapore)","1007282","407"}
+	{"REMUS (Tokyo)","1015181","407"}
+	{"Reporting","2300007","90007"}
+	{"Reporting","2300007","90008"}
+	{"Revenue Booking","2222251","105"}
+	{"Reward Portal","1058099","524"}
+	{"REX","1000392","616"}
+#The Folloing entry is disabled by Raj as per CHGLDN001140722
+#{"Rhino","1058308","582"}
+#The Folloing entry is added by Raj as per CHGLDN001140722
+	{"Rhino","1058308","162"}
+	{"Risk Engine","1056681","90"}
+	{"RISKCUBE","1057153","556"}
+	{"RiskMonitor","110040","90"}
+	{"RiskOnline","1056680","90"}
+	{"RISK-WAREHOUSE","5000641","90"}
+	{"RKYC Admin Application","2300005","90007"}
+	{"RKYC Admin Application","2300005","90008"}
+	{"RKYC Document Store","1057726","90007"}
+	{"RKYC PIL","1058049","90007"}
+	{"RmonV2","2525252","257"}
+	{"RockyME","1057587","407"}
+	{"RockySNG","81650","407"}
+	{"RockyZH","1000477","407"}
+	{"Rokenbok","2217002","641"}
+	{"Rokenbok_Chicago","2217009","641"}
+	{"Rokenbok_DLN","2217011","641"}
+	{"Rokenbok_Frankfurt","2217005","641"}
+	{"Rokenbok_HongKong","2217003","641"}
+	{"Rokenbok_London","2217007","641"}
+	{"Rokenbok_Stamford","2217008","641"}
+	{"Rokenbok_STP","2217010","641"}
+	{"Rokenbok_Sydney","2217004","641"}
+	{"Rokenbok_Tokyo","2217001","641"}
+	{"Rokenbok_Zurich","2217006","641"}
+	{"ROT","1058269","90004"}
+	{"RPC_ME_TRANSFER","51040","577"}
+	{"RPP","55040","198"}
+	{"RPP_QA","2055040","20198"}
+	{"RRW","110030","90"}
+	{"RTA","1057137","133"}
+	{"Rules","2300006","90007"}
+	{"Rules","2300006","90008"}
+	{"SABRE","1057275","703"}
+	{"SalesLogix","2222245","105"}
+	{"Sapbasis","126050","100"}
+	{"SAPGGL","1052446","276"}
+	{"sapggl.cfg","1052446","276"}
+	{"SCALE","1057686","98"}
+	{"SCF","1057305","641"}
+	{"SCR","1057190","616"}
+	{"Scribe","1058061","689"}
+	{"SDC","1020245","105"}
+	{"SDPC","2222226","90009"}
+	{"SDR","1056504","90"}
+	{"SDT","1057293","617"}
+	{"Security - File Missing","8005","575"}
+	{"Security - File Permission","8004","575"}
+	{"Security Kerberos","1057923","615"}
+	{"SECURITY","8006","575"}
+	{"SERF","1058079","162"}
+	{"SESAME","50100","49"}
+	{"SevOne","304","464"}
+	{"SharePoint","208870","8"}
+	{"SHAREPOINT-IBD ARCHITECTURE POC","5007336","105"}
+	{"SHARES","126050","100"}
+	{"Short_Sell_Updator_Error","52020","578"}
+	{"Short_Sell_Updator_Running","52020","578"}
+	{"SIDE","1056984","396"}
+	{"Sigma","1058141","707"}
+	{"Singapore:GERONIMO","1000217","54010"}
+	{"Singapore:TERMINATOR","1056306","54011"}
+	{"Single Cost Tool","1057185","624"}
+	{"Sitescope","401","464"}
+	{"Sitescope-URL","100001","88"}
+	{"SLC World (Part of GL servers)","50160","49"}
+	{"Smarts","5004624","464"}
+	{"SMS","128830","8"}
+	{"SNL","1057660","105"}
+	{"SNMP ISM","6250","0"}
+	{"SO_FIX","53030","576"}
+	{"SOCDBAUD","1057286","575"}
+	{"SocketProbeAppender","0","591"}
+	{"SOCRATES","1008193","624"}
+	{"Solaris OS","126060","601"}
+	{"Specific Engine","1056682","90"}
+	{"Sport","1058072","530"}
+	{"SPR","53030","576"}
+	{"Spread Trader","50050","49"}
+	{"Spyda","1056631","90"}
+	{"SQL Error","2999999","591"}
+	{"SRL","1057274","359"}
+	{"SRM","110000","90"}
+	{"SSE NG","1057974","773"}
+	{"SSE NG: ODS","1058436","773"}
+	{"SSE NG: Sub-Ledger","50850","773"}
+	{"SSE NG: Transaction Reporting","1056462","773"}
+	{"SSE NG: Transaction Reporting","1058615","773"}
+	{"SSE NG: Work Item Management","1056773","773"}
+	{"SSE NG: Work Item Management","1058614","773"}
+	{"SSE","1027204","190"}
+	{"SSENG: TRADE CONFIRMATION AND AGREEMENT","5010090","773"}
+	{"SSM Agent","1670","702"}
+	{"SSM","124020","702"}
+	{"SSMAGENT_HB","1601","999"}
+	{"SSMAGENT_HB_WMUS","1606","1606"}
+	{"SSMStartStop","124021","468"}
+	{"SSTS","1056268","407"}
+	{"Staff Planning","2222246","105"}
+	{"Stamford:EVT","1056901","55007"}
+	{"Stamford:GERONIMO","1000217","55010"}
+	{"Stealth","80800","103"}
+	{"STP_TOM","1057971","50"}
+	{"STPTOM","1056815","49"}
+	{"Subversion","1057954","461"}
+	{"Sun Cluster (ITFX-Infra)","126030","601"}
+	{"Superbond","1056097","463"}
+	{"SWIFTAlliance Access (SAA)","1056983","396"}
+	{"SwiftAlliance Gateway (SAG)","1056783","396"}
+	{"SwiftNet Process Alert Monitor (SPAM)","1056786","396"}
+	{"Swiskey Execution","50700","56"}
+	{"SwiskeyEurope","54880","56"}
+	{"SwiskeyUS","54880","56"}
+	{"Swiss CMIS","1056261","57"}
+	{"Swiss_Fix_Gateway","55200","552"}
+	{"SYBASE","121000","239"}
+	{"Sydney:EVT","1056901","56007"}
+	{"Sydney:GERONIMO","1000217","56010"}
+	{"Synticket","1057643","105"}
+	{"T24 Autosys Jobs","1007190","162"}
+	{"T3 SAN (ITFX-Infra)","126020","601"}
+	{"Tactical Alert Direct","1057618","285"}
+	{"TAS Autosys","1057956","162"}
+	{"TCARCH","126050","100"}
+	{"TCDC","126050","100"}
+	{"TCDCEXE","126050","100"}
+	{"TCDCLINK","126050","100"}
+	{"TCFW","126050","100"}
+	{"TCGENDEP","126050","100"}
+	{"TCIMGIO","126050","100"}
+	{"TCJUKE","126050","100"}
+	{"TCLANPRT","126050","100"}
+	{"TCLINK","126050","100"}
+	{"TCLINKAC","126050","100"}
+	{"TCLINKFI ","126050","100"}
+	{"TCLINKFI","126050","100"}
+	{"TCLINKFI2","126050","100"}
+	{"TCLINKFI3","126050","100"}
+	{"TCLINKFIGlobalOne","126050","100"}
+	{"TCLINKFIGSBLS","126050","100"}
+	{"TCLINKFITerminator","126050","100"}
+	{"TCLINKMQ","126050","100"}
+	{"TCLINKMQ2","126050","100"}
+	{"TCLINKSM","126050","100"}
+	{"TCLT","126050","100"}
+	{"TCM","1015153","86"}
+	{"TCMON","126050","100"}
+	{"TCOCR","126050","100"}
+	{"TCOSS","126050","100"}
+	{"TCPPD","126050","100"}
+	{"TCReport_fetch","126050","100"}
+	{"TCREPORT_TCREPORT","126050","100"}
+	{"TCSRV","126050","100"}
+	{"TCSTATUS","126050","100"}
+	{"TDR","1056704","90"}
+	{"TEB","50060","49"}
+	{"TelDir","1056970","105"}
+	{"TELDIRECTORY","5005875","764"}
+	{"TelNetcool","2300009","591"}
+	{"TEM","1058353","407"}
+	{"Terminal Services","128840","8"}
+	{"TERMINATOR","1056306","999"}
+	{"Test Class","49960","999"}
+	{"Testdirector","127100","566"}
+	{"TETRIS","52020","578"}
+	{"TETRIS-PROCMON","52020","578"}
+	{"TGRS","1056896","637"}
+
+#Following entry is disabled as per request CHGLDN001135793
+#{"TheLens","1057505","50}
+#The following entry is added by raj on 20091118 as per CHGLDN001139816
+{"CRM Interface","5007842","636"}
+
+#The above entry is disabled as per request CHGLDN001135793
+
+	{"Thunderhead","1057831","689"}
+	{"ThunderheadSSZ","2057831","407"}
+	{"TickDB","1057481","609"}
+	{"Time Series Engine","1056679","90"}
+	{"TLM","1054224","637"}
+	{"TMIG","1009813","61"}
+	{"Tokyo BoJ Contingency Measures","1056700","396"}
+	{"Tokyo:GERONIMO","1000217","57010"}
+	{"TOMCAT","2070992","88"}
+	{"TOMCAT_Test","2070996","40000"}
+	{"TP Reporting","1057664","407"}
+	{"Tradefeed","1016451","61"}
+	{"TradeLine","80870","103"}
+	{"TradePublisher_Client_Exception","52020","578"}
+	{"TradePublisher_Exception","52020","578"}
+	{"TradeSubscriber_Cannot_Connect_To_Publisher","52020","578"}
+	{"TradeSubscriber_Trades_Out_Of_Sequence","52020","578"}
+	{"TRADEWATCH","50200","49"}
+	{"TRANSX ISM","6350","0"}
+	{"TRaPA","1056609","90"}
+	{"Trapd","300","464"}
+	{"TRAX","50395","602"}
+	{"Triad","128630","999"}
+	{"TRIDENT","1057454","586"}
+	{"Troy","1058110","407"}
+	{"UBS IRIS","2222247","105"}
+	{"UBS: BLISS Servers","55120","636"}
+	{"UBS: UltraBac8","40276","8"}
+	{"UDP","54940","198"}
+	{"UFC","5005210","117"}
+	{"UNDEFINED ISM","6050","0"}
+	{"Unix Blades","123002","468"}
+	{"UNIX","123000","468"}
+	{"Unix_IMS-WIS","2070999","88"}
+	{"Unknown Class (12100) - Sitescope?","12100","88"}
+	{"USBRASSTOM","51020","577"}
+	{"USROUTER","51000","577"}
+	{"usrouter.cfg","51000","577"}
+	{"UTOPEA","1018741","198"}
+	{"VaR","110020","90"}
+	{"VaRGate","1057239","90"}
+	{"VBrick","308","464"}
+	{"Verity","1057754","648"}
+	{"VMWARE","2045669","468"}
+	{"W2K Operating System","128850","8"}
+	{"Warburg Abacus Gateway","1016355","407"}
+	{"Warburg Abacus gateway","81620","407"}
+	{"WebFiler","55060","198"}
+	{"WebSphere","122100","88"}
+	{"WEBSPHERE","2070990","88"}
+	{"WEBSPHERE_Test","2070994","40000"}
+	{"Wintel AntiVirus","128860","8"}
+	{"Wintel","124000","8"}
+	{"Wire","55050","198"}
+	{"WIRE_QA","2055141","20198"}
+	{"Wisdom","1008296","703"}
+	{"WISDOM","54800","556"}
+	{"WISPA AGENCY","50370","162"}
+	{"WISPA DEPOT","50380","162"}
+	{"WISPA","50350","602"}
+	{"WISPAFI","50350","602"}
+	{"wispafi.cfg","50350","602"}
+	{"WISPALINK","50350","602"}
+	{"WLAN Kiosk","319","464"}
+	{"WM ATK HKSG","1058442","678"}
+	{"WM COPS HK","1016060","678"}
+	{"WM COPS Lite Australia","1058031","678"}
+	{"WM COPS SG","1057694","678"}
+	{"WM COPS TW","1057825","678"}
+	{"WM Enrichment HKSGDJ","1056266","678"}
+	{"WM FIM Asia RTO HK","1057347","678"}
+	{"WM FIM Asia RTO SG","1057750","678"}
+	{"WM FMS HKSG","1058416","678"}
+	{"WM HiInvest HK","1056801","678"}
+	{"WM HiInvest SG","1057706","678"}
+	{"WM HiPerformance HK","1057456","678"}
+	{"WM HiPerformance SG","1057707","678"}
+	{"WM HS Trading CN","1058288","751"}
+	{"WM ICRM HKSG","1057346","675"}
+	{"WM IS Profile HKSG","1057961","678"}
+	{"WM MDS CN","1058301","751"}
+	{"WM Price Alert (SMS) CN","1058289","751"}
+	{"WMUS-Campus","204","464"}
+	{"WMUS-Retail","205","464"}
+	{"World Clock","1057577","105"}
+	{"WORLDCLOCK","5005877","764"}
+	{"WPAS","1057507","720"}
+	{"WttD_LDAP_Facade","1057969","90002"}
+	{"X1OperaSource","52010","578"}
+	{"X2OperaSource","52010","578"}
+	{"XCheck","1058062","689"}
+	{"XCOLL","110010","90"}
+	{"XTC","1057527","117"}
+	{"Y-alta","1058605","407"}
+	{"ZCAL","1058392","535"}
+	{"ZoneRanger","323","464"}
+	{"Zurich:GDS","1000211","58008"}
+       {"SSE NG: FI FSA REPORTING","5010217","773"} 
+       {"IMS-L2-BO-BUSINESSOBJECTS","5004110","90036"} 
+       {"TRACS","5010231","413"}
+       {"EQUITY DERIVATIVES PRICING","5008193","641"}
+
+#Following entries are added by rajshekhar as per request by raghavendra CHGLDN001082030
+	{"CLIENT_POLL","5005882","764"}
+	{"CONTENT_PUBLISHER","5009904","764"}
+	{"DEVKIT","5005889","764"}
+	{"ECONTRACT_MANAGEMENT","5005886","764"}
+	{"FAILOVER","5005888","764"}
+	{"FEEDBACK_TOOL","5005883","764"}
+	{"MARCOMMS_PLANNER","5005871","764"}
+	{"ROADMAP","5005890","764"}
+	{"USAGE_TOOL","5005887","764"}
+
+#Following Entries are added by Rajshekhar as per request by Udo for CHGLDN001083097
+	{"FUSION HISTORICAL - FUSION","55000","609"} #Modified by Rayagouda Patil as per CHGLDN001089156
+	{"EQUITY SECURITY MART","54992","609"}
+	{"EQUITY DATA SERVICE","54993","609"}
+	{"END-OF-DAY SERVICE","54994","609"}
+
+#Following entry is added by Srinivas as per request by Udo for CHGLDN001134880
+	{"SCREENSAVER","5005884","90037"}
+
+#Following entry is added by Srinivas as per request by Vasantha for CHGLDN001135865
+	{"CLIENT SAPPHIRE AUSTRALIA","5008231","417"}
+
+#Following entry is added by Srinivas as per request by Vasantha for CHGLDN001135868
+	{"CLIENT SAPPHIRE JAPAN","5008191","417"}
+	{"CLIENT SAPPHIRE ASIA","5001422","417"}
+
+#Following entries are added by Rajshekhar as per request by Udo for CHGLDN001083698
+	{"CASH Manual Tasks","55270","417"}
+
+#Following entry is added by Suresh K S on 20091023 as per CHGLDN001122934
+        {"SoftDollar","5004757","581"}
+
+#Following entry is added by Suresh K S on 20091026 as per CHGLDN001124534
+        {"PRIME VAULT OPTIMIZER","5010029","703"}
+ 
+#Following entry is added by Suresh K S on 20091023 as per CHGLDN001123682
+        {"GLOBAL PRIMEACCESS","1057334","703"} 
+
+#Following entry is added by Suresh K S on 20091021  as per CHGLDN001120976
+        {"IDM Monitoring","2222262 ","88"}
+
+#Following entry is added by Rajshekhar as per request of Raghavendra for CHGLDN001083733
+	{"UBSSC AS400","5009013","162"}
+
+#Following entry is added by Amrut as per request of Vasantha-Kumar for CHGLDN001102024
+	{"UPSELLING","5009465","636"}
+#Following entry is added by Amrut as per request of Raghavendra for CHGLDN001107304
+	{"Topcat Listed Options","5000192","90039"}
+        
+{"WIGWAM","5004761","198"} #Added by Rayagouda Patil as per CHGLDN001094255
+{"ORCA NG","5010093","648"}  #Addedd as per Simon's request CHGLDN001072934,Modified as per CHGLDN001076861
+{"Evidence","1057988","90034"} #Added as per request CHGLDN001076849 on 20090819
+{"Time Entry System","1057988","90032"} #Added as per request CHGLDN001076849 on 20090819
+{"Master Data Administration System","1057988","90032"} #Added as per request CHGLDN001076849 on 20090819
+{"FIT DSS","5000230","90032"} #Added as per the request CHGLDN001155554 on 20091214
+
+#Following entries added by Surendra as per requests CHGLDN001141694 and  CHGLDN001141697
+
+	{"BOXER","5000678","641"}
+	{"POKER","5004727","641"}
+	{"INSIGHT","5004726","641"}
+	{"RADAR Web Mailer","5007843","636"}
+	{"RADAR V3","5004710","636"}
+	{"RADAR V2","5004769","636"}
+	{"RADAR TELEPHONY","5004725","636"}
+#Above entries added by Surendra as per requests CHGLDN001141694 and  CHGLDN001141697
+}
+default = {"6999","999"}

@@ -1,0 +1,2 @@
+map(name="Capture",bgColor="#ffff66",w=250,h=250,acl="*")
+button(name="Amrut",label="Visual",x=96,y=106,action="Active Event List (AEL)",url="",target="Main",entity="",datasource="NCOMS",flash="true",w=60,h=40,type="rectangle",arc diameter=20,legend=Label,font="Courier",size=15,font color="red",style="p")

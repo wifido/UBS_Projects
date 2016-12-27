@@ -1,0 +1,6 @@
+map(name="Micromuse_Infra",bgColor="white",w=1109,h=816,acl="*")
+button(name="visual_5",label="untitled",x=686,y=539,action="ael",url="",target="_self",entity="LONPROBE",w=65,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="visual_4",label="lonobjprod1",x=791,y=264,action="ael",url="",target="_self",entity="LONOBJPROD1",w=65,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="visual_3",label="stmprobe",x=395,y=461,action="ael",url="",target="_self",entity="STMPROBE",w=65,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+button(name="visual_2",label="stmobjprod1",x=396,y=269,action="ael",url="",target="_self",entity="GlobalInfra",w=65,h=23,type="rounded",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+icon(name="visual_1",label="untitled",x=6,y=23,image="micromuse_infra.gif")

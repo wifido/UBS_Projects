@@ -1,0 +1,33 @@
+case "70000":
+	$ruleset = $ruleset + " - firc energy"
+        # Rule set for FIRC_Energy. All tokens are pre-mapped off the tibco bus, so field assignment is fairly
+        # straightforward.
+        @Node = $Node
+        @NodeAlias = $NodeAlias
+        @AlertGroup = $AlertGroup
+        @AlertKey = $AlertKey
+        @Class = $ClassID
+        @Agent = $Agent
+        @Summary = $Summary
+        @Severity = $Severity
+        @Type = 0
+        # Here we make sure that we have been provided with a proper
+        # timestamp. If no timestamp for the event we will supply one.
+        # A rough and ready test is that the epoch timestring should
+        # be 10 characters long (until about 2038).
+        $tempEventTime = length($EventTime)
+        switch($tempEventTime)
+                {
+                case "10":
+                        @FirstOccurrence = $EventTime
+                        @LastOccurrence = $EventTime
+                        update(@LastOccurrence)
+
+                default:
+                        $TOKENERROR = (int($TOKENERROR) + 1 )
+                        $tempEventTime = getdate
+                        @FirstOccurrence = $tempEventTime
+                        @LastOccurrence = $tempEventTime
+                        update(@LastOccurrence)
+                }
+        $tempIdentifier = $Summary + " " + $Node + " " + $NodeAlias + " " + $Agent + " " + $AlertGroup

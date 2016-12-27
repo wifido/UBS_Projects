@@ -1,0 +1,45 @@
+case "GmViewer":
+
+	$ruleset = $ruleset + "-gmviewer"
+	@Agent="IMS gmviewer"
+
+
+
+# 	Class ID	- 2222225
+#	SubClass ID	- RV or EMS for the two types of monitoring - I assume your team allocate numbers
+#	Severity		- 1 info to 5 fatal (probably never send these)
+#	Environment	- dev/uat/prod
+#	Host Address
+#	AlertGroup	- Missed Packets / Retransmissions / Restarted / Message Rate In / Message Rate Out
+#	Alert Key	- error key, e.g. server name
+#	Free text	- detail, e.g. number of messages sent
+#
+#	As an example:
+#
+#	2222225:RV:3:dev:192.168.111.111:Message Rate Out:default:16543 messages sent
+
+	$ArraySize = split($1, SplitArray, ":")
+	if(match($ArraySize, "8"))
+	{
+		@Agent = "GM Viewer"
+		@Class = SplitArray[1]
+		@Subclass = SplitArray[2]
+		@Severity = SplitArray[3]
+		@Environment = SplitArray[4]
+		@Origin = SplitArray[5]
+		@AlertKey = SplitArray[6]
+		@AlertGroup = SplitArray[7]
+		@Summary = SplitArray[8]
+		@UserData = $1
+	}
+	else
+	{
+		@Agent = "GM Viewer"
+		@AlertKey = "ArraySize = "  + $ArraySize
+		@Summary="it didn't work then!"
+		@UserData = $1
+		@Class = 2222225
+	}
+	$TempDoLookup = 2
+	@OwnerUID = 65534
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey

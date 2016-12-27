@@ -1,0 +1,165 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2003 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#    ucdavis.include.snmp.rules 1.0 2003/12/12 Robert Cowart
+#
+###############################################################################
+#
+# 1.0 - Initial Release.  Complies with the Micromuse Rules File Standards
+#       (MUSE-STD-RF-02, July 2002)
+#
+# 20081105	V 2.0	Chris Janes	
+#			Code addded for netSnmpNotifications
+#				
+#
+###############################################################################
+
+case "Net-SNMPTraps": ### NET-SNMP Agent - Notifications from NET-SNMP-MIB
+
+    	$ruleset = $ruleset + "-case:Net-SNMPTraps"
+    	@Agent = "Net-SNMP Agent"
+#	Change by Chris Janes of Abilitec TD 4851
+#    	@Class = 123000
+#    	@OwnerGID = 468
+
+	if(match($community, "REMAX"))
+	{
+		$ClassGidKey = "REMAX"
+	}
+	else if(nmatch($community, "ESX"))
+	{
+		$ClassGidKey = lookup(@NodeAlias, ESX_Swiss_Table)
+	}
+	else
+	{
+		$ClassGidKey = "UNIX"
+	}
+	[@Class, @OwnerGID] = lookup($ClassGidKey, MttrapdClassGID)
+
+
+
+    	@OwnerUID = 65534
+    	$TempDoLookup = 2
+	@Description = "mteHotTrigger = " + $1 + "  mteHotTargetName = " + $2 + "   mteHotContextName = " + $3 + "   mteHotOID = " + $4 + "   mteHotValue = " + $5 + "  $6 = " + $6
+	@UserInt = $specific-trap
+
+    switch ($1)
+    {
+        case "ProcessDown": ### Net-SNMP ProcessDown
+
+	    $ruleset = $ruleset + "-case:ProcessDown"
+            @AlertGroup = $1
+            @AlertKey = $6
+            @Summary = $7
+            @Severity = 5
+            @Type = 1
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $1
+
+        case "ProcessUp": ### Net-SNMP ProcessUp
+
+            $ruleset = $ruleset + "-case:ProcessUp"
+            @AlertGroup = $1
+            @AlertKey = $6
+            @Summary = $7
+            @Severity = 1
+            @Type = 2
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $1
+
+        case "DiskCritical": ### Net-SNMP ProcessDown
+
+            $ruleset = $ruleset + "-case:DiskCritical"
+            @AlertGroup = $1
+            @AlertKey = $6
+            @Summary = "Disk on " + @AlertKey + " is running at a critical level (above 90%)" 
+            @Severity = 5
+            @Type = 1
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $1
+
+
+	case "LoadAverage": ### Net-SNMP LoadAverage
+
+            @AlertGroup = $1
+            @AlertKey = $6
+            @Summary = $6
+
+#		20080411	Change by Chris Janes of Abilitec	TD4790
+
+#           @Severity = 5
+            @Severity = 4
+
+#		20080411	End of Change
+            @Type = 1
+            @Identifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager + " " + $1
+
+
+
+        default:
+
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown mteHotTrigger (" + $1 + ") Received for Enterprise " + $enterprise
+            @Severity = 1
+            @Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + "  " + $1
+    }
+
+
+
+
+case "netSnmpNotifications": ### NET-SNMP Agent - Notifications from NET-SNMP-MIB
+
+    	$ruleset = $ruleset + "-case:netSnmpNotifications"
+    	@Agent = "?Net-SNMP Agent (V1)"
+    	@Class = 999999
+
+
+
+    	@OwnerUID = 65534
+    	$TempDoLookup = 2
+        $ruleset = $ruleset + " ST = " + $specific-trap
+        switch ($specific-trap)
+        {
+        case "1":
+#               nsNotifyStart
+
+                @Summary = "The Agent has Started"
+                @Severity = 2
+                @Type = 1
+                @AlertGroup = "Agent"
+                @Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+        case "2":
+#               nsNotifyShutdown
+
+                @Summary = "The Agent has Shutdown"
+                @Severity = 2
+                @Type = 1
+                @AlertGroup = "Agent"
+                @Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+        case "3":
+#               nsNotifyRestart
+
+                @Summary = "The Agent has Re-started"
+                @Severity = 2
+                @Type = 1
+                @AlertGroup = "Agent"
+                @Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+
+
+        default:
+                $ruleset = $ruleset + "-case:default"
+                @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+                @Severity = 1
+                @Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4
+        }
+
+        $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAd

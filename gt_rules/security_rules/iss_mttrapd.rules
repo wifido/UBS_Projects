@@ -1,0 +1,55 @@
+# UBSW Monitoring Script for MTTRAPD probes
+# Karey Weston
+
+############################################
+# Uncomment this if you want to turn on 
+# details for all events in this ruleset
+############################################
+
+case "ISS":
+
+##########################################
+# For Innerwall we need to look at string
+# 2 for location.  This looks to see if
+# string 2 is populated.
+#########################################
+        @AlertGroup = "SECURITY"
+        @AlertKey = $3
+	$alertkey = $1
+        @Agent = "ISS"
+        @Class = "8001"
+	@OwnerGID=575
+	@OwnerUID=65534
+        $TempDoLookup=2 
+	@Severity = 3
+
+switch ($specific-trap)
+{
+case "3":
+	{ 
+	@Summary = $5
+	@Severity = 5 
+	@AlertKey = $alertkey
+	@Summary = $1 + " Source IP " + $4 + " Destination IP " + $5 
+	}
+case "4":
+	{
+	@Severity =3 
+	@AlertKey = $alertkey 
+	@Summary = $1 + " Source IP " + $4 + " Destination IP " + $5 
+	}
+case "5":
+	{
+	@AlertKey = $alertkey
+	@Severity = 2
+        $systemagent = extract($11, " [A-Za-z]+:([A-Z|a-z|0-9]+); .*")
+        $user = extract($11, " [.*]+:[.*]+; [.*]+:([A-Za-z0-9]+); .*")
+        $domain = extract($11, " [A-Za-z]+:[A-Za-z0-9]+; [A-Za-z]+:[A-Za-z0-9]+; [A-Za-z]+:([A-Z|a-z|0-9]+); .*")
+        #@Summary="The system agent " + $systemagent + " on host " + $NodeAlias + " reports that " + $user + " on domain " + $domain + " just performed the following action " + $1
+	@Summary = $1 + " Source IP " + $4 + " Destination IP " + $5 
+	}	
+default:
+	@Summary = $5 
+}
+$tempIdentifier = $Node + @Summary + $specific-trap + $generic-trap + $1 + $4 + $5
+$ruleset = "iss"

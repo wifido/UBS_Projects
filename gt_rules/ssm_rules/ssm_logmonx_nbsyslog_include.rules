@@ -1,0 +1,41 @@
+##################################################################################
+#
+#	ssm_logmonx_nbsyslog_include.rules
+#
+#	Date		Author		Description
+#	200602003		Chris Janes	Origional
+#
+##################################################################################
+
+        $logMonXHistoryLineNODATE = substr($logMonXHistoryLine, 17, 1000)
+        $logMonXHistoryLineDATE = substr($logMonXHistoryLine, 1, 16)
+        $logMonXHistoryLineSUBSYSTEM = extract($logMonXHistoryLineNODATE, "^[^ ]+ ([^:]+):.*$")
+
+        $logMonXHistoryLineEVENTID = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID ([0-9]+) [^]]+\] .*$")
+        $logMonXHistoryLineSUMMARY = extract($logMonXHistoryLineNODATE, "^[^ ]+ [^:]+: \[ID [^]]+\] (.*)$")
+
+	$ssmSummary = $logMonXHistoryLineSUMMARY
+	$TempDoLookup = 2
+	$ssmAppClass = 126040
+	$ssmAlertGroup = "/var/adm/messages"
+
+# Does this event have a unique PID associated with it?  If so, zap it to decrease uniqueness
+#
+	if (regmatch($logMonXHistoryLineSUBSYSTEM, "^[^[]+\[[0-9]+\]$"))  
+	{
+        	$ssmAlertKey = extract($logMonXHistoryLineSUBSYSTEM, "^([^[]+)\[[0-9]+\]$")
+	}
+	else  
+	{
+        	$ssmAlertKey = $logMonXHistoryLineSUBSYSTEM
+	}
+
+
+	if (nmatch($ssmSummary,"WARNING: Sorry, no swap space to grow"))
+	{
+	        $NoElements = split($ssmSummary, SplitArray, "\(")
+	        $tmpProcessName = SplitArray[2]
+	        $ssmSummary = "WARNING: Sorry, no swap space to grow stack for (" + $tmpProcessName
+	}
+
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $4 + $ssmAlertGroup + $ssmAlertKey + $ssmType + $ssmSummary

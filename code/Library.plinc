@@ -1,0 +1,179 @@
+########################################################################
+#
+#	This is an include file to carry  regularly used functions
+#
+#	Version	Date		Author		Details
+#	0.0	20080624	Chris Janes	Original
+#
+########################################################################
+
+
+#############################################################################
+#
+#	This sub send a netcool event to socket 2004 on host defined 
+#	in $Socket_Probe, the data to be sent must be definded in %Socket_Message
+#	the following global variable are required to be set
+#	$Socket_Probe
+#	%Socket_Message
+#
+#############################################################################
+
+our %LIB_Socket_Message;
+our $LIB_Socket_Probe;
+
+
+
+sub SendSocketEvent
+{
+
+	
+	socket('TO_SERVER', PF_INET, SOCK_STREAM,getprotobyname('tcp'));
+        # build the address of the remote machine
+	my $internet_addr;
+	my $remote_host;
+	
+	$internet_addr = inet_aton($LIB_Socket_Probe);
+	$remote_host = $Socket_Probe;
+
+
+	my $paddr = sockaddr_in(2004, $internet_addr);
+        $EventTime = time();
+
+        # connect
+	connect(TO_SERVER, $paddr) or die "could not connect to $Socket_Probe:Port 2004 : $!\n";
+	
+	# while we are connected send event	
+	foreach $key (keys %LIB_Socket_Message)
+	{
+		print TO_SERVER "'$key' '$LIB_Socket_Message{$key}'\n";
+	}
+	print TO_SERVER "\n";
+	print TO_SERVER "\n";
+	
+	# close socket
+	close(TO_SERVER);
+}
+
+
+#############################################################################
+
+sub GetHostName
+{
+#############################################################################
+#
+#	This sub returns the FQDN of the host on which this script is running
+#
+#############################################################################
+	system("uname -n | cut -f1 -d. > /tmp/tmppdhhostname");
+	open (HOST,"/tmp/tmppdhhostname")|| die "cannot open /tmp/tmppdhhostname file";
+	my @Hostname = <HOST>;	
+	close (HOST);
+	unlink "/tmp/tmppdhhostname" or die "Cannot delete tmppdhhostname\n";
+	my $Host =  (substr($Hostname[0], 0,length($Hostname[0])-1));
+	
+	my $Return = $Host;
+	return  $Return;
+}
+
+#############################################################################
+
+
+
+# $LIB_AppLogFile - Name of this apps logfile
+##our $LIB_AppLogFileName="/sbclocal/netcool/omnibus/log/";
+#our $LIB_AppLogFileName="LogFile";
+##our $LIB_PathAppLogFile="/sbclocal/netcool/omnibus/log/";
+#our $LIB_PathAppLogFile="/home/janesch/perl/cmdb/DataVerification/";
+## MaxLogFileSize - Maximum size of the logfile
+#our $LIB_MaxLogFileSize=1000000;
+
+sub logit
+{
+#############################################################################
+#
+#	This sub returns writes a log message
+#
+#############################################################################
+	my $str = $_[0];
+
+# Test that the logfile does exist (ot atleast can exist)
+if ($Verbose){ print "$LIB_PathAppLogFile$LIB_AppLogFileName.log\n";}
+	my $LIB_AppLogFile=$LIB_PathAppLogFile. $LIB_AppLogFileName . ".log";
+	system ("touch $LIB_AppLogFile");
+	if (-e $LIB_AppLogFile){}
+	else 
+	{ 
+		if ($_debug)
+		{
+			print "Unable to open $LIB_AppLogFile \n";
+		}
+		exit 0;
+	}
+
+# Make sure the logfile is an acceptable size
+
+	my @logfilestat  = stat($LIB_AppLogFile);
+	if ($logfilestat[7] > $LIB_MaxLogFileSize)
+	{
+		my $LIB_AppLogFileBackup = $LIB_AppLogFile."old";
+		if (-e $LIB_AppLogFileBackup)
+		{
+			unlink $LIB_AppLogFileBackup or die "Cannot delete $LIB_AppLogFileBackup\n";
+		}
+		system("mv $LIB_AppLogFile $LIB_AppLogFileBackup");
+		system ("touch $LIB_AppLogFile");
+	}	
+
+		
+# Write the message
+
+	chomp $str;
+	my $error_str = gmtime(time) . " " . $str . "\n";
+	open (APPLOG,">>$LIB_AppLogFile")|| die "cannot open $LIB_AppLogFile file";
+	print APPLOG $error_str;
+	close (APPLOG);
+}
+
+
+# Simple Email Function
+# ($LIB_MailTo, $LIB_MailFrom, $LIB_MailSubject, $LIB_MailMessage)
+our	$LIB_MailSubject;
+our	$LIB_MailMessage;
+our	$LIB_MailTo;
+our	$LIB_MailFrom;
+ 
+sub SendEmail
+{
+print "Entered sendEmail sub\n";
+
+	if not (defined ($LIB_MailFrom)){$LIB_MailFrom = "netcool\@ubs.com";}
+	if not (defined ($LIB_MailSubject)){$LIB_MailSubject = " ";}
+	if not (defined ($LIB_MailMessage)){$LIB_MailMessage = "Email Contemt not defined \n 2nd Line of Message";)}
+	if not (defined ($LIB_MailTo))
+	{
+		logit "Email has no Reciepient set";
+	}
+	else
+	{
+		my $sendmail = '/usr/lib/sendmail';
+
+			print  "From: $LIB_MailFrom\n";
+			print  "To: $to\n";
+			print  "Subject: $subject\n\n";
+			print  "$message\n";
+
+		if(-e $sendmail)
+		{
+			open(MAIL, "|$sendmail -oi -t");
+			print MAIL "From: $LIB_MailFrom\n";
+			print MAIL "To: $to\n";
+			print MAIL "Subject: $subject\n\n";
+			print MAIL "$message\n";
+			close(MAIL);
+		}
+		else
+		{
+			logit "Can't find $sendmail";
+		}
+	}
+} 

@@ -1,0 +1,56 @@
+#################################################################################
+#
+#	diskusage.rule	Chris janes of Abilitec with Peter Diffey
+#
+#	V 1.0	20081205	Chris Janes		
+#				Original
+#
+#################################################################################
+
+
+case "2600000":
+		$ruleset = $ruleset + " Disk Usage"
+		@Agent = $Transport
+		@Summary = $MessageText
+#		@Class = $ClassID
+		if (exists($Userint) && int($Userint) > 0)
+		{
+			@Class = $Userint
+		}
+		else
+		{
+			@Class = 2600000
+			@Summary = "No Class Received - " + @Summary
+		}
+		# Mahesh Kumar, TD #5252
+		# Now set the OwenrGID by looking up SocketClassGID table
+		# TempDoLookup set to 2, OwnerGID will not be overwritten
+		@OwnerGID = lookup(@Class, SocketClassGID)
+		$TempDoLookup = 2
+		@Stream = $Stream
+		$temp_length_location = length($Location)
+		if (exists($Location) && int($temp_length_location) > 0)
+		{
+			@Location = $Location
+		}
+		@Environment = $Environment
+		@Subclass = $Subclass
+		@UserData = $Userdata
+		@UserInt = $Userint
+		@SAPNumber = $SAPnumber
+                @SourceKey=$SourceKey
+                @RemData1=$RemData1
+		@RemData2=$RemData2
+		if (exists($Component))
+		{
+			@AlertKey = $Component
+		}
+		else
+		{
+			@AlertKey = $SAPname
+		}
+		@AlertGroup = $EventIdentifier
+		if (exists($ProcessID) && int($ProcessID) > 0)
+		{
+			@AlertGroup = $EventIdentifier + "-" + $ProcessID
+		}

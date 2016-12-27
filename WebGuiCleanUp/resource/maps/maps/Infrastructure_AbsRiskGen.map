@@ -1,0 +1,3 @@
+map(name="Infrastructure_AbsRiskGen",bgImage="Infrastructure_ABSRiskGen .jpg",bgColor="white",w="1100",h="610",acl="*")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="446",x="559",w="50",entity="sstm1271pap",font="Helvetica",size="10",flash="true",action="Lightweight Event List (LEL)",h="25",style="p",target="_self",name="visual_2")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="197",x="524",w="50",entity="snyc2222pap",font="Helvetica",size="10",flash="true",action="Lightweight Event List (LEL)",h="25",style="p",target="_self",name="visual_1")

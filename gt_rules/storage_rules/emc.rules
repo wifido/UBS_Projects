@@ -1,0 +1,640 @@
+# include file for EMC CX arrays
+case "EMC-CLARiiON":
+	$ruleset = $ruleset + "emc-" + $enterprise-name
+	# MK 05Aug2009
+	@Summary = "CX Array - " + $1 + ": " + $4 + ": " + $2
+	$tempIdentifier = $Node + $4 + $1
+
+	@AlertGroup = "CX Array"
+
+	@AlertKey = "STORAGE"
+	@OwnerGID = 542
+	@OwnerUID=65534
+	@Class = 128000
+	$TempDoLookup=2
+	@Type = 1
+
+#	20091118 GT BR_670 Added CX Array Serial number to UserData2.
+	@UserData2 = $5
+#	20091118 End of change.
+
+	if (match($OID3,".1.3.6.1.4.1.1981.1.4.5")) 
+	{
+		$ruleset = $ruleset + " Match OID3"
+	  	if (regmatch($3_raw, "^[2346][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 1"
+	    		$i = substr($3_raw,3,1)
+			$ruleset = $ruleset + " $i=" + $i
+	    		if (int($i) >= 0 && int($i) <= 3) 
+			{
+	      			@Severity = 2
+	    		} 
+			else if (int($i) >= 4 && int($i) <= 7) 
+			{
+	      			@Severity = 3
+	    		} 
+			else if (int($i) >= 8 || (regmatch($i, "[a-cA-C]"))) 
+			{
+	      			@Severity = 4
+	    		} 
+			else if (regmatch($i, "[d-fD-F]")) 
+			{
+	      			@Severity = 5
+	    		}
+	  	} 
+		else if (regmatch($3_raw, "^[67][a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 2"
+	    		@Severity = 2
+	  	} 
+		else if (regmatch($3_raw, "^8[a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 3"
+	    		@Severity = 3
+	  	} 
+		else if (regmatch($3_raw, "^9[a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 4"
+	    		@Severity = 4
+	  	} 
+		else if (regmatch($3_raw, "^[aA][a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 5"
+	    		@Severity = 5
+	  	} 
+		else if (regmatch($3_raw, "^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 6"
+	    		$p = substr($3_raw,5,1)
+			$ruleset = $ruleset + " $p=" + $p
+	    		if (int($p) == 0) 
+			{
+	      			$ruleset = $ruleset + " $p match 1"
+				@Severity = 2
+	    		} 
+			else if (int($p) == 4) 
+			{
+	      			$ruleset = $ruleset + " $p match 2"
+	      			@Severity = 3
+			} 
+			else if (int($p) == 8) 
+			{
+	      			$ruleset = $ruleset + " $p match 3"
+	      			@Severity = 4
+	    		} 
+			else if (regmatch($p, "[cC]")) 
+			{
+	      			$ruleset = $ruleset + " $p match 4"
+	      			@Severity = 5
+	    		}
+	  	}
+
+#	20080414	Addition by Chris Janes of Abilitec TD 4709 
+		else if (regmatch($3_raw, "^[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]$")) 
+		{
+			$ruleset = $ruleset + " $3 match 7"
+			@UserData = $3_raw
+	    		$p = substr($3_raw,5,1)
+			$ruleset = $ruleset + " $p=" + $p
+	    		if (int($p) == 0) 
+			{
+	      			$ruleset = $ruleset + " $p match 1"
+				@Severity = 2
+	    		} 
+			else if (int($p) == 4) 
+			{
+	      			$ruleset = $ruleset + " $p match 2"
+	      			@Severity = 3
+			} 
+			else if (int($p) == 8) 
+			{
+	      			$ruleset = $ruleset + " $p match 3"
+	      			@Severity = 4
+	    		} 
+			else if (regmatch($p, "[cC]")) 
+			{
+	      			$ruleset = $ruleset + " $p match 4"
+	      			@Severity = 5
+	    		}
+	  	} 
+
+#	20080414	End of Additions
+		else 
+		{
+			$ruleset = $ruleset + " $3 not match"
+	    		@Summary = $4_raw
+
+#			20080307 Change by Chris Janes of Abilitec
+
+			@UserData = $3_raw
+
+#			20080307	End of Change
+	  	}
+	} 
+	else 
+	{
+		$ruleset = $ruleset + " Not Match OID3"
+		@Summary = $OID3
+	}
+	$ruleset = $ruleset + " ST=" + $specific-trap
+        switch($specific-trap) 
+	{
+		case "1": ### connUnitStatusChange
+			$connUnitStatus = $1
+			switch($connUnitStatus)
+			{
+				case "2":
+					$txt_connUnitStatus = "Unused"
+				case "3":
+					$txt_connUnitStatus = "OK"
+				case "4":
+					$txt_connUnitStatus = "Warning"
+				case "5":
+					$txt_connUnitStatus = "Failed"
+				default:
+					$txt_connUnitStatus = "Unknown"
+			}
+			$connUnitState = $2
+                        switch($connUnitStatus)
+                        {
+                                case "2":
+					$txt_connUnitState = "Online"
+				case "3":
+					$txt_connUnitState = "Offline"
+                               default:
+                                        $txt_connUnitState = "Unknown"
+			}
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+ 
+		case "2": ### Not Used
+			@Description = "Not Used ???"
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+
+		case "3": ### connUnitDeletedTrap
+			$connUnitId = $1
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+
+		case "4": ### connUnitEventTrap
+			$connUnitEventId = $1
+			$connUnitEventType = $2
+			switch($connUnitEventType)
+			{
+				case "2":
+					$txt_connUnitEventType = "Other"
+				case "3":
+					$txt_connUnitEventType = "Status"
+				case "4":
+					$txt_connUnitEventType = "Configuration"
+				case "5":
+					$txt_connUnitEventType = "Topology"
+				default:
+					$txt_connUnitEventType = "Unknown"
+			}
+			$connUnitEventObject = $3
+			$connUnitEventDescr = $4
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+			# GT 25 Aug 2009 . Start. this bit commented out for time being.
+			#GT## MK 05Aug2009 - Start
+			#GT#if( (nmatch($4,"Soft SCSI Bus Error")) && (nmatch($3,"801")) )
+			#GT#{
+			   #GT#$tempMarkForDiscard = 2 
+			#GT#}	
+			#GT## MK 05Aug2009 - End
+			#GT 20090825 End.
+
+
+		case "5": ### connUnitSensorStatusChange
+			$connUnitSensorStatus = $1
+                        switch($connUnitSensorStatus)
+                        {
+                                case "2":
+                                        $txt_connUnitSensorStatus = "Other"
+                                case "3":
+                                        $txt_connUnitSensorStatus = "OK"
+                                case "4":
+                                        $txt_connUnitSensorStatus = "Warning"
+                                case "5":
+                                        $txt_connUnitSensorStatus = "failed"
+                                default:
+                                        $txt_connUnitSensorStatus = "Unknown"
+                        }
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+			# MK 05Aug2009 - Start
+			if( (regmatch($4,"^VSC Shutdown\/Removed$")) && (nmatch($3,"904")) )
+			{
+			   $tempMarkForDiscard = 2 
+			}	
+			else if( (nmatch($4,"Unit Shutdown")) && (nmatch($3,"906")) )
+			{
+			   $tempMarkForDiscard = 2 
+			}	
+			# 20091102 GT BR 670.
+			#else if( (nmatch($4,"SPS Removed")) && (nmatch($3,"90d")) )
+			#{
+			   #$tempMarkForDiscard = 2 
+			#}	
+			# 20091102 GT end of change.
+			else if( (regmatch($4,"^K10PsmFileImpl::GetFile:.*$")) && (nmatch($3,"7600800c")) )
+			{
+			   $tempMarkForDiscard = 2 
+			}	
+			# MK 05Aug2009 - End
+
+		case "6": ### connUnitPortStatusChange
+			$connUnitPortStatus = $1
+                        switch($connUnitPortStatus)
+                        {
+                                case "2":
+                                        $txt_connUnitPortStatus = "Unused"
+                                case "3":
+                                        $txt_connUnitPortStatus = "Ready"
+                                case "4":
+                                        $txt_connUnitPortStatus = "Warning"
+                                case "5":
+                                        $txt_connUnitPortStatus = "Failure"
+                                case "6":
+                                        $txt_connUnitPortStatus = "Not Participating"
+                                case "7":
+                                        $txt_connUnitPortStatus = "Initializing"
+                                case "8":
+                                        $txt_connUnitPortStatus = "Bypass"
+                                case "9":
+                                        $txt_connUnitPortStatus = "OLS"
+                                case "10":
+					$txt_connUnitPortStatus = "Other"
+                                default:
+                                        $txt_connUnitPortStatus = "Unknown"
+                        }
+ 
+			$connUnitPortState = $2
+                        switch($connUnitPortState)
+                        {
+                                case "2":
+                                        $txt_connUnitPortState = "Online"
+                                case "3":
+                                        $txt_connUnitPortState = "Offline"
+                                case "4":
+                                        $txt_connUnitPortState = "Bypassed"
+                                case "5":
+                                        $txt_connUnitPortState = "Diagnostics"
+                                default:
+                                        $txt_connUnitPortState = "Unknown"
+                        }
+			# MK 05Aug2009
+			if( (nmatch($4,"CRU Powered Down")) && (nmatch($3,"a07")) )
+			{
+			   $tempMarkForDiscard = 2 
+			}	
+			@Description = "$1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4 + " $5 = " + $5 + " $6 = " + $6
+		default:
+			@Description = "Specific Trap (" + $specific-trap + ") Unknown.  $1 = " + $1 + " $2 = " + $2 + " $3 = " + $3 + " $4 = " + $4
+
+	}
+######
+# mcData include file
+######
+case "mcData":
+	@OwnerGID = 542
+	@OwnerUID=65534
+	@Class = 128020
+	$TempDoLookup=2
+	$ruleset = $ruleset + "emc-" + $enterprise-name + " ST=" + $specific-trap
+	switch($specific-trap) {
+		case "1": ### - es1000PortBportScn
+			# SNMPv1
+			# An ed1032PortScn(1) is generated      whenever a Fc_Port changes its operational state.
+			# For instance, the Fc_Port goes from on-line to offline.
+				$ed1032PortOpStatus = $1
+			@AlertGroup = "mcData.mcDataV1traps"
+			@Agent = "mcData"
+			@Summary = "es1000PortBportScn"
+			@Severity = 1
+			@Type = 1
+			@Identifier = @Node + @Summary
+
+		case "2": ### - es1000PortHportScn
+			# SNMPv1
+			# An ed1032FruScn(2) is generated      whenever a FRU status changes its operational state.
+				$ed1032FruStatus = $1
+			@AlertGroup = "mcData.mcDataV1traps"
+			@Agent = "mcData"
+			@Summary = "es1000PortHportScn"
+			@Severity = 1
+			@Type = 1
+			@Identifier = @Node + @Summary
+
+		case "3": ### - es1000CompScn
+			# SNMPv1
+			# An fcEosPortBindingViolation(3) is generated         whenever the switch detects that a port binding violation occurs.
+				$fcEosPortAttachedWWN = $1
+			@AlertGroup = "mcData.mcDataV1traps"
+			@Agent = "mcData"
+			@Summary = "es1000CompScn"
+			@Severity = 1
+			@Type = 1
+			@Identifier = @Node + @Summary
+
+		case "4": ### - fcEosThresholdAlert
+			# SNMPv1
+			# An fcEosThresholdAlert(4) is generated         whenever a threshold alert occurs.
+				$fcEosPortIndex = $1
+				$fcEosTAIndex = $2
+			@AlertGroup = "mcData.mcDataV1traps"
+			@Agent = "mcData"
+			@Summary = "fcEosThresholdAlert"
+			@Severity = 1
+			@Type = 1
+			@Identifier = @Node + @Summary
+
+		default:
+			$ruleset = $ruleset + " default case"
+			@Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+			@Identifier = @Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager
+			@Severity = 1
+	}
+
+
+######
+# include file for emc connectrix switches/managers
+######
+case "emc-fcMgmtMIB":
+  $ruleset = $ruleset + "emc-" + $enterprise-name + " ST=" + $specific-trap
+  @OwnerGID = 542
+  @OwnerUID=65534
+  @Class = 128030
+  $TempDoLookup=2
+
+  $switch_id = extract($OID1, "^\.1\.3\.6\.1\.2\.1\.8888\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.(.*)\.[0-9]+$")
+  $canonhost = extract($PeerAddress,"^([^.]+)")
+  $key = $canonhost + ":" + $switch_id
+  $switchname = lookup($key,DeviceLookup)
+
+  @AlertKey = "FABRIC"
+  switch($specific-trap) {
+  case "1": ### - fcConnUnitStatusChange
+    # SNMPv2
+    # The overall status of the connectivity unit has changed.
+    # Recommended severity level (for filtering): alert
+    [$fcConnUnitStatus,$throwMe1,$throwMe2] = lookup("fcConnUnitStatus." + $1,FabricMisc)
+    if(match($fcConnUnitStatus,"UNKNOWN")) {
+      $fcConnUnitStatus = $1
+    } else {
+      $fcConnUnitStatus = $fcConnUnitStatus + " ( " + $1 + " )"
+    }
+    [$fcConnUnitState,$throwMe1,$throwMe2] = lookup("fcConnUnitState." + $2,FabricMisc)
+    if(match($fcConnUnitState,"UNKNOWN")) {
+      $fcConnUnitState = $2
+    } else {
+      $fcConnUnitState = $fcConnUnitState + " ( " + $2 + " )"
+    }
+    @AlertGroup = "mgmt.mib-2.fcMgmtMIB.fcMgmtNotifications"
+    @Agent = "generic"
+    @Summary = "fcConnUnitStatusChange"
+    @Severity = 1
+    @Type = 1
+    @Identifier = @Node + @Summary
+
+  case "2": ### - fcConnUnitDeletedTrap
+    # SNMPv2
+    # An fcConnUnit has been deleted from this agent.
+    # Recommended severity level (for filtering): warning
+    $fcConnUnitGlobalId = $1
+    @AlertGroup = "mgmt.mib-2.fcMgmtMIB.fcMgmtNotifications"
+    @Agent = "generic"
+    @Summary = "fcConnUnitDeletedTrap"
+    @Severity = 1
+    @Type = 1
+    @Identifier = @Node + @Summary
+
+  case "3": ### - fcConnUnitEventTrap
+    # SNMPv2
+    # An event has been generated by the connectivity unit.
+    # Recommended severity level (for filtering): info
+    $fcConnUnitGlobalId = $1
+    $fcConnUnitEventObject = $3
+    $fcConnUnitEventDescr = $4
+    [$fcConnUnitEventType,$throwMe1,$throwMe2] = lookup("fcConnUnitEventType." + $2,FabricMisc)
+    if(match($fcConnUnitEventType,"UNKNOWN")) {
+      $fcConnUnitEventType = $2
+    } else {
+      $fcConnUnitEventType = $fcConnUnitEventType + " ( " + $2 + " )"
+    }
+    $errorcode = extract($fcConnUnitEventDescr,"^Reason code ([0-9]+)")
+    [@Severity, @Summary] = lookup($errorcode,FabricEvent)
+    if(match(@Severity,"0")) {
+      @Severity = "1"
+    } 
+    if(match(@Summary,"")) {
+      @Summary = "Unknown error: " + $errorcode
+    } #else {
+      #@Summary = @Summary + " (" + $errorcode + ")"
+    #}
+    @AlertGroup = "mgmt.mib-2.fcMgmtMIB.fcMgmtNotifications"
+    @Agent = "generic"
+    #@Summary = "fcConnUnitEventTrap " + $fcConnUnitEventDescr + " " + $error + " " + $errorcode
+    #@Summary = $error
+    #@Severity = 1
+    @Type = 1
+    @Identifier = @Node + @Summary
+
+  case "4": ### - fcConnUnitSensorStatusChange
+    # SNMPv2
+    # The overall status of the connectivity unit has changed.
+    # Recommended severity level (for filtering): alert
+    [$fcConnUnitSensorStatus,$throwMe1,$throwMe2] = lookup("fcConnUnitSensorStatus." + $1,FabricMisc)
+    if(match($fcConnUnitSensorStatus,"UNKNOWN")) {
+      $fcConnUnitSensorStatus = $1
+    } else {
+      $fcConnUnitSensorStatus = $fcConnUnitSensorStatus + " ( " + $1 + " )"
+    }
+    @AlertGroup = "mgmt.mib-2.fcMgmtMIB.fcMgmtNotifications"
+    @Agent = "generic"
+    @Summary = "fcConnUnitSensorStatusChange"
+    @Severity = 1
+    @Type = 1
+    @Identifier = @Node + @Summary
+
+  case "5": ### - fcConnUnitPortStatusChange
+    # SNMPv2
+    # The overall status of the connectivity unit has changed.
+    # Recommended severity level (for filtering): alert
+    [$fcConnUnitPortStatus,$throwMe1,$throwMe2] = lookup("fcConnUnitPortStatus." + $1,FabricMisc)
+    if(match($fcConnUnitPortStatus,"UNKNOWN")) {
+      $fcConnUnitPortStatus = $2
+    } 
+    [$fcConnUnitPortState,$throwMe1,$throwMe2] = lookup("fcConnUnitPortState." + $2,FabricMisc)
+    if(match($fcConnUnitPortState,"UNKNOWN")) {
+      $fcConnUnitPortState = $2
+    } 
+    $temp = extract($OID1,".*\.([0-9]+)")
+    $portnum = int($temp)-1
+    @AlertGroup = "mgmt.mib-2.fcMgmtMIB.fcMgmtNotifications"
+    @Agent = "generic"
+    if (match($switchname, "Unknown")) {
+      #@Summary = "Port " + $portnum + " on switch " + $switchname + " is " + $fcConnUnitPortState + ". Status is " + $fcConnUnitPortStatus + " " + $switch_id + " " + $switchname + " " + $key
+      @Summary = "Port " + $portnum + " is " + $fcConnUnitPortState + ". Status is " + $fcConnUnitPortStatus 
+    } else {
+      @Summary = "Port " + $portnum + " on switch " + $switchname + " is " + $fcConnUnitPortState + ". Status is " + $fcConnUnitPortStatus
+    }
+    if (match($fcConnUnitPortStatus,"failure")) {
+      @Severity = 5
+    } else if (match($fcConnUnitPortStatus,"warning")) {
+      @Severity = 4
+    } else {
+      @Severity = 3
+    }
+    @Type = 1
+    @Identifier = @Node + @Summary
+
+  default:
+    @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+    @Identifier = @Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager
+    @Severity = 1
+    $ruleset = $ruleset + " case default"
+  }
+
+case "centera.notificationTrap":
+######################################################################################################
+#
+#	Centera.MIB: EMC BDG Centera Manager MIB, version 2.0.1
+#	LAST-UPDATED "200303121252Z"
+#
+######################################################################################################
+
+	$notifyTimestamp = $1		# The timestamp of the notification
+	$notifyServer = $2		# The cluster ID
+	$notifyDescription = $3		# A complete description of the event
+	$notifySeverity = $4		# The severity level of the event
+
+    @Agent = "Centera"
+    @AlertGroup = $notifyServer
+    @AlertKey = ""
+    @Summary = $notifyDescription
+#	20071108	Changes by Chris Janes of Abilitec for Dave Pamedis/Simon Hull
+	if(nmatch(@Summary,"The Centera cluster is healthy."))
+	{
+		$tempMarkForDiscard = 2
+	}
+
+#	20071108 	End of Changes
+
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128010
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "emc-centera" + " ST=" + $specific-trap
+    switch ($notifySeverity)  {
+        case "1":
+            @Severity = 2
+            @Type = 2
+#	20091123 GT BR_670 Modified all Centera events to be Major.
+        #case "2":
+            #@Severity = 3
+            #@Type = 1
+        #case "3":
+	case "2" | "3":
+            @Severity = 4
+            @Type = 1
+#	20091123 GT End of change.
+        default:
+    }
+    switch ($specific-trap)  {
+        case "1":
+        case "2":
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey + @Summary
+
+case "ecc.notificationTrap":
+
+#
+#  EMC ControlCenter Integration for Micromuse NetCool
+#  Copyright (c) 2001 EMC Corporation
+#
+#  EMC ControlCenter event rules
+#
+
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128080
+    $TempDoLookup = 2
+    $ruleset = $ruleset + "emc-" + $enterprise-name + " ST=" + $specific-trap
+
+    switch ($specific-trap)  {
+        case "1":
+	    # connUnitStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitStatus." + $1, FabricMisc)
+	    [$tempState,$throwMe3,$throwMe4] = lookup("fcConnUnitState." + $2, FabricMisc)
+	    [$connUnitType,$throwMe5,$throwMe6] = lookup("fcConnUnitType." + $4, FabricMisc)
+    	    @Summary = "Unit " + $3 + " status changed to " + $tempStatus
+	    @AlertGroup = $connUnitType
+	    @AlertKey = $3
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+        case "3":
+	    # connUnitDeletedTrap
+    	    @Summary = "Connection Unit " + $1 + " deleted"
+    	    @Severity = 2
+	    @Type = 1
+	    @AlertGroup = "UnitDeleted"
+	    @AlertKey = $1
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+        case "4":
+	    # connUnitEventTrap
+	    [$tempSev,@Severity,@Type] = lookup("fcConnUnitEventSeverity." + $5, FabricMisc)
+	    [$tempEVType,$throwMe3,$throwMe4] = lookup("fcConnUnitEventType." + $2, FabricMisc)
+	    [$connUnitType,$throwMe5,$throwMe6] = lookup("fcConnUnitType." + $7, FabricMisc)
+	    @AlertGroup = $connUnitType
+	    if (regmatch($4, "^(\[[^]]+\] ?)+.?$"))  
+	    {
+		$ruleset = $ruleset + " $4 Match"
+		$alertId = extract($4, "^[^:]+: ([^]]+)\] \[[^]]+\] \[[^]]+\] \[[^]]+\].?$")
+		$alertObj = extract($4, "^\[[^]]+\] \[[^]]+\] [^:]+: ([^]]+)\] \[[^]]+\].?$")
+		$alertDesc = extract($4, "^\[[^]]+\] \[[^]]+\] \[[^]]+\] [^:]+: ([^]]+)\].?$")
+	        @Summary = $alertDesc
+	        @AlertKey = $alertObj + ":" + $alertId + ":" + $7
+	    }
+	    else  
+	    {
+		$ruleset = $ruleset + " $4 Not Match"
+		$alertDesc = $4
+	        @Summary = $alertDesc
+	        @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\.[^.]+\.[^.]+\.[^.]+\.(.*)$") + ":" + $7
+	    }
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+        case "5":
+	    # connUnitSensorStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitSensorStatus." + $1, FabricMisc)
+    	    @Summary = "Sensor status changed to " + $tempStatus
+	    @AlertGroup = "SensorStatus"
+	    @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\.[^.]+\.[^.]+\.[^.]+\.(.*)$")
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+        case "6":
+	    # connUnitPortStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitPortStatus." + $1, FabricMisc)
+	    [$tempState,$throwMe3,$throwMe4] = lookup("fcConnUnitState." + $2, FabricMisc)
+	    @AlertGroup = "PortStatus"
+	    @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\..*\.([^.]+)$")
+    	    @Summary = "Port " + @AlertKey + " status changed to " + $tempState
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $ruleset = $ruleset + " case default"
+	    $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            # Mahesh Kumar TD #5265
+	    @Description = '$1 = ' + $1 + ' $2 = ' + $2 + ' $3 = ' + $3 + ' $4 = ' + $4
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+

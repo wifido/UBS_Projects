@@ -1,0 +1,103 @@
+#
+# VhaYU Market Data System rules incluce file
+# Chris Janes - Abilitec - 20050629
+# 	
+
+case "vhayuTraps":
+
+	# Set up some generic stuff here.
+        $ruleset = $ruleset + "-vhayuTraps"
+        @Manager = %Manager
+        @Agent = "vhayuTraps "
+
+
+	#Specific rules start here	
+	
+	@OwnerGID = 609
+	@OwnerUID = 65534
+	@Class = 1057481
+	$TempDoLookup = 2
+
+		$ruleset = $ruleset + "-sev:" + $1
+	#Mapping vhayuMsgLogType to Severity	
+	switch ($1)
+	{
+		case "0":
+			@Severity = 5
+		case "1":
+			@Severity = 2
+		case "2":
+			@Severity = 3
+		case "3":
+			@Severity = 4
+		case "4":
+			@Severity = 2
+		default:
+		        $ruleset = $ruleset + "-:default"
+			@Severity = 5
+	}
+
+#	20070110	Changes made by Chris Janes of Abilitec
+	@Type = 1
+#	20070110	End of Changes
+
+
+#	Changes made by Chris Janes of Abilitec
+#	#Mapping vhayuMsgLogMachineName to alert group
+#	@AlertGroup = $2
+#
+#	#Mapping vhayuMsgLogSource to alert key
+#	@AlertKey = $3
+#
+#	#Mapping vhayuMsgLogdescription to summary
+#	@Summary = $4
+#
+
+#       Mapping vhayuMsgLogSource to alert group
+	@AlertGroup = $3
+
+#	20080917	Change by Chris Janes of Abilitec	TD 5052
+## for debug
+#@UserData = $4
+## end debug
+#	20080917	End of Change
+
+#	Extract from $4	
+#	$VhayuMessageText = extract ($4, "^[^,],[^,],[^,],[^,],[^,],[^,](.*)$")
+#	$VhayuMessageNumber = extract ($4, "^[^,],[^,],[^,],([^,]),[^,],[^,].*$")
+#	$VhayuSeverity = extract ($4, "^[^,],[^,],[^,],[^,],([^,]),[^,].*$")
+
+	$CountElements = split($4, SplitArray,",")
+
+#	20080917	Change by Chris Janes of Abilitec	TD 5052
+## for debug
+#@UserInt=$CountElements
+## end debug
+#	20080917	End of Change
+
+	$VhayuMessageNumber = SplitArray[6] 
+	$VhayuSeverity = SplitArray[7]
+	switch($CountElements )
+	{
+		case "9":
+			$VhayuMessageText = SplitArray[8] + SplitArray[9]
+		case "10":
+			$VhayuMessageText = SplitArray[8] + SplitArray[9] + SplitArray[10]
+		default:	
+			$VhayuMessageText = SplitArray[8]
+	} 
+	@AlertKey = $VhayuMessageNumber
+	@Summary = $VhayuSeverity + " " + $VhayuMessageText
+
+#	20060406	Addition by Chris Janes of Abilitec
+#	20060531	Changes by Chris Janes of Abilitec HDLDN0000431775
+#	$ShortSummary = substr($4, 21, 233)
+	$ShortSummary = SplitArray[3] + SplitArray[5] + SplitArray[6] + SplitArray[7] + $VhayuMessageText
+#	20060531	End of Changes
+
+		
+	$tempIdentifier = @Node + " " + @Manager + " " + @AlertGroup + " " + @Type + " " + @AlertKey + $ShortSummary
+#	$tempIdentifier = @Node + " " + @Manager + " " + @AlertGroup + " " + @Type + " " + @AlertKey + @Summary
+#	$tempIdentifier = @Node + " " + @Manager + " " + @AlertGroup + " " + @Type + " " + @AlertKey
+	
+

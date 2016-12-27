@@ -1,0 +1,3 @@
+map(name="ritu",bgColor="#99ffcc",w=250,h=250,acl="*")
+text(name="visual_2",label="untitled",x=96,y=194,action="Open URL",url="http://ncdevwebtop/support/",target="_blank",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=15,justify="center",style="b",color="black")
+button(name="visual_1",label="Oasis",x=87,y=91,action="ael",url="",target="_self",entity="testritu",datasource="NCOMS",flash="true",w=50,h=25,type="rectangle",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="+_fontStyle+")

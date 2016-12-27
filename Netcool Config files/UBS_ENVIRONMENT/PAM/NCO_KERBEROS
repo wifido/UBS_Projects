@@ -1,0 +1,7 @@
+#
+# PAM Configuration for the Netcool/OMNIbus ObjectServer.
+#
+## Settings for Kerberos
+auth       required     pam_stack.so service=system-auth
+account    required     pam_stack.so service=system-auth
+#password   required     pam_stack.so service=system-auth

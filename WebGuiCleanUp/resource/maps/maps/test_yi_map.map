@@ -1,0 +1,2 @@
+map(name="test_yi_map",bgColor="white",w=250,h=250,numCols=4,acl="*")
+monitor(name="visual_3",label="untitled",x=57,y=73,translucency=0,show shadow=false,action="Open URL",url="",target="_self",filter="test_yi",filtertype="system",datasource="NCOMS",flash="true",w=100,h=50,w=100,h=50,type="lavalamp",show label=true,show total=false,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Dialog,size=11,style=p,show highest severity as border=false,show lowest color=false)

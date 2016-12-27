@@ -1,0 +1,28 @@
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias pss='ps'
+
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# Source the Micromuse environment
+
+MUSE_BASE=/sbclocal/netcool
+OMNIHOME=${MUSE_BASE}/omnibus
+
+export MUSE_BASE OMNIHOME
+if [ -f /sbclocal/netcool/omnibus/etc/omniprof ]; then
+	. /sbclocal/netcool/omnibus/etc/omniprof
+fi
+
+
+# Put here so that group permissions are retained 
+umask -p 2

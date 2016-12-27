@@ -1,0 +1,8 @@
+table citra_class = 
+{
+	{"Remedy Experience","1057419","3600"}
+	{"Remedy_Experience_RaiseTickets","1057419","3600"}
+	{"BO","1057419","25200"}
+	{"Webtop Experience","0","7200"}
+}
+default = {"49930","0"}

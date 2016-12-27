@@ -1,0 +1,35 @@
+###############################################################################
+#
+#    Copyright (C) 1994 - 2004 Micromuse, Inc.
+#    All Rights Reserved
+#
+#    RESTRICTED RIGHTS:
+#
+#    This file may have been supplied under a license.  It may be used,
+#    disclosed, and/or copied only as permitted under such license agreement.
+#    Any copy must contain the above copyright notice and this restricted
+#    rights notice.  Use, copying, and/or disclosure of the file is strictly
+#    prohibited unless otherwise provided in the license agreement.
+#
+#
+###############################################################################
+#
+#   ssm_logmonx_app_include_x.rules Chris Janes of Abilitec 19th August 2005, late on a Friday Afternoon! 
+#
+#	This is an include for netcool-ssm.include.snmp.rules to deal with Events generaled
+#	by Netcool SSM's from Application Log Files
+#
+#	Origional	Chris Janes	Abilitec	19th August 2005
+#
+#
+###############################################################################
+
+
+$ssmSummary = $logMonXHistoryLine
+$ssmAppClass = extract($logMonXControlDescription, '^[^:]+:([^:]+):[^:]+:[^:]+:[^:]+$')
+@Subclass = extract($logMonXControlDescription, '^[^:]+:[^:]+:([^:]+):[^:]+:[^:]+$')
+@SystemDesig = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:([^:]+):[^:]+$')
+$ssmShortDesc = extract($logMonXControlDescription, '^[^:]+:[^:]+:[^:]+:[^:]+:([^:]+)$')
+$ssmAlertGroup = $ssmShortDesc
+$ssmAlertKey = $logMonXControlLogFile
+

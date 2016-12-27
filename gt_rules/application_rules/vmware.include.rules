@@ -1,0 +1,96 @@
+###################################################################################
+#
+#	vmware.rules
+#
+#	20070207	Chris Janes of Abilitec
+#
+###################################################################################
+
+case "vmware" :
+	$ruleset = $ruleset + ":VMware"
+#	Change by Chris Janes of Abilitec TD 4851
+#       20080523        Change by Chris Janes of Abilitec       TD 4851#	@Class = 999999
+#	@Class = 2045669
+#	@OwnerGID = 0
+	if(match($community, "REMAX"))
+	{
+		$vm_community = "REMAX"
+	}
+	else if(nmatch($community, "ESX"))
+	{
+		$vm_community = lookup(@NodeAlias, ESX_Swiss_Table)
+	}
+	else
+	{
+		$vm_community = "VMWARE"
+	}
+        [@Class, @OwnerGID] = lookup($vm_community, MttrapdClassGID)
+
+#	20080917	Change by Chris Janes of Abilitec	TD 5052
+#@Description = @Class + "    " + @OwnerGID
+#	20080917	End of Change
+
+#	20080730	Change by Chris Janes of Abilitec
+	$TempDoLookup = 2
+
+#	20080730	End of Change
+#	20080523	End of Change
+
+	$ruleset = $ruleset + " ST = " + $specific-trap 
+	switch ($specific-trap) 
+	{
+	case "1":
+            	@Summary = "Virtual machine " + $1 + " has been powered ON from a suspended  or a powered off state "  
+            	@Severity = 2
+            	@Type = 2
+		@AlertGroup = "vmExistance"
+		@AlertKey = $2
+		
+	case "2":
+            	@Summary = "Virtual machine " + $1 + " has been powered OFF "  
+            	@Severity = 4
+            	@Type = 1
+		@AlertGroup = "vmExistance"
+		@AlertKey = $2
+		
+	case "3":
+            	@Summary = "Virtual machine " + $1 + " has detected a loss in guest heartbeat "  
+            	@Severity = 2
+            	@Type = 1
+		@AlertGroup = "vmHeartbeat"
+		@AlertKey = $2
+
+#	20080903	Change by Chris Janes of Abilitec TD 5037
+		$tempMarkForDiscard = 2
+
+#	20080903	End of Changes
+		
+	case "4":
+            	@Summary = "Virtual machine " + $1 + " has detected or regains the guest heartbeat "  
+            	@Severity = 1
+            	@Type = 2
+		@AlertGroup = "vmHeartbeat"
+		@AlertKey = $2
+		
+#	20080903	Change by Chris Janes of Abilitec TD 5037
+		$tempMarkForDiscard = 2
+
+#	20080903	End of Changes
+		
+
+	case "5":
+            	@Summary = "Virtual machine " + $1 + " has been suspended "  
+            	@Severity = 3
+            	@Type = 1
+		@AlertGroup = "vmExistance"
+		@AlertKey = $2
+		
+	default:
+            	@Summary = "Unknown Specific Trap Number (" + $specific-trap + ") Received for Enterprise " + $enterprise
+            	@Severity = 1
+            	@Identifier = @Node + " " + @Agent + " " + @Manager + " " + $enterprise + " " + @AlertGroup + @AlertKey + @Type
+        	@UserInt = $1
+		@UserData = $2    
+		@Subclass = $OID2    
+            	include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+	}

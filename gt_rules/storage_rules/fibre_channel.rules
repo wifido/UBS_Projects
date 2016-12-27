@@ -1,0 +1,70 @@
+#
+# Fibre Alliance MIB traps
+#
+case "fcmgmt":
+
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128110
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - fcmib-" + $enterprise-name
+
+    switch ($specific-trap)  {
+        case "1":
+	    # connUnitStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitStatus." + $1, FabricMisc)
+	    [$tempState,$throwMe3,$throwMe4] = lookup("fcConnUnitState." + $2, FabricMisc)
+	    [$connUnitType,$throwMe5,$throwMe6] = lookup("fcConnUnitType." + $4, FabricMisc)
+    	    @Summary = "Unit " + $3 + " status changed to " + $tempStatus
+	    @AlertGroup = $connUnitType
+	    @AlertKey = $3
+        case "3":
+	    # connUnitDeletedTrap
+    	    @Summary = "Connection Unit " + $1 + " deleted"
+    	    @Severity = 2
+	    @Type = 1
+	    @AlertGroup = "UnitDeleted"
+	    @AlertKey = $1
+        case "4":
+	    # connUnitEventTrap
+	    [$tempSev,@Severity,@Type] = lookup("fcConnUnitEventSeverity." + $5, FabricMisc)
+	    [$tempEVType,$throwMe3,$throwMe4] = lookup("fcConnUnitEventType." + $2, FabricMisc)
+	    [$connUnitType,$throwMe5,$throwMe6] = lookup("fcConnUnitType." + $7, FabricMisc)
+	    @AlertGroup = $connUnitType
+	    if (regmatch($4, "^(\[[^]]+\] ?)+.?$"))  {
+		$alertId = extract($4, "^[^:]+: ([^]]+)\] \[[^]]+\] \[[^]]+\] \[[^]]+\].?$")
+		$alertObj = extract($4, "^\[[^]]+\] \[[^]]+\] [^:]+: ([^]]+)\] \[[^]]+\].?$")
+		$alertDesc = extract($4, "^\[[^]]+\] \[[^]]+\] \[[^]]+\] [^:]+: ([^]]+)\].?$")
+	        @Summary = $alertDesc
+	        @AlertKey = $alertObj + ":" + $alertId + ":" + $7
+	    }
+	    else  {
+		$alertDesc = $4
+	        @Summary = $alertDesc
+	        @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\.[^.]+\.[^.]+\.[^.]+\.(.*)$") + ":" + $7
+	    }
+        case "5":
+	    # connUnitSensorStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitSensorStatus." + $1, FabricMisc)
+    	    @Summary = "Sensor status changed to " + $tempStatus
+	    @AlertGroup = "SensorStatus"
+	    @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\.[^.]+\.[^.]+\.[^.]+\.(.*)$")
+        case "6":
+	    # connUnitPortStatusChange
+	    [$tempStatus,@Severity,@Type] = lookup("fcConnUnitPortStatus." + $1, FabricMisc)
+	    [$tempState,$throwMe3,$throwMe4] = lookup("fcConnUnitState." + $2, FabricMisc)
+	    @AlertGroup = "PortStatus"
+	    @AlertKey = extract($OID1, "^\.1\.3\.6\.1\.3\.94\.1\..*\.([^.]+)$")
+    	    @Summary = "Port " + @AlertKey + " status changed to " + $tempState
+#	20080918	Changes by Chris Janes
+		$tempMarkForDiscard = 2
+#	20080918	End of Change
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+    }
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+

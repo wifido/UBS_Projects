@@ -1,0 +1,17 @@
+table ssm_hpmon_locale =
+{
+        {"1","Other"}
+        {"3","System"}
+        {"4","SystemBoard"}
+        {"5","IoBoard"}
+        {"6","CPU"}
+        {"7","Memory"}
+        {"8","Storage"}
+        {"9","RemovableMedia"}
+        {"10","PowerSupply"}
+        {"11","Ambiant"}
+        {"12","Chassis"}
+        {"12","BridgeCard"}
+}
+default = {"Unknown"}
+

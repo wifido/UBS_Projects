@@ -1,0 +1,106 @@
+###############################################################################
+#
+#	Fujitsu-OPL-SP-MIB.lookup
+#	used with Fujitsu-OPL-SP-MIB.rules
+#
+#	20080507	Chris Janes	Original
+#
+###############################################################################
+
+table scfTrapEventType =
+{
+        {"2","added"}
+        {"3","removed"}
+}
+default = {"other"}
+
+table ScfStateTC =
+{
+        {"1","unmounted"}
+        {"2","stop"}
+        {"3","init"}
+        {"4","not Configured"}
+        {"5","idle"}
+        {"6","run"}
+        {"7","decongigured"}
+        {"254","change"}
+}
+default = {"other"}
+
+
+table scfTrapStatusEventType =
+{
+        {"2","degraded"}
+        {"3","faulted"}
+        {"4","recover"}
+}
+default = {"other"}
+
+table ScfDomainStatusTC =
+{
+        {"1","powerOff"}
+        {"2","panic"}
+        {"3","shutdown"}
+        {"4","initialise"}
+        {"5","boot"}
+        {"6","running"}
+        {"7","prom"}
+        {"254","change"}
+}
+default = {"other"}
+
+
+table ScfDomainStatusAlarmType =
+{
+        {"2","status"}
+        {"3","panic"}
+}
+default = {"other"}
+
+
+
+table ScfIoBoxComponentType =
+{
+        {"2","cp"}
+        {"3","ps"}
+        {"4","boat"}
+        {"5","ulc"}
+        {"6","dlc"}
+}
+default = {"unknown"}
+
+table ScfIoBoxLEDType =
+{
+        {"2","locate"}
+        {"3","active"}
+        {"4","powerDC"}
+        {"5","powerAC"}
+        {"6","service"}
+        {"7","rtr"}
+        {"8","overtemp"}
+        {"9","mgmt"}
+        {"10","data"}
+}
+default = {"unknown"}
+
+
+table ScfIoBoxLEDState =
+{
+        {"1","off"}
+        {"2","standbyBlink"}
+        {"3","blinkSlow"}
+        {"4","blinkFast"}
+        {"5","feedbackFlash"}
+        {"6","on"}
+}
+default = {"unknown"}
+
+
+
+table ScfTrapIoBoxTempEventTypeTC =
+{
+        {"2","overTemp"}
+        {"3","recover"}
+}
+default = {"other"}
+

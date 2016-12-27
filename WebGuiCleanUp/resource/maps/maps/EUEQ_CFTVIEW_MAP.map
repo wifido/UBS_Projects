@@ -1,0 +1,2 @@
+map(name="EUEQ_CFTVIEW_MAP",bgColor="white",w=210,h=250,acl="*")
+monitor(name="CFT_FIXWEB_VIEW",label="CFT_FIXWEB_VIEW",x=6,y=22,action="go",url="$(SERVER)/Template/openPageWide.html?System_Filter=EUEQ_FIXWEB",target="hidden",entity="EQ_FixWeb",w=197,h=50,w=197,h=50,type="lavalamp",show label=true,show total=false,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=12,style=b,show highest severity as border=false)

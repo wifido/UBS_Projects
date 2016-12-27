@@ -1,0 +1,12 @@
+host 151.191.59.32:4032 139.149.61.117:4032 147.60.47.32:4032
+#host oid.swissbank.com:4032
+#base o=staff,dc=ubsw,dc=com
+base dc=ubsw,dc=com
+pam_login_attribute cn
+#scope one
+ldap_version 3
+#ssl configuration
+##ssl start_tls
+##ssl on
+##tls_checkpeer yes
+##tls_cacertfile /sbclocal/netcool/UBS_ENVIRONMENT/PAM/CAcert.pem 

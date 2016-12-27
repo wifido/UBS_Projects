@@ -1,0 +1,3 @@
+map(name="COMA",bgColor="#003466",w=260,h=600,acl="*")
+text(name="visual_2",label="ETD COMA",x=33,y=113,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=20,justify="center",style="p",color="#33ffff")
+button(name="visual_1",label="ETD_COMA",x=152,y=94,action="Active Event List (AEL)",url="",target="main",entity="ETD_COMA",datasource="NCOMS",flash="true",w=50,h=25,type="rounded",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")

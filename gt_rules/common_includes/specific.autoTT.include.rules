@@ -1,0 +1,48 @@
+#################################################################################################
+#
+# 	specific.autoTT.include.rules include file
+#	This rules file should live towards the end of the rules file as it post processes events
+#	to set the 
+#
+#	20090618	V1.0	Mahesh Kumar	Original
+#
+#################################################################################################
+
+$ruleset     = $ruleset + "-autoTT_SR"
+
+switch (@OwnerGID)
+{
+
+   case "1468"|"468": # GOC
+   switch (@AlertKey)
+   {
+       case "rmclomv":
+           $TD_Num = "5261"
+           switch (@AlertGroup)
+           {
+	       case "Power":	# Power alerts
+	           if (regmatch(@Summary, "^PSU @ PS.*$"))
+                   {
+	               $TT_raise = 1
+		       @RemData1="Operations"
+                   }
+
+	       default:
+           }
+
+       case "/var":
+           $TD_Num = "5261"
+           switch (@AlertGroup)
+           {
+	       case "Disk usage":	# Disk usage alerts
+	            $TT_raise = 1
+		    @RemData1="Capacity"
+
+	       default:
+           }
+      default:
+   }
+
+   default:
+       # do nothing
+}

@@ -1,0 +1,8 @@
+map(name="IMS_DevCon_WilyTest",bgColor="white",w=250,h=250,acl="*")
+text(name="txt3",label="osman",x=15,y=211,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+button(name="Alerts 3",label="Alerts3",x=85,y=189,action="Active Event List (AEL)",url="",target="_self",entity="IMS_osman",datasource="NCOMS",flash="true",w=65,h=46,type="rounded",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+text(name="txt2",label="All Introscope",x=12,y=151,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+text(name="txt1",label="xstm2336dap",x=10,y=80,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=10,justify="center",style="p",color="black")
+button(name="Alerts1",label="Alerts1",x=85,y=125,action="Active Event List (AEL)",url="",target="_self",entity="IMS_wem_alerts",datasource="NCOMS",flash="true",w=65,h=46,type="rounded",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+button(name="Alerts 2",label="Green",x=83,y=59,action="Active Event List (AEL)",url="",target="_self",entity="wem1-eng",datasource="NCOMS",flash="true",w=65,h=46,type="rounded",arc diameter=20,legend=Count,font="Helvetica",size=10,font color="black",style="p")
+text(name="pagetitle",label="IMS DevCon Wily Test",x=17,y=30,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",font="Helvetica",size=20,justify="center",style="b",color="black")

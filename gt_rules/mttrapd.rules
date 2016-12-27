@@ -1,0 +1,821 @@
+# UBSW Monitoring Script for MTTRAPD probes
+# Karey Weston
+#
+#
+# Register all potential target ObjectServers
+include "$OMNIHOME/etc/register_target.include.rules"
+
+
+#
+#  Declare some arrays'n'stuff
+#
+array NodeLoads;
+array ServerLoads;
+array ssmgenAlarm_array;
+array eccMemFreq;
+array eccMemTime;
+array	SplitArray;
+array EventCount;
+array SpamList;
+array SsmStopArray
+
+
+############################################
+# Uncomment this if you want to turn on 
+# det ails for all events in this ruleset
+#  If a relative path is specified, this path is relative to the main rules file
+# i.e. ./
+#
+############################################
+#Simon Waller Abilitec sets foglight ownergid 20051202
+include "$OMNIHOME/all_rules/ubsw/lookuptables/foglight_subclass.lookup"
+table FabricMisc = "$OMNIHOME/all_rules/ubsw/lookuptables/fabric_misc.lookup"
+table FabricEvent = "$OMNIHOME/all_rules/ubsw/lookuptables/fabric_event.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/cisco_mds.lookup"
+table DeviceLookup = "$OMNIHOME/all_rules/ubsw/lookuptables/devicetable.lookup"
+default = "Unknown"
+table SLA_lookup = "$OMNIHOME/all_rules/ubsw/lookuptables/support-level.lookup"
+default = "2"
+table regloc = "$OMNIHOME/all_rules/ubsw/lookuptables/regloc.lookup"
+default = {"Undefined","Undefined","Undefined"}
+table hbtdnsexceptions = "$OMNIHOME/all_rules/ubsw/lookuptables/hbtdnsexceptions.lookup"
+default = {"","","","0"}
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassGroup.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/app_severity.lookup"
+
+
+
+table enterprises_V1 = "$OMNIHOME/all_rules/ubsw/lookuptables/enterprises_V1.lookup"
+default = "Unknown enterprise"
+
+table enterprises_V2 = "$OMNIHOME/all_rules/ubsw/lookuptables/enterprises_V2.lookup"
+default = "Unknown enterprise"
+
+include "$OMNIHOME/all_rules/ubsw/lookuptables/foglight.v2oid.lookup"
+
+table cpqSevMap = "$OMNIHOME/all_rules/ubsw/lookuptables/cpq-sev-map.lookup"
+default = {"unknownStatus","2","1"}
+include "$OMNIHOME/all_rules/ubsw/lookuptables/common.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/routing.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ucdavis.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/netcool-ssm.include.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/IANA.include.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/IETF-IF-MIB.include.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/IETF-RMON-MIB.include.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/Autosys_ClassGroup.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/citratest_class.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/fast_track.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/socket.include.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/risk.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassRisk.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ghviewer.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/monitoring_hosts.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ClassStream.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/version.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/ssm_hpmon.lookup"
+include "$OMNIHOME/all_rules/ubsw/lookuptables/compaq.lookup"
+
+#       20071115        Changes by Chris Janes of Abilitec 
+include "$OMNIHOME/all_rules/ubsw/lookuptables/3PAR.lookup"
+#       20071115        End of Changes
+
+#	20071218	Change by Chris Janes of Abilitec
+#
+include "$OMNIHOME/all_rules/ubsw/lookuptables/app_hbt.lookup"
+#
+include "$OMNIHOME/all_rules/ubsw/lookuptables/zerot.lookup"
+#
+#	20071218	End of Change
+
+#       20080214        Changes by Chris Janes of Abilitec 
+include "$OMNIHOME/all_rules/ubsw/lookuptables/SUN-HW-TRAP-MIB.lookup"
+#       20080214        End of Changes
+
+#       20080303        Changes by Chris Janes of Abilitec 
+include "$OMNIHOME/all_rules/ubsw/lookuptables/environment.lookup"
+#       20080303        End of Changes
+
+
+#       20080508        Changes by Chris Janes of Abilitec
+include "$OMNIHOME/all_rules/ubsw/lookuptables/SUN-FM-MIB.lookup"
+#       20080508        End of Changes
+
+#       20080508        Changes by Chris Janes of Abilitec
+
+include "$OMNIHOME/all_rules/ubsw/lookuptables/Fujitsu-oplSpMIB.lookup"
+#       20080508        End of Changes
+
+#	20080512	Changes by Chris Janes of Abilitec TD 4832
+table DB_SLA_lookup = "$OMNIHOME/all_rules/ubsw/lookuptables/PS_Database_Hosts.lookup"
+default = "2"
+
+#       20080512        End of Changes
+
+#	20080523	Change by Chris Janes of Abilitec TD 4851
+table ESX_Swiss_Table = "$OMNIHOME/all_rules/ubsw/lookuptables/ESX_Swiss_Hosts.lookup"
+default = "ESX"
+#       20080523        End of Changes
+
+#	20081030	Changes by Chris Janes of Abilitec TD 5111
+include "$OMNIHOME/all_rules/ubsw/lookuptables/isc_levelzero.lookup"
+
+#       20081030        End of Changes
+#	20090409	GT TD5240
+include "$OMNIHOME/all_rules/ubsw/lookuptables/UnixAg.lookup"
+#	20090409	End of change
+# 	20091112	GT BR 670
+include "$OMNIHOME/all_rules/ubsw/lookuptables/netapp_isc.lookup"
+#	20091112	End of change
+
+
+# 20090610 MK
+#include "$OMNIHOME/all_rules/ubsw/lookuptables/netapp_volume.lookup"
+
+############################################
+# This is for the monitoring of the probes
+# talking to the Object Servers.
+############################################
+
+switch (@Manager)  {
+   case "ProbeWatch":
+		$hostname = hostname()
+        	$ruleset = $hostname + " " + $RulesVersion + " Mttrapd ProbeWatch`"
+		switch(@Summary)  {
+			case "Running ...":
+				@Severity = 1
+				@AlertGroup = "Probe"
+				@Type = 2
+			case "Going Down ...":
+				@Severity = 5
+				@AlertGroup = "Probe"
+				@Type = 1
+			case "Unable to get events":
+				@Severity = 4
+				@AlertGroup = "Probe"
+				@Type = 1
+				# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+				include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"	
+			default:
+				@Severity = @Severity
+		}
+		@Agent = %Manager
+		@AlertKey = @Agent
+		@Summary = @Agent + " probe on " + @Node + ": " + @Summary
+
+   default:
+
+	# Here we set the default Object Server to connect to based on the return of the probes hostname. 
+	# The second column in the Lookup defines the heartbeat server for that region.
+	# The third column in the Lookup defines the "telemetry" server for that region.
+
+	# Probe Hostname defined at the beginning now due to change in OSServers lookup table. GT. 30/10/6
+	@ProbeHostName = hostname()
+#       Set the default ObjectServer
+#	20090220	GT Modified lookup statement to include app_hbt_status.
+	[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $UBS_CAHOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+	#[$UBS_OS, $UBS_HBTOS, $UBS_FTOS, $isDevOrProd] = lookup(@ProbeHostName, OSServers)
+#	20090220	GT End of change.
+
+#	setdefaultobjectserver($UBS_OS)
+        switch ($UBS_OS)
+        {
+                include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+        }
+
+
+	$tempServer = $UBS_OS
+	$tempServerChange = 0
+
+	# Start populating Object Server fields here.
+
+	# Token $tmpISHeartbeat added by G.Thomas 18/8/06. It allows for easy switch within location.include.rules to determine if
+	# trap is a heartbeat message or a normal trap. It will be modified in the netcool-ssm.include.rules file in Trap 22.
+	$tmpISHeartbeat = 0
+
+	# Switch on IPAddress placed here by GT in order to provide more meaningful values for Node and NodeAlias 21/11/05
+	if (nmatch($IPAddress,"127.0.0") || nmatch($Node,"localhost")) {
+		@Node = $PeerIPaddress
+		@NodeAlias = $PeerAddress
+	}
+	else {
+		@Node = $IPaddress
+		@NodeAlias = $Node
+	}
+	# End of Node/NodeAlias fix.
+	@Agent = %Name
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/version.include.rules"
+	$LookupVersion=lookup("lookup_version", LookupVersion)
+#       20081001        Change by Chris Janes of Abilitec       TD5071
+#       $ruleset = $RulesVersion + " " + $LookupVersion + " Mttrapd"
+        $ruleset = " Mttrapd"
+        $TD_Num = "5071"
+#       20081001        End of Change
+
+
+						include "$OMNIHOME/all_rules/ubsw/common_includes/supt_level.include.rules"
+
+
+	switch($SNMP_Version)  {
+		case "1":
+			### RFC1215 - .1.3.6.1.2.1.11
+			$ruleset = $ruleset + ' SNMPv1'
+			switch($generic-trap)  {
+				case "0":
+					@Manager = "Generic"
+
+					@AlertGroup = "Generic"
+					@AlertKey = $generic-trap
+					@Summary = "Cold Start: Agent's configuration may be altered"
+					@Type = 1
+					@Agent = "GenericV1"
+					@Class = 6999
+                                        if (match(@Supt_Lvl, '3') || match(@Supt_Lvl, '33'))
+					{
+                                        	@Severity = 5
+                                        }
+                                        else 
+					{
+                                                 @Severity = 2
+                                        }
+				case "1":
+					@Manager = "Generic"
+					@AlertGroup = "Generic"
+					@AlertKey = $generic-trap
+					@Summary = "Warm Start: Agent's configuration unaltered"
+					@Severity = 2
+					@Type = 1
+					@Agent = "GenericV1"
+					@Class = 6999
+				case "2":
+					@Manager = "Generic"
+
+					### $1 = ifIndex
+					@AlertGroup = "Generic Link Status"
+					@AlertKey = $1
+					@Summary = "Link Down: ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					@Severity = 4
+					@Type = 1
+					@Agent = "GenericV1"
+					@Class = 6999
+				case "3":
+					@Manager = "Generic"
+
+					### $1 = ifIndex
+					@AlertGroup = "Generic Link Status"
+					@AlertKey = $1
+					@Summary = "Link Up: ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					@Severity = 1
+					@Type = 2
+					@Agent = "GenericV1"
+					@Class = 6999
+				case "4":
+					@Manager = "Generic"
+
+					@AlertGroup = "Generic"
+					@AlertKey = $generic-trap
+					@Summary = "Authentication Failure"
+					@Severity = 3
+					@Type = 1
+					@Agent = "GenericV1"
+					@Class = 6999
+				case "5":
+					@Manager = "Generic"
+
+					### $1 = egpNeighAddr - The IP address of this entry's EGP neighbour.
+					@AlertGroup = "Generic"
+					@AlertKey = $1
+					@Summary = "Egp Neighbour Loss: egpNeighAddr = " + $1
+					@Severity = 3
+					@Type = 1
+					@Agent = "GenericV1"
+					@Class = 6999
+					$tempIdentifier = $tempIdentifier + "GenTrp " + $generic-trap
+				case "6":
+					$enterprise-name = lookup($enterprise, enterprises_V1)
+					switch($enterprise-name)  {
+						include "$OMNIHOME/all_rules/ubsw/application_rules/vhayu.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/vmware.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/sitescope.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/app_mttrapd.rules"
+						include "$OMNIHOME/all_rules/ubsw/ibm_includes/bladeserver.rules"
+						include "$OMNIHOME/all_rules/ubsw/security_rules/innerwall.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/dell.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/bmc_mttrapd.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/microsoft.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/net-snmp.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/emc.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/fibre_channel.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/netapp.rules"
+						include "$OMNIHOME/all_rules/ubsw/autosys_rules/autosys.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/oracle.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/bea.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/compaq.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/sun-t3xx.rules"
+						include "$OMNIHOME/all_rules/ubsw/ssm_rules/netcool-ssm.include.snmp.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/TrapLatency.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/ucdavis.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/datasynapse.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/citratest.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/cisco_mds.rules"
+						# Remedy include file not found so hashed out until we can find them.
+						#include "$OMNIHOME/all_rules/ubsw/application_rules/remedy.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/ssm_rules/IETF-RMON-MIB.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/qpasa.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/wysdm.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/foglight.rules"
+						include "$OMNIHOME/all_rules/ubsw/common_includes/probe.test.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/ims_rules/ghviewer.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/CYCLADES-ACS-TRAP-MIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/AVOCENT-MERGEPOINT-TRAP-MIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/SYMARK-POWERKEEPER-MIB.rules"
+			                        include "$OMNIHOME/all_rules/ubsw/common_includes/probe_loglevel_include.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/OscarAgent.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/decru.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/rmonEventsV2.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/data_domain.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/OscarAgent.rules"
+			                        include "$OMNIHOME/all_rules/ubsw/common_includes/unknownEnterprise.rules"
+						include "$OMNIHOME/all_rules/ubsw/sun_rules/sun-mdadm-trap.rules"
+						include "$OMNIHOME/all_rules/ubsw/abilisoft_rules/ubsw_abilisoft.rules"
+
+						default:
+							@Summary="Unknown SNMP V1 enterprise ID: " + $enterprise
+							@AlertKey = $enterprise-name
+							@AlertGroup = $community
+							@UserInt = $specific-trap
+
+							@Class = 6999
+
+
+							include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+					}
+				default:
+					@Summary = "Invalid Generic Trap Number (see Details): " + $enterprise + " " + $generic-trap + " " + $specific-trap
+					@Severity = 2
+					@Type = 0
+					# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+					include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+			}
+
+		case "2":
+			### Trap is an SNMPv2 Generic Trap - .1.3.6.1.6.3.1.1.5
+			$ruleset = $ruleset + ' SNMPv2'
+			# Convert to V1 for processing through here
+			if (nmatch($notify, ".1.3.6.1.6.3.1.1.5")) ### Trap is an SNMPv2 Generic Trap
+			{
+				$enterprise = extract($notify, "(.*)\.[0-9]+$")
+				$specific-trap = "0"
+				$generic-trap = extract($notify, ".*\.([0-9]+)$")
+			}
+			else ### Trap is Enterprise Specific
+			{
+				$enterprise = extract($notify, "^(.*)\.[0-9]+\.[0-9]+$")
+				$specific-trap = extract($notify, "^.*\.([0-9]+)$")
+				$generic-trap = "6"
+			}
+			switch ($generic-trap)  {
+				case "1":
+					@Manager = "Generic"
+
+					@AlertGroup = "Generic"
+					@AlertKey = $generic-trap
+					@Summary = "Cold Start: Agent's configuration may be altered"
+					@Type = 1
+                                        @Agent = "GenericV2"
+                                        @Class = 6999
+                                        if (match(@Supt_Lvl, '3') || match(@Supt_Lvl, '33')) 
+					{
+                                                @Severity = 5 
+                                        }
+                                        else {
+                                        #end of change 20060307
+                                                @Severity = 2
+					}
+				case "2":
+					@Manager = "Generic"
+
+					@AlertGroup = "Generic"
+					@AlertKey = ""
+					@Summary = "Warm Start: Agent's configuration unaltered"
+					@Severity = 2
+					@Type = 1
+					@Agent = "GenericV2"
+					@Class = 6999
+				case "3":
+					@Manager = "Generic"
+
+					### $1 = ifIndex
+					### $2 = ifAdminStatus
+					### $3 = ifOperStatus
+					@AlertGroup = "Generic Link Status"
+					if (exists($5))  {
+						@AlertKey  = $5
+						@Summary = "Link Down: port = " + $5 + ", ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					}
+					else  {
+						@AlertKey  = $1
+						@Summary = "Link Down: ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					}
+					@Severity = 4
+					@Type = 1
+					@Agent = "GenericV2"
+					@Class = 6999
+				case "4":
+					@Manager = "Generic"
+
+					### $1 = ifIndex
+					### $2 = ifAdminStatus
+					### $3 = ifOperStatus
+					@AlertGroup = "Generic Link Status"
+					if (exists($5))  {
+						@AlertKey  = $5
+						@Summary = "Link Up: port = " + $5 + ", ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					}
+					else  {
+						@AlertKey  = $1
+						@Summary = "Link Up: ifIndex = " + $1 + ", ifAdminStatus = " + $2 + ", ifOperStatus = " + $3
+					}
+					@Severity = 1
+					@Type = 2
+					@Agent = "GenericV2"
+					@Class = 6999
+				case "5":
+					@Manager = "Generic"
+
+					@AlertGroup = "Generic"
+					@AlertKey = ""
+					@Summary = "Authentication Failure"
+					@Severity = 3
+					@Type = 1
+					@Agent = "GenericV2"
+					@Class = 6999
+				case "6":
+					### Trap is Enterprise Specific
+					$enterprise-name = lookup($enterprise, enterprises_V2)
+#					@RemData3 = "Enterprise " + $enterprise + " = gt " + $generic-trap + " st = " + $specific-trap + " Notify = " + $notify
+					switch($enterprise-name)  {
+
+						include "$OMNIHOME/all_rules/ubsw/application_rules/vhayu.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/security_rules/innerwall.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/kestrel.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/quantum.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/datasynapse.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/citratest.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/ssm_rules/netcool-ssm.include.snmp.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/emc.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/fibre_channel.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/cisco_mds.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/veritas.rules"
+						include "$OMNIHOME/all_rules/ubsw/ssm_rules/IETF-RMON-MIB.include.rules"
+						include "$OMNIHOME/all_rules/ubsw/ims_rules/ghviewer.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/foglight_V2.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/SYMARK-POWERKEEPER-MIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/3par.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/decru.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/FT-IMAuditor-mib.rules"
+						include "$OMNIHOME/all_rules/ubsw/sun_rules/SUN-HW-TRAP-MIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/OscarAgent.rules"
+						include "$OMNIHOME/all_rules/ubsw/sun_rules/SUN-FM-MIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/sun_rules/Fujitsu-oplSpMIB.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/rmonEventsV2.rules"
+						include "$OMNIHOME/all_rules/ubsw/application_rules/data_domain.rules"
+						include "$OMNIHOME/all_rules/ubsw/abilisoft_rules/ubsw_abilisoft.rules"
+						include "$OMNIHOME/all_rules/ubsw/storage_rules/sunAK.rules"
+#						include "$OMNIHOME/all_rules/ubsw/application_rules/siteminder.rules"
+			                        include "$OMNIHOME/all_rules/ubsw/common_includes/unknownEnterprise.rules"
+
+						default:
+							@Summary="Unknown SNMP V2 enterprise ID: " + $enterprise + " Notify = " + $notify + " $specific-trap = " + $specific-trap + "  " + $1 + " " + $2
+							@Description = "$1 = " + $1 + "$2 = " + $2 + "$3 = " + $3 + "$4 = " + $4 + "$5 = " + $5 + "$6 = " + $6 + "$7 = " + $7 + "$8 = " + $8 
+							@AlertGroup = $enterprise
+							@AlertKey = $enterprise-name
+							@Stream = $community
+							@UserInt = $specific-trap
+							# Details turned on to identify why we ended up here.
+							# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+							include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"	
+					}
+				default:
+					@Summary = "Invalid Generic Trap Number (see Details): " + $enterprise + " " + $generic-trap + " " + $specific-trap + " Notify = " + $notify
+					@AlertGroup = $enterprise
+					@AlertKey = $enterprise-name
+					@Stream = $community
+					
+					@Severity = 2
+					@Type = 0
+#							20060922 Change by Chris Janes of Abilitec
+							@Class = 6999
+
+#							20060922	End of Change
+					# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+					include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"	
+			}
+		default:
+#			20050906 Change By Chris Janes of Abilitec
+			$ruleset = $ruleset + ' + Unknown SNMP version'
+#			20050906 End of Change
+			@Summary="Unknown SNMP version: " + $SNMP_Version
+			@Severity=1
+
+#			20060922 Change by Chris Janes of Abilitec
+			@Class = 6999
+
+#			20060922	End of Change
+			# Details turned on for this event in order to ascertain why it fell through this bit.
+			# 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+			include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"	
+	}
+
+
+
+
+
+# ## # # # # # # THIS MUST BE THE LAST SECTION IN THE RULES FILE # # # # # 
+# Here we call the location include rules to define Location and Region fields.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/location.include.rules"
+
+# This section added by GT to allow for the auto-setting of OwnerGID in the rules file based on the value of @AlertGroup. 
+# As we have to cater for all event sources, we will initially set a $UBSTempClass token rather than overwrite any existing
+# value to @Class, and then test to see if we need to update the real Class value.
+# The $TempDoLookup token should be set in all sub rules where Class is already assigned. Currently only Sitescope does this
+# The sitescope rules can be found in the application_rules subdirectory.
+
+	switch($TempDoLookup)  {
+		case "3":
+			# Exception to allow a "composite" ClassGroup lookup key
+			#   for apps which exist in multiple locations
+			#   with different support teams
+			$compKey = @Location + ":" + @AlertGroup
+			[$UBSTempClass, @OwnerGID] = lookup($compKey, MttrapdClassGID)
+                case "2":
+			# Do nothing here as the Class and OwnerGID must already have been set in the
+			# subrules.
+
+		case "1":
+			# This bit catches any sub rules sets that already preassign OwnerGID.
+			[$UBSTempClass, $TempToThrow] = lookup(@AlertGroup,MttrapdClassGID)
+
+		default:
+			# This bit catches the rest of the events.
+			[$UBSTempClass, @OwnerGID] = lookup(@AlertGroup,MttrapdClassGID)
+			@OwnerUID = 65534
+ 	}
+
+#	20081030	Change by Chris Janes of Abilitec TD 5111
+	include "$OMNIHOME/all_rules/ubsw/common_includes/isc.rules"
+# Specific rules to check, If an alert needs a autoTT raised. TD 5261
+	include "$OMNIHOME/all_rules/ubsw/common_includes/specific.autoTT.include.rules"
+
+
+#	20081030	End of Change
+
+
+
+	switch(@Class)  {
+		case "6999":
+			# This should catch all the BMC and CPLite events here.
+			if (int($UBSTempClass) > 0)	
+			{
+				@Class = $UBSTempClass
+				$ruleset = $ruleset + " using UBSTempClass"
+			}
+
+		#
+		# Here we route events based on Class to a seperate object Server.
+		# Current diversions are :
+		# 1601 SSMAGENT_HB
+		# 5201 PRI_PROBE_TELE
+		#
+                case "1601"|"1602"|"1603"|"1604"|"1605"|"1606":
+                        @Agent = @Agent + '-HEARTBEAT'
+                        $tempServer=$UBS_HBTOS
+                        $tempServerChange = 2
+
+                case "5201":
+                        @Agent = @Agent + '-TELEMETRY'
+                        $tempServer="DISCARD"
+                        $tempServerChange = 1
+
+                default:
+                        #
+                        # The following is required by John Irvine for characterising Syslog events
+                        #
+                        if (match(@Agent, "SSM") && int($specific-trap) == 46 && match($4, "SyslogMessage") && int(@Severity) == 2)
+                        {
+                                @Agent = @Agent + '-MESSAGES'
+                                $tempServer="DISCARD"
+                                $tempServerChange = 1
+                        }
+	}
+
+	if(nmatch($community,"fast_track"))
+	{
+		if (exists($FT_Chat_Channel))  
+		{
+			@Alarm_Dest = $FT_Chat_Channel 
+			$ruleset = $ruleset + "FT_Chat_Channel on " + @Alarm_Dest
+		}
+		else
+		{        
+			@Alarm_Dest = lookup(@Class, fast_track)
+			$ruleset = $ruleset + "lookup Chat Chn " + @Alarm_Dest
+		} 
+		$tempServer=$UBS_FTOS 
+                $tempServerChange = 3
+		log(ERROR,"FastTrack Event using " + $UBS_FTOS)
+		$ruleset = $ruleset + "FastTrack(1) on " + @Alarm_Dest
+	}
+
+
+	#
+	# Allow final event routing decision to be made - i.e. if routing lookup contains "DISCARD",
+	#   do not forward the event
+	#
+
+        switch($tempServerChange)  {
+                case "1":
+				$tempMarkForDiscard = 2
+		case "2" | "3":
+		                switch ($tempServer)
+		                {
+                		        include "$OMNIHOME/all_rules/ubsw/common_includes/set_target.include.rules"
+                		}
+
+                default:
+        }
+
+	#
+	#  Make sure we don't overwrite Identifier if it's already defined
+	#
+	$identifierLength = length(@Identifier)
+	if (exists($tempIdentifier))  {        
+		$seenRule = 1
+		@Identifier = $tempIdentifier
+	}
+	else if (int($identifierLength) == 0)  {        
+		$seenRule = 2
+		@Identifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + %Manager
+	}
+	else  {
+		$seenRule = 3
+		# Nowt
+	}
+#	20070207	Change by Chris Janes of Abilitec for debug
+	$ruleset = $ruleset + " Ident rule " + $seenRule + " "
+
+
+# Check to see if this event should be notified to a chat channel
+        if (match(@Alarm_Dest, ""))
+        {
+                [@Notification, @Alarm_Dest] = lookup(@Class, NotifyTable_by_class)
+                if(match(@Notification, "3") || match(@Notification, "1"))
+                {
+                        $ruleset = $ruleset + "  notified to a chat channel " + @Alarm_Dest
+                }
+        }
+        if (match(@Alarm_Dest, ""))
+        {
+                [@Notification, @Alarm_Dest] = lookup(@OwnerGID, NotifyTable)
+                if(match(@Notification, "3") || match(@Notification, "1"))
+                {
+                        $ruleset = $ruleset + "  notified to a chat channel " + @Alarm_Dest
+                }
+        }
+	if ( (match(@Notification,"1")) || (match(@Notification,"3")) )
+	{
+		$tmpSummaryEnd = substr(@Summary, length(@Summary),1)
+		if(not regmatch($tmpSummaryEnd, "[A-Za-z0-9_\-\]\}\)]"))
+		{
+			$tmpSummaryStart = substr(@Summary,1 ,length(@Summary)-1)
+			@Summary = $tmpSummaryStart
+			$ruleset = $ruleset + "CHOPPED"
+		}
+	}
+
+	# 20061214 GT. probe_load includes moved down to the debugging section
+	# Here we include the probe load rules to ascertain probe load statistics.
+	#include "$OMNIHOME/all_rules/ubsw/common_includes/probe_load.include.rules"
+	# 20061214  .End of Change . GT
+	@ExpireTime = lookup(@Severity, expire_values)
+	include "$OMNIHOME/all_rules/ubsw/common_includes/expiretime.rules"
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/risk.include.rules"
+
+#			This is to set @Environment based upon @SystemDesig for given classes
+
+	$tmpSetEnv = lookup(@Class, SetEnvClass)
+	if (match($tmpSetEnv, "1"))
+	{
+		$tmpEnvLen = length(@Environment)
+		if (int($tmpEnvLen) == 0)
+		{
+			@Environment = lookup(@SystemDesig, EnvText)
+		}
+	}
+
+	
+	switch($bypassGradeLookup)
+	{
+		case "1":
+			@Grade = $tempGrade
+		default:
+			@Grade = lookup(@NodeAlias, MonHosts)
+	}
+
+        @BusinessStream = lookup(@Class, ClassStream)
+
+
+	update(@Severity)
+	update(@Summary)
+	update(@SysInt)
+	update(@Type)
+	update(@ExpireTime)
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/app_hbt.rules"
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/supt_level.include.rules"
+
+
+	switch(@Class)
+	{
+		case"123000":
+			if ((match(@Supt_Lvl, "3")) || (match(@Supt_Lvl, "33")))
+			{
+				$AENFlag = 1
+				$AENChannel = "Unix_Premium"
+			} 
+		case "1640":
+			$AENFlag = 1
+			$AENChannel = "Duff"
+		default:
+	}
+
+	
+        if (match(@Grade,"999"))
+        {
+                switch(@Severity)
+                {
+                        case "5":
+                                $AENFlag = 1
+                                $AENChannel = "Monitoring"
+                        default:
+                }
+        }
+
+        include "$OMNIHOME/all_rules/ubsw/common_includes/aen.include.rules"
+
+# GT TD5261 section moved here. and opex rules added.
+        include "$OMNIHOME/all_rules/ubsw/common_includes/specific.opex.include.rules"
+
+
+        # MK TD 5261
+        switch($TT_raise)
+        {
+                case "1":
+                        if (int(@ActionCode) > 0 && int(@ActionStatus) == 0 ) {
+				# This will act ONLY on Opex events where the original event would default to raising a ticket.
+				@TTicket_Status = 6
+				$ruleset = $ruleset + "TTOT"
+			}
+			else if (match(@Severity, "5")){
+				# Critical alerts "on insert"
+				@TTicket_Status = 8
+				$ruleset = $ruleset + "TTCR"
+			}
+			else {
+			   	# New status code for non-critical alerts "on insert" which are
+			    	# tentatively marked for autoTT and will get a autoTT raised only 
+			    	# when they turn critical(on update)
+				@TTicket_Status = 7
+				$ruleset = $ruleset + "TTNCR"
+			}
+                default:
+				# Do nothing
+				$ruleset = $ruleset + "DEF"
+        }
+
+	#
+	#  Include various debugging utilities
+	#
+	include "$OMNIHOME/all_rules/ubsw/common_includes/debug.include.rules"
+	# Here we include the probe load rules to ascertain probe load statistics.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/probe_load.include.rules"
+        @Summary = substr(@Summary,1,250)
+
+
+
+
+
+	# Set @Probe_Rule
+	#
+	###  Please ensure this is the final rule in this rules file!!!
+	#
+
+#       20081001        Change by Chris Janes of Abilitec       TD 5071
+#	@Probe_Rule = $ruleset
+        @Probe_Rule = $RulesVersion + " " + $LookupVersion + ":" + $TD_Num + ": " + $IscRule + ": " + $ruleset
+#       20081001        End of Change
+
+
+}

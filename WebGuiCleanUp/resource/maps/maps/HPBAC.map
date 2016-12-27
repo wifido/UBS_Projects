@@ -1,0 +1,2 @@
+map(name="HPBAC",bgColor="#003366",w=230,h=519,acl="*")
+monitor(name="total",label="total",x=115,y=38,action="Active Event List (AEL)",url="",target="_new",entity="HPBAC",datasource="NCOMS",flash="true",w=88,h=50,w=88,h=50,type="lavalamp",show label=false,show total=true,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

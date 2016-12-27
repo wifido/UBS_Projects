@@ -1,0 +1,2 @@
+map(name="FIRC_MORPHEUS_PRODUCTION",bgImage="Morpheus.jpg",bgColor="white",w="520",h="400",acl="*")
+button(name="visual_1",url="",style="+_fontStyle+",font="Helvetica",action="Active Event List (AEL)",entity="firc_morpheus",h="43",font color="black",target="_blank",type="rectangle",y="187",x="92",label="Morpheus",legend="Label",w="78",arc diameter="20",size="10")

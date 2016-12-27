@@ -1,0 +1,2 @@
+map(name="UK",bgColor="white",w=250,h=250,acl="*")
+monitor(name="visual_1",label="untitled",x=5,y=5,action="go",url="",target="_self",entity="",w=101,h=120,w=101,h=120,type="histogram",show label=true,show total=false,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

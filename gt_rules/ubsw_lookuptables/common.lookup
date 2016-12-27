@@ -1,0 +1,187 @@
+# Table for chat channel notifications using OwnerGID
+#	Format of this lookup {<OwnerGID>,<Notify Method>,<Alarm_Destination>}
+#		where <Notify Method> is 1 for origional chat method and 3 for new (Jan 2007)Method
+#		and <Alarm_Destination> is the desired chat channel
+table NotifyTable =
+{
+        {"49","1","TOM_Micromuse"}
+        {"66","1","ECT_GSD_Monitor"}
+#        {"90","1","risk_micromuse_alerts"}
+	{"105","3","IBD_Micromuse_Alerts"}
+	{"417","1","apex_micromuse"}
+        {"559","1","chatAdmin"}
+        {"595","1","Autosys_Monitoring"}
+# {"1057419","1","ITSM_Alerts"} commented out as per request 2005 Oct 03
+#        {"622","1","ITSM_Alerts"}    Changed by CHris Janes 20070111
+#        {"622","1","ITSM_ALerts_Citratest"} Changed back by Chris Janes 20070117
+        {"622","3","ITSM_Alerts"}         
+#	{"461","1","SETS_monitor"} Changed by Chris janes 20070220 This is for the migration to the 
+#				enhanced chat notification for IB TS IMS request made by Jeremy Bell 
+	{"461","3","SETS_monitor"}
+#	20080429	Entry remove Chris Janes GCMS 397646
+#	{"609","1","VWAP_Engine_Support"}
+#	20080429	End of Change
+#		20070329 CMDB Added at the request of Mark Pollard HDLDN0001008191
+}
+default = {"0",""}
+
+# Table for chat channel notifications using Class
+#	Format of this lookup {<Class>,<Notify Method>,<Alarm_Destination>}
+#		where <Notify Method> is 1 for origional chat method and 3 for new (Jan 2007)Method
+#		and <Alarm_Destination> is the desired chat channel
+table NotifyTable_by_class =
+{
+	{"81760","3","GSD_BROIL_ALERTS"}
+	{"1056567","3","CLAS_Alerts"}
+        {"1057307","3","CMP_CCY_CutOff_Alert"}
+	{"1057869","3","CMP_CCY_CutOff_Alert"}
+	{"1057868","3","CMP_CCY_CutOff_Alert"}
+#Change made for Sayantan Ghosh with IT Cross Products GSD
+	{"2222224","3","fRisk_MM_DEV_ALERTS"}
+#Request by Venugopala Kanumuri (kanumuve) HDSTM0000252359 --Fixed Imcome-- IT FI App Support Credit Flow --IRD Flow
+
+# Request by IBD applications - Danesh Kadwa and Tam Casey - implemented by Simon Waller - 20071030
+	{"1054241","3","IBDIT_Monitoring_Alerts"}
+	{"1057460","3","IBDIT_Monitoring_Alerts"}
+	{"2076087","3","IBDIT_Monitoring_Alerts"}
+	{"1057095","3","IBDIT_Monitoring_Alerts"}
+	{"1057089","3","IBDIT_Monitoring_Alerts"}
+	{"1015255","3","IBDIT_Monitoring_Alerts"}
+	{"1016189","3","IBDIT_Monitoring_Alerts"}
+	{"1057459","3","IBDIT_Monitoring_Alerts"}
+	{"1056210","3","IBDIT_Monitoring_Alerts"}
+	{"1057802","3","IBDIT_Monitoring_Alerts"}
+	{"1057847","3","IBDIT_Monitoring_Alerts"}
+	{"1056904","3","IBDIT_Monitoring_Alerts"}
+	{"1056200","3","IBDIT_Monitoring_Alerts"}
+	{"1057801","3","IBDIT_Monitoring_Alerts"}
+	{"1056806","3","IBDIT_Monitoring_Alerts"}
+	{"1020245","3","IBDIT_Monitoring_Alerts"}
+	{"1057660","3","IBDIT_Monitoring_Alerts"}
+	{"1057643","3","IBDIT_Monitoring_Alerts"}
+	{"2222230","3","IBDIT_Monitoring_Alerts"}
+	{"2222231","3","IBDIT_Monitoring_Alerts"}
+	{"2222232","3","IBDIT_Monitoring_Alerts"}
+	{"2222233","3","IBDIT_Monitoring_Alerts"}
+	{"2222234","3","IBDIT_Monitoring_Alerts"}
+	{"2222235","3","IBDIT_Monitoring_Alerts"}
+	{"2222236","3","IBDIT_Monitoring_Alerts"}
+	{"2222237","3","IBDIT_Monitoring_Alerts"}
+	{"2222238","3","IBDIT_Monitoring_Alerts"}
+	{"2222239","3","IBDIT_Monitoring_Alerts"}
+	{"2222240","3","IBDIT_Monitoring_Alerts"}
+	{"2222241","3","IBDIT_Monitoring_Alerts"}
+	{"2222242","3","IBDIT_Monitoring_Alerts"}
+	{"2222243","3","IBDIT_Monitoring_Alerts"}
+	{"2222244","3","IBDIT_Monitoring_Alerts"}
+	{"2222245","3","IBDIT_Monitoring_Alerts"}
+	{"2222246","3","IBDIT_Monitoring_Alerts"}
+	{"2222247","3","IBDIT_Monitoring_Alerts"}
+	{"2222250","3","IBDIT_Monitoring_Alerts"}
+	{"2222251","3","IBDIT_Monitoring_Alerts"}
+	#Sharif inserted for chat alerts 
+	{"208870","3","Sharepoint_Global"}
+	#Simon Waller 042908 for IT Data GSD - Mark Pringle
+	{"2300003","3","DataIT_DMI_Alerts"}
+	{"124010","3","ITSM_Alerts"}
+	{"2100000","3","ITSM_Alerts"}
+	{"2071639","3","ChatAdmin"} 
+	{"5004545","3","PDM_DEV"} 
+}
+default = {"0",""}
+
+# Table for chat channel notifications using Class
+#       Format of this lookup {<Class>,<Notify Method>,<Alarm_Destination>}
+#               where <Notify Method> is 1 for origional chat method and 3 for new (Jan 2007)Method
+#               and <Alarm_Destination> is the desired chat channel
+table NotifyTable_by_Profile =
+{
+        {"Evidence","1","evidence"}
+
+}
+default = {"0",""}
+
+
+
+#	20070112	Addition by Chris Janes of Abilitec
+#			This done with Richard Harper of the Agent team
+#			to allow for monitoring of REMAX devices via  ssm agent
+table Community_ssmClassGidKey =
+{
+	{"REMAX","REMAX"}
+}
+default = {"UNIX"}
+
+#	20070112	End of Addition
+
+table FastTrackClass =
+{
+        {"55390","1","apex_raptor_dev"}
+        {"55250","1","apex_raptor_dev"}
+        {"55230","1","apex_raptor_dev"}
+        {"55240","1","apex_raptor_dev"}
+        {"55260","1","apex_raptor_dev"}
+        {"55261","1","apex_raptor_dev"}
+        {"1057772","1","apex_raptor_dev"}
+        {"1057621","1","apex_raptor_dev"}
+        {"1057619","1","apex_raptor_dev"}
+        {"1057688","1","apex_raptor_dev"}
+        {"1057874","1","apex_raptor_dev"}
+        {"1057620","1","apex_raptor_dev"}
+}
+default = {"0",""}
+
+# Table for defining event route destinations based on probe server hostname
+
+# Table for mapping disk events to applications
+table StorageAppMap = 
+{
+	{"dldnc004pn2:/w01/GSD_Test","6999"}
+#	{"dldnc004pn2:/w00/dyn-EquityResearch","55100"}
+#	{"dldnc005pn2:/w05/ldn_shared01/IT/RANMargin","57394"}
+	{"dldnc005pn2:/w05/ldn_shared01","57394"}
+	{"dldnc007pn1:/v03/dyn-EVT","1056901"}
+	{"dldnc007pn2:/w02/LDN_Equities_EF_C001","1007421"}
+	{"dldnc011pn1:/v01/ETDComa","1056948"}
+	{"dldnc012pn1:/v01/SwiskeyClearingProd","54880"}
+#	{"dstmc002pn2:/v07/dyn-EquityResearch","55100"}
+	{"dstmce01pn1:/prod1/apphomes","81470"}
+	{"dstmce01pn1:/vol2/erms","81460"}
+#	{"dsydc001pn1:/v00/devl-dyn","55100"}
+	{"dldn0027pfs:/v01/micromuse03","0"}
+	{"dhkgc002pn1:/v01/dyn","6999"}
+	{"dldnc007pn1:/v01/dyn","6999"}
+	{"dstmc016pn2:/w01/sbcexp","6999"}
+	{"dstmc014pn1:/w01/STM_FIRC_01","80200"}
+	{"dstmc003pn1:/v01/SALSPROD","80200"}
+	{"opfproddyn:/vol/w05/dyn-RISK","110000"}
+	{"opfbcpdyn:/vol/w01/dyn-RISK","110000"}
+}
+default = {""}
+
+#
+# Table for determining how we treat SSM syslog events
+# Return values: 0=discard, 1=deduplicate, 2=keep with defaults
+#
+table SSMDiscardMap =
+{
+	{"sendmail","0"}
+	{"pbrun3.2.1-01","0"}
+	{"pbmasterd3.2.1-01","0"}
+	{"pblocald3.2.1-01","0"}
+	{"PBTTYFIX","0"}
+	{"stunnel","0"}
+	{"automount","0"}
+	{"automountd","0"}
+	{"kernel","1"}
+	{"cisco","0"}
+	{"in.ftpd","1"}
+        {"arserverd","0"}
+        {"arservdsd","0"}
+        {"apsvcdsp","0"}
+        {"arservapd","0"}
+        {"brsvcbrie","0"}
+        {"arplugin","0"}
+}
+default = {"2"}
+

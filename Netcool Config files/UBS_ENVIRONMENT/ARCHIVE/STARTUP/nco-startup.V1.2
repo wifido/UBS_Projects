@@ -1,0 +1,379 @@
+#!/bin/sh
+#
+# UBS generic startup script 
+# Operating systems tested against
+#	Linux AS 2.1 3.0
+#	Solaris 2.8
+#
+# Author: Gary Thomas
+# Date:  16th June 2007
+# Version: 1.2
+# Change log.
+# 1.2 - GT Added logic to copy away pa_child.log and NCO_PA.log if they exist.
+# 1.1 - GT Added section to identify if this script is running as root or a member of NCO_Superuser netgroup.
+
+# Script starts here.
+# Variables that can be changed
+
+# To enable debug logging for NCO_PA set the PA_DEBUG variable to 1
+# To disable the debug logging set PA_DEBUG variable to 0
+
+PA_DEBUG=0
+if [ ${PA_DEBUG} -eq 1 ]; then
+	DEBUG_OPTIONS='-logsize 2048000 -debug 1 -tracemsgq -traceevtq -tracemtx -tracenet'
+else
+	DEBUG_OPTIONS=''
+fi
+
+## We source all necessary evironmental variables from $OMNIHOME/etc/omniprof. Please do not add any here.
+## Only variables not set in omniprof are $NCO_PA and $SECURE.
+## The following 2 environment statements are just to get us to the profile file.
+NCHOME=/sbclocal/netcool
+OMNIHOME=${NCHOME}/omnibus
+if [ -f ${NCHOME}/UBS_ENVIRONMENT/omniprof ]; then
+	. ${NCHOME}/UBS_ENVIRONMENT/omniprof
+elif [ -f ${OMNIHOME}/etc/omniprof ]; then
+	. ${OMNIHOME}/etc/omniprof
+else
+	echo "omniprof not found... Please check variables are set correctly"
+	exit 1
+fi
+
+if [ ${MUSE_ARCH} = "linux2x86" ]; then
+	# Source function library.
+	. /etc/rc.d/init.d/functions
+
+	# Source networking configuration.
+	. /etc/sysconfig/network
+
+	# Check that networking is up? If it is not we exit here.
+	[ ${NETWORKING} = "no" ] && exit 0
+	
+	MUSE_PS_ARGS="ppid,pid,cmd"
+
+elif [ ${MUSE_ARCH} = "solaris2" ]; then
+
+	MUSE_PS_ARGS="ppid,pid,args"
+
+else
+	echo "Invalid Operating system"
+	exit 1
+fi
+User=$(id | cut -f2 -d'(' | cut -f1 -d')')
+if [ $User = root ]; then
+	KILLCMD=kill
+	FLEXSTARTCMD=${NCLICENSE}/bin/nc_start_license 
+	FLEXSTOPCMD=${NCLICENSE}/bin/nc_stop_license
+	PASTARTCMD=${OMNIHOME}/bin/nco_pad
+	CPCMD="/bin/cp -fp"
+	RMCMD="/bin/rm -f"
+	
+else
+	
+	PBRUN=/usr/bin/pbrun
+	${PBRUN} -a
+	PBRUNCMD="${PBRUN} -b"
+	KILLCMD="${PBRUNCMD} /usr/bin/kill"
+	FLEXSTARTCMD="${PBRUNCMD} ${NCLICENSE}/bin/nc_start_license"
+	FLEXSTOPCMD="${PBRUNCMD} ${NCLICENSE}/bin/nc_stop_license"
+	PASTARTCMD="${PBRUNCMD} ${OMNIHOME}/bin/nco_pad"
+	CPCMD="${PBRUNCMD} /bin/cp -fp"
+	RMCMD="${PBRUNCMD} /bin/rm -f"
+fi
+
+NCO_PA="NCO_PA"
+SECURE=N							# Not needed to export
+ulimit -c unlimited				# Allows a core file to be generated
+ulimit -n 8192					# Increases number of open files allowed
+ulimit -s 2048					# Restricts Stack size to 2 Meg in line with Micromuse recommendation.
+
+if [ ! -d ${OMNIHOME}/bin ]; then
+	# $OMNIHOME/bin doesnt exist
+	echo "directory ${OMNIHOME}/bin: does not exist, nco not starting"
+	exit
+fi
+
+preservelogs() {
+	for FILETOSAVE in NCO_PA.log pa_child.log
+	do
+		FILE=${OMNILOG}/${FILETOSAVE}
+		if [ -f ${FILE} ]; then	
+			[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Preserving old ${FILETOSAVE} !"
+			${CPCMD} ${FILE} ${FILE}_old
+			if [ $? -eq 0 ]; then
+				${RMCMD} ${FILE}
+			fi
+		else
+			[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : No old ${FILETOSAVE} to preserve... Skipping !"
+		fi
+	done
+}
+# The PAD used to be shutdown using nco_pa_shutdown utility with -option STOP.
+# However, there was a security requirement to remove the password on the
+# nco_pa_shutdown command from this script.
+# As a result the following function was added to terminate all PADs and their
+# children using the 'kill' command.
+
+killpad() {
+	# Find all PAD processes
+
+	pad_pids=`ps -eo ${MUSE_PS_ARGS} | grep -v grep | grep nco_pad | awk '{print $2}' | sort -n`
+
+	# NOTE: If this script is run as non-root, we have the potential
+	# for an endless loop here.
+	# That is because the effective user may not have permission
+	# to terminate some of the PADs on the system.
+	# Added count to terminate loop after 10 iterations.
+
+	count=0
+	while [ "$pad_pids" != "" -a $count -lt 10 ]
+	do
+
+		# Find all the process group id's of PAD children
+
+ 		child_list=""		
+
+		for parent_pid in $pad_pids
+		do
+			children=`ps -eo ${MUSE_PS_ARGS} | grep -v nco_pad | grep -v grep | grep $parent_pid | awk '{print $2}' | sort -nru`
+			child_list="$child_list $children"
+		done
+
+		# Kill PADs first to prevent them from re-starting children
+
+		#kill $pad_pids
+		${KILLCMD} $pad_pids
+	
+		# Kill child processes and all other processes that share
+		# their process group id's.
+
+		for gid in $child_list
+		do
+			#[ "$gid" != "" ] && kill -TERM -$gid
+			[ "$gid" != "" ] && ${KILLCMD} -TERM -$gid
+		done
+
+		# In case PAD daemons weren't killed in the right order
+		# get the ones that have come alive again.
+		# This will happen if the orginal PAD pid's span
+		# across pid wrap around.
+
+		count=`expr $count + 1`
+
+		sleep 10
+ 
+		pad_pids=`ps -eo ${MUSE_PS_ARGS} | grep -v grep | grep nco_pad | awk '{print $2}' | sort -n`
+	done
+}
+# Start/stop NCO processes
+
+case "$1" in
+'start')
+	# Check here to see if it is just one process to be started or all processes.
+
+	if [ $# -eq 1 ]; then
+		# We test for a local flex server here. If it is remote then no need to start FLEX.
+		if [ ${LMGRD_LOCAL} -eq 1 ]; then
+		# Here I make the assumption that we need to start the flex server anyway. If the Flex server is already running we will be told.
+			START_FLEX=Y
+		else
+			START_FLEX=N
+		fi
+		START_NCO=Y				# Starts the Netcool Process control agent
+
+	elif [ $# -eq 2 ]; then
+		case "$2" in
+		'flex')
+			# We test for a local flex server here. If it is remote then no need to start FLEX.
+			if [ ${LMGRD_LOCAL} -eq 1 ]; then
+			# Here I make the assumption that we need to start the flex server anyway. If the Flex server is already running we will be told.
+				START_FLEX=Y
+			else
+				START_FLEX=N
+				echo "Flex server not needed on this box. Please check what you are trying to do"
+			fi
+			START_NCO=N
+			;;
+		'nco')
+			# We test for a local flex server here. If it is remote then no need to start FLEX.
+			if [ ${LMGRD_LOCAL} -eq 1 ]; then
+			# Here I make the assumption that we need to start the flex server anyway. If the Flex server is already running we will be told.
+				START_FLEX=Y
+			else
+				START_FLEX=N
+			fi
+			START_NCO=Y
+			;;
+		*)
+			echo "Usage: /etc/init.d/nco { start | start flex | start nco }"
+			;;
+		esac
+	fi
+
+
+	# Now start the required processes.
+
+	case "${START_FLEX}" in
+	'Y')
+		ps -eo  ${MUSE_PS_ARGS} | grep lmgrd | grep -v grep > /dev/null
+		if [ $? -eq 0 ]; then
+			[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Flex License Server was already running !"
+		else
+			if [ -x ${NCLICENSE}/bin/nc_start_license ]; then
+				[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Flex License Server starting"
+				#${NCLICENSE}/bin/nc_start_license &
+				${FLEXSTARTCMD} &
+				sleep 10
+				[ "${BOOTUP}" != "verbose" ] && echo
+			else
+				echo "Netcool/OMNIbus : Flexlm lmgrd not found"
+				exit 1
+			fi
+		fi
+		;;
+
+	'N')
+		[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Flex License server not starting"
+		;;
+	*)
+		echo "Netcool/OMNIbus : START_FLEX incorrectly set"
+		;;
+	esac
+
+	case "${START_NCO}" in
+	'Y')
+		if [ -x ${OMNIHOME}/bin/nco_pad ]; then
+			grep ${NCO_PA} ${OMNIHOME}/etc/omni.dat >/dev/null 2>/dev/null
+			if [ $? -eq 0 ]; then
+				preservelogs
+				[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Starting Process Control..."
+				if [ "${SECURE}" = "Y" ]; then
+					${PASTARTCMD} -name ${NCO_PA} -admingroup NCO_Superuser -secure -redirectfile ${OMNIHOME}/log/pa_child.log ${DEBUG_OPTIONS} > /dev/null 2> /dev/null
+					#${OMNIHOME}/bin/nco_pad -name ${NCO_PA} -admingroup NCO_Superuser -secure -redirectfile ${OMNIHOME}/log/pa_child.log ${DEBUG_OPTIONS} > /dev/null 2> /dev/null
+				else
+					${PASTARTCMD} -name ${NCO_PA} -admingroup NCO_Superuser -redirectfile ${OMNIHOME}/log/pa_child.log  ${DEBUG_OPTIONS} >/dev/null 2> /dev/null 
+					#${OMNIHOME}/bin/nco_pad -name ${NCO_PA} -admingroup NCO_Superuser -redirectfile ${OMNIHOME}/log/pa_child.log  ${DEBUG_OPTIONS} >/dev/null 2> /dev/null 
+				fi
+				sleep 2
+				PID=`ps -eo  ${MUSE_PS_ARGS} | grep nco_pad | grep ${NCO_PA} | grep -v grep | awk '{print $2}'`
+				if [ "${PID}" != "" ]; then
+					echo_success;
+				else
+					echo_failure;
+				fi
+				[ "${BOOTUP}" != "verbose" ] && echo 
+			else
+				[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Process Control not configured"
+			fi
+		else
+			echo "Netcool/OMNIbus : nco_pad is not executable"
+		fi
+		;;
+	'N')
+		[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : Process Control not starting"
+		;;
+	*)
+		echo "Netcool/OMNIbus : START_NCO incorrectly set"
+		exit 2
+		;;
+	esac
+	;;
+
+'stop')
+
+	# Check here to see if it is just one process to be stopped or all processes.
+
+	if [ $# -eq 1 ]; then
+		# We test for a local flex server here. If it is remote then no need to start FLEX.
+		if [ ${LMGRD_LOCAL} -eq 1 ]; then
+			# Here I make the assumption that we need to stop the flex server anyway.
+			STOP_FLEX=Y
+			STOP_NCO=Y				# Stops the Netcool Process control agent
+		else
+			STOP_FLEX=N
+			echo "Flex server not running on this box."
+			STOP_NCO=Y				# Stops the Netcool Process control agent
+		fi
+	elif [ $# -eq 2 ]; then
+		case "$2" in
+		'flex')
+			# We test for a local flex server here. If it is remote then no need to start FLEX.
+			if [ ${LMGRD_LOCAL} -eq 1 ]; then
+			# Here I make the assumption that we need to stop the flex server anyway.
+				STOP_FLEX=Y
+			else
+				STOP_FLEX=N
+				echo "Flex server not running on this box. Please check what you are trying to do"
+			fi
+			STOP_NCO=N
+			;;
+
+		'nco')
+			STOP_FLEX=N
+			STOP_NCO=Y
+			;;
+		*)
+			echo "Usage: /etc/init.d/nco { stop | stop flex | stop nco }"
+			;;
+		esac
+	fi
+
+
+	case "${STOP_NCO}" in
+	'Y')
+		PID=`ps -eo ${MUSE_PS_ARGS} | grep nco_pad | grep -v grep | awk '{print $2}'`
+		if [ "${PID}" != "" ]; then
+			[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : stopping Process Control ..."
+			killpad
+			if [ $? -eq 0 ]; then
+				echo_success
+			else
+				echo_failure
+			fi
+			[ "${BOOTUP}" != "verbose" ] && echo
+		else
+			echo "Netcool/OMNIbus : Process Control not running ..."
+		fi
+		;;
+
+	'N')
+		echo "Netcool/Omnibus : Process control not issued a stop command"
+		;;
+	
+	*)
+		echo "Netcool/Omnibus : STOP_NCO not set correctly"
+		;;
+	esac
+
+	case "${STOP_FLEX}" in
+	'Y')
+		FLEXPID=`ps -eo ${MUSE_PS_ARGS} | grep lmgrd | grep -v grep | awk '{print $2}'`
+		if [ "${FLEXPID}" != "" ]; then
+			[ "${BOOTUP}" != "verbose" ] && echo "Netcool/OMNIbus : stopping Flex License Manager ..."
+			#${NCLICENSE}/bin/nc_stop_license
+			${FLEXSTOPCMD}
+			sleep 5
+			echo "Flex License Manager has been stopped"
+		else
+			echo "Flex License Manager was not running"
+		fi
+		;;
+	
+	'N')
+		echo "Netcool/Flex Manager not issued a stop command"
+		;;
+	
+	*)
+		echo "Netcool/Flex Manager : STOP_FLEX not set correctly"
+		;;
+	esac
+	;;
+
+restart|reload)
+	$0 stop
+	$0 start
+	;;
+*)
+	echo "Usage: /etc/init.d/nco { start | start flex | start nco | stop | stop nco | stop flex | restart | reload }"
+	;;
+esac

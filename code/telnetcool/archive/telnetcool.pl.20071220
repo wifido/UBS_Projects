@@ -1,0 +1,301 @@
+#!/usr/bin/perl
+#or #!/sbclocal/bin/perl
+#or #!/sbcimp/run/pd/perl
+
+#############################################################################
+#
+#	telnetcool.pl
+#	This script is the property of the ITSM Monitoring Team
+#	No Changes should be made directly to this script, should you require
+#	please request this vi sh-monitoring-support
+#
+#	Initial		19th Oct 2007		Chris Janes
+#	Beta 1		19th Oct 2007		Chris Janes
+#
+#############################################################################
+
+
+#############################################################################
+#
+#	Here we declare pragma
+#
+#############################################################################
+
+use strict;
+
+
+#############################################################################
+#
+#	Here we declare Librarys we need
+#
+#############################################################################
+
+use Getopt::Std;
+use IO::Socket;
+use Socket;
+use Time::Local;
+
+
+#############################################################################
+#
+#	Here we declare the Global Variables
+#
+#############################################################################
+
+use vars qw/ %opt /;
+
+my $Debug;	# Flag to run in Debug mode
+my $EventTime;	# Time of event
+my $Host;	# Hostname of server running this script
+my $Profile;	# Is used to select which probe rules to use
+my $Verbose;	# Flag to run in Verbose mode - otherwise silent
+my $UserData;	# Can be used to pass a string to the rules file
+my $UserInt;	# Can be used to pass an Int to the rules file
+my %RegionLookup = {
+"chi" => "Americas",
+"ldn" => "EMEA",
+"mel" => "APAC",
+"nyc" => "Americas",
+"sng" => "APAC",
+"stm" => "Americas",
+"tky" => "APAC",
+};		# this is used to identify the region - it will default to being Switzerland
+
+
+
+
+#############################################################################
+#
+#	Here we put the sub routines
+#
+#############################################################################
+
+
+sub usage()
+{
+#############################################################################
+#
+#	This sub shows usage when invokes by -h or incorrect usage
+#
+#############################################################################
+	print "	This program does inserts a MicroMuse Event dependent on Profile Parameter\n";
+	print "	usage: $0 [-t time] [-f host]\n";
+	print "	\n";
+	print "	-h        	: this (help) message\n";
+	print "	-V        	: verbose output\n";
+	print "	-p profile   	: Determins the probe rules to be used\n";
+	print "	-d data   	: Pass this data to the rules file\n";
+	print "	-i int   	: Pass this int to the rules file\n";
+	print "	\n";
+}
+
+
+
+sub GetHostName
+{
+#############################################################################
+#
+#	This sub returns the FQDN of the host on which this script is running
+#
+#############################################################################
+	system("uname -n | cut -f1 -d. > /tmp/tmppdhhostname");
+	open (HOST,"/tmp/tmppdhhostname")|| die "cannot open /tmp/tmppdhhostname file";
+	my @Hostname = <HOST>;	
+	close (HOST);
+	unlink "/tmp/tmppdhhostname" or die "Cannot delete tmppdhhostname\n";
+	my $Host =  (substr($Hostname[0], 0,length($Hostname[0])-1));
+	
+	system("domainname > /tmp/domainname");
+	open (HOST,"/tmp/domainname")|| die "cannot open /tmp/domainname file";
+	my @Hostname = <HOST>;	
+	close (HOST);
+	unlink "/tmp/domainname" or die "Cannot delete domainname\n";
+	my $Domain =  substr($Hostname[0], 0,length($Hostname[0])-1);
+	my $Return = $Host ."." . $Domain;
+	return  $Return;
+
+}
+
+sub GetUserName
+{
+############################################################################
+#
+#	This sub returns the name of the user running this script
+#
+#############################################################################
+	system("who am i > /tmp/tmppdhusername");
+	open (USER,"/tmp/tmppdhusername")|| die "cannot open /tmp/tmppdhusername file";
+	my @Username = <USER>;	
+	close (USER);
+	unlink "/tmp/tmppdhusername" or die "Cannot delete tmppdhusername\n";
+	my @UserArray = split/ /,$Username[0];
+	return $UserArray[0];
+}
+
+
+sub GetRegion
+{
+	$CountryCode = substr($Host, 2, 3)
+	print " CountryCode = $CountryCode\n";
+}
+sub SendSocketEvent
+{
+#############################################################################
+#
+#	This sub send a netcool event to socket 2004 on host defined 
+#	in $remote_host.
+#	the following global variable are required to be set
+#		my $Host;		defines the host to be put into PDH
+#
+#############################################################################
+
+	socket('TO_SERVER', PF_INET, SOCK_STREAM,getprotobyname('tcp'));
+        # build the address of the remote machine
+	my $internet_addr;
+	my $remote_host;
+	
+#	USE THIS BIT FOR DEV
+#	# Discover Which probe we can reach
+	if (inet_aton("stmsktdev1.stm.swissbank.com")) 
+	{
+		if($Debug) {print "stmsktdev1\n";}
+		$internet_addr = inet_aton("stmsktdev1.stm.swissbank.com");
+		$remote_host = "stmsktdev1";
+	}
+
+#	# Discover Which probe we can reach
+#	if (inet_aton("ldnsktprod1.ldn.swissbank.com")) 
+#	{
+#		if($Debug) {print "ldnsktprod1\n";}
+#		$internet_addr = inet_aton("ldnsktprod1.ldn.swissbank.com");
+#		$remote_host = "ldnsktprod1";
+#	}
+#	elsif(inet_aton("zursktprod1.zur.swissbank.com"))
+#	{
+#		if($Debug) {print "zursktprod1\n";}
+#		$internet_addr = inet_aton("zursktprod1.zur.swissbank.com");
+#		$remote_host = "zursktprod1";
+#	}
+#	elsif(inet_aton("stmsktprod1.stm.swissbank.com"))
+#	{
+#		if($Debug) {print "stmsktprod1\n";}
+#		$internet_addr = inet_aton("stmsktprod1.stm.swissbank.com");
+#		$remote_host = "stmsktprod1";
+#	}
+#	elsif(inet_aton("sngsktprod1.sng.swissbank.com"))
+#	{
+#		if($Debug) {print "sngsktprod1\n";}
+#		$internet_addr = inet_aton("sngsktprod1.sng.swissbank.com");
+#		$remote_host = "sngsktprod1";
+#	}
+#	else
+#	{
+#		print "Unable to Connect to a Netcool Socket Probe\n";
+#		print "Please contact sh-monitoring-support for assistance\n\n";
+#		return;
+#	}
+
+
+	my $paddr = sockaddr_in(2004, $internet_addr);
+        $EventTime = time();
+
+        # connect
+	connect(TO_SERVER, $paddr) or die "could not connect to $remote_host:remote_port : $!\n";
+	
+	# while we are connected send event	
+	print TO_SERVER "'Transport' 'Telnetcool'\n";
+	print TO_SERVER "'Severity' 'INFO'\n";
+	print TO_SERVER "'Nodealias' '$Host'\n";
+	print TO_SERVER "'Profile' '$Profile'\n";
+	print TO_SERVER "'EventIdentifier' 'Agent'\n";
+	print TO_SERVER "'ClassID' '2300007'\n";
+	print TO_SERVER "'MessageText' 'New SSM Agent Installation (StartStop Insert Event)'\n"; 
+	print TO_SERVER "'EventType' '1'\n";
+	print TO_SERVER "'EventTime' '$EventTime'\n";
+	print TO_SERVER "'Component' 'StartStop'\n";
+	print TO_SERVER "'Resolution' 'False'\n";
+	print TO_SERVER "'Acknowledged' '0'\n";
+	print TO_SERVER "'UserData' '$UserData'\n";
+	print TO_SERVER "'UserInt' '$UserInt'\n";
+	print TO_SERVER "\n";
+	print TO_SERVER "\n";
+	
+	# close socket
+	close(TO_SERVER);
+}
+
+
+#############################################################################
+#############################################################################
+#
+#	This is where the code 'proper' starts 
+#
+#############################################################################
+#############################################################################
+
+
+
+# get any command line arguements
+getopts( "hDVp:d:i:", \%opt ) or usage();
+
+
+# are we in debug mode
+if ($opt{D})
+{
+	$Debug = 1 ;
+}
+
+if ($opt{V})
+{
+	$Verbose = 1 ;
+}
+if($Verbose) {print "\npdhinsert.pl running in Verbose Mode\n\n";}
+
+	$Host = GetHostName();
+
+#If a Profile is supplied as an arguement use it if not it will send NULL as $Profile
+if ($opt{p})
+{
+	# Use Profile supplied
+	$Profile = $opt{p};
+	if($Verbose) {print "Using Profile Supplied\n";}
+	if($Verbose) {print "Profile             $Profile\n";}
+}
+
+
+#If a UserInt is supplied as an arguement use it if not it will send NULL as $UserInt
+if ($opt{i})
+{
+	# Use Profile supplied
+	$UserInt = $opt{i};
+	if($Verbose) {print "Using UserInt Supplied\n";}
+	if($Verbose) {print "Profile             $UserInt\n";}
+}
+
+#If a UserData is supplied as an arguement use it if not it will send NULL as $UserDate
+if ($opt{d})
+{
+	# Use UserData supplied
+	$UserData = $opt{d};
+	if($Verbose) {print "Using UserData Supplied\n";}
+	if($Verbose) {print "UserData             $UserData\n";}
+}
+
+
+# if -h option used show usage
+if ($opt{h})
+{
+	usage();
+	exit 1;
+}
+else
+{
+	if($Debug) {print "Host      = $Host\n";}
+	SendSocketEvent ;
+}
+
+# Done now so say goodbye nicely
+exit 0;
+
+
+

@@ -1,0 +1,83 @@
+#######################################################################
+#
+#       Copyright (C) 1997, 1998, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: transx.props 1.6 2001/04/20 10:13:06 nik Development $
+#
+#######################################################################
+
+#######################################################################
+#
+# Properties supported by this monitor:
+#
+# Property Name                 Default
+#
+# AuthPassword          :       ""
+# AuthUserName          :       ""
+# PreviousFields        :       "NONE"
+# Manager               :       "Internet Service Monitors"
+# MaxLogFileSize        :       1048576
+# MaxRawFileSize        :       -1
+# MaxSAFFileSize        :       1048576
+# PreviousFields        :       "NONE"
+# Manager               :       "Internet Service Monitors"
+# MaxLogFileSize        :       1048576
+# MaxRawFileSize        :       -1
+# MaxSAFFileSize        :       1048576
+# SAFFileName           :       ""
+# Name                  :       "TRANSX"
+# Server                :       "NCOMS"
+# Manager               :       "Internet Service Monitors"
+# PropsFile             :       "$OMNIHOME/monitors/<arch>/transx.props"
+# RulesFile             :       "$OMNIHOME/monitors/<arch>/transx.rules"
+# AutoSAF               :       0
+# Buffering             :       0
+# BufferSize            :       10
+# CompleteTransax	:	0
+# ConfigFile            :       ""
+# ConfigurationCheckInterval :	1
+# Datalog               :       0
+# DatalogFormat         :       "$stepTimes (stepTimeSeconds)"
+# DetailedTimings	:	0
+# Domain                :       ""
+# EventQSize            :       25
+# IdentifierChecksumFields :	""
+# IpAddress             :       ""
+# IgnoreUnmatchedDVC	:	0
+# MaxCCA                :       10
+# MessageLog            :       "$OMNIHOME/log/transx.log"
+# MessageLevel          :       "warn"
+# MinPoll               :       60
+# MultipleEvents	:	0
+# NewProfileCheckMultiple :	10
+# Profile               :       "*"
+# RawCapture            :       0
+# RawCaptureFile        :       "$OMNIHOME/var/transx.cap"
+# StoreAndForward       :       1
+# Help                  :       0
+# Version               :       0
+#
+#######################################################################
+
+#######################################################################
+#
+# Add your settings here
+#
+#######################################################################
+RulesFile : "/sbclocal/netcool/omnibus/all_rules/ubsw/transx_ism.rules"
+Datalog : 1 
+#MessageLevel : "debug"
+MessageLevel : "info"
+Manager : "LDNTRNSXPROD1"
+MaxLogFileSize        :       10485760

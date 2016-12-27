@@ -1,0 +1,4 @@
+map(name="ESM_SD_ITAM",bgImage="ITAM.jpg",bgColor="white",w="950",h="700",acl="*")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="216",x="307",w="82",entity="ESM_xldn2931pap",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_xldn2931pap")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="216",x="555",w="82",entity="ESM_nldn1797pap",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_nldn1797pap")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="341",x="307",w="82",entity="ESM_sldn1656por",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="23",style="p",target="_self",name="ESM_sldn1656por")

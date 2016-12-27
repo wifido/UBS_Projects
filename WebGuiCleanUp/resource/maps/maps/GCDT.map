@@ -1,0 +1,2 @@
+map(name="GCDT",bgImage="gcdt-map.gif",bgColor="white",w=1089,h=900,acl="*")
+button(name="nstm0138dapname",label="test",x=482,y=324,action="ael",url="$(SERVER)/Template/ael.html?System_Filter=nstm0138dap",target="_blank",entity="nstm0138dap",w=39,h=22,type="rectangle",arc diameter=20,legend=Label,font="Helvetica",size=10,font color="black",style="+_fontStyle+")

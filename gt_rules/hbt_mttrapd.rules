@@ -1,0 +1,339 @@
+# UBS Heartbeat Probe specific rules
+# 8th September 2009
+# Gary Thomas - Abilitec
+
+# First Target definitions
+include "$OMNIHOME/etc/register_target.include.rules"
+
+# Now array definitions
+array NodeLoads;
+array ServerLoads;
+array SplitArray;
+#  20061214             New arrays defined GT
+array EventCount;
+array SpamList;
+#  20061214             End of New array definitions.
+
+# Now lookup definitions. with defaults if required.
+table SLA_lookup = "$OMNIHOME/all_rules/ubsw/lookuptables/support-level.lookup"
+default = "2"
+
+table regloc = "$OMNIHOME/all_rules/ubsw/lookuptables/regloc.lookup"
+default = {"Undefined","Undefined","Undefined"}
+
+table hbtdnsexceptions = "$OMNIHOME/all_rules/ubsw/lookuptables/hbtdnsexceptions.lookup"
+default = {"","","","0"}
+
+table enterprises_V1 = "$OMNIHOME/all_rules/ubsw/lookuptables/enterprises_V1.lookup"
+default = "Unknown enterprise"
+
+table ESX_Swiss_Table = "$OMNIHOME/all_rules/ubsw/lookuptables/ESX_Swiss_Hosts.lookup"
+default = ""
+
+
+# This include is required for the automated lookup tables push procedure.  N Wood Abilitec 20070830
+#
+include "$OMNIHOME/all_rules/ubsw/lookuptables/version.lookup"
+#
+# Here we add the version info.
+include "$OMNIHOME/all_rules/ubsw/common_includes/version.include.rules"
+
+# Ok now we get down to business.
+switch (@Manager)  {
+   case "ProbeWatch":
+	@ProbeHostName = hostname()
+	@NodeAlias = getenv("PROF_FQDN")
+	@Node = getenv("PROF_IP")
+	switch(@ProbeHostName) {
+		case "xldn0234dap":
+			settarget(LDNENG)
+		case "xldn1018pap":
+			settarget(EMEA)
+		case "xstm1315pap":
+			settarget(USAPAC)
+		default:
+	}
+	$ruleset = @ProbeHostName + " " + $RulesVersion + " Heartbeat ProbeWatch`"
+	switch(@Summary)  {
+		case "Running ...":
+			@Severity = 1
+			@AlertGroup = "Probe"
+			@Type = 2
+		case "Going Down ...":
+			@Severity = 5
+			@AlertGroup = "Probe"
+			@Type = 1
+		case "Unable to get events":
+			@Severity = 4
+			@AlertGroup = "Probe"
+			@Type = 1
+		default:
+			@Severity = @Severity
+	}
+	@Agent = %Manager
+	@AlertKey = @Agent
+	@Summary = @Agent + " probe on " + @Node + ": " + @Summary
+
+   default:
+
+	@Manager = %Manager
+	@ProbeHostName = hostname()
+	$ruleset = @ProbeHostName + " " + $RulesVersion + " Heartbeat ProbeWatch`"
+
+	# This switch validates that the probe instance is a Heartbeat probe, and logs an error in the logfile if it is not.
+	# Originally this switch was done on Manager value. For consistency with other rules files, it is now done on @ProbeHostName
+	switch (@ProbeHostName) {
+		case "xldn1018pap" |"xstm1315pap":
+			# We go down here if we are a 'pukka' heartbeat probe instance. If not the default action is to discard the trap.
+			# This rule set is ONLY to be used on designated Heartbeat probes.
+			settarget(UBS_HBT_OS)
+			$tempServer = 'UBS_HBT_OS'
+			
+		case "xldn0234dap":
+			# We go down here if we are a 'pukka' dev heartbeat probe instance. If not the default action is to discard the trap.
+			# This rule set is ONLY to be used on designated Heartbeat probes.
+			settarget(DEV_HBT_OS)
+			$tempServer = 'DEV_HBT_OS'
+
+		default:
+			# We got here because we are not a Heartbeat probe. This Ruleset should never run against a production probe instance.
+			# Log an error in the probe log file.
+			log(ERROR, "Incorrect Probe rules file being used. This is a specific ruleset for Heartbeats only. Check your probe props file!!!")
+			discard
+	}
+	switch($SNMP_Version)  {
+		case "2":
+			# Convert to V1 for processing through here
+			if (nmatch($notify, ".1.3.6.1.6.3.1.1.5")) ### Trap is an SNMPv2 Generic Trap
+			{
+				$enterprise = extract($notify, "(.*)\.[0-9]+$")
+				$specific-trap = "0"
+				$generic-trap = extract($notify, ".*\.([0-9]+)$")
+			}
+			else ### Trap is Enterprise Specific
+			{
+				$enterprise = extract($notify, "^(.*)\.[0-9]+\.[0-9]+$")
+				$specific-trap = extract($notify, "^.*\.([0-9]+)$")
+				$generic-trap = "6"
+			}
+		default:
+			# Do nothing
+	}
+	$enterprise-name = lookup($enterprise, enterprises_V1)
+	$tmpIdentifyTrap = $enterprise-name + "-" + $generic-trap + "-" + $specific-trap
+	switch($tmpIdentifyTrap) {
+                # N Wood Jul 2007 Abilitec Added probe_loglevel_rules
+                case "Abilitec_Probe_LogLevel-6-1":
+                        # This is a Probe Log level trap
+                        switch ($enterprise-name)
+                        { 
+                                        include "$OMNIHOME/all_rules/ubsw/common_includes/probe_loglevel_include.rules"
+                                        @Identifier = $tempIdentifier
+					@ProbeHostName = hostname()
+					switch(@ProbeHostName) {
+						case "xldn0234dap":
+							settarget(LDNENG)
+						case "xldn1018pap":
+							settarget(EMEA)
+						case "xstm1315pap":
+							settarget(USAPAC)
+						default:
+					}
+                           	default:
+                        }
+
+		case "ssmAgent-6-22" | "ubsw_abilisoft-6-99":
+                        switch($enterprise-name)
+			{
+				case "ssmAgent":
+					# This is a heartbeat trap. Here is where we set all fields correctly.
+					# This trap contains 4 varbinds in the pdu.
+					$agentIdUniqueId = $1
+					$agentIdAddress = $2
+					$agentIdName = $3
+					$ifPhyAddress = $4
+					# Now we use the Hostname supplied within the Heartbeat trap from SSM.
+					# We cast it as lower to ensure matches in lookups.
+					$tmpNodeAlias = lower($agentIdName)
+					$tmpAgent = "SSM-HEARTBEAT"
+					$tmpSummary = "SSM Agent Heartbeat"
+
+					# Here we try to set a decent value for NodeAlias. We provide a default value for $tmpDoLookup first.
+					$tmpDoLookup = 0
+					
+		
+					# Now we check to see if this is a known exception where Hostname will not follow the rules to provide Domain info.
+					[$UBS_Location, $UBS_Region, $tmpDomain, $tmpDoLookup] = lookup($tmpNodeAlias,hbtdnsexceptions)
+		
+					# Now we try and extract Domain info from Hostname as supplied by the $agentIdName token.
+					switch($tmpDoLookup) {
+						case "1":
+							# Do nothing here, we have just set the required values from the hbtdnsexceptions lookup table.
+						default:
+							if (regmatch($tmpNodeAlias,"^[denmsx][a-z][a-z][a-z][0-9fec][0-9].*"))
+							{
+		
+								# This regmatch should hit hosts of the following format 
+								# xstm1315pap.stm.swissbank.com
+								# sstme005.ubswenergy.net
+								# sldn0150por.ldn.swissbank.com
+								# estmf001005p.stm.swissbank.com
+								$location_node = substr($tmpNodeAlias,2,3)
+								[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+								#log(ERROR," regmatch 1 - loc_node = " + $location_node)
+							}
+							else if (regmatch($tmpNodeAlias,"^[a-z][a-z][0-9][0-9dpt].*"))
+							{
+		
+								# This regmatch should hit hosts of the following format 
+								# hk1p295cmp.hkg.swissbank.com
+								# ln16p36cmp.ldn.swissbank.com
+								# zr14p350cmp.opf.swissbank.com
+								$location_node = substr($tmpNodeAlias,1,2)
+								[$UBS_Location, $UBS_Region, $tmpDomain] = lookup($location_node, regloc)
+								#log(ERROR," regmatch 2 - loc_node = " + $location_node)
+							}
+							else
+							{
+		
+								# We obviously cant set an FQDN here as the Hostname is an unknown format.
+								$UBS_Location = "No FQDN"
+								$UBS_Region = "No FQDN"
+								$tmpDomain = ""
+							}
+		
+					}	# End of tmpDoLookup switch.
+		
+					# The following regexp just looks for the pattern alphnum.alpha.* to identify if $tmpNodeAlias is already set as an FQDN
+					if (regmatch($tmpNodeAlias,"swissbank"))
+					{
+		
+						# This matches any value of $tmpNodeAlias that appears to be an FQDN already.
+						@NodeAlias = $tmpNodeAlias
+						log(ERROR,"NodeAlias recieved as - " + $tmpNodeAlias)
+					}
+					else if (regmatch($tmpNodeAlias,"ubs.[a-z]"))
+					{
+		       			 # This matches any value of $tmpNodeAlias that appears to be an FQDN already.
+		       			 @NodeAlias = $tmpNodeAlias
+		       			 log(ERROR,"NodeAlias recieved as - " + $tmpNodeAlias)
+					}
+					else if (regmatch($tmpNodeAlias,"ubs[a-z].[a-z]"))
+					{
+		       			 # This matches any value of $tmpNodeAlias that appears to be an FQDN already.
+		       			 @NodeAlias = $tmpNodeAlias
+		       			 log(ERROR,"NodeAlias recieved as - " + $tmpNodeAlias)
+					}
+					else
+					{
+		
+						# This matches any value of $tmpNodeAlias that is not an FQDN already.
+						@NodeAlias = $tmpNodeAlias + "." + $tmpDomain
+		       			       log(ERROR,"NodeAlias recieved as - " + $tmpNodeAlias)
+					}
+					switch($community) {
+						case "SSMAGENT_HB_DMZ":
+							@Class = 1602
+
+						case "SSMAGENT_HB_SSZ":
+							@Class = 1603
+
+						case "SSMAGENT_HB_RED":
+							@Class = 1604
+
+						case "OSXAGENT_HB":
+							@Class = 1605
+	
+						case "SSMAGENT_HB_WMUS":
+                                        		@Class = 1606
+				
+						case "SSMAGENT_HB_SAVVIS":
+							@Class = 1607
+
+						case "SSMAGENT_HB_ESX":
+                                        		@Class = 1601
+							@AlertKey = lookup(@NodeAlias, ESX_Swiss_Table)
+	
+						default:
+							@Class = 1601
+					}	# End of community switch
+
+				case "ubsw_abilisoft":
+					$agentIdName   = $1
+					$agentVersion  = $2
+					$agentStream   = $3
+					$agentLocation = $4
+					$agentRegion   = $5
+					$agentClass    = $6
+					@NodeAlias     = lower($agentIdName)
+                                	$tmpAgent      = "AS-HEARTBEAT"
+					$tmpSummary    = "AS Agent Heartbeat >Version: " + $agentVersion + " Stream: " + $agentStream + "<"
+					$UBS_Location  = $agentLocation	
+					$UBS_Region    = $agentRegion
+					@Class         = $agentClass
+
+				default:
+					# We should NEVER get here...
+			} 
+
+			# This bit just makes sure that we are setting @Node to a valid Newtork IP Address rather than a loopback address.
+			if (nmatch($IPAddress,"127.0.0") || nmatch($Node,"localhost"))
+			{
+				@Node = $PeerIPaddress
+			}
+			else
+			{
+				@Node = $IPaddress
+			}
+
+
+			# Now we should have a workable value for $UBS_Location and $UBS_Region to set the Object Server fields correctly.
+			@Location = $UBS_Location
+			@Region = $UBS_Region
+			
+                        # Added by Sharif to project a more accurate heartbeat message time from the source
+                        @ProbeReceivedTime = $ReceivedTime
+                        @LastOccurrence = getdate
+
+			# Now start populating the rest of the fields.
+        		@Supt_Lvl = lookup(@NodeAlias,SLA_lookup)
+			@OwnerGID = 999
+			@OwnerUID = 65534
+			@Agent = $tmpAgent
+			@AlertGroup = $community
+			#@AlertKey = ""
+			@Summary = $tmpSummary
+			@Severity = 2
+			@Type = 2
+			@ExpireTime = 3600
+			@Identifier = @NodeAlias + $tmpIdentifyTrap + @Type + @AlertGroup + @AlertKey
+
+
+		default:
+			# We got here because the trap is not an SSM Heartbeat message. Discarding!!!
+			log(ERROR, $tmpIdentifyTrap + " trap recieved from "  + $Node + " ,not a Heartbeat Message. Discarding!!!")
+			discard
+	}
+
+	
+
+	# Here we include the probe load rules to ascertain probe load statistics.
+	include "$OMNIHOME/all_rules/ubsw/common_includes/probe_load.include.rules"
+
+	# Define all update statements here.
+	update(@Agent)
+	# Comment out the update AlertGroup statement if we want to prevent deduplication when we have both agents firing.
+	update(@AlertGroup)
+	update(@AlertKey)
+	update(@Location)
+	update(@Manager)
+	update(@Node)
+	update(@Region)
+        update(@Supt_Lvl)
+        update(@Class)
+        update(@Summary)
+        # Added by Sharif to project a more accurate heartbeat message time from the source
+        update(@ProbeReceivedTime)
+        update(@LastOccurrence)
+
+}

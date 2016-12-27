@@ -1,0 +1,3 @@
+map(name="Suri",bgColor="white",w=250,h=250,acl="*")
+button(name="visual_2",label="untitled",x=225,y=319,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="true",w=50,h=25,type="rectangle",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="p")
+button(name="visual_1",label="welcome",x=28,y=10,action="Open URL",url="",target="_self",entity="",datasource="NCOMS",flash="false",w=60,h=20,type="rounded",arc diameter=2,legend=Label,font="Helvetica",size=10,font color="#333300",style="bi")

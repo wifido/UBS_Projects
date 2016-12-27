@@ -1,0 +1,352 @@
+########################################################################
+#
+# Rules for DataSynapse GridServer
+#
+########################################################################
+case "dsBrokerTraps":
+    $ruleset = $ruleset + "gridserver-broker"
+    @Class = 1057302
+    @OwnerGID = 463
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    @Agent = "DataSynapse"
+    
+    $ruleset = $ruleset + " ST " + $specific-trap 
+    switch ($specific-trap)  {
+        case "1":
+            # dsBrokerStarted
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "LiveCluster Broker has started on host " + $1
+		@Summary = "LiveCluster Broker has started on host " + $dsBrokerHostname
+            @Severity = 2
+            @Type = 2
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "2":
+            # dsEngineAdded
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsBrokerHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Engine " + $2 + " has been added to the LiveCluster Broker on host " + $1
+		@Summary = "Engine " + $dsEngineDaemonUsername + " has been added to the LiveCluster Broker on host " + $dsBrokerHostname
+            @Severity = 2
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname + $dsEngineDaemonUsername
+            
+        case "3":
+            # dsEngineRemoved
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsBrokerHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Engine " + $2 + " has been removed from the LiveCluster Broker on host " + $1
+		@Summary = "Engine " + $dsEngineDaemonUsername + " has been removed from the LiveCluster Broker on host " + $dsBrokerHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname + $dsEngineDaemonUsername
+            
+        case "4":
+            # dsEngineDied
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsBrokerHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Engine " + $dsEngineDaemonUsername + " has died on the LiveCluster Broker on host " + $1
+		@Summary = "Engine " + $dsEngineDaemonUsername + " has died on the LiveCluster Broker on host " + $dsBrokerHostname
+            @Severity = 5
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname + $dsEngineDaemonUsername
+            
+        case "9":
+            # dsDriverAdded
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsBrokerHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Driver for host " + $2 + " has been added to LiveCluster Broker on host " + $1
+		@Summary = "Driver for host " + $dsEngineDaemonUsername + " has been added to LiveCluster Broker on host " + $dsBrokerHostname
+            @Severity = 2
+            @Type = 2
+           	$tempIdentifierAddOn =	$dsBrokerHostname + $dsEngineDaemonUsername
+            
+        case "10":
+            # dsDriverRemoved
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsBrokerHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Driver for host " + $2 + " has been removed from LiveCluster Broker on host " + $1
+		@Summary = "Driver for host " + $dsEngineDaemonUsername + " has been removed from LiveCluster Broker on host " + $dsBrokerHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname + $dsEngineDaemonUsername
+            
+        case "13":
+            # dsJobStarted
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "A job was started on host " + $1
+		@Summary = "A job was started on host " + $dsBrokerHostname
+            @Severity = 2
+            @Type = 2
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "14":
+            # dsJobCompleted
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "A job completed successfully on host " + $1
+		@Summary = "A job completed successfully on host " + $dsBrokerHostname
+            @Severity = 2
+            @Type = 2
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "15":
+            # dsJobCancelled
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "A job was cancelled on host " + $1
+		@Summary = "A job was cancelled on host " + $dsBrokerHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "16":
+            # dsBrokerConfigChanged
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Broker configuration changed on host " + $1
+		@Summary = "Broker configuration changed on host " + $dsBrokerHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "18":
+            # dsEngineConfigChanged
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Engine configuration changed on host " + $1
+		@Summary = "Engine configuration changed on host " + $dsBrokerHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "19":
+            # dsBrokerCriticalError
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Critical error on the LiveCluster server on host " + $1
+		@Summary = "Critical error on the LiveCluster server on host " + $dsBrokerHostname
+            @Severity = 5
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        case "20":
+            # dsTaskError
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsBrokerHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "BrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Task error on host " + $1
+		@Summary = "Task error on host " + $dsBrokerHostname
+            @Severity = 4
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsBrokerHostname
+            
+        default:
+            $ruleset = $ruleset + "-case: default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+}
+
+
+@Identifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + %Manager + $tempIdentifierAddOn 
+
+################################################################################
+#
+#	DataSynapse Rules for dsDirectorTraps
+#
+#	Original	Unknown
+#	20070605	Chris Janes	Updated to MiB dated April 28, 2003
+#
+################################################################################
+  
+case "dsDirectorTraps":
+    $ruleset = $ruleset + "-case : dsDirectorTraps"
+    @Class = 1057302
+    @OwnerGID = 463
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+    @Agent = "DataSynapse"
+    
+    $ruleset = $ruleset + " ST " + $specific-trap 
+    switch ($specific-trap)  {
+        case "1":
+            # dsDirectorStarted
+#            @AlertKey = $1
+	 	$dsDirectorHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+#           @Summary = "LiveCluster Director has started on host " + $1
+            @Summary = "LiveCluster Director has started on host " + $dsDirectorHostname
+            @Severity = 2
+            @Type = 2
+           	$tempIdentifierAddOn =	$dsDirectorHostname
+
+ 
+            
+        case "5":
+            # dsEngineDaemonAdded
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsDirectorHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Engine Daemon " + $2 + " was added to the Director on host " + $1
+		@Summary = "Engine Daemon " + $dsEngineDaemonUsername + " was added to the Director on host " + $dsDirectorHostname
+            @Severity = 2
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname + $dsEngineDaemonUsername
+            
+        case "6":
+            # dsEngineDaemonRemoved
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsDirectorHostname = $1
+                $dsEngineDaemonUsername = $2
+                @AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+                @AlertKey = "dsEngineDaemonUsername = " + $dsEngineDaemonUsername
+#            @Summary = "Engine Daemon " + $2 + " was removed from the Director on host " + $1
+		@Summary = "Engine Daemon " + $dsEngineDaemonUsername + " was removed from the Director on host " + $dsDirectorHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname + $dsEngineDaemonUsername
+            
+        case "7":
+            # dsBrokerAdded
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsDirectorHostname = $1
+                $dsBrokerHostname = $2
+                @AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+                @AlertKey = "dsBrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Broker " + $2 + " was added to the Director on host " + $1
+		@Summary = "Broker " + $dsBrokerHostname + " was added to the Director on host " + $dsDirectorHostname
+            @Severity = 2
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname + $dsBrokerHostname
+            
+        case "8":
+            # dsBrokerRemoved
+#            @AlertKey = $1 + $2
+#            @AlertGroup = ""
+                $dsDirectorHostname = $1
+                $dsBrokerHostname = $2
+                @AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+                @AlertKey = "dsBrokerHostname = " + $dsBrokerHostname
+#            @Summary = "Broker " + $2 + " was removed from the Director on host " + $1
+		@Summary = "Broker " + $dsBrokerHostname + " was removed to the Director on host " + $dsDirectorHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname + $dsBrokerHostname
+            
+        case "17":
+            # dsDirectorConfigChanged
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsDirectorHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+#            @Summary = "Director configuration changed on host " + $1
+		@Summary = "Director configuration changed on host " + $dsDirectorHostname
+            @Severity = 3
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname
+            
+        case "19":
+            # dsDirectorCriticalError
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsDirectorHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+#            @Summary = "Critical error on the LiveCluster server on host " + $1
+		@Summary = "Critical error on the LiveCluster server on host " + $dsDirectorHostname
+            @Severity = 5
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname
+            
+        case "21":
+            # dsDatabaseLocalBackupFailure
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsDirectorHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+#            @Summary = "Error performing a local database backup on host " + $1
+		@Summary = "Error performing a local database backup on host " + $dsDirectorHostname
+            @Severity = 4
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname
+            
+        case "22":
+            # dsDatabaseRemoteBackupFailure
+#            @AlertKey = $1
+#            @AlertGroup = ""
+	 	$dsDirectorHostname = $1
+		@AlertKey = ""
+		@AlertGroup = "DirectorHostname = " + $dsDirectorHostname
+#            @Summary = "Error performing a remote database backup on host " + $1
+		@Summary = "Error performing a remote database backup on host " + $dsDirectorHostname
+            @Severity = 4
+            @Type = 1
+           	$tempIdentifierAddOn =	$dsDirectorHostname
+            
+        default:
+            $ruleset = $ruleset + "-case : default"
+		@AlertKey = $2
+		@AlertGroup = $1
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+
+	    @Identifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + %Manager + @AlertKey + @AlertGroup
+
+
+}
+
+@Identifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap + " " + @Agent + " " + %Manager + $tempIdentifierAddOn 

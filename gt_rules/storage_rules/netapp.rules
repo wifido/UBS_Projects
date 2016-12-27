@@ -1,0 +1,1504 @@
+#############################################################################################
+#
+# 	netapp include file
+#
+#	20071213	Chris Janes	Traps 256 and 257 for netapp filer added
+#
+#
+#
+#
+#############################################################################################
+
+case "netapp":
+    @Agent = "NetApp Filer"
+    @AlertGroup = ""
+    @AlertKey = ""
+    @Summary = $1
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128040
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " - netapp STrap " + $specific-trap
+
+    switch($specific-trap) {
+        case "2": ### - userDefined
+            # A polling-style trap built using the 'snmp traps'
+            # command on the filer.
+            @Severity = 2
+            @Type = 1
+        case "6": ### - dhmNoticeDegradedIO
+            # Disk Health Monitor -
+            # Reported a Disk Degraded-I/O  Event
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "DHM"
+        case "7": ### - dhmNoticePFAEvent
+            # Disk Health Monitor -
+            # Reported a Disk Predictive-Failure Event
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "DHM"
+        case "11": ### - emergencyTrap
+            # A user-defined trap indicating an extremely urgent
+            # situation, usually indicating that the system has
+            # failed and is shutting down.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "12": ### - alertTrap
+            # A user-defined trap indicating a condition that
+            # should be corrected immediately, such as a failed disk.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "13": ### - criticalTrap
+            # A user-defined trap indicating a critical condition,
+            # such as a hard device error.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "14": ### - errorTrap
+            # A user-defined trap indicating an error condition,
+            # such as a mistake in a configuration file.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "15": ### - warningTrap
+            # A user-defined trap indicating a condition which
+            # is not an error, but which may require special handling.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "16": ### - notificationTrap
+            # A user-defined trap meant to provide notification,
+            # such as an hourly uptime message.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "17": ### - informationalTrap
+            # A user-defined trap used for informational purposes.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "18": ### - dbgTrap
+            # A user-defined trap used for debugging purposes.
+            # This trap was previously mis-documented as being trap
+            # number 17, with the name debugTrap.  It has always,
+            # actually, been trap 18.  The name change is to avoid
+            # issues with environments that already have a record
+            # for debugTrap.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "userDefined"
+        case "21": ### - diskFailedShutdown
+            # System is shutting down because the system has been
+            # running in degraded mode for 24 hours.
+            # The trap includes a string describing the failed disk.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "diskFailed"
+        case "22": ### - diskFailed
+            # One or more disks failed.
+            # The trap includes a string describing the failed disk(s).
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "diskFailed"
+            @AlertKey = extract($1, "^[^/]+([^ ]+)")
+        case "26": ### - diskRepaired
+            # The failed disks have been repaired.
+            # This trap is a placeholder -
+            # it is not currently sent by ONTAP.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "diskFailed"
+            @AlertKey = extract($1, "^[^/]+([^ ]+)")
+        case "31": ### - fanFailureShutdown
+            # Critical chassis or cpu fans have failed and the system
+            # is shutting down.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "fanFailed"
+        case "33": ### - fanFailed
+            # One or more chassis fans failed.
+            # The trap includes a string describing the failed fan(s).
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "fanFailed"
+        case "35": ### - fanWarning
+            # One or more chassis or cpu fans are in warning state.
+            # The trap includes a string describing the fan(s) in
+            # the warning state.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "fanFailed"
+        case "36": ### - fanRepaired
+            # All fans are repaired.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "fanFailed"
+        case "41": ### - powerSupplyFailureShutdown
+            # Critical power supplies or power rails failed and
+            # the system is shutting down.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "powerSupplyFailed"
+        case "43": ### - powerSupplyFailed
+            # One or more redundant power supplies failed.
+            # Include in the trap a string describing
+            # the failed power supply(ies).
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "powerSupplyFailed"
+        case "45": ### - powerSupplyWarning
+            # One or more power supplies or power rails in
+            # warning state. Include in the trap a string describing
+            # the power supply(ies) or the power rail(s) in the
+            # warning state.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "powerSupplyFailed"
+        case "46": ### - powerSupplyRepaired
+            # Previously-failed power supplies or power rails have been
+            # repaired.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "powerSupplyFailed"
+        case "55": ### - cpuTooBusy
+            # CPU utilization exceeds 90%.
+            # This trap is a placeholder -
+            # it is not currently sent by ONTAP.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "cpuTooBusy"
+        case "56": ### - cpuOk
+            # CPU utilization has dropped back below 90%.
+            # This trap is a placeholder -
+            # it is not currently sent by ONTAP.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "cpuTooBusy"
+        case "62": ### - nvramBatteryDischarged
+            # The NVRAM battery is fully discharged.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "nvramBattery"
+        case "63": ### - nvramBatteryLow
+            # The charge in the NVRAM battery is low.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "nvramBattery"
+        case "72": ### - clusterNodeFailed
+            # A node in a Cluster FailOver configuration failed.
+            # Its partner will assume service for the failed node.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "clusterNodeFailed"
+        case "75": ### - clusterNodeTakenOver
+            # The partner has taken over for a failed cluster node.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "clusterNodeFailed"
+        case "76": ### - clusterNodeRepaired
+            # A cluster node has resumed operation.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "clusterNodeFailed"
+        case "82": ### - volumeFull
+            # At least one volume is more than 98% full.
+            # The string sent with the trap gives the 
+            # name of the volume or volumes which exceed
+            # the threshold.
+            @AlertGroup = "volumeFull"
+            @AlertKey = extract($1, "^(.*) is full .*$")
+            $percentFull = extract($8, "^The qtree is ([^%]+)%.*$")
+	    @SysInt = real($percentFull)
+            if (int($percentFull) < 70)  {
+                @Severity = 1
+                @Type = 2
+		@Display_Hide = 1
+            }
+            else if (int($percentFull) >= 70 and int($percentFull) < 75)  {
+                @Severity = 2
+                @Type = 1
+            }
+            else if (int($percentFull) >= 75 and int($percentFull) < 78)  {
+                @Severity = 3
+                @Type = 1
+            }
+            else if (int($percentFull) >= 78 and int($percentFull) < 80)  {
+                @Severity = 4
+                @Type = 1
+            }
+            else  {
+                @Severity = 5
+                @Type = 1
+            }
+	    if ( (regmatch(@Summary,"^.*.nearly full \(using.*$")) || (regmatch(@Summary,"^.*.is full \(using.*$")) )
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+        case "85": ### - volumeNearlyFull
+            # At least one volume is more than 95% full.
+            # The string sent with the trap gives the 
+            # name of the volume or volumes which exceed
+            # the threshold.
+            @AlertGroup = "volumeFull"
+            @AlertKey = extract($1, "^(.*) is nearly full .*$")
+            #$percentFull = extract($1, "^.*using or reserving ([0-9]+) .*$")
+	    #@SysInt = real($percentFull)
+            ## Mahesh Kumar TD #5232
+	    # Irrespective of Threshold, set severity to MAJOR
+	    @Severity = 4
+	    @Type = 1
+	    if ( (regmatch(@Summary,"^.*.nearly full \(using.*$")) || (regmatch(@Summary,"^.*.is full \(using.*$")) )
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+        case "86": ### - volumeRepaired
+            # All volumes are now under 95% full.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "volumeFull"
+            @AlertKey = extract($1, "^(.*) is .*$")
+	    if (regmatch(@Summary,"^.*.nearly full \(using.*$"))
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+#	20081128	Change by Chris janes of Abilitec TD 5166
+        case "87": ### - volumesStillFull
+            # At least one volume that was full or nearly full is now OK, but more volumes still exceed 
+            # the volumeNearlyFull or volumeFull thresholds. This trap is generally sent within a short 
+            # time of when a volume becomes OK, though if two volumes become OK within this timeframe, 
+            # only one trap is sent. The string sent with the trap gives the name of the volume or volumes
+            # which still exceed the volumeFull or volumeNearlyFull thresholds. It does not send the name 
+            # of any volume that is OK
+            $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "volumesStillFull"
+            @AlertKey = extract($productTrapData, "^(.*) is .*$")
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+	    if ( (regmatch(@Summary,"^.*.nearly full \(using.*$")) || (regmatch(@Summary,"^.*.is full \(using.*$")) )
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+#	20081128	End of Change
+
+        case "91": ### - overTempShutdown
+            # System temperature is too high to continue
+            # operating.  The system is shutting down.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "overTemp"
+        case "95": ### - overTemp
+            # System temperature is too high and in the
+            # warning level.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "overTemp"
+        case "96": ### - overTempRepaired
+            # System temperature has returned to an
+            # acceptable value.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "overTemp"
+        case "103": ### - shelfFault
+            # A disk storage shelf reported a fault, probably due
+            # to a problem with drive placement, fans, power,
+            # or temperature.
+	    ## Mahesh Kumar TD #5232
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "shelfFault"
+            @AlertKey = extract($1, "^.* channel ([a-zA-Z0-9]+).*$")
+        case "106": ### - shelfRepaired
+            # A previously-reported shelf fault is now corrected.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "shelfFault"
+            @AlertKey = extract($1, "^.* channel ([a-zA-Z0-9]+).*$")
+        case "111": ### - globalStatusNonRecoverable
+            # The appliance's overall status changed to
+            # 'nonRecoverable', indicating a problem so severe
+            # that the appliance is shutting down.
+            @Severity = 5
+            @Type = 1
+        case "113": ### - globalStatusCritical
+            # The appliance's overall status changed to 'critical',
+            # indicating a problem that needs immediate attention.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "globalStatus"
+        case "115": ### - globalStatusNonCritical
+            # The appliance's overall status changed to 'nonCritical',
+            # indicating a problem that needs attention.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "globalStatus"
+	    if (regmatch(@Summary,"^.*.is full \(using.*$"))
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+        case "116": ### - globalStatusOk
+            # The appliance's overall status returned to normal.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "globalStatus"
+        case "126": ### - softQuotaExceeded
+            # A user has exceeded their soft quota limit.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "softQuota"
+        case "127": ### - softQuotaNormal
+            # A user is safely back under their soft quota limit.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "softQuota"
+        case "134": ### - autosupportSendError
+            # Unable to send autosupport.
+            # The trap includes a string describing the reason for the failure.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "autosupport"
+        case "135": ### - autosupportConfigurationError
+            # Autosupport may be configured incorrectly.
+            # The trap includes a string describing the mis-configuration.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "autosupport"
+        case "136": ### - autosupportSent
+            # Autosupport was sent successfully.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "autosupport"
+        case "142": ### - upsLinePowerOff
+            # UPS: Input line power has failed and UPS is now on battery.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "UPS"
+        case "143": ### - upsBatteryCritical
+            # UPS: Battery exhausted, system is shutting down.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "UPS"
+        case "145": ### - upsBatteryWarning
+            # UPS: Warning: Time left on battery is getting critical.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "UPS"
+        case "146": ### - upsLinePowerRetored
+            # UPS:  Input line power has been restored and UPS is now off battery.
+            @Severity = 1
+            @Type = 2
+            @AlertGroup = "UPS"
+        case "151": ### - appEmergency
+            # The application encountered an extremely urgent
+            # situation and requires an immediate response.
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "APP"
+        case "152": ### - appAlert
+            # The application is in a condition that should 
+            # be corrected immediately.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "APP"
+        case "153": ### - appCritical
+            # The application encountered a critical condition.
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "APP"
+        case "154": ### - appError
+            # The application encountered an error condition.
+            @Severity = 3
+            @Type = 1
+        case "155": ### - appWarning
+            # The application is in a condition which is not an 
+            # error, but which may require special handling.
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "APP"
+        case "156": ### - appNotice
+            # The application is notifing of a certain event.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "APP"
+        case "157": ### - appInfo
+            # The application's message is meant for informational 
+            # purposes.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "APP"
+        case "158": ### - appTrap
+            # The application requires to be debugged.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "APP"
+        case "162": ### - alfFilewrap
+            # The internal audit file has wrapped. You are
+            # currently losing event records. Warning the user.
+	    ## Mahesh Kumar TD #5232
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "alfFile"
+        case "166": ### - alfFileSaved
+            # The internal audit log has been autosaved to an
+            # external evt file. Notifying the user.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "alfFile"
+        case "167": ### - alfFileNearlyFull
+            # The internal audit log file is nearly full. The fule
+            # is going to wrap. Notifying the user.
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "alfFile"
+        case "176": ### - quotaExceeded
+#		20070627	Change by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+#		20070627	End of Changes
+        case "177": ### - quotaNormal
+#		20070627	Change by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+#		20070627	End of Changes
+        case "187": ### - waflDirFull
+            # The directory has been filled to its limit
+            @Severity = 4
+            @Type = 1
+        case "192": ### - eccSummary
+            # Memory ECC: number of new correctable ECC errors
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "ECC"
+        case "195": ### - eccMasked
+            # Memory ECC: High frequency of ECC errors
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "ECC"
+
+#	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+#	--
+#	--  This section contains traps related to VIF Failover & Link Status
+#	--
+#	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+#	20081128	Change by Chris janes of Abilitec TD 5166
+        case "237": ### - vifPrimaryLinkFailed
+            # Vif: The primary Interface on a Single mode vif has failed 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "vif Primary Link "
+            @AlertKey = $productTrapData
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+            
+        case "238": ### - vifPrimaryLinkFailed
+            # Vif: The primary Interface on a Single mode vif has failed 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "vif All Link "
+            @AlertKey = $productTrapData
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+            
+#	20081128	End of Change
+
+        case "254": ### - vscanDisConnection
+            # VScan: There has been a connection to the vscan servers dropped 
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "Vscan"
+#	20071129	Changes by Chris Janes of Abilitec please see HDLDN0001568004
+	    @Class = 128860	#	Wintel AntiVirus
+	    @OwnerGID = 8	#	Wintel
+	    @OwnerUID = 65534	#	nobody
+#	20071129	End of Changes
+#		20080813	Change by Chris Janes TD 4986
+		$tempMarkForDiscard = 2
+
+#		20080813	End of Change
+        case "255": ### - vscanConfigurationChange
+            # VScan:There has been a change to the vscan configuration
+#		20070823	Change by Chris Janes see HDLDN0001359888
+		$NoElements = split(@Summary, SplitArray, ")") 
+            	if (match(SplitArray[2], " has disconnected from the filer"))
+		{
+			@Severity = 5
+		}
+		else
+		{
+			@Severity = 3
+		}
+#		@Severity = 3
+#		20070823	End of Change
+            	@Type = 1
+            	@AlertGroup = "Vscan"
+#		20080729	Change by Chris Janes TD 4986
+		$tempMarkForDiscard = 2
+
+#		20080729	End of Change
+
+#	20071213	Changes by Chris Janes of Abilitec ref Gordon Fong
+        case "256": ### -vscanServerUpgrade
+            # VScan: There has been a change to the vscan configuration
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "Vscan"
+
+#		20080729	Change by Chris Janes TD 4986
+		$tempMarkForDiscard = 2
+
+#		20080729	End of Change
+
+        case "257": ### -vscanServerUpgrade
+            # VScan: A virus scanner has made a connection to the Filer
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "Vscan"
+#		20080729	Change by Chris Janes TD 4986
+		$tempMarkForDiscard = 2
+
+#		20080729	End of Change
+
+#	20071213	End of Changes
+
+        case "266": ### -vscanServerUpgrade
+            # VScan:VScan: The Vscan server has been upgraded
+            @Severity = 3
+            @Type = 1
+            @AlertGroup = "Vscan"
+
+#		20080729	Change by Chris Janes TD 4986
+		$tempMarkForDiscard = 2
+
+#		20080729	End of Change
+
+#        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#	-- 
+#	--  This section contains traps related to volume status being offline,
+#	--  online or restricted
+#	-- 
+#	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+#	20081128	Change by Chris janes of Abilitec TD 5166
+        case "272": ### - volumeRestrictedByMirrorBigIo
+            # A volume that experienced a medium error during reconstruction is restricted and marked
+            # wafl-inconsistent, but starting wafliron has failed. This trap is issued to alert 
+            # operator that a volume is not accessible and wafliron must be started to allow access to it 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "volumeOnline"
+            @AlertKey = extract($1, "^Volume (.*) is online")
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+            
+        case "274": ### - volumeInconsistentUmount
+            # This trap is issued when we unmount a volume due to an inconsistency 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "volumeOnline"
+            @AlertKey = extract($1, "^Volume (.*) is online")
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+
+        case "275": ### - volumeStateChanged
+            # Volume is being taken offline or being restricted. The string sent with trap specifies 
+            # name of affected volume and its state 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "volumeOnline"
+            @AlertKey = extract($1, "^Volume (.*) is online")
+            @Description = "productTrapData is " + $productTrapData
+            @UserData = $productSerialNum
+	    if (regmatch(@Summary,"^.*.nearly full \(using.*$"))
+            {
+                $TD_Num = "5274"
+                $tempMarkForDiscard = 2
+            }
+
+        case "276":
+            @Severity = 2
+            @Type = 2
+            @AlertGroup = "volumeOnline"
+            @AlertKey = extract($1, "^Volume (.*) is online")
+            
+#	20081128	Changes by Chris Janes of Abilitec
+
+        case "284":
+            @Severity = 4
+            @Type = 1
+            @AlertGroup = "volumeOnline"
+            @AlertKey = extract($1, "^Volume (.*) is offline")
+#	20080729	Changes by Chris Janes of Abilitec
+        case "482": ### maxDirSizeAlert
+		$productTrapData = $1
+		$productSerialNum = $2
+            	@Severity = 5
+            	@Type = 1
+            	@AlertGroup = "maxdirsize"
+            	@AlertKey = $productTrapData 
+		@UserData = $productSerialNum
+#		@Summary = "A directory has reached it's maxdirsize limit. Either increase the maxdirsize or clean up the directory."
+
+#	20081128	Change by Chris janes of Abilitec TD 5166
+
+#	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#	-- CIFS domain controller-related traps
+#	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+        case "435": ### - domainControllerDisconnect
+            # Volume is being taken offline or being restricted. The string sent with trap specifies 
+            # name of affected volume and its state 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 2
+            @Type = 1
+            @AlertGroup = "domainController"
+            @AlertKey = $productTrapData
+            @AlertKey = $productSerialNum
+
+        case "436": ### - dcPasswdChangeFailed
+            # An attempt to change the filer's password with the domain controller has failed
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "dcPasswdChange"
+            @AlertKey = $productTrapData
+            @AlertKey = $productSerialNum
+
+
+#	20081128	End of Change
+
+
+        case "485": ### maxDirSizeWarning
+		$productTrapData = $1
+		$productSerialNum = $2
+            	@Severity = 5
+            	@Type = 1
+            	@AlertGroup = "maxdirsize"
+            	@AlertKey = $productTrapData 
+		@UserData = $productSerialNum
+#		@Summary = "A directory s getting close to it's maxdirsize limit. Either increase the maxdirsize or clean up the directory."
+
+
+        case "574": ### - driveDisableErr
+            # A drive has been disabled by the shelf module due to hardware errors.  If it's the only 
+            # drive in the shelf that is disabled, replace the drive 
+ 
+ 	    $productTrapData = $1
+            $productSerialNum = $2
+            @Severity = 5
+            @Type = 1
+            @AlertGroup = "driveDisable"
+            @AlertKey = $productTrapData
+            @AlertKey = $productSerialNum
+
+
+
+#	20080729	End of Changes
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Identifier = @Node + $enterprise + $generic-trap + $specific-trap + @Agent + @Manager
+            @Severity = 1
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
+#
+# Netapp Data Fabric Manager rules
+# Alan Charlton, Abilitec, June 2004
+#
+
+case "netappDataFabricManager":
+    @Agent = "NetApp DFM"
+    @OwnerGID = 542
+    @OwnerUID = 65534
+    @Class = 128050
+    $TempDoLookup = 2
+    $ruleset = $ruleset + " netapp-dfm "
+
+    #
+    # Set Severity
+    #
+    $ruleset = $ruleset + " $5 " + $5
+    switch ($5)  {
+        case "1" | "2":
+            @Severity = 2
+            @Type = 2
+#		20070627	Change by Chris Janes of Abilitec
+#           discard
+		$tempMarkForDiscard = 2
+#		20070627	End of Changes
+        case "3":
+            @Severity = 3
+            @Type = 1
+        case "4":
+            @Severity = 4
+            @Type = 1
+        case "5" | "6":
+            @Severity = 5
+            @Type = 1
+        default:
+    }
+
+    #
+    # Set AlertGroup
+    #
+    $ruleset = $ruleset + " $12 " + $12
+    switch ($12)  {
+        case "1":
+            @AlertGroup = "unknown"
+        case "2":
+            @AlertGroup = "mgmtStation"
+        case "3":
+            @AlertGroup = "host"
+        case "4":
+            @AlertGroup = "volume"
+        case "5":
+            @AlertGroup = "qtree"
+        case "6":
+            @AlertGroup = "config"
+        case "7":
+            @AlertGroup = "user"
+        case "8":
+            @AlertGroup = "network"
+        case "9":
+            @AlertGroup = "lun"
+        case "10":
+            @AlertGroup = "group"
+        case "11":
+            @AlertGroup = "fcSwitchPort"
+        case "12":
+            @AlertGroup = "directory"
+        case "13":
+            @AlertGroup = "hbaPort"
+        case "14":
+            @AlertGroup = "cmsJob"
+        case "15":
+            @AlertGroup = "aggregate"
+        case "16":
+            @AlertGroup = "interface"
+        case "17":
+            @AlertGroup = "script"
+        case "18":
+            @AlertGroup = "scriptJob"
+        default:
+            @AlertGroup = $12
+	
+    }
+
+    if (regmatch($13, ":"))  {
+        $machine = extract($13, "^([^:]+):.*$")
+        $tempAlertKey = extract($13, "^[^:]+:(.*)$")
+    }
+    else  {
+        $machine = $13
+        $tempAlertKey = ""
+    }
+    @AlertKey = $tempAlertKey
+
+    $dollar8length = length($8)
+    if (int($dollar8length) == 0)  {
+        @Summary = $4
+    }
+    else if (regmatch($8, "^The .*"))  {
+        @Summary = extract($8, "^(The) .*") + " " + $tempAlertKey + " " + extract($8, "^The (.*)")
+    }
+    else  {
+        @Summary = $8
+    }
+
+    $ruleset = $ruleset + " machine =  " + $machine
+    if (exists($machine))  {
+        @Node = lower($machine)
+        @NodeAlias = lower($machine)
+        @Origin = $Node
+        $machArea = substr($machine, 2, 3)
+        [@Location, @Region, $tmpDomain] = lookup($machArea, regloc)
+    }
+
+    $ruleset = $ruleset + " st " + $specific-trap
+	@Stream = $specific-trap
+    switch ($specific-trap)  {
+        case "10001":
+            @Severity = 1
+            @Type = 2
+            @Display_Hide = 1
+
+	case "10002":
+            $percentFull = extract($8, "^.* is ([0-9]+)\.[0-9]+% full.*$")
+	    @SysInt = real($percentFull)
+            if (int($percentFull) < 80)  {
+                @Severity = 1
+                @Type = 2
+		@Display_Hide = 1
+            }
+            else if (int($percentFull) >= 80 and int($percentFull) < 90)  {
+                @Severity = 2
+                @Type = 1
+            }
+            else if (int($percentFull) >= 90 and int($percentFull) < 100)  {
+                @Severity = 3
+                @Type = 1
+            }
+            else if (int($percentFull) >= 100 and int($percentFull) < 110)  {
+                @Severity = 4
+                @Type = 1
+            }
+            else  {
+                @Severity = 5
+                @Type = 1
+            }
+
+        case "10011":
+            @Severity = 1
+            @Type = 2
+            @Display_Hide = 1
+
+        case "10012":
+	    #Modified by Mahesh Kumar, TD #5223
+	    # This trap will only be sent when Threshold is >90 and <95
+	    $TD_Num = "5223"
+            $percentFull = extract($8, "^.* is ([0-9]+)\.[0-9]+% full.*$")
+	    @SysInt = real($percentFull)
+            @Severity = 4
+            @Type = 1
+	
+	case "10013":
+	    #Modified by Mahesh Kumar, TD #5223
+	    # This trap will only be sent when Threshold is >95
+	    $TD_Num = "5223"
+            $percentFull = extract($8, "^.* is ([0-9]+)\.[0-9]+% full.*$")
+            @SysInt = real($percentFull)
+            @Severity = 5
+            @Type = 1
+
+        case "10021":
+
+        case "10022":
+
+        case "10023":
+
+        case "10031":
+
+        case "10032":
+
+        case "10033":
+
+        case "10034":
+
+        case "10035":
+
+        case "10036":
+
+        case "10037":
+
+        case "10041":
+
+        case "10042":
+
+        case "10043":
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10049":
+
+        case "10050":
+
+#	20060915	End of Changes
+        case "10051":
+
+        case "10052":
+
+        case "10053":
+
+        case "10054":
+
+        case "10055":
+
+        case "10056":
+
+        case "10057":
+
+        case "10058":
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10059":
+
+        case "10060":
+
+#	20060915	End of Changes
+        case "10061":
+
+        case "10062":
+
+        case "10071":
+
+        case "10072":
+
+        case "10081":
+
+        case "10082":
+
+        case "10091":
+
+        case "10092":
+
+        case "10101" | "10102" | "10103":
+            $percentFull = extract($8, "^.* is ([0-9]+)\.[0-9]+% full.*$")
+	    @SysInt = real($percentFull)
+	    $freeLeft = extract($8, "^[^(]+(\([^)]+\)).$")
+	    @Summary = $tempAlertKey + " is " + $percentFull + "% full " + $freeLeft
+            if (int($percentFull) < 70)  {
+                @Severity = 2
+                @Type = 2
+            }
+            else if (int($percentFull) >= 70 and int($percentFull) < 80)  {
+                @Severity = 2
+                @Type = 1
+            }
+            else if (int($percentFull) >= 80 and int($percentFull) < 90)  {
+                @Severity = 3
+                @Type = 1
+            }
+            else if (int($percentFull) >= 90 and int($percentFull) < 95)  {
+                @Severity = 4
+                @Type = 1
+            }
+            else  {
+                @Severity = 5
+                @Type = 1
+            }
+        #
+        # Rules to add application SAP ID or Class ID to "SubClass" field for notification of filesystem errors to GSD teams
+	# Events are discarded if they don't have an association to a GSD team
+        #
+            $tmpClass = lookup($13, StorageAppMap)
+       #Simon Waller Abilitec 20060308
+	    $tmpClass2 = @Location + ":" + $tmpClass
+       #end of change
+	    if (match($tmpClass, ""))  {
+		@Type = 2
+		@Severity = 1
+		@Display_Hide = 1
+            }
+            else  {
+                @Class = $tmpClass
+                @OwnerGID = lookup($tmpClass2,SocketClassGID)
+                @Subclass = $tmpClass
+            }
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10104":
+
+        case "10105":
+
+        case "10106":
+
+#	20060915	End of Changes
+        case "10111":
+
+        case "10112":
+
+        case "10121":
+
+        case "10122":
+
+        case "10123":
+
+        case "10131":
+
+        case "10132":
+
+        case "10133":
+
+        case "10141":
+
+        case "10142":
+
+        case "10151":
+
+        case "10152":
+
+        case "10153":
+
+        case "10154":
+
+        case "10155":
+
+        case "10156":
+
+        case "10157":
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10158":
+
+        case "10159":
+
+#	20060915	End of Changes
+        case "10161":
+
+        case "10162":
+
+        case "10163":
+
+        case "10164":
+
+        case "10165":
+
+        case "10166":
+
+        case "10171":
+
+        case "10172":
+
+        case "10173":
+
+        case "10174":
+
+        case "10175":
+
+        case "10176":
+
+        case "10181":
+
+        case "10182":
+
+        case "10183":
+
+        case "10184":
+
+        case "10185":
+
+        case "10191":
+
+        case "10192":
+
+        case "10193":
+
+        case "10194":
+
+        case "10201":
+
+        case "10202":
+
+        case "10203":
+
+        case "10211":
+
+        case "10212":
+
+        case "10213":
+
+        case "10214":
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10220":
+
+#	20060915	End of Changes
+        case "10221":
+
+        case "10222":
+
+        case "10223":
+
+        case "10225":
+
+        case "10226":
+
+        case "10227":
+
+        case "10228":
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10229":
+
+#	20060915	End of Changes
+        case "10231":
+
+        case "10232":
+
+#	20060915	Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10233":
+
+#	20060915	End of Changes
+        case "10241":
+
+        case "10242":
+
+        case "10251":
+
+        case "10252":
+
+        case "10261":
+
+        case "10262":
+
+        case "10263":
+
+        case "10264":
+
+        case "10281":
+
+        case "10282":
+
+        case "10291":
+
+        case "10292":
+
+        case "10293":
+
+        case "10301":
+
+        case "10302":
+
+        case "10303":
+
+        case "10311":
+
+        case "10312":
+
+        case "10313":
+
+        case "10314":
+
+        case "10321":
+
+        case "10322":
+
+        case "10331":
+
+        case "10332":
+
+        case "10333":
+
+        case "10334":
+
+        case "10335":
+
+        case "10336":
+
+        case "10337":
+
+        case "10338":
+
+        case "10339":
+
+        case "10340":
+
+        case "10341":
+
+        case "10342":
+
+        case "10343":
+
+        case "10344":
+
+        case "10345":
+
+#       20060915        Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10346":
+
+#       20060915        End of Changes
+
+        case "10351":
+
+        case "10361":
+
+        case "10362":
+
+        case "10371":
+
+        case "10372":
+
+        case "10373":
+
+        case "10374":
+
+        case "10375":
+
+        case "10376":
+
+        case "10377":
+
+        case "10378":
+
+        case "10379":
+
+        case "10380":
+
+        case "10381":
+
+        case "10382":
+
+        case "10383":
+
+        case "10384":
+
+        case "10385":
+
+        case "10386":
+
+        case "10387":
+
+        case "10388":
+
+        case "10389":
+
+        case "10390":
+
+        case "10391":
+
+        case "10392":
+
+        case "10393":
+
+        case "10394":
+
+        case "10395":
+
+        case "10396":
+
+        case "10397":
+
+        case "10398":
+
+        case "10399":
+
+        case "10400":
+
+        case "10401":
+
+        case "10402":
+
+        case "10411":
+
+        case "10412":
+
+#       20060915        Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10422":
+
+
+        case "10423":
+
+        case "10432":
+
+        case "10433":
+
+        case "10434":
+
+        case "10435":
+
+        case "10436":
+
+        case "10437":
+
+        case "10441":
+
+        case "10442":
+
+        case "10451":
+
+        case "10452":
+
+        case "10453":
+
+        case "10461":
+
+        case "10462":
+
+        case "10463":
+
+        case "10471":
+
+        case "10472":
+
+        case "10481":
+
+        case "10482":
+
+        case "10491":
+
+        case "10492":
+
+        case "10501":
+
+        case "10511":
+
+        case "10521":
+
+        case "10531":
+
+        case "10541":
+
+        case "10551":
+
+        case "10561":
+
+        case "10571":
+
+        case "10581":
+
+#       20060915        End of Changes
+        case "10582":
+
+#       20060915        Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10583":
+
+        case "10584":
+
+        case "10583":
+
+        case "10591":
+
+        case "10592":
+
+        case "10593":
+
+        case "10594":
+
+        case "10595":
+
+        case "10596":
+
+        case "10601":
+
+        case "10602":
+
+        case "10603":
+
+        case "10611":
+
+        case "10612":
+
+        case "10613":
+
+        case "10621":
+
+        case "10622":
+
+        case "10623":
+
+        case "10631":
+
+        case "10632":
+
+        case "10641":
+
+        case "10642":
+
+        case "10651":
+
+#       20060915        End of Changes
+
+        case "10652":
+#       20060915        Changes by Chris Janes of Abilitec HDSNG0000486662
+        case "10661":
+
+        case "10662":
+
+        case "10671":
+
+        case "10681":
+
+        case "10682":
+
+        case "10683":
+
+        case "10684":
+
+        case "10685":
+
+        case "10686":
+
+        case "10687":
+
+        case "10688":
+
+        case "10689":
+
+        case "10691":
+
+        case "10692":
+
+        case "10693":
+
+        case "10694":
+
+        case "10701":
+
+        case "10711":
+
+        case "10712":
+
+        case "10721":
+
+        case "10722":
+
+        case "10731":
+
+        case "10732":
+
+        case "10741":
+
+        case "10742":
+
+        case "10751":
+
+        case "10752":
+
+        case "10753":
+
+        case "10754":
+
+        case "10761":
+
+        case "10762":
+
+        case "10771":
+
+        case "10772":
+
+        case "10781":
+
+        case "10782":
+
+#       20060915        End of Changes
+
+        default:
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+            $tempIdentifier = $Node + " " + $enterprise + " " + $generic-trap + " " + $specific-trap
+            # 20050728 Following line Added to replace De tails by Chris Janes of Abilitec
+	    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+    }
+    # 20090610 MK
+
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + $machine + @Type + @AlertGroup + @AlertKey
+

@@ -1,0 +1,2 @@
+map(name="UNIX-prem-test",bgImage="",bgColor="white",w="250",h="250",acl="*")
+monitor(show highest="false",type="lavalamp",url="",show lowest="false",show highest severity as border="false",datasource="NCOMS",label="untitled",show total="false",y="89",x="56",w="140",entity="UNIX-prem-test",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",show label="true",h="109",foreground color="black",style="p",background color="lightGray",show metric="false",target="_self",name="visual_1")

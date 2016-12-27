@@ -1,0 +1,94 @@
+
+# Table for defining event route destinations based on probe server hostname
+table OSServers =
+{
+	# Engineering probes
+	{"STMSKTENG1","STMENG","STMENG","STMENG_FT","STMENG_AH","1"}
+	{"LDNSKTENG1","LDNENG","LDNENG","LDNENG_FT","LDNENG_AH","1"}
+	{"ENG_SSM_STM","STMENG","DEV_HBT_OS","STMENG_FT","STMENG_AH","1"}
+	{"ENG_SSM_LDN","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"}
+	{"ENG_MTT_STM","STMENG","STMENG","STMENG_FT","STMENG_AH","1"}
+	{"ENG_MTT_LDN","LDNENG","LDNENG","LDNENG_FT","LDNENG_AH","1"}
+	{"xstm1953dap","STMENG","DEV_HBT_OS","STMENG_FT","STMENG_AH","1"}
+	# Added 7743 GT 20090501
+	{"xstm7743dap","STMENG","DEV_HBT_OS","STMENG_FT","STMENG_AH","1"}
+	#{"xstm1979dap","STMENG","DEV_HBT_OS","STMENG_FT","STMENG_AH","1"} Removed GT 20090501
+	#{"xldn1052dap","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"} Removed GT 20090501
+	{"xldn2929dap","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"}
+	#{"xldn1053dap","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"} Removed GT 20090501
+	#{"xldn1054dap","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"} Removed GT 20090501
+	{"xldn1055dap","LDNENG","DEV_HBT_OS","LDNENG_FT","LDNENG_AH","1"}
+	
+	# Dev probes
+	{"STMSKTDEV1","STMTEST","STMTEST","STMTEST","STMTEST_AH","1"}
+		# Dev mttrapd probe will change name from STMMTTDEV36 to STMMTTDEV1  when upgraded to V7
+	{"STMMTTDEV36","STMTEST","STMTEST","STMTEST","STMTEST_AH","1"}
+	{"STMMTTDEV1","STMTEST","STMTEST","STMTEST","STMTEST_AH","1"}
+		# Dev SSM probe will change manager name when upgraded to V7 from STMMTTENG1 to STMMTTDEV2
+	{"STMMTTENG1","STMTEST","DEV_HBT_OS","STMENG","STMENG_AH","1"}
+	{"STMMTTDEV2","STMTEST","DEV_HBT_OS","STMENG","STMENG_AH","1"}
+	{"xstm5257dap","STMTEST","DEV_HBT_OS","STMTEST_FT","STMTEST_AH","1"}
+	#{"xstm1935dap","STMTEST","DEV_HBT_OS","STMTEST_FT","STMTEST_AH","1"} Removed GT 20090501
+	{"xsng1281dap","STMTEST","DEV_HBT_OS","STMTEST_FT","STMTEST_AH","1"}
+
+	# Dev ISM monitors
+	{"LDNHTTPDEV1","EMEA","EMEA","EMEA","EMEA_AH","1"}
+	{"LDNHTTPSDEV1","EMEA","EMEA","EMEA","EMEA_AH","1"}
+	{"LDNSNMPDEV1","EMEA","EMEA","EMEA","EMEA_AH","1"}
+	{"LDNTCPPORTDEV1","EMEA","EMEA","EMEA","EMEA_AH","1"}
+	{"xstm9174dap","STMENG","DEV_HBT_OS","STMENG_FT","STMENG_AH","1"}
+	
+	# London Production probes
+	{"LDNSKTPROD1","EMEA","EMEA","EMEA_FT","EMEA_AH","0"}
+	{"LDNMTPPROD1","EMEA","EMEA","EMEA_FT","EMEA_AH","0"}
+	# Probes on xldn0064pap repointed to Stamford. GT 12/11/07
+	{"xldn0064pap","USAPAC","UBS_HBT_OS","USAPAC_FT","USAPAC_AH","0"}
+	{"xldn1014pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+	{"xldn1018pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+	{"xldn2795pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+
+	# Opfikon Production probes
+	{"OPFSKTPROD1","EMEA","EMEA","EMEA_FT","EMEA_AH","0"}
+	{"OPFMTPPROD1","EMEA","EMEA","EMEA_FT","EMEA_AH","0"}
+	{"OPFMTPPROD2","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+	{"xopf0100pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+	{"xopf0101pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+
+	# Singapore Production probes
+	{"SNGSKTPROD1","PACIFIC","PACIFIC","PACIFIC_FT","PACIFIC_AH","0"}
+	{"SNGMTPPROD1","PACIFIC","PACIFIC","PACIFIC_FT","PACIFIC_AH","0"}
+	{"SNGMTPPROD2","PACIFIC","UBS_HBT_OS","PACIFIC_FT","PACIFIC_AH","0"}
+	{"xsng1001pap","PACIFIC","UBS_HBT_OS","PACIFIC_FT","PACIFIC_AH","0"}
+	{"xsng1283pap","PACIFIC","UBS_HBT_OS","PACIFIC_FT","PACIFIC_AH","0"}
+	
+	# Stamford Production probes
+	{"STMSKTPROD1","USAPAC","USAPAC","USAPAC_FT","USAPAC_AH","0"}
+	{"STMMTPPROD1","USAPAC","USAPAC","USAPAC_FT","USAPAC_AH","0"}
+	{"STMMTPPROD2","USAPAC","UBS_HBT_OS","USAPAC_FT","USAPAC_AH","0"}
+	{"xstm8951pap","USAPAC","UBS_HBT_OS","USAPAC_FT","USAPAC_AH","0"}
+	{"xstm1394pap","USAPAC","UBS_HBT_OS","USAPAC_FT","USAPAC_AH","0"}
+
+	# Zurich Production probes.
+	{"xzur0565pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+	{"xzur0567pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+
+	# Heartbeat Probes
+	# THese are now hard coded in the hbt_mttrapd rules file.
+	{"HBTMTPPROD1","UBS_HBT_OS","UBS_HBT_OS","UBS_HBT_OS","UBS_HBT_OS","0"}
+
+	# London Production ISM monitors
+	{"LDNHTTPPROD1","EMEA","EMEA","EMEA","EMEA_AH","0"}
+	{"LDNHTTPSPROD1","EMEA","EMEA","EMEA","EMEA_AH","0"}
+	{"LDNSNMPPROD1","EMEA","EMEA","EMEA","EMEA_AH","0"}
+	{"LDNTCPPORTPROD1","EMEA","EMEA","EMEA","EMEA_AH","0"}
+	{"xldn1017pap","EMEA","UBS_HBT_OS","EMEA_FT","EMEA_AH","0"}
+
+	# Stamford production ISM monitors
+	{"STMHTTPPROD1","USAPAC","USAPAC","USAPAC","USAPAC_AH","0"}
+	{"STMHTTPSPROD1","USAPAC","USAPAC","USAPAC","USAPAC_AH","0"}
+	{"STMSNMPPROD1","USAPAC","USAPAC","USAPAC","USAPAC_AH","0"}
+	{"STMTCPPORTPROD1","USAPAC","USAPAC","USAPAC","USAPAC_AH","0"}
+	{"xstm1343pap","USAPAC","UBS_HBT_OS","USAPAC_FT","USAPAC_AH","0"}
+}
+default = {"","","","",""}
+

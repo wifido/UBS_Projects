@@ -1,0 +1,6 @@
+Name "main::EntityMetricOf" used only once: possible typo at ./webtopCheck_V2.pl line 211.
+Name "main::PathTargetFolder" used only once: possible typo at ./webtopCheck_V2.pl line 60.
+Name "main::EntityMetricLabel" used only once: possible typo at ./webtopCheck_V2.pl line 203.
+Name "main::EntityMetricShow" used only once: possible typo at ./webtopCheck_V2.pl line 207.
+Name "main::osmap" used only once: possible typo at ./webtopCheck_V2.pl line 159.
+Name "main::dbh" used only once: possible typo at ./webtopCheck_V2.pl line 112.

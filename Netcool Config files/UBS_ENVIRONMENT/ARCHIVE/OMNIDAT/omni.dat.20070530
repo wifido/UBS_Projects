@@ -1,0 +1,733 @@
+# omni.dat file as prototype for interfaces file
+#
+# Ident: $Id: omni.dat 1.5 1999/07/13 09:34:20 chris Development $
+#
+# Created by G.Thomas 5/02/2007
+# Version for Omnibus V7.1.1 and ISM 2.4
+#
+## Local NCO_PA alias here
+[NCO_PA]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4200
+}
+
+## Object Servers.. Production Virtual ones first
+[EMEA]
+{
+	Primary:	xldn2795pap.ldn.swissbank.com 4100
+	Backup:		xzur0567pap.zur.swissbank.com 4100
+}
+
+[USAPAC]
+{
+	Primary:	xstm8950pap.stm.swissbank.com 4100
+	Backup:		xstm8027pap.stm.swissbank.com 4100
+}
+
+[PACIFIC]
+{
+	Primary:	xsng1209pap.sng.swissbank.com 4100
+	Backup:		xsng1299pap.sng.swissbank.com 4100
+}
+
+[UBS_HBT_OS]
+{
+	Primary:	xstm1315pap.stm.swissbank.com 4100
+	Backup:		xldn1018pap.ldn.swissbank.com 4100
+}
+
+[AEN_PROD]
+{
+	Primary:	xldn1018pap.ldn.swissbank.com 4100
+	Backup:		xstm1315pap.stm.swissbank.com 4100
+}
+
+## Now the production physical hosts.
+## Collection Layer Hosts. EMEA Region xldn2795pap.ldn.swissbank.com
+[LDNOBJPROD1]
+{
+	Primary:	xldn2795pap.ldn.swissbank.com 4100
+}
+
+[BG_EM1-US1]
+{
+	Primary:	xldn2795pap.ldn.swissbank.com 4320
+}
+
+[G_REM_PLDN]
+{
+	Primary:	xldn2795pap.ldn.swissbank.com 4322
+}
+
+[LDN2795_PA]
+{
+	Primary:	xldn2795pap.ldn.swissbank.com 4200
+}
+
+## Collection Layer Hosts. EMEA Region xzur0567pap.zur.swissbank.com
+[ZUROBJPROD1]
+{
+	Primary:	xzur0567pap.zur.swissbank.com 4100
+}
+
+[BG_EM2-US2]
+{
+	Primary:	xzur0567pap.zur.swissbank.com 4320
+}
+
+[FG_ZUR-LDN]
+{
+	Primary:	xzur0567pap.zur.swissbank.com 4323
+}
+
+[ZUR0567_PA]
+{
+	Primary:	xzur0567pap.zur.swissbank.com 4200
+}
+
+## Collection Layer Hosts. USAPAC Region xstm8950pap.stm.swissbank.com
+[STMOBJPROD1]
+{
+	Primary:	xstm8950pap.stm.swissbank.com 4100
+}
+
+[G_REM_PSTM]
+{
+	Primary:	xstm8950pap.stm.swissbank.com 4322
+}
+
+[STM8950_PA]
+{
+	Primary:	xstm8950pap.stm.swissbank.com 4200
+}
+
+## Collection Layer Hosts. USAPAC Region xstm8027pap.stm.swissbank.com
+[STMOBJPROD2]
+{
+	Primary:	xstm8027pap.stm.swissbank.com 4100
+}
+
+[FG_STM-STM]
+{
+	Primary:	xstm8027pap.stm.swissbank.com 4323
+}
+
+[STM8027_PA]
+{
+	Primary:	xstm8027pap.stm.swissbank.com 4200
+}
+
+## Collection Layer Hosts. PACIFIC Region xsng1209pap.sng.swissbank.com
+[SNGOBJPROD1]
+{
+	Primary:	xsng1209pap.sng.swissbank.com 4100
+}
+
+[BG_AP1-EM1]
+{
+	Primary:	xsng1209pap.sng.swissbank.com 4321
+}
+
+[G_REM_PSNG]
+{
+	Primary:	xsng1209pap.sng.swissbank.com 4322
+}
+
+[SNG1209_PA]
+{
+	Primary:	xsng1209pap.sng.swissbank.com 4200
+}
+
+## Collection Layer Hosts. PACIFIC Region xsng1299pap.sng.swissbank.com
+[SNGOBJPROD2]
+{
+	Primary:	xsng1299pap.sng.swissbank.com 4100
+}
+
+[BG_AP2-EM2]
+{
+	Primary:	xsng1299pap.sng.swissbank.com 4321
+}
+
+[FG_SNG-SNG]
+{
+	Primary:	xsng1299pap.sng.swissbank.com 4323
+}
+
+[SNG1299_PA]
+{
+	Primary:	xsng1299pap.sng.swissbank.com 4200
+}
+
+## Production DSD Object Servers EMEA Region xldn2892pap.ldn.swissbank.com
+[LDNOBJPDSP1]
+{
+	Primary:	xldn2892pap.ldn.swissbank.com 4150
+}
+
+[UG_LDNP1]
+{
+	Primary:	xldn2892pap.ldn.swissbank.com 4350
+}
+
+[LDN2892_PA]
+{
+	Primary:	xldn2892pap.ldn.swissbank.com 4200
+}
+
+## Production DSD Object Servers EMEA Region xldn2893pap.ldn.swissbank.com
+[LDNOBJPDSP2]
+{
+	Primary:	xldn2893pap.ldn.swissbank.com 4150
+}
+
+[UG_LDNP2]
+{
+	Primary:	xldn2893pap.ldn.swissbank.com 4350
+}
+
+[LDN2893_PA]
+{
+	Primary:	xldn2893pap.ldn.swissbank.com 4200
+}
+
+## Production DSD Object Servers EMEA Region xldn2376pap.ldn.swissbank.com
+[LDNOBJPDSP3]
+{
+	Primary:	xldn2376pap.ldn.swissbank.com 4150
+}
+
+[UG_LDNP3]
+{
+	Primary:	xldn2376pap.ldn.swissbank.com 4350
+}
+
+[LDN2376_PA]
+{
+	Primary:	xldn2376pap.ldn.swissbank.com 4200
+}
+
+## Production DSD Object Servers USAPAC Region xstm1335pap.stm.swissbank.com
+[STMOBJPDSP1]
+{
+	Primary:	xstm1335pap.stm.swissbank.com 4150
+}
+
+[UG_STMP1]
+{
+	Primary:	xstm1335pap.stm.swissbank.com 4350
+}
+
+[STM1335_PA]
+{
+	Primary:	xstm1335pap.stm.swissbank.com 4200
+}
+
+## Production DSD Object Servers USAPAC Region xstm1317pap.stm.swissbank.com
+[STMOBJPDSP2]
+{
+	Primary:	xstm1317pap.stm.swissbank.com 4150
+}
+
+[UG_STMP2]
+{
+	Primary:	xstm1317pap.stm.swissbank.com 4350
+}
+
+[STM1317_PA]
+{
+	Primary:	xstm1317pap.stm.swissbank.com 4200
+}
+
+## Production DSD Object Servers PACIFIC Region xsng1284pap.sng.swissbank.com
+[SNGOBJPDSP1]
+{
+	Primary:	xsng1284pap.sng.swissbank.com 4150
+}
+
+[UG_SNGP1]
+{
+	Primary:	xsng1284pap.sng.swissbank.com 4350
+}
+
+[SNG1284_PA]
+{
+	Primary:	xsng1284pap.sng.swissbank.com 4200
+}
+
+## Production DSD Object Servers PACIFIC Region xsng1285pap.sng.swissbank.com
+[SNGOBJPDSP2]
+{
+	Primary:	xsng1285pap.sng.swissbank.com 4150
+}
+
+[UG_SNGP2]
+{
+	Primary:	xsng1285pap.sng.swissbank.com 4350
+}
+
+[SNG1285_PA]
+{
+	Primary:	xsng1285pap.sng.swissbank.com 4200
+}
+
+## Production DSD Object Servers PACIFIC Region xsng1282pap.sng.swissbank.com
+[SNGOBJPDSP3]
+{
+	Primary:	xsng1282pap.sng.swissbank.com 4150
+}
+
+[UG_SNGP3]
+{
+	Primary:	xsng1282pap.sng.swissbank.com 4350
+}
+
+[SNG1282_PA]
+{
+	Primary:	xsng1282pap.sng.swissbank.com 4200
+}
+
+
+## Production HEARTBEAT Servers: xstm1315pap.stm.swissbank.com
+[STMOBJPHBT1]
+{
+	Primary:	xstm1315pap.stm.swissbank.com 4100
+}
+
+[NG_STM-STM]
+{
+	Primary:	xstm1315pap.stm.swissbank.com 4350
+}
+
+[STM1315_PA]
+{
+	Primary:	xstm1315pap.stm.swissbank.com 4200
+}
+
+## Production HEARTBEAT Servers: xldn1018pap.ldn.swissbank.com
+[LDNOBJPHBT1]
+{
+	Primary:	xldn1018pap.ldn.swissbank.com 4100
+}
+
+[HG_LDN-STM]
+{
+	Primary:	xldn1018pap.ldn.swissbank.com 4351
+}
+
+[NG_LDN-LDN]
+{
+	Primary:	xldn1018pap.ldn.swissbank.com 4352
+}
+
+[LDN1018_PA]
+{
+	Primary:	xldn1018pap.ldn.swissbank.com 4200
+}
+
+## Reporter Gateways here. These are High Performance gateways.
+[REP_FG_LDN]
+{
+	Primary:	sldn0150por.ldn.swissbank.com 4306
+}
+
+[LDN0150_PA]
+{
+	Primary:	sldn0150por.ldn.swissbank.com 4200
+}
+
+[REP_FG_STM]
+{
+	Primary:	sstm8958por.stm.swissbank.com 4307
+}
+	
+[STM8958_PA]
+{
+	Primary:	sstm8958por.stm.swissbank.com 4200
+}
+	
+## Production Impact Servers.
+## USAPAC Region
+[STM1333_PA]
+{
+	Primary:	xstm1333pap.stm.swissbank.com 4200
+}
+
+[STM1318_PA]
+{
+	Primary:	xstm1318pap.stm.swissbank.com 4200
+}
+
+## EMEA Region
+[LDN1016_PA]
+{
+	Primary:	xldn1016pap.ldn.swissbank.com 4200
+}
+
+[LDN1015_PA]
+{
+	Primary:	xldn1015pap.ldn.swissbank.com 4200
+}
+
+## Production ISM Servers
+[STM1343_PA]
+{
+	Primary:	xstm1343pap.stm.swissbank.com 4200
+}
+
+[LDN1017_PA]
+{
+	Primary:	xldn1017pap.ldn.swissbank.com 4200
+}
+
+## Production Probe Servers not already catered for above.
+## EMEA Probes
+[LDN1014_PA]
+{
+	Primary:	xldn1014pap.ldn.swissbank.com 4200
+}
+
+[ZUR0565_PA]
+{
+	Primary:	xzur0565pap.zur.swissbank.com 4200
+}
+
+[OPF0101_PA]
+{
+	Primary:	xopf0101pap.opf.swissbank.com 4200
+}
+
+[OPF0100_PA]
+{
+	Primary:	xopf0100pap.opf.swissbank.com 4200
+}
+
+[LDN0064_PA]
+{
+	Primary:	xldn0064pap.ldn.swissbank.com 4200
+}
+## USAPAC Probes
+[STM1394_PA]
+{
+	Primary:	xstm1394pap.stm.swissbank.com 4200
+}
+
+
+## PACIFIC Probes
+[SNG1283_PA]
+{
+	Primary:	xsng1283pap.sng.swissbank.com 4200
+}
+
+[SNG1001_PA]
+{
+	Primary:	xsng1001pap.sng.swissbank.com 4200
+}
+
+
+
+## Development Environment
+## Virtual
+[STMTEST]
+{
+	Primary:	xstm9838dap.stm.swissbank.com 4100
+}
+
+## Changed for AEN testing
+#[DEV_HBT_OS]
+#{
+	#Primary:	xldn1055dap.ldn.swissbank.com 4100
+	#Backup:	xldn1055dap.ldn.swissbank.com 4101
+#}
+
+[DEV_HBT_OS]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4100
+	Backup:		xsng1281dap.sng.swissbank.com 4101
+}
+
+
+[AEN_ENG]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4101
+	Backup:		xldn1055dap.ldn.swissbank.com 4100
+}
+
+## xstm9838dap.stm.swissbank.com
+## Physical
+[STMOBJTEST1]
+{
+	Primary:	xstm9838dap.stm.swissbank.com 4100
+}
+
+[G_REM_DSTM]
+{
+	Primary:	xstm9838dap.stm.swissbank.com 4385
+}
+
+[UNI_GATE]
+{
+	Primary:	xstm9838dap.stm.swissbank.com 4398
+}
+
+[STM9838_PA]
+{
+	Primary:	xstm9838dap.stm.swissbank.com 4200
+}
+
+
+## xstm1935dap.stm.swissbank.com
+[STMOBJDDSP1]
+{
+	Primary:	xstm1935dap.stm.swissbank.com 4100
+}
+
+[UG_STMD1]
+{
+	Primary:	xstm1935dap.stm.swissbank.com 4350
+}
+
+[UNI_DDISP]
+{
+	Primary:	xstm1935dap.stm.swissbank.com 4351
+}
+
+[STM1935_PA]
+{
+	Primary:	xstm1935dap.stm.swissbank.com 4200
+}
+
+## xstm9174dap.stm.swissbank.com
+[STM9174_PA]
+{
+	Primary:	xstm9174dap.stm.swissbank.com 4200
+}
+
+## xsng1281dap.sng.swissbank.com
+## Physical Development
+[SNGOBJTEST1]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4100
+}
+
+[UG_PROD-DEV]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4370
+}
+
+
+## Physical Engineering
+[SNGOBJENG1]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4101
+}
+
+[UG_DEV-ENG]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4380
+}
+
+[BG_SNG-STM]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4310
+}
+
+[HG_SNG-LDN]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4311
+}
+
+[NG_SNG-ENG]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4312
+}
+
+[SNG1281_PA]
+{
+	Primary:	xsng1281dap.sng.swissbank.com 4200
+}
+
+## xldn1052dap.ldn.swissbank.com
+## Virtual Engineering
+[LDNENG]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4100
+	Backup:		xldn1052dap.ldn.swissbank.com 4101
+}
+
+## Physical Engineering
+[LDNOBJENG1]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4100
+}
+
+[LDNOBJENG2]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4101
+}
+
+[BG_LDN-STM]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4391
+}
+
+[FG_LDN-ENG]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4390
+}
+
+[LDN1052_PA]
+{
+	Primary:	xldn1052dap.ldn.swissbank.com 4200
+}
+
+## xstm1953dap.stm.swissbank.com
+## Virtual Engineering
+[STMENG]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4100
+	Backup:		xstm1953dap.stm.swissbank.com 4101
+}
+
+## Physical Engineering
+[STMOBJENG1]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4100
+}
+
+[STMOBJENG2]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4101
+}
+
+[BG_STM-LDN]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4391
+}
+
+[BG_STM2-LDN]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4392
+}
+
+[FG_ENG-ENG2]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4395
+}
+
+[UNI_TST2ENG]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4396
+}
+
+[STM1953_PA]
+{
+	Primary:	xstm1953dap.stm.swissbank.com 4200
+}
+
+
+## Engineering Display object servers here
+## London
+## xldn1053dap.ldn.swissbank.com
+[LDNOBJEDSP1]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4100
+}
+
+[LDNOBJEDSP2]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4101
+}
+
+[UG_LDNE1]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4380
+}
+
+[UG_LDNE2]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4381
+}
+
+[LDNOBJRAD1]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4102
+}
+
+[LDN1053_PA]
+{
+	Primary:	xldn1053dap.ldn.swissbank.com 4200
+}
+
+## xldn1054dap.ldn.swissbank.com
+[LDNOBJEDSP3]
+{
+	Primary:	xldn1054dap.ldn.swissbank.com 4100
+}
+
+[UG_LDNE3]
+{
+	Primary:	xldn1054dap.ldn.swissbank.com 4382
+}
+
+[LDN1054_PA]
+{
+	Primary:	xldn1054dap.ldn.swissbank.com 4200
+}
+
+## Stamford
+## xstm1979dap.stm.swissbank.com
+[STMOBJEDSP1]
+{
+	Primary:	xstm1979dap.stm.swissbank.com 4100
+}
+
+[STMOBJEDSP2]
+{
+	Primary:	xstm1979dap.stm.swissbank.com 4101
+}
+
+[UG_STME1]
+{
+	Primary:	xstm1979dap.stm.swissbank.com 4350
+}
+[UG_STME2]
+{
+	Primary:	xstm1979dap.stm.swissbank.com 4351
+}
+
+[STM1979_PA]
+{
+	Primary:	xstm1979dap.stm.swissbank.com 4200
+}
+
+## Dev/Eng HEARTBEAT servers.
+[LDNOBJEHBT1]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4100
+}
+
+[LDNOBJEHBT2]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4101
+}
+
+[UG_HBT-ENG]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4352
+}
+
+[NG_LDN-ENG]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4353
+}
+
+[HG_HBT-ENG]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4351
+}
+
+[LDN1055_PA]
+{
+	Primary:	xldn1055dap.ldn.swissbank.com 4200
+}

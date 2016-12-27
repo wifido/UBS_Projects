@@ -1,0 +1,9 @@
+# Table for BigIP IP/Port to Application mapping
+table IPPortAppMap =
+{
+        {"139.149.47.154:11103","xldn0199dap.ldn.swissbank.com","provider1"}
+        {"139.149.47.154:11108","xldn0199dap.ldn.swissbank.com","provider2"}
+        {"139.149.47.158:11103","xldn0219dap.ldn.swissbank.com","provider1"}
+        {"139.149.47.158:11108","xldn0219dap.ldn.swissbank.com","provider2"}
+}
+default = {"unknown host","unknown app"}

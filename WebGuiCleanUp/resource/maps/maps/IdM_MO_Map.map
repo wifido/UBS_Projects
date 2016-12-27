@@ -1,0 +1,4 @@
+map(name="IdM_MO_Map",bgImage="map.jpg",bgColor="#333333",w="950",h="900",acl="*")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="352",x="162",w="50",entity="IDM_ExternalSSO",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="25",style="p",target="_self",name="External")
+button(legend="None",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="272",x="310",w="50",font="Helvetica",size="10",action="Open URL",color="gray",h="25",transparent="false",target="_self",name="visual_1")
+button(legend="Count",arc diameter="20",type="rectangle",url="",datasource="NCOMS",label="untitled",font color="black",y="100",x="105",w="166",entity="IDM_Test2",font="Helvetica",size="10",flash="true",action="Active Event List (AEL)",h="125",style="p",target="_self",name="HASv3 Eng-UAT")

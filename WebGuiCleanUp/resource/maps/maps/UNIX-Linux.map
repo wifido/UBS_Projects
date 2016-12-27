@@ -1,0 +1,2 @@
+map(name="UNIX-Linux",bgColor="white",w=158,h=89,acl="*")
+monitor(name="visual_1",label="Linux Servers - Global",x=6,y=5,action="ael",url="",target="_self",entity="UNIX-Linux",w=144,h=75,w=144,h=75,type="lavalamp",show label=true,show total=false,show highest=false,show lowest=false,show metric=true,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

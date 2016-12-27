@@ -1,0 +1,36 @@
+#
+# Determine whether we should enable various "debugging" aids
+#
+$hn = hostname()
+$envChar = substr($hn, 9, 1)
+$DEV = 0
+$debugMode = 0
+#	20090220 GT modified lookup statement to include App_hbt_status target definition.
+#[$UBS_OStoThrow, $UBS_HBTOStoThrow, $UBS_TELEOStoThrow, $isDev] = lookup(@ProbeHostName, OSServers)
+[$UBS_OStoThrow, $UBS_HBTOStoThrow, $UBS_TELEOStoThrow, $UBS_CAHOStoThrow, $isDev] = lookup(@ProbeHostName, OSServers)
+#	20090220 GT end of change.
+$msglvl = upper(%MessageLevel)
+if (match($isDev, '1') || match($envChar, 'd') || match($envChar, 'n'))  {
+    $DEV = 1
+}
+
+if (match($msglvl, "DEBUG") && int($DEV) == 1)  {
+    $debugMode = 1
+    include "$OMNIHOME/all_rules/ubsw/common_includes/specific.debug.include.rules"
+}
+else  {
+    $debugMode = 2
+}
+
+switch ($hn)
+{
+	case "xstm5257dap":
+		@Identifier = @Identifier + "-Dev"
+
+	case "xldn2929dap" | "xstm7743dap":
+		@Identifier = @Identifier + "-Eng"
+	
+	default:
+		#Do nothing
+}
+

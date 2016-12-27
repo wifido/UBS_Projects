@@ -1,0 +1,6 @@
+map(name="ProdOps_IRD_MAP_FIRST",bgImage="",bgColor="black",w="250",h="650",acl="*")
+text(color="yellow",action="Open URL",label="4. Monitor Database",target="_self",style="b",y="142",entity="",url="db.html",size="12",name="DatabaseLink",x="58",justify="center",font="Helvetica")
+text(color="yellow",action="Open URL",label="3. Monitor Batch / Job",target="_self",style="b",y="111",entity="",url="batches.html",size="12",name="BatchLink",x="59",justify="center",font="Helvetica")
+text(color="yellow",action="Open URL",label="2. Monitor NCS / NWK",target="_self",style="b",y="80",entity="",url="contents.html",size="12",name="NCSLink",x="59",justify="center",font="Helvetica")
+text(color="yellow",action="Active Event List (AEL)",label="1. Monitor CMP / BOX",target="contents",style="b",y="50",entity="",url="contents.html",size="12",name="CMPLink",x="60",justify="center",font="Helvetica")
+text(color="blue",action="Open URL",label="IRD Monitoring System",target="_self",style="b",y="17",entity="",url="",size="15",name="Title",x="45",justify="center",font="Helvetica")

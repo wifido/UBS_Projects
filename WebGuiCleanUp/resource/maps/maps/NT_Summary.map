@@ -1,0 +1,7 @@
+map(name="NT_Summary",bgColor="white",w=250,h=352,acl="*")
+text(name="visual_6",label="SSM Alerts",x=102,y=147,action="go",url="",target="_self",entity="",font="TimesRoman",size=20,justify="center",style="b",color="black")
+button(name="visual_5",label="untitled",x=12,y=132,action="ael",url="",target="_blank",entity="SSM_Alerts",w=69,h=25,type="rectangle",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+text(name="visual_4",label="XMP Connector",x=99,y=96,action="go",url="",target="_self",entity="",font="TimesRoman",size=20,justify="center",style="b",color="black")
+button(name="visual_3",label="untitled",x=10,y=80,action="ael",url="",target="_blank",entity="XMP_Connector",w=70,h=25,type="rectangle",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")
+text(name="visual_2",label="MOM Traps",x=99,y=44,action="go",url="",target="_self",entity="",font="TimesRoman",size=20,justify="center",style="b",color="black")
+button(name="visual_1",label="untitled",x=8,y=27,action="ael",url="",target="_blank",entity="MOM_test",w=73,h=24,type="rectangle",arc diameter=20,legend=None,font="Helvetica",size=10,font color="black",style="+_fontStyle+")

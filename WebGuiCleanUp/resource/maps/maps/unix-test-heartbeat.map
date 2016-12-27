@@ -1,0 +1,2 @@
+map(name="unix-test-heartbeat",bgColor="white",w=250,h=250,acl="*")
+monitor(name="visual_1",label="untitled",x=80,y=105,action="go",url="$(SERVER)/Template/ael.html?System_Filter=unix-heartbeat-down",target="_blank",entity="unix-heartbeat-down",w=100,h=50,w=100,h=50,type="lavalamp",show label=true,show total=false,show highest=false,show lowest=false,show metric=false,foreground color=black,background color=lightGray,font=Helvetica,size=10,style=p,show highest severity as border=false)

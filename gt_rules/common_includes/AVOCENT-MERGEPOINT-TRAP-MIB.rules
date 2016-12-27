@@ -1,0 +1,592 @@
+#################################################################################
+#
+#    AVOCENT-MERGEPOINT-TRAP-MIB rules file original generated bu Chris's Mib2Rules script
+#
+#################################################################################
+
+
+
+case "AVOCENT-MERGEPOINT-TRAP-MIB" :
+	$ruleset = $ruleset + " AVOCENT-MERGEPOINT-TRAP-MIB"
+	@Agent = $enterprise
+#	These are temp values that need to be set correctly
+	@Class = 2071939
+	@Subclass = "AVOCENT-MERGEPOINT"
+	@OwnerGID = 468
+	$ruleset = $ruleset + " ST = " + $specific-trap
+	switch ($specific-trap)  
+	{
+        case "1":
+              $trapObjectUserName = $1
+
+              @AlertGroup = "rebootStarted"
+              @AlertKey = $trapObjectUserName
+              @Summary = "The appliance is rebooting. Command issued by user: " + $trapObjectUserName            
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "2":
+              $trapObjectUserName = $1
+              $trapObjectSessionType = $2
+
+              @AlertGroup = "UserLogin"
+              @AlertKey = $trapObjectUserName
+              @Summary = "User logged in successfully. User " + $trapObjectUserName + "Session Type: " + $trapObjectSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "3":
+              $trapObjectUserName = $1
+              $trapObjectSessionType = $2
+
+              @AlertGroup = "UserLogin"
+              @AlertKey = $trapObjectUserName
+              @Summary = "User logged out. User: " + $trapObjectUserName + "Session Type: " + $trapObjectSessionType
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "4":
+              $trapObjectUserName = $1
+
+              @AlertGroup = "UserLogin"
+              @AlertKey = $trapObjectUserName
+              @Summary = "User login failed. User: " + $trapObjectUserName 
+              @Severity = 1
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "8":
+              $trapObjectDeviceName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectAlertIndex = $3
+              $trapObjectAlertString = $4
+              $trapObjectAlertMessage = $5
+
+              @AlertGroup = "PortAlert"
+              @AlertKey = $trapObjectDeviceName
+              @Summary = "An device alert was detected. Device name: " + $trapObjectDeviceName + "Device number: " + $trapObjectDeviceNumber + "Device alert index: " + $trapObjectAlertIndex + "Device alert string: " + $trapObjectAlertString + "Line text: " + $trapObjectAlertMessage
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "11":
+              $trapObjectUserName = $1
+              $trapObjectDaemonName = $2
+
+              @AlertGroup = "Daemon"
+              @AlertKey = $trapObjectDaemonName
+              @Summary = "Network daemon started: User " + $trapObjectUserName + "Daemon " + $trapObjectDaemonName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "12":
+              $trapObjectUserName = $1
+              $trapObjectDaemonName = $2
+
+              @AlertGroup = "Daemon"
+              @AlertKey = $trapObjectDaemonName
+              @Summary = "Network daemon stopped. User: " + $trapObjectUserName + "Daemon: " + $trapObjectDaemonName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "13":
+              $trapObjectUserName = $1
+              $trapObjectTargetUserName = $2
+
+              @AlertGroup = "adminSessionTerminatedTrap"
+              @AlertKey = ""
+              @Summary = "Session Terminated. Command issued by user: " + $trapObjectUserName + "Terminated user: " + $trapObjectTargetUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "14":
+              $trapObjectUserName = $1
+
+              @AlertGroup = "configurationSavedTrap"
+              @AlertKey = ""
+              @Summary = "Configuration saved to flash by User: " + $trapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "15":
+              $trapObjectUserName = $1
+
+              @AlertGroup = "configurationActivatedTrap"
+              @AlertKey = ""
+              @Summary = "Configuration activated by User: " + $trapObjectUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "16":
+              $trapObjectUserName = $1
+              $trapObjectTargetUserName = $2
+
+              @AlertGroup = "localUserAddedTrap"
+              @AlertKey = ""
+              @Summary = "A user was added to the local user database. Command issued by user: " + $trapObjectUserName + "New user: " + $trapObjectTargetUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "17":
+              $trapObjectUserName = $1
+              $trapObjectTargetUserName = $2
+
+              @AlertGroup = "localUserDeletedTrap"
+              @AlertKey = ""
+              @Summary = "A user was deleted from the local user database. Command issued by user: " + $trapObjectUserName + "Deleted user: " + $trapObjectTargetUserName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "18":
+              $trapObjectDataBufferSize = $1
+
+              @AlertGroup = "dataBufferFullThresholdLowTrap"
+              @AlertKey = ""
+              @Summary = "Data-buffering level reached low Threshold. Buffer Size: " + $trapObjectDataBufferSize
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "19":
+              $trapObjectDataBufferSize = $1
+
+              @AlertGroup = "dataBufferFullThresholdMedTrap"
+              @AlertKey = ""
+              @Summary = "Data-buffering level reached medium Threshold. Buffer Size: " + $trapObjectDataBufferSize
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "20":
+
+              @AlertGroup = "dataBufferFullLostDataTrap"
+              @AlertKey = ""
+              @Summary = "Data-buffering data has been discarded because buffer is full." 
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "21":
+
+              @AlertGroup = "applianceDataBufferLostTrap"
+              @AlertKey = ""
+              @Summary = "Data-buffering data has been discarded because buffer is full." 
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "22":
+              $trapObjectAuxPortName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMCount = $3
+              $trapObjectPMSocketCount = $4
+
+              @AlertGroup = "pmOnlineTrap"
+              @AlertKey = ""
+              @Summary = "Power Device is online. Port Name: " + $trapObjectAuxPortName + "Port Number " + $trapObjectAuxPortNumber + "Power Device Count: " + $trapObjectPMCount + "Total Socket Count: " + $trapObjectPMSocketCount
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "23":
+              $trapObjectAuxPortName = $1
+              $trapObjectAuxPortNumber = $2
+
+              @AlertGroup = "pmOfflineTrap"
+              @AlertKey = ""
+              @Summary = "A chain of power device is off-line. Port Name: " + $trapObjectAuxPortName + "Port Number " + $trapObjectAuxPortNumber
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "24":
+              $trapObjectUserName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMSocketNumber = $3
+              $trapObjectPMSocketName = $4
+
+              @AlertGroup = "pmSocketTurnedOnTrap"
+              @AlertKey = ""
+              @Summary = "The on command was issued to a power device socket. Command issued by user: " + $trapObjectUserName + "Power device port number: " + $trapObjectAuxPortNumber + "Socket number: " + $trapObjectPMSocketNumber + "Socket name: " + $trapObjectPMSocketName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "25":
+              $trapObjectUserName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMSocketNumber = $3
+              $trapObjectPMSocketName = $4
+
+              @AlertGroup = "pmSocketTurnedOffTrap"
+              @AlertKey = ""
+              @Summary = "The off command was issued to a power device socket. Command issued by user: " + $trapObjectUserName + "Power device port number: " + $trapObjectAuxPortNumber + "Socket number: " + $trapObjectPMSocketNumber + "Socket name: " + $trapObjectPMSocketName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "26":
+              $trapObjectUserName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMSocketNumber = $3
+              $trapObjectPMSocketName = $4
+
+              @AlertGroup = "pmSocketCycledTrap"
+              @AlertKey = ""
+              @Summary = "The cycle command was issued to a power device socket. Command issued by user: " + $trapObjectUserName + "Power device port number: " + $trapObjectAuxPortNumber + "Socket number: " + $trapObjectPMSocketNumber + "Socket name: " + $trapObjectPMSocketName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "27":
+              $trapObjectAuxPortName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMNumber = $3
+              $trapObjectCyPMCurrentValue = $4
+
+              @AlertGroup = "pmMaxLoadThresholdReachedTrap"
+              @AlertKey = ""
+              @Summary = "Power device exceeded the maximum threshold. Power device port name: " + $trapObjectAuxPortName + "Power device port number: " + $trapObjectAuxPortNumber + "Power device number: " + $trapObjectPMNumber + "Current detected: " + $trapObjectCyPMCurrentValue + "AMPs" 
+              @Severity = 3
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "28":
+              $trapObjectAuxPortName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMNumber = $3
+              $trapObjectCyPMCurrentValue = $4
+
+              @AlertGroup = "pmMinLoadThresholdReachedTrap"
+              @AlertKey = ""
+              @Summary = "Power device reached the minimum load threshold. Power device port name: " + $trapObjectAuxPortName + "Power device port number: " + $trapObjectAuxPortNumber + "Power device number: " + $trapObjectPMNumber + "Current detected: " + $trapObjectCyPMCurrentValue + "AMP" 
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "29":
+              $trapObjectUserName = $1
+              $trapObjectAlertIndex = $2
+              $trapObjectAlertString = $3
+              $trapObjectAlertMessage = $4
+
+              @AlertGroup = "applianceAlertTrap"
+              @AlertKey = ""
+              @Summary = "A alert string was detected on the appliance. User name: " + $trapObjectUserName + "Alert index: " + $trapObjectAlertIndex + "Alert string: " + $trapObjectAlertString + "Line text: " + $trapObjectAlertMessage
+              @Severity = 5
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "30":
+              $trapObjectUserName = $1
+              $trapFirmwareVersion = $2
+              $trapNewFirmwareVersion = $3
+
+              @AlertGroup = "firmwareUpgradeStarted"
+              @AlertKey = ""
+              @Summary = "Firmware upgrade started. Command issued by user: " + $trapObjectUserName + "New version: " + $trapFirmwareVersion + "Current version: " + $trapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "31":
+              $trapFirmwareUpdateResult = $1
+              $trapNewFirmwareVersion = $2
+
+              @AlertGroup = "firmwareUpgradeResultsTrap"
+              @AlertKey = ""
+              @Summary = "Firmware upgrade result. Result " + $trapFirmwareUpdateResult + "Firmware Version: " + $trapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "32":
+              $trapObjectUserName = $1
+              $trapObjectAuxPortName = $2
+              $trapObjectAuxPortNumber = $3
+              $trapObjectPMNumber = $4
+              $trapFirmwareVersion = $5
+              $trapNewFirmwareVersion = $6
+
+              @AlertGroup = "pmFirmwareUpgradeStarted"
+              @AlertKey = ""
+              @Summary = "Firmware upgrade started. Command issued by user: " + $trapObjectUserName + "Power device name: " + $trapObjectAuxPortName + "Power device port number: " + $trapObjectAuxPortNumber + "Power device number: " + $trapObjectPMNumber + "Current version: " + $trapFirmwareVersion + "New Version: " + $trapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "33":
+              $trapObjectAuxPortName = $1
+              $trapObjectAuxPortNumber = $2
+              $trapObjectPMNumber = $3
+              $trapFirmwareUpdateResult = $4
+              $trapNewFirmwareVersion = $5
+
+              @AlertGroup = "pmFirmwareUpgradeResultsTrap"
+              @AlertKey = ""
+              @Summary = "Firmware upgrade result. Power device name: " + $trapObjectAuxPortName + "Power device port: " + $trapObjectAuxPortNumber + "Power device number: " + $trapObjectPMNumber + "Result: " + $trapFirmwareUpdateResult + "New Firmware Version: " + $trapNewFirmwareVersion
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "50":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceAuth"
+              @AlertKey = ""
+              @Summary = "A user has failed to log into a device. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "51":
+              $trapObjectUserName = $1
+              $trapObjectCommand = $2
+              $trapObjectDeviceNumber = $3
+              $trapObjectDeviceName = $4
+
+              @AlertGroup = "deviceCommandFailureTrap"
+              @AlertKey = ""
+              @Summary = "A users command has failed. User " + $trapObjectUserName + "" + $trapObjectCommand + "Device ID: " + $trapObjectDeviceNumber + "Device Name " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "55":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceSPConsoleLoginTrap"
+              @AlertKey = ""
+              @Summary = "Service Processor Console Log in. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "56":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceSPConsoleLogoutTrap"
+              @AlertKey = ""
+              @Summary = "Service Processor Console Logout. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "57":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceConsoleLoginTrap"
+              @AlertKey = ""
+              @Summary = "Device Login. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "58":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceDirectLogoutTrap"
+              @AlertKey = ""
+              @Summary = "Device Logout. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "60":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "nativeIPEnabledTrap"
+              @AlertKey = ""
+              @Summary = "NativeIP is enabled. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "61":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "nativeIPDisabledTrap"
+              @AlertKey = ""
+              @Summary = "NativeIP is disabled. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "62":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "sshTunnelInUseTrap"
+              @AlertKey = ""
+              @Summary = "SSH Tunnel is in use. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "63":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "sshTunnelNotInUseTrap"
+              @AlertKey = ""
+              @Summary = "SSH Tunnel is no longer in use. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "64":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceDirectCommandEnableTrap"
+              @AlertKey = ""
+              @Summary = "Direct Command Enabled. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "65":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceDirectCommandDisableTrap"
+              @AlertKey = ""
+              @Summary = "Direct Command Disable. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "70":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceResetTrap"
+              @AlertKey = ""
+              @Summary = "Device has been reset. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "71":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "devicePowerUpTrap"
+              @AlertKey = ""
+              @Summary = "Device has been powered up. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "72":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "devicePowerDownTrap"
+              @AlertKey = ""
+              @Summary = "Device has been powered down. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "73":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "devicePowerCycleTrap"
+              @AlertKey = ""
+              @Summary = "Device has been power cycled. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "90":
+              $trapObjectUserName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceName = $3
+
+              @AlertGroup = "deviceEventLogClearedTrap"
+              @AlertKey = ""
+              @Summary = "Device data log buffer cleared. User: " + $trapObjectUserName + "Device ID: " + $trapObjectDeviceNumber + "Device Name: " + $trapObjectDeviceName
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "91":
+              $trapObjectDeviceName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDataBufferSize = $3
+
+              @AlertGroup = "deviceEventLogFullLostTrap"
+              @AlertKey = ""
+              @Summary = "Device data log buffer full. Device Name " + $trapObjectDeviceName + "Device Number: " + $trapObjectDeviceNumber + "Buffer size " + $trapObjectDataBufferSize
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "95":
+              $trapObjectDeviceName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectAlertMessage = $3
+              $trapObjectAlertString = $4
+
+              @AlertGroup = "deviceAlertTrap"
+              @AlertKey = ""
+              @Summary = "A device alert string was detected. Device Name: " + $trapObjectDeviceName + "Device Number: " + $trapObjectDeviceNumber + "Alert String: " + $trapObjectAlertMessage + "Alert Line Text: " + $trapObjectAlertString
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+        case "96":
+              $trapObjectDeviceName = $1
+              $trapObjectDeviceNumber = $2
+              $trapObjectDeviceSensorName = $3
+              $trapObjectDeviceSensorAlarmId = $4
+
+              @AlertGroup = "deviceSensorAlarmTrap"
+              @AlertKey = ""
+              @Summary = "A device sensor alarm was detected. Device Name: " + $trapObjectDeviceName + "Device Number: " + $trapObjectDeviceNumber + "Sensor Name: " + $trapObjectDeviceSensorName + "Sensor Alarm Id: " + $trapObjectDeviceSensorAlarmId
+              @Severity = 2
+              @Type = 1
+              $IdentifierAddOn = ""
+
+         default:
+            $ruleset = $ruleset + "-case:default"
+            @Summary = "Unknown specific trap number (" + $specific-trap + ") received for enterprise " + $enterprise
+            @Severity = 1
+
+	}
+	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertGroup + @AlertKey + @Type + $IdentifierAddOn
+

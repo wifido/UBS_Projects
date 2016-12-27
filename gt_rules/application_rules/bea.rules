@@ -1,0 +1,409 @@
+#
+# Initial BEA WebLogic rules for characterisation - Alan Charlton - Abilitec
+#
+
+    case "beaSysDescr":
+    	$ruleset = $ruleset + " BEA beaSysDesc -SpecTrap " + $specific-trap
+#	20060619	Changes by Chris Janes of Abilitec at the request of Zameel
+	@Class = 80400
+#	20070126	Changes by Chris Janes of Abilitec
+	@OwnerGID = 586
+#	200700126	End of Changes
+	$TempDoLookup = 2
+#	20060619	End of changes
+        switch ($specific-trap)  {
+            case "306":
+            	@AlertKey = $1
+                @AlertGroup = "tranStateErrTrap"
+                @Summary = "Rule ID " + $1 + " has triggered from OK to ERR state"
+                @Type = 1
+                @Severity = 4
+                
+            case "307":
+            	@AlertKey = $1
+                @AlertGroup = "tranStateErrTrap"
+                @Summary = "Rule ID " + $1 + " has triggered from ERR to OK state"
+                @Type = 2
+                @Severity = 1
+                
+            default:
+		$ruleset = $ruleset + " def"
+            	@Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        }
+    
+    @Agent = "BEA WebLogic"
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey
+
+    case "tuxedo":
+    	$ruleset = $ruleset + " BEA tuxedo -SpecTrap " + $specific-trap
+        switch ($specific-trap){
+            case "1":
+                $ruleset = $ruleset + "-case : 1"
+                @AlertKey = $1
+                @AlertGroup = "resourceConfigTrap"
+                #@Summary = "Trap resourceConfigTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "2":
+                # machineBroadcastTrap
+                @AlertKey = $1
+                @AlertGroup = "machineBroadcastTrap"
+                #@Summary = "Trap machineBroadcastTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+				
+            case "3":
+                # machineConfigTrap
+                @AlertKey = $1
+                @AlertGroup = "machineConfigTrap"
+                #@Summary = "Trap machineConfigTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "4":
+                # machineFullMaxAccessersTrap
+                @AlertKey = $1
+                @AlertGroup = "machineFullMaxAccessersTrap"
+                #@Summary = "Trap machineFullMaxAccessersTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "5":
+                # machineFullMaxConvTrap
+                @AlertKey = $1
+                @AlertGroup = "machineFullMaxConvTrap"
+                #@Summary = "Trap machineFullMaxConvTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "6":
+                # machineFullMaxGttTrap
+                @AlertKey = $1
+                @AlertGroup = "machineFullMaxGttTrap"
+                #@Summary = "Trap machineFullMaxGttTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "7":
+                # machineFullMaxWsClientsTrap
+                @AlertKey = $1
+                @AlertGroup = "machineFullMaxWsClientsTrap"
+                #@Summary = "Trap machineFullMaxWsClientsTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "8":
+                # machineMsgQTrap
+                @AlertKey = $1
+                @AlertGroup = "machineMsgQTrap"
+                #@Summary = "Trap machineMsgQTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "9":
+                # machinePartitionedTrap
+                @AlertKey = $1
+                @AlertGroup = "machinePartitionedTrap"
+                #@Summary = "Trap machinePartitionedTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "10":
+                # machineSlowTrap
+                @AlertKey = $1
+                @AlertGroup = "machineSlowTrap"
+                #@Summary = "Trap machineSlowTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "11":
+                # machineStateTrap
+                @AlertKey = $1
+                @AlertGroup = "machineStateTrap"
+                #@Summary = "Trap machineStateTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "12":
+                # networkConfigTrap
+                @AlertKey = $1
+                @AlertGroup = "networkConfigTrap"
+                #@Summary = "Trap networkConfigTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "13":
+                # networkDroppedTrap
+                @AlertKey = $1
+                @AlertGroup = "networkDroppedTrap"
+                #@Summary = "Trap networkDroppedTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "14":
+                # networkFailureTrap
+                @AlertKey = $1
+                @AlertGroup = "networkFailureTrap"
+                #@Summary = "Trap networkFailureTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "15":
+                # networkFlowTrap
+                @AlertKey = $1
+                @AlertGroup = "networkFlowTrap"
+                #@Summary = "Trap networkFlowTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "16":
+                # networkStateTrap
+                @AlertKey = $1
+                @AlertGroup = "networkStateTrap"
+                #@Summary = "Trap networkStateTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "17":
+                # serverCleaningTrap
+                @AlertKey = $1
+                @AlertGroup = "serverCleaningTrap"
+                #@Summary = "Trap serverCleaningTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "18":
+                # serverConfigTrap
+                @AlertKey = $1
+                @AlertGroup = "serverConfigTrap"
+                #@Summary = "Trap serverConfigTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "19":
+                # serverDiedTrap
+                @AlertKey = $1
+                @AlertGroup = "serverDiedTrap"
+                #@Summary = "Trap serverDiedTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "20":
+                # serverInitTrap
+                @AlertKey = $1
+                @AlertGroup = "serverInitTrap"
+                #@Summary = "Trap serverInitTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "21":
+                # serverMaxgenTrap
+                @AlertKey = $1
+                @AlertGroup = "serverMaxgenTrap"
+                #@Summary = "Trap serverMaxgenTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "22":
+                # serverRestartingTrap
+                @AlertKey = $1
+                @AlertGroup = "serverDiedTrap"
+                #@Summary = "Trap serverRestartingTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 2
+                
+            case "23":
+                # serverStateTrap
+                @AlertKey = $1
+                @AlertGroup = "serverStateTrap"
+                #@Summary = "Trap serverStateTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "24":
+                # serverTpExitTrap
+                @AlertKey = $1
+                @AlertGroup = "serverTpExitTrap"
+                #@Summary = "Trap serverTpExitTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "25":
+                # clientConfigTrap
+                @AlertKey = $1
+                @AlertGroup = "clientConfigTrap"
+                #@Summary = "Trap clientConfigTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "26":
+                # clientDiedTrap
+                @AlertKey = $1
+                @AlertGroup = "clientDiedTrap"
+                #@Summary = "Trap clientDiedTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+                
+            case "27":
+                # clientSecurityTrap
+                @AlertKey = $1
+                @AlertGroup = "clientSecurityTrap"
+                #@Summary = "Trap clientSecurityTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "28":
+                # clientStateTrap
+                @AlertKey = $1
+                @AlertGroup = "clientStateTrap"
+                #@Summary = "Trap clientStateTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+		
+            case "29":
+                # transHeuristicAbortTrap
+                @AlertKey = $1
+                @AlertGroup = "transHeuristicAbortTrap"
+                #@Summary = "Trap transHeuristicAbortTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+
+            case "30":
+                # transHeuristicCommitTrap
+                @AlertKey = $1
+                @AlertGroup = "transHeuristicCommitTrap"
+                #@Summary = "Trap transHeuristicCommitTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+
+            case "31":
+                # eventDeliveryTrap
+                @AlertKey = $1
+                @AlertGroup = "eventDeliveryTrap"
+                #@Summary = "Trap eventDeliveryTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+
+            case "32":
+                # eventFailureTrap
+                @AlertKey = $1
+                @AlertGroup = "eventFailureTrap"
+                #@Summary = "Trap eventFailureTrap received, tuxEventsName=" + $1 + ", tuxEventsSeverity=" + $2 + ", tuxEventsLmid=" + $3 + ", tuxEventsTime=" + $4 + ", tuxEventsUsec=" + $5 + ", tuxEventsDescription=" + $6 + ", tuxEventsClass=" + $7 + ", tuxEventsUlogCat=" + $8 + ", tuxEventsUlogMsgNum=" + $9 + ", beaDomainID=" + $10 + ", beaDomainKey=" + $11 + ", beaLogicalAgentName=" + $12 + ""
+                @Summary = $6
+                @Type = 1
+
+            default:
+                $ruleset = $ruleset + "-case : def"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+        }
+        switch ($2)  {
+            case "1":
+                @Severity = 4
+            case "2":
+                @Severity = 3
+            case "3":
+                @Severity = 2
+            default:
+        }
+    
+    @Agent = "BEA WebLogic"
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey
+
+    case "wls":
+    $ruleset = $ruleset + " BEA wls -SpecTrap " + $specific-trap
+#	20060619	Changes by Chris Janes of Abilitec at the request of Zameel
+	@Class = 80400
+#	20070126	Changes by Chris Janes of Abilitec
+	@OwnerGID = 586
+#	200700126	End of Changes
+	$TempDoLookup = 2
+#	20060619	End of changes
+    	switch ($specific-trap)  {
+            case "60":
+           	# wlsLogNotification
+                @AlertKey = $2 + ":" + $7 + ":" + $8
+                @AlertGroup = "wlsLogNotification"
+                #@Summary = "Trap wlsLogNotification received, trapTime=" + $1 + ", trapServerName=" + $2 + ", trapMachineName=" + $3 + ", trapLogThreadId=" + $4 + ", trapLogTransactionId=" + $5 + ", trapLogUserId=" + $6 + ", trapLogSubsystem=" + $7 + ", trapLogMsgId=" + $8 + ", trapLogSeverity=" + $9 + ", trapLogMessage=" + $10 + ""
+		if (regmatch($10, "^.*:.*:.*:.*$"))  {
+               	    @Summary = extract($10, "^(.*:.*:.*:).*$")
+		}
+		else  {
+		    @Summary = $10
+		}
+                @Type = 1
+		switch (upper($9))  {
+		    case "DEBUG":
+			@Severity = 2
+		    case "INFO":
+			@Severity = 2
+		    case "WARNING":
+			@Severity = 3
+		    case "ERROR":
+			@Severity = 4
+		    case "NOTICE":
+			@Severity = 4
+		    case "CRITICAL":
+			@Severity = 5
+		    case "ALERT":
+			@Severity = 5
+		    case "EMERGENCY":
+			@Severity = 5
+		    default:
+			@Severity = 4
+		}	
+
+            case "65":
+            	# wlsServerStart
+                @AlertKey = $2
+                @AlertGroup = "wlsServerShutDown"
+                #@Summary = "Trap wlsServerStart received, trapTime=" + $1 + ", trapServerName=" + $2 + ""
+                @Summary = "WebLogic server " + $2 + " started at " + $1
+                @Severity = 1
+                @Type = 2
+			
+            case "70":
+                # wlsServerShutDown
+                @AlertKey = $2
+                @AlertGroup = "wlsServerShutDown"
+                #@Summary = "Trap wlsServerShutDown received, trapTime=" + $1 + ", trapServerName=" + $2 + ""
+                @Summary = "WebLogic server " + $2 + " shut down at " + $1
+                @Severity = 4
+                @Type = 1
+		
+            case "75":
+                # wlsMonitorNotification
+                @AlertKey = $2 + ":" + $3 + ":" + $5
+                @AlertGroup = "wlsMonitorNotification"
+                #@Summary = "Trap wlsMonitorNotification received, trapTime=" + $1 + ", trapServerName=" + $2 + ", trapMonitorType=" + $3 + ", trapMonitorThreshold=" + $4 + ", trapMonitorValue=" + $5 + ", trapMBeanName=" + $6 + ", trapMBeanType=" + $7 + ", trapAttributeName=" + $8 + ""
+                @Summary = "Threshold of " + $4 + " exceeded: now " + $5
+                @Severity = 2
+                @Type = 1
+		
+            case "80":
+                # wlsAttributeChange
+                @AlertKey = $5
+                @AlertGroup = "wlsAttributeChange"
+                #@Summary = "Trap wlsAttributeChange received, trapTime=" + $1 + ", trapServerName=" + $2 + ", trapMBeanName=" + $3 + ", trapMBeanType=" + $4 + ", trapAttributeName=" + $5 + ", trapAttributeType=" + $6 + ", trapAttributeChangeType=" + $7 + ", trapAttributeOldVal=" + $8 + ", trapAttributeNewVal=" + $9 + ""
+                @Summary = "Attribute changed (see AlertKey): type=" + $6 + "; change=" + $7
+                @Severity = 3
+                @Type = 1
+                
+            default:
+                $ruleset = $ruleset + " def"
+                @Summary = "Unknown " + $enterprise-name + " specific trap " + $enterprise + "." + $specific-trap
+                @Severity = 2
+                @AlertGroup = $enterprise-name
+                @AlertKey = $specific-trap
+                
+        }
+    @Agent = "BEA WebLogic"
+    $tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @AlertKey
+
+

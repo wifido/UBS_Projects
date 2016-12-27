@@ -1,0 +1,39 @@
+case "procmon":
+	$ruleset = $ruleset + " procmon"
+	@Agent = $Transport
+	@Manager = 'SystemWatch'
+	@Class = 0
+	@Summary = $MessageText
+	###@Stream = $Stream
+	###$temp_length_location = length($Location)
+	###if (exists($Location) && int($temp_length_location) > 0)
+	###{
+		###@Location = $Location
+	###}
+	@Environment = $Environment
+	@Subclass = $Subclass
+	@UserData = $Userdata
+	@UserInt = $Userint
+	###@SAPNumber = $SAPnumber
+	if (exists($Component))
+	{
+		@AlertKey = $Component
+	}
+	else
+	{
+		@AlertKey = $SAPname
+	}
+	
+	@AlertGroup = $EventIdentifier
+	###if (exists($ProcessID) && int($ProcessID) > 0)
+	###{
+		###@AlertGroup = $EventIdentifier + "-" + $ProcessID
+	###}
+	#
+	
+	$tempEventType = $EventType
+	@Display_Hide = 0
+	$TempDoLookup = 2
+	@OwnerGID = 591
+	@OwnerUID = 65534
+	$tempIdentifier = @NodeAlias + @AlertGroup + @AlertKey

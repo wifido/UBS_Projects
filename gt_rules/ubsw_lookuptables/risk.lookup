@@ -1,0 +1,41 @@
+#	risk.lookup created by Chris Janes of Abilitec
+#	1st September 2006
+
+
+
+#This table defines the SLA time (in Secounds) for each Risk Level
+
+#	Risk Level, SLA Time for Critical, SLA Time for Major , SLA Time for Minor
+table RiskSevSLA =
+{
+{"ESS Systemic Risk (External)","900","900","2700"}	
+{"ESS Systemic Risk (Ext)","900","900","2700"}	
+{"ESS UBS Survival Risk (Internal)","1200","1200","2700"}	
+{"ESS UBS Survival Risk (Int)","1200","1200","2700"}	
+{"ESS UBS Continuity Risk (Internal)","1800","1800","2700"}
+{"ESS UBS Continuity Risk (Int)","1800","1800","2700"}
+{"ESS Business desirable","1800","1800","2700"}
+{"OPS Default","300","600","900"}
+{"ISC Default","300","300","300"}
+{"Monitoring","1200","1200","1200"}
+}
+default = {"0","0","0"}
+
+##############################################################################
+#
+#	This Table Added  by Chris Janes of Abilitec 20080812 - TD 5004
+#
+##############################################################################
+
+table GroupRisk =
+{
+	{"999999","Monitoring"}
+	{"162","OPS Default"}
+	{"773","OPS Default"}
+	{"1468","ISC Default"}
+	{"1008","ISC Default"}
+	{"1542","ISC Default"}
+	{"1239","ISC Default"}
+}
+default = {"None"}
+

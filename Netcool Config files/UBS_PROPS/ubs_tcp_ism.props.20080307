@@ -1,0 +1,78 @@
+#######################################################################
+#
+#       Copyright (C) 1997, 1998, Omnibus Transport Technologies Ltd.
+#       All Rights Reserved
+#
+#       RESTRICTED RIGHTS:
+#
+#       This file may have been supplied under a license.
+#       It may be used, disclosed, and/or copied only as permitted
+#       under such license agreement.  Any copy must contain the
+#       above copyright notice and this restricted rights notice.
+#       Use, copying, and/or disclosure of the file is strictly
+#       prohibited unless otherwise provided in the license agreement.
+#
+#
+# Ident: $Id: tcpport.props,v 1.1 2002/07/10 11:30:38 nik Development $
+#
+#######################################################################
+
+#######################################################################
+#
+# Properties supported by this monitor:
+#
+# Property Name                 Default
+#
+# PreviousFields        :       "NONE"
+# Manager               :       "Internet Service Monitors"
+# MaxLogFileSize        :       1048576
+# Name                  :       "TCPPORT"
+# Manager               :       "Internet Service Monitors"
+# PropsFile             :       "$OMNIHOME/monitors/<arch>/tcpport.props"
+# ConfigFile            :       ""
+# ConfigurationCheckInterval :	1
+# Datalog               :       0
+# DatalogFormat         :       "$lookupTime (seconds)|$connectTime (seconds)|$downloadTime (seconds)"
+# Domain                :       ""
+# FullHostInfo		:	0
+# IgnoreUnmatchedDVC    :       0
+# IpAddress             :       ""
+# MaxCCA                :       10
+# MessageLog            :       "$OMNIHOME/log/tcpport.log"
+# MessageLevel          :       "warn"
+# MinPoll               :       60
+# MonitorDisconnect	:	0
+# NewProfileCheckMultiple :	10
+# OutputResult		:	0
+# OutputDirectory	:	"$OMNIHOME/var"
+# Profile               :       "*"
+# SingleLineMatch	:	0
+# Help                  :       0
+# Version               :       0
+# WaitFor#              :       ""
+# Send#                 :       ""
+#
+# Brige Properties
+# ================
+# BridgePort            :       9510
+# BridgeTimeout         :       10
+# QFile                 :       "$OMNIHOME/var/sm_tcpport.saf
+# QSize                 :       1024000       
+# NoRecover             :       0
+#
+#######################################################################
+
+#######################################################################
+#
+# Add your settings here
+#
+#######################################################################
+Datalog : 1 
+FullHostInfo : 1
+MaxCCA :  128
+#MaxLogFileSize : 40960000
+MsgDailyLog : 0
+MessageLevel : "debug"
+MonitorDisconnect : 1
+WaitFor1 : ""
+Manager               :       "LDNTCPPORTPROD1"

@@ -1,0 +1,64 @@
+###############################################################################
+#
+#    foglight_V2.rules 
+#
+###############################################################################
+#
+# 1.0 - Initial Release. 20070205	Chris Janes of Abilitec
+#					Please note this is for SNMP V2 traps the existing
+#					rules file (foglight.rules) deals with SNMP V1 traps 
+#
+#
+###############################################################################
+case "Foglight":
+    $ruleset = $ruleset + "-case:Foglight V2 " 
+    @Agent = "Quest-Foglight Network Monitor Agent"
+    if (regmatch($community,"^[0-9]+:.*$"))
+        	{
+            		@Class = extract($community,"(^[0-9]+):.*$")
+         	        @Subclass = extract($community,"^[0-9]+:(.*$)")
+        	}
+        else 
+        	{
+        		@Class = 1000217
+#        		@Class = 999999 # details
+    			@Subclass = 999
+        	}
+    @OwnerGID=lookup(@Subclass,foglight_subclass) 
+    @OwnerUID = 65534
+    $TempDoLookup = 2
+
+
+    $fgAgentMsg = $1
+    $fgAgentIdString = $2
+
+    @AlertKey = $fgAgentIdString
+    @Summary = $cwfgAgentMsg1
+    $ruleset = $ruleset + "SpecTrap " + $specific-trap
+    switch ($specific-trap)
+    {
+        case "0": ### clear
+            @Severity = 1
+            @Type = 2
+        case "1": ### informational
+            @Severity = 3
+            @Type = 1
+            @ExpireTime = 900
+        case "2": ### warning
+            @Severity = 3
+            @Type = 1
+        case "3": ### critical
+            @Severity = 4
+            @Type = 1
+        case "4": ### fatal
+            @Severity = 5
+            @Type = 1
+        default:
+            @Severity = 3
+            @Type = 1
+    }
+
+	@AlertGroup = lookup($enterprise, foglight_OID)
+
+    $tempIdentifier = @Node + " " + @AlertKey + " " + @AlertGroup + " " + @Type + " " + @Agent + " " + @Manager
+

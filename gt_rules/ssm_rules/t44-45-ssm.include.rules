@@ -1,0 +1,72 @@
+        case "44" | "45": ### logMonXFileRemoved || logMonXFileCreated
+
+            	##########
+            	# The SNMP trap generated when a log file can no longer be opened.
+            	#
+           	# $1 = logMonXControlLogFile - Absolute path to the log file being
+           	#        monitored. This field can include the wildcards '*' or '?'
+           	#        to monitor multiple files. For example: to monitor all
+           	#        files is /var/log you would enter '/var/log/*'.
+           	# $2 = logMonXControlDescription - A description of the control
+           	#        row.
+           	##########
+
+		$ruleset = $ruleset + " - Trap 44-45"
+
+            	$logMonXControlLogFile = $1
+            	$logMonXControlDescription = $2
+
+           	@AlertGroup = $logMonXControlDescription
+            	@AlertKey = $logMonXControlLogFile
+
+		$ruleset = $ruleset + ' ST ' + $specific-trap
+            	switch($specific-trap)
+            	{
+            	case "44": # Log file removed
+            		@Summary = "Log file " + $logMonXControlLogFile + " removed"
+            		@Severity = 3
+            		@Type = 1
+            	case "45": # Log file created
+            		@Summary = "Log file " + $logMonXControlLogFile + " created"
+            		@Severity = 1
+            		@Type = 2
+		default: ### don't see how we could get here but......
+            		@Summary = "Trap unknown"
+            		@Severity = 1
+            		@Type = 1
+		}
+
+
+		$NoElements = split($logMonXControlDescription, SplitArray, ":")
+		switch ($NoElements)  
+		{
+       		case "1":
+			$ssmAppClass = $CommunityClass
+		default:
+			$ruleset = $ruleset + '- Split'
+			$ssmAppClass = SplitArray[2]
+			@Subclass = SplitArray[3]
+			@SystemDesig = SplitArray[4]
+			@AlertGroup = SplitArray[5]
+			$tempOwnerGID = lookup($ssmAppClass, SocketClassGID)
+			if (match($tempOwnerGID,"999"))
+			{
+				$ruleset = $ruleset + '- tempOwnerGID = 999'
+				$ssmAppClass = 1670
+			}
+#	Here we dicard unwanted events 
+			if(nmatch(@AlertKey,"/sbcimp/dyn/data/GGL/consol/micromuse/sctMicromuse.log"))
+			{
+				$tempMarkForDiscard = 2
+			}
+			else if(nmatch(@AlertKey,"/sbcimp/dyn/data/EquityPnl/EC/log/tigerLoad_prod.log"))
+			{
+				$tempMarkForDiscard = 2
+			}
+			else if(nmatch(@AlertKey,"/sbcimp/dyn/data/EquityPnl/EC/log/tigerMicromuse_prod.log"))
+			{
+				$tempMarkForDiscard = 2
+			}
+		}
+            	$tempIdentifier = $Node + $enterprise + $generic-trap + $specific-trap + @Type + @AlertGroup + @AlertKey
+
